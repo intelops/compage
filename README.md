@@ -1,10 +1,10 @@
-<p align="center"><img src="compage-2.png" width="360"></p>
+<p align="center"><img src="compage-2.png" width="200"></p>
 <p align="center"><b>Low-Code No-Code for Cloud Native</b></p>
 
 <hr>
 
 # Compage.dev
-Low-Code Framework to develop Microservices, REST APIs, GraphQL API, gRPC, dRPC, WebAssembly code, Temporal.io Workflows, Temporal.io Workers, etc. with visual coding and by automatically applying best practice methods like software supply chain security measures, SBOM, etc. Auto generate code after defining requirements in UI as architecture diagram. 
+Low-Code Framework to develop Rest APIs, gRPC, dRPC, GraphQL APIs, WebAssembly, microservices, FaaS, Temporal workloads, IoT and edge services, K8s controllers, K8s CRDs, K8s custom APIs, K8s Operators, K8s hooks, etc. with visual coding and by automatically applying best practice methods like software supply chain security measures, SBOM, openAPI, cloudevents, vulnerability reports, etc. Auto generate code after defining requirements in UI as architecture diagram.
 
 **Draw the requirements for backend workloads, and then auto generate code, customize it and maintain it.**
 > Our goal is to support both auto-generate code and import existing code. Let's see how far we can go with importing existing code support. One step at a time! 
@@ -15,11 +15,14 @@ Low-Code Framework to develop Microservices, REST APIs, GraphQL API, gRPC, dRPC,
 - Python
 - Node.js
 - Deno
+- Dart
 - WebAssembly
 - Temporal.io 
+- custom K8s resources like API, Controllers, Hooks, CRDs, Operators, etc.
 - Applications/Infra API Gateway
 - Data API Gateway
-- Runtime env in local with everything running in browser via WebAssembly & Containerized OS / Web-Containers (similar to the concepts/designs of browsix, openvscode-server, stackblitz.com, loft vcluster, etc.) 
+- Runtime env in local with everything running in browser via WebAssembly & Containerized OS / Web-Containers (similar to the concepts/designs of browsix, openvscode-server, stackblitz.com, loft vcluster, brainboard, etc.) 
+- **we like to add more support to different concepts. please feel free to suggest.**
 
 > support of different programming languages and frameworks will be added one by one with community contribution.
 
