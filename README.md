@@ -55,12 +55,12 @@ Compage - opensource tool runs in your local or in WebAssembly based Web Contain
 - auto generate the backend code, based on requirements defined via diagram & forms 
 - auto generate the endpoint configs to be able to use with API gateways & service-mesh environments like Kong, Tyk, Easegress, Istio, Linkerd, Kuma, Ngnix, Cilium tools, Calico, etc.
 - easy plug-ins by supporting tools like Ory Hydra, Kratos, Keto, OathKeeper, KeyCloak, Gluu, Janssen, Cerbos, Open Policy Agent, OAuth, OIDC, FIDO, SAML, Dex, MFA, Passwordless, etc. 
-- auto build containers as multi-stage and/or distroless to make them secure, portable and optimal
-- automatically manage the service catalog & their visualization by versioning and integrations, and also git repo observability 
+- auto build containers as multi-stage and/or distroless to make them secure, portable and optimal 
 - automatically take care of all git processes like tagging, versioning, commits, PRs, etc.
 - automatically enforce software supply chain security process like signing the source code for integrity and generating immutable ledger logs, generating SBOM, generating vulnerability report, and also generate configurations to auto verify, validate & control the source code integrity and container image integrity for deployments, etc. in K8s env 
 - automatically convert backend application related environment variables' content to configmaps, secrets, etc. to make the generated backend compatible to K8s of any flavor (K8s, K3s, TalOS, etc.) and also auto configs to support integration with Vault, cert-manager, external secrets, sealed secrets & Venafi tools for TLS/SSL and secrets management 
 - slowly add support for ML development & ML frameworks to make it easy to develop ML applications that will run on Kubernetes 
+- **automatically manage generated code for by auto creating the services catalog & their visualization by versioning and integrations, and also git repo observability** 
 - **please suggest what you would like to add as features**
 
 -------------------------
