@@ -6,7 +6,7 @@
 # Compage.dev
 Low-Code Framework to develop Microservices, REST APIs, GraphQL API, gRPC, dRPC, WebAssembly code, Temporal.io Workflows, Temporal.io Workers, etc. with visual coding and by automatically applying best practice methods like software supply chain security measures, SBOM, etc. Auto generate code after defining requirements in UI as architecture diagram. 
 
-### Draw the requirements for backend, generate code, customize and maintain.
+**Draw the requirements for backend workloads, and then auto generate code, customize it and maintain it.**
 > Our goal is to support both auto-generate code and import existing code. Let's see how far we can go with importing existing code support. One step at a time! 
 
 #### Supports:
