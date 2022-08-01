@@ -21,6 +21,8 @@ Low-Code Framework to develop Rest APIs, gRPC, dRPC, GraphQL APIs, WebAssembly, 
 **Draw the requirements for backend workloads, and then auto generate code, customize it and maintain it.**
 > Our goal is to support both auto-generate code and import existing code. Let's see how far we can go with importing existing code support. One step at a time! 
 
+#
+
 #### Supports:
 - GoLang
 - Rust
@@ -39,9 +41,9 @@ Low-Code Framework to develop Rest APIs, gRPC, dRPC, GraphQL APIs, WebAssembly, 
 > support of different programming languages and frameworks will be added one by one with community contribution.
 
 ------------
-Problem:
+Problems Compage is trying to solve:
 
-problems with current low-code platforms - 
+problems with many of the current low-code platforms - 
 - single programming language support only
 - locked-in infra if you want to choose their cloud hosting
 - no proper support or automation for self-hosting and also lot of dependencies on the low-code/no-code tool itself to run it on your infra
@@ -57,7 +59,7 @@ problems with current low-code platforms -
 
 Solution:
 
-Compage - opensource tool runs in your local or in WebAssembly based Web Containers within the browser :- 
+Compage - opensource tool runs in your local or in WebAssembly based Web Containers within the browser, to visually develop backend workloads for cloud-native & K8s :- 
 - easy to adopt & use UI/UX 
 - built-in vscode, git, container build tools, cosign, etc. 
 - Diagramming library to define the project requirements by drawing the flow of backend workloads
@@ -78,4 +80,4 @@ Compage - opensource tool runs in your local or in WebAssembly based Web Contain
 -------------------------
 ## Getting started
 
-Simply get the container image and spin it up in local or WebAssembly based Web-Container in browser, and you will get everything in one place (vscode and all dev environment you need). 
+Simply get the container image and spin it up in local or WebAssembly based Web-Container in browser, and you will get everything in one place (vscode and the complete dev environment you need). 
