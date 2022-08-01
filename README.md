@@ -2,7 +2,7 @@
 <p align="center"><b>Low-Code No-Code for Cloud Native</b></p>
 
 <p align="center">
-  <a href="https://img.shields.io/github/discussions/kube-tarian/compage">
+  <a href="Github Discussions">
     <img src="https://img.shields.io/github/discussions/kube-tarian/compage" alt="Github Discussions">
   </a>
   <a href="code_of_conduct.md">
@@ -10,6 +10,9 @@
   </a>
   <a href="https://opensource.org/licenses/Apache-2.0">
     <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License">
+  </a>
+  <a href="deepsource-badge">
+    <img src="https://deepsource.io/gh/kube-tarian/compage.svg/?label=active+issues&show_trend=true&token=m1DCdAuysqc5fOcnRlY8GsWA" alt="deepsource">
   </a>
 </p>
 
