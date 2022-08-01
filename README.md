@@ -1,6 +1,18 @@
 <p align="center"><img src="compage-2.png" width="200"></p>
 <p align="center"><b>Low-Code No-Code for Cloud Native</b></p>
 
+<p align="center">
+  <a href="https://img.shields.io/github/discussions/kube-tarian/compage">
+    <img src="https://img.shields.io/github/discussions/kube-tarian/compage" alt="Github Discussions">
+  </a>
+  <a href="code_of_conduct.md">
+    <img src="https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg" alt="Contributor Covenant">
+  </a>
+  <a href="https://opensource.org/licenses/Apache-2.0">
+    <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License">
+  </a>
+</p>
+
 <hr>
 
 # Compage.dev
@@ -64,3 +76,6 @@ Compage - opensource tool runs in your local or in WebAssembly based Web Contain
 - **please suggest what you would like to add as features**
 
 -------------------------
+## Getting started
+
+Simply get the container image and spin it up in local or WebAssembly based Web-Container in browser, and you will get everything in one place (vscode and all dev environment you need). 
