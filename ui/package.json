@@ -1,5 +1,5 @@
 {
-  "name": "ui",
+  "name": "compage-ui",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -39,5 +39,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "dagre": "^0.8.5",
+    "diagram-maker": "^2.0.1"
   }
 }
