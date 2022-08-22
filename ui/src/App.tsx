@@ -1,14 +1,14 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import {DiagramMakerContainer} from "./components/diagram-maker-container";
+// import {DiagramMakerContainer} from "./components/diagram-maker-container";
 
-function App() {
+function    App() {
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <DiagramMakerContainer config={} initialData={}/>
+        {/*<DiagramMakerContainer config={} initialData={}/>*/}
       </header>
     </div>
   );
