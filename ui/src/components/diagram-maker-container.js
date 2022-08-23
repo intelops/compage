@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import {DiagramMaker, EditorMode} from "diagram-maker";
+import {ConnectorPlacement, DiagramMaker, EditorMode, Shape, VisibleConnectorTypes} from "diagram-maker";
 import "diagram-maker/dist/diagramMaker.css";
 import React, {useRef} from "react";
 
@@ -8,10 +8,16 @@ export const DiagramMakerContainer = () => {
     const diagramMakerRef = useRef();
 
     React.useEffect(() => {
+        let shape, connectorPlacement, showArrowhead
         diagramMakerRef.current = new DiagramMaker(containerRef.current, {
             options: {
-                showArrowhead: true
-            }, renderCallbacks: {
+                connectorPlacement: connectorPlacement || ConnectorPlacement.LEFT_RIGHT,
+                showArrowhead: showArrowhead || false,
+            },
+            renderCallbacks: {
+                destroy: (container) => {
+                    ReactDOM.unmountComponentAtNode(container);
+                },
                 node: (node, container) => {
                     ReactDOM.render(<Node
                         id={node.id}
@@ -19,10 +25,51 @@ export const DiagramMakerContainer = () => {
                         selected={node.diagramMakerData.selected}
                     />, container);
                 }, edge: () => {
-                }, destroy: (container) => {
-                    ReactDOM.unmountComponentAtNode(container);
                 }, panels: {}
-            }
+            },
+            nodeTypeConfig: {
+                'testId-centered': {
+                    size: {width: 100, height: 100},
+                    connectorPlacementOverride: ConnectorPlacement.CENTERED,
+                },
+                'testId-dead': {
+                    size: {width: 150, height: 50},
+                    connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
+                    visibleConnectorTypes: VisibleConnectorTypes.NONE,
+                },
+                'testId-dropdown': {
+                    size: {width: 150, height: 50},
+                    connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
+                },
+                'testId-end': {
+                    size: {width: 150, height: 50},
+                    connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
+                    visibleConnectorTypes: VisibleConnectorTypes.INPUT_ONLY,
+                },
+                'testId-input': {
+                    size: {width: 150, height: 50},
+                    connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
+                },
+                'testId-normal': {
+                    size: {width: 150, height: 50},
+                    connectorPlacementOverride: connectorPlacement || ConnectorPlacement.LEFT_RIGHT,
+                    shape: shape || Shape.RECTANGLE,
+                },
+                'testId-normalWithSize': {
+                    size: {width: 150, height: 50},
+                    connectorPlacementOverride: connectorPlacement || ConnectorPlacement.LEFT_RIGHT,
+                    shape: shape || Shape.RECTANGLE,
+                },
+                'testId-start': {
+                    size: {width: 150, height: 50},
+                    connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
+                    visibleConnectorTypes: VisibleConnectorTypes.OUTPUT_ONLY,
+                },
+                'testId-topBottom': {
+                    size: {width: 150, height: 50},
+                    connectorPlacementOverride: ConnectorPlacement.TOP_BOTTOM,
+                },
+            },
         }, {
             initialData: {
 
@@ -78,6 +125,15 @@ export const DiagramMakerContainer = () => {
         </div>
     </div>);
 }
+
+// export function addDevTools() {
+//     if (process.env.NODE_ENV === 'development') {
+//         const windowAsAny = window as any;
+//         // eslint-disable-next-line no-underscore-dangle
+//         return windowAsAny.__REDUX_DEVTOOLS_EXTENSION__ && windowAsAny.__REDUX_DEVTOOLS_EXTENSION__();
+//     }
+//     return undefined;
+// }
 
 function Node({selected, width, height}) {
     return (<div
