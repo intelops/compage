@@ -1,14 +1,64 @@
 import ReactDOM from "react-dom";
-import {ConnectorPlacement, DiagramMaker, EditorMode, Shape, VisibleConnectorTypes} from "diagram-maker";
+import {
+    ConnectorPlacement,
+    DiagramMaker,
+    EditorMode,
+    Event,
+    Shape,
+    VisibleConnectorTypes,
+    WorkspaceActions
+} from "diagram-maker";
 import "diagram-maker/dist/diagramMaker.css";
 import React, {useRef} from "react";
 
 export const DiagramMakerContainer = () => {
-    const containerRef = useRef();
-    const diagramMakerRef = useRef();
+    const containerRef = useRef() as any;
+    const diagramMakerRef = useRef() as any;
 
     React.useEffect(() => {
-        let shape, connectorPlacement, showArrowhead
+        let shape, connectorPlacement, showArrowhead, plugin
+        let initialData = {
+            editor: {mode: EditorMode.DRAG},
+            workspace: {
+                position: {x: 0, y: 0},
+                scale: 1,
+                canvasSize: {width: 3200, height: 1600},
+                viewContainerSize: {width: window.innerWidth, height: window.innerHeight},
+            }, nodes: {
+                // a: {
+                //     id: "a", diagramMakerData: {
+                //         position: {
+                //             x: 200, y: 100
+                //         }, size: {
+                //             width: 100, height: 100
+                //         }
+                //     }
+                // }
+                node1: {
+                    id: 'node1',
+                    typeId: 'testId-normal',
+                    diagramMakerData: {
+                        position: {x: 200, y: 150},
+                        size: {width: 100, height: 100},
+                    },
+                },
+                node2: {
+                    id: 'node2',
+                    typeId: 'testId-normal',
+                    diagramMakerData: {
+                        position: {x: 400, y: 300},
+                        size: {width: 100, height: 100},
+                    },
+                },
+            }, edges: {
+                edge1: {
+                    id: 'edge1',
+                    src: 'node1',
+                    dest: 'node2',
+                    diagramMakerData: {},
+                },
+            }, panels: {}
+        };
         diagramMakerRef.current = new DiagramMaker(containerRef.current, {
             options: {
                 connectorPlacement: connectorPlacement || ConnectorPlacement.LEFT_RIGHT,
@@ -20,7 +70,8 @@ export const DiagramMakerContainer = () => {
                 },
                 node: (node, container) => {
                     ReactDOM.render(<Node
-                        id={node.id}
+                        //TODO
+                        // id={node.id}
                         {...node.diagramMakerData.size}
                         selected={node.diagramMakerData.selected}
                     />, container);
@@ -71,42 +122,11 @@ export const DiagramMakerContainer = () => {
                 },
             },
         }, {
-            initialData: {
-
-                editor: {mode: EditorMode.DRAG},
-                workspace: {
-                    position: {x: 0, y: 0},
-                    scale: 1,
-                    canvasSize: {width: 3200, height: 1600},
-                    viewContainerSize: {width: window.innerWidth, height: window.innerHeight},
-                }, nodes: {
-                    a: {
-                        id: "a", diagramMakerData: {
-                            position: {
-                                x: 200, y: 100
-                            }, size: {
-                                width: 100, height: 100
-                            }
-                        }
-                    }, b: {
-                        id: "b", diagramMakerData: {
-                            position: {
-                                x: 200, y: 200
-                            }, size: {
-                                width: 100, height: 100
-                            }
-                        }
-                    }, c: {
-                        id: "c", diagramMakerData: {
-                            position: {
-                                x: 300, y: 100
-                            }, size: {
-                                width: 100, height: 100
-                            }
-                        }
-                    }
-                }
-            }
+            consumerEnhancer: addDevTools(),
+            eventListener: plugin ? (event) => {
+                handleTestPluginEvent(event, diagramMakerRef.current);
+            } : undefined,
+            initialData
         });
         diagramMakerRef.current.store.subscribe((e) => {
             const state = diagramMakerRef.current.store.getState();
@@ -126,14 +146,28 @@ export const DiagramMakerContainer = () => {
     </div>);
 }
 
-// export function addDevTools() {
-//     if (process.env.NODE_ENV === 'development') {
-//         const windowAsAny = window as any;
-//         // eslint-disable-next-line no-underscore-dangle
-//         return windowAsAny.__REDUX_DEVTOOLS_EXTENSION__ && windowAsAny.__REDUX_DEVTOOLS_EXTENSION__();
-//     }
-//     return undefined;
-// }
+export function addDevTools() {
+    if (process.env.NODE_ENV === 'development') {
+        const windowAsAny = window as any;
+        // eslint-disable-next-line no-underscore-dangle
+        return windowAsAny.__REDUX_DEVTOOLS_EXTENSION__ && windowAsAny.__REDUX_DEVTOOLS_EXTENSION__();
+    }
+    return undefined;
+}
+
+
+export function handleTestPluginEvent(event: any, diagramMaker: any) {
+    if (event.type === Event.LEFT_CLICK && event.target.type === 'testPlugin') {
+        const state = diagramMaker.store.getState();
+        if (!state.plugins) return;
+        const position = state.plugins.testPlugin.data.workspacePos;
+
+        diagramMaker.api.dispatch({
+            payload: {position},
+            type: WorkspaceActions.WORKSPACE_DRAG,
+        });
+    }
+}
 
 function Node({selected, width, height}) {
     return (<div
