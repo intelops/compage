@@ -54,9 +54,9 @@
   },
   "devDependencies": {
     "@storybook/addon-actions": "^6.5.10",
+    "@storybook/addon-controls": "^6.5.10",
     "@storybook/addon-essentials": "^6.5.10",
     "@storybook/addon-interactions": "^6.5.10",
-    "@storybook/addon-controls": "^6.5.10",
     "@storybook/addon-knobs": "^6.4.0",
     "@storybook/addon-links": "^6.5.10",
     "@storybook/addon-storyshots": "^6.5.10",
@@ -69,8 +69,19 @@
     "babel-plugin-named-exports-order": "^0.0.2",
     "dagre": "^0.8.5",
     "diagram-maker": "^2.0.1",
+    "diagram-maker-plugin-minimap": "^1.0.1",
+    "mini-css-extract-plugin": "^2.5.3",
+    "postcss": "^8.4.6",
+    "postcss-loader": "^6.2.1",
+    "postcss-scss": "^4.0.3",
     "prop-types": "^15.8.1",
+    "react-redux": "^7.2.6",
     "react-test-renderer": "^18.2.0",
+    "redux": "^4.1.2",
+    "redux-undo-redo": "^2.1.1",
+    "sass": "^1.49.7",
+    "sass-loader": "^12.4.0",
+    "ts-loader": "^9.2.6",
     "webpack": "^5.74.0"
   }
 }
