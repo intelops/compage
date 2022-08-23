@@ -1,4 +1,4 @@
-<p align="center"><img src="compage-2.png" width="200"></p>
+<p align="center"><img src="compage-logo2-0.png" width="400"></p>
 <p align="center"><b>Low-Code No-Code for Cloud Native</b></p>
 
 <p align="center">
