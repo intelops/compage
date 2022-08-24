@@ -3,12 +3,17 @@ import {
     ConnectorPlacement,
     ConnectorPlacementType,
     ContextMenuRenderCallbacks,
+    CreateEdgeAction,
     DiagramMaker,
+    DiagramMakerAction,
+    DiagramMakerActions,
+    DiagramMakerData,
     DiagramMakerEdge,
     DiagramMakerNode,
     DiagramMakerPotentialNode,
     Event,
     Shape,
+    ShapeType,
     VisibleConnectorTypes,
     WorkspaceActions
 } from "diagram-maker";
@@ -27,12 +32,36 @@ import {
     createRectangularConnectorNode,
     createRectangularNode,
     createToolsPanel,
-    createWorkspaceContextMenu
+    createWorkspaceContextMenu,
+    updateActionInLogger
 } from "./utils";
 
 import BoundaryCircularData from './BoundaryCircular/data';
+import {Action, Dispatch} from "redux";
 
-export const DiagramMakerContainer = () => {
+interface ArgTypes {
+    initialData?: DiagramMakerData<{}, {}>;
+    connectorPlacement?: ConnectorPlacementType;
+    showArrowhead?: boolean;
+    shape?: ShapeType;
+    edgeBadge?: boolean;
+    darkTheme?: boolean;
+    actionInterceptor?: boolean;
+    plugin?: boolean;
+    onAction?: (...args: any) => void;
+}
+
+export const DiagramMakerContainer = ({
+                                          initialData,
+                                          connectorPlacement,
+                                          showArrowhead,
+                                          shape,
+                                          edgeBadge,
+                                          darkTheme,
+                                          actionInterceptor,
+                                          plugin,
+                                          onAction,
+                                      }: ArgTypes) => {
     const containerRef = useRef() as any;
     const diagramMakerRef = useRef() as any;
 
@@ -44,6 +73,11 @@ export const DiagramMakerContainer = () => {
         let showArrowhead = true
         let shape = Shape.CIRCLE
         let edgeBadge = true
+        let actionInterceptor = true
+        let onAction : {
+            action: 'action',
+        }
+
         diagramMakerRef.current = new DiagramMaker(containerRef.current, {
             options: {
                 connectorPlacement: connectorPlacement || ConnectorPlacement.LEFT_RIGHT,
@@ -106,6 +140,51 @@ export const DiagramMakerContainer = () => {
                     workspace: (container: HTMLElement) => createWorkspaceContextMenu(container),
                 } as ContextMenuRenderCallbacks,
             },
+            actionInterceptor: (action: Action, next: Dispatch<Action>, getState: () => DiagramMakerData<{}, {}>) => {
+                // onAction(action);
+                if (actionInterceptor) {
+                    const diagramMakerAction = action as DiagramMakerAction<{ odd: boolean }, {}>;
+                    console.log("++++++++++++++++++++++++++")
+                    console.log("action : ", diagramMakerAction)
+                    console.log("++++++++++++++++++++++++++")
+                    updateActionInLogger(action);
+                    // if (diagramMakerAction.type === DiagramMakerActions.DELETE_ITEMS
+                    //     && diagramMakerAction.payload.nodeIds.length > 0) {
+                    //     return;
+                    // }
+
+                    if (diagramMakerAction.type === DiagramMakerActions.NODE_CREATE) {
+                        // // nodes before are even so this odd
+                        // diagramMakerAction.payload.consumerData = {
+                        //     odd: Object.keys(getState().nodes).length % 2 === 0,
+                        // };
+                        next(diagramMakerAction);
+                        return;
+                    }
+
+                    if (diagramMakerAction.type === DiagramMakerActions.EDGE_CREATE) {
+                        next(diagramMakerAction);
+                        const newAction: CreateEdgeAction<{}> = {
+                            type: DiagramMakerActions.EDGE_CREATE,
+                            payload: {
+                                id: "mahendra",
+                                src: "src",
+                                dest: "dest"
+                            }
+                            // payload: {
+                            //     id: `${diagramMakerAction.payload.id}-2`,
+                            //     src: diagramMakerAction.payload.dest,
+                            //     dest: diagramMakerAction.payload.src,
+                            // },
+                        };
+                        setTimeout(() => next(newAction), 1000);
+                    }
+                    next(action);
+                } else {
+                    updateActionInLogger(action);
+                    next(action);
+                }
+            },
             nodeTypeConfig: {
                 'testId-centered': {
                     size: {width: 100, height: 100},
@@ -160,7 +239,7 @@ export const DiagramMakerContainer = () => {
             const state = diagramMakerRef.current.store.getState();
             console.log(state);
         });
-    }, []);
+    }, [plugin]);
     return (<div style={{display: "flex", flexDirection: "column", height: "900px"}}>
         <button onClick={() => {
             diagramMakerRef.current.api.fit();
