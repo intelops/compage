@@ -215,7 +215,7 @@ export function createLibraryPanel(container: HTMLElement) {
     newDiv.appendChild(draggableElement);
 
     newDiv.appendChild(createPanelNode('testId-normal', 'Normal'));
-    newDiv.appendChild(createPanelNode('testId-normalWithSize', 'Normal with Size', {width: 100, height: 50}));
+    newDiv.appendChild(createPanelNode('testId-normalWithSize', 'Normal with Size', {width: 50, height: 50}));
     newDiv.appendChild(createPanelNode('testId-topBottom', 'Top Bottom'));
     newDiv.appendChild(createPanelNode('testId-centered', 'Centered'));
     newDiv.appendChild(createPanelNode('testId-start', 'Start Node'));

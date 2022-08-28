@@ -247,7 +247,7 @@ export const DiagramMakerContainer = ({
             console.log(state);
         });
     }, [plugin, initialData]);
-    return <div ref={containerRef}/>
+    return <div /*className="diagram-maker"*/ ref={containerRef}/>
 }
 
 export function addDevTools() {

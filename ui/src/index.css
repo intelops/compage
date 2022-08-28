@@ -19,6 +19,12 @@ code {
     height: 50%;
     /*border: 1px solid red;*/
 }
+.diagram-maker {
+    overflow-y: scroll;
+    overflow-x: scroll;
+    max-height: 600px;
+    max-width: 600px;
+}
 
 /*.row {*/
 /*    width: 50%;*/

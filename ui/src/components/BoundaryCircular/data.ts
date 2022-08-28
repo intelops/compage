@@ -8,7 +8,7 @@ export const getData = (parentWidth, parentHeight) => {
                 typeId: 'testId-normal',
                 diagramMakerData: {
                     position: {x: 200, y: 150},
-                    size: {width: 100, height: 100},
+                    size: {width: 50, height: 50},
                 },
             },
             node2: {
@@ -16,7 +16,7 @@ export const getData = (parentWidth, parentHeight) => {
                 typeId: 'testId-normal',
                 diagramMakerData: {
                     position: {x: 400, y: 300},
-                    size: {width: 100, height: 100},
+                    size: {width: 50, height: 50},
                 },
             },
         },
@@ -31,21 +31,21 @@ export const getData = (parentWidth, parentHeight) => {
         panels: {
             library: {
                 id: 'library',
-                position: {x: 0, y: parentHeight / 2},
-                size: {width: 250, height: 400},
-                positionAnchor: PositionAnchor.TOP_RIGHT,
+                position: {x: 0, y: parentHeight / 3},
+                size: {width: parentWidth/3, height: parentHeight/1.5},
+                positionAnchor: PositionAnchor.TOP_LEFT,
             },
             tools: {
                 id: 'tools',
-                position: {x: 0, y: parentHeight / 2},
-                size: {width: 250, height: 400},
+                position: {x: 0, y:   parentHeight },
+                size: {width: parentWidth/3, height: parentHeight/1.5},
                 positionAnchor: PositionAnchor.TOP_LEFT,
             },
         },
         workspace: {
             scale: 1,
-            // position: {x: 0, y: 0},
-            position: { x: parentWidth, y: 0 },
+            position: {x: 0, y: 0},
+            // position: { x: parentWidth, y: 0 },
             canvasSize: {width: parentWidth, height: parentHeight},
             viewContainerSize: {width: parentWidth, height: parentHeight},
         },
