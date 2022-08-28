@@ -36,7 +36,7 @@ import {
     updateActionInLogger
 } from "./utils";
 
-import BoundaryCircularData from './BoundaryCircular/data';
+// import BoundaryRectangularData from './BoundaryRectangular/data';
 import {Action, Dispatch} from "redux";
 
 interface ArgTypes {
@@ -64,14 +64,11 @@ export const DiagramMakerContainer = ({
                                       }: ArgTypes) => {
     const containerRef = useRef() as any;
     const diagramMakerRef = useRef() as any;
-    // const diagramMakerLogger = document.createElement('div');
-    // diagramMakerLogger.id = "diagramMakerLogger";
-    // containerRef.current.appendChild(diagramMakerLogger);
 
     React.useEffect(() => {
         // let shape, connectorPlacement, showArrowhead, plugin, edgeBadge
         let plugin, connectorPlacement
-        let initialData = BoundaryCircularData
+        // let initialData = BoundaryRectangularData
         // let connectorPlacement = ConnectorPlacementType.BOUNDARY
         let showArrowhead = true
         let shape = Shape.CIRCLE
@@ -249,7 +246,7 @@ export const DiagramMakerContainer = ({
             const state = diagramMakerRef.current.store.getState();
             console.log(state);
         });
-    }, [plugin]);
+    }, [plugin, initialData]);
     return <div ref={containerRef}/>
 }
 
