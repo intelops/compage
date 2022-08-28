@@ -34,7 +34,7 @@ import {
     createToolsPanel,
     createWorkspaceContextMenu,
     updateActionInLogger
-} from "./utils";
+} from "../utils/utils";
 
 // import BoundaryRectangularData from './BoundaryRectangular/data';
 import {Action, Dispatch} from "redux";

@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import {DiagramMakerContainer} from "./components/diagram-maker-container";
-import {getData} from "./components/BoundaryCircular/data";
+import {getData} from "./data/BoundaryCircular/data";
 
 export const App = () => {
     let diagramMakerData = getData(500, 400);
