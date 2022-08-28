@@ -75,6 +75,7 @@
     "postcss-loader": "^6.2.1",
     "postcss-scss": "^4.0.3",
     "prop-types": "^15.8.1",
+    "react-draggable": "^4.4.5",
     "react-redux": "^7.2.6",
     "react-test-renderer": "^18.2.0",
     "redux": "^4.1.2",

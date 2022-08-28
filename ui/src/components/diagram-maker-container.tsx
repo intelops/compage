@@ -64,6 +64,9 @@ export const DiagramMakerContainer = ({
                                       }: ArgTypes) => {
     const containerRef = useRef() as any;
     const diagramMakerRef = useRef() as any;
+    // const diagramMakerLogger = document.createElement('div');
+    // diagramMakerLogger.id = "diagramMakerLogger";
+    // containerRef.appendChild(diagramMakerLogger);
 
     React.useEffect(() => {
         // let shape, connectorPlacement, showArrowhead, plugin, edgeBadge
@@ -74,7 +77,7 @@ export const DiagramMakerContainer = ({
         let shape = Shape.CIRCLE
         let edgeBadge = true
         let actionInterceptor = true
-        let onAction : {
+        let onAction: {
             action: 'action',
         }
 
@@ -88,6 +91,7 @@ export const DiagramMakerContainer = ({
                     ReactDOM.unmountComponentAtNode(container);
                 },
                 node: (node: DiagramMakerNode<{}>, container: HTMLElement) => {
+                    container.setAttribute("style", "border: 1px solid black");
                     if (node.typeId === 'testId-centered') {
                         return createCircularNode(node, container);
                     }
@@ -133,6 +137,7 @@ export const DiagramMakerContainer = ({
                         ) => createToolsPanel(container, () => diagramMakerRef.current),
                     }),
                 },
+                //This is the place to identify which element has been clicked
                 contextMenu: {
                     node: (id: string | undefined, container: HTMLElement) => createNodeContextMenu(id, container),
                     edge: (id: string | undefined, container: HTMLElement) => createEdgeContextMenu(id, container),
@@ -144,9 +149,11 @@ export const DiagramMakerContainer = ({
                 // onAction(action);
                 if (actionInterceptor) {
                     const diagramMakerAction = action as DiagramMakerAction<{ odd: boolean }, {}>;
-                    console.log("++++++++++++++++++++++++++")
-                    console.log("action : ", diagramMakerAction)
-                    console.log("++++++++++++++++++++++++++")
+                    if ("payload" in diagramMakerAction) {
+                        console.log("++++++++++++++++++++++++++")
+                        console.log("action : ", diagramMakerAction?.payload)
+                        console.log("++++++++++++++++++++++++++")
+                    }
                     updateActionInLogger(action);
                     // if (diagramMakerAction.type === DiagramMakerActions.DELETE_ITEMS
                     //     && diagramMakerAction.payload.nodeIds.length > 0) {
@@ -241,15 +248,7 @@ export const DiagramMakerContainer = ({
         });
     }, [plugin]);
     return (<div style={{display: "flex", flexDirection: "column", height: "900px"}}>
-        <button onClick={() => {
-            diagramMakerRef.current.api.fit();
-        }}> Reset
-        </button>
-        <div style={{
-            position: "relative", height: "100%", border: "1px solid red"
-        }}>
-            <div ref={containerRef}/>
-        </div>
+        <div ref={containerRef}/>
     </div>);
 }
 
@@ -264,6 +263,7 @@ export function addDevTools() {
 
 
 export function handleTestPluginEvent(event: any, diagramMaker: any) {
+    console.log("%%%%%%%%%%%%%%%%%%%%%%", event)
     if (event.type === Event.LEFT_CLICK && event.target.type === 'testPlugin') {
         const state = diagramMaker.store.getState();
         if (!state.plugins) return;

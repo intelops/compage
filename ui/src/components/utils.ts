@@ -148,6 +148,8 @@ export function createContextMenu(text: string) {
 }
 
 export function createNodeContextMenu(id: string | undefined, container: HTMLElement) {
+    console.log("mahendra reached")
+    debugger
     if (!id) {
         return;
     }
@@ -178,6 +180,7 @@ export function createWorkspaceContextMenu(container: HTMLElement) {
 
 export function createPanelNode(testId: string, text: string, size?: Size) {
     const newDiv = createDivWithText(text);
+    // newDiv.setAttribute("style", "border: 1px solid black");
     newDiv.classList.add('rectangle', 'example-node', 'potential-node');
     newDiv.setAttribute('data-id', testId);
     newDiv.setAttribute('data-type', 'DiagramMaker.PotentialNode');
@@ -348,6 +351,7 @@ export function createToolsPanel(container: HTMLElement, getDiagramMakerObj: () 
 
     const newDiv = document.createElement('div');
     newDiv.classList.add('tools');
+    newDiv.innerText = 'Tools';
 
     newDiv.appendChild(createUpdateContainerButton(getDiagramMakerObj));
     newDiv.appendChild(createDestroyButton(getDiagramMakerObj));
