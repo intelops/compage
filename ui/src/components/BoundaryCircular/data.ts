@@ -60,20 +60,20 @@ const graph: DiagramMakerData<{}, {}> = {
     library: {
       id: 'library',
       position: { x: 20, y: 20 },
-      size: { width: 250, height: 600 },
+      size: { width: 250, height: 400 },
       positionAnchor: PositionAnchor.TOP_RIGHT,
     },
     tools: {
       id: 'tools',
       position: { x: 20, y: 20 },
-      size: { width: 150, height: 400 },
+      size: { width: 250, height: 400 },
     },
   },
   workspace: {
-    position: { x: 0, y: 0 },
+    position: { x: 500, y: 100 },
     scale: 1,
-    canvasSize: { width: 3200, height: 1600 },
-    viewContainerSize: { width: window.innerWidth, height: window.innerHeight },
+    canvasSize: { width: 1366, height: 450 },
+    viewContainerSize: { width: 1366, height: 450 },
   },
   editor: { mode: EditorMode.DRAG },
 };

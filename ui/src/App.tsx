@@ -3,5 +3,7 @@ import './App.css';
 import {DiagramMakerContainer} from "./components/diagram-maker-container";
 
 export const App = () => {
-    return <DiagramMakerContainer/>
+    return <React.Fragment>
+        <DiagramMakerContainer></DiagramMakerContainer>
+    </React.Fragment>
 }

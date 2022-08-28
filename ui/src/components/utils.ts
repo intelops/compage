@@ -237,6 +237,7 @@ function createToolButton(text: string, eventListener: () => void) {
 
 function createUpdateContainerButton(getDiagramMakerObj: () => DiagramMaker) {
     return createToolButton('UpdateContainer', () => {
+        getDiagramMakerObj().api.fit(500, 500)
         getDiagramMakerObj().updateContainer();
     });
 }
@@ -352,7 +353,7 @@ export function createToolsPanel(container: HTMLElement, getDiagramMakerObj: () 
     const newDiv = document.createElement('div');
     newDiv.classList.add('tools');
     newDiv.innerText = 'Tools';
-
+    // getDiagramMakerObj().api.layout().
     newDiv.appendChild(createUpdateContainerButton(getDiagramMakerObj));
     newDiv.appendChild(createDestroyButton(getDiagramMakerObj));
     newDiv.appendChild(createDragToolButton(getDiagramMakerObj));

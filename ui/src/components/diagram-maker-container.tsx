@@ -66,7 +66,7 @@ export const DiagramMakerContainer = ({
     const diagramMakerRef = useRef() as any;
     // const diagramMakerLogger = document.createElement('div');
     // diagramMakerLogger.id = "diagramMakerLogger";
-    // containerRef.appendChild(diagramMakerLogger);
+    // containerRef.current.appendChild(diagramMakerLogger);
 
     React.useEffect(() => {
         // let shape, connectorPlacement, showArrowhead, plugin, edgeBadge
@@ -80,6 +80,9 @@ export const DiagramMakerContainer = ({
         let onAction: {
             action: 'action',
         }
+        // const diagramMakerLogger = document.createElement('div');
+        // diagramMakerLogger.id = "diagramMakerLogger";
+        // containerRef.current.appendChild(diagramMakerLogger);
 
         diagramMakerRef.current = new DiagramMaker(containerRef.current, {
             options: {
@@ -247,9 +250,7 @@ export const DiagramMakerContainer = ({
             console.log(state);
         });
     }, [plugin]);
-    return (<div style={{display: "flex", flexDirection: "column", height: "900px"}}>
-        <div ref={containerRef}/>
-    </div>);
+    return <div ref={containerRef}/>
 }
 
 export function addDevTools() {
