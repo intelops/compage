@@ -237,7 +237,8 @@ function createToolButton(text: string, eventListener: () => void) {
 
 function createUpdateContainerButton(getDiagramMakerObj: () => DiagramMaker) {
     return createToolButton('UpdateContainer', () => {
-        getDiagramMakerObj().api.fit(500, 500)
+        // Not required - MB
+        // getDiagramMakerObj().api.fit(500, 500)
         getDiagramMakerObj().updateContainer();
     });
 }

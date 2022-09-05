@@ -38,6 +38,8 @@ import {
 
 // import BoundaryRectangularData from './BoundaryRectangular/data';
 import {Action, Dispatch} from "redux";
+import {CircularNode} from "./circular-node";
+import {ErrorBoundary} from "./error-boundary/ErrorBoundary";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -92,9 +94,12 @@ export const DiagramMakerContainer = ({
                 },
                 node: (node: DiagramMakerNode<{}>, container: HTMLElement) => {
                     container.setAttribute("style", "border: 1px solid black");
-                    if (node.typeId === 'testId-centered') {
-                        return createCircularNode(node, container);
-                    }
+                    // if (node.typeId === 'testId-centered') {
+                    return ReactDOM.render(<CircularNode
+                        node={node}
+                    />, container);
+                    // return createCircularNode(node, container);
+                    // }
                     if (node.typeId === 'testId-input') {
                         return createNodeWithInput(node, container);
                     }
