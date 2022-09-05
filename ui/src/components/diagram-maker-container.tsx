@@ -77,9 +77,9 @@ export const DiagramMakerContainer = ({
         let onAction: {
             action: 'action',
         }
-        // const diagramMakerLogger = document.createElement('div');
-        // diagramMakerLogger.id = "diagramMakerLogger";
-        // containerRef.current.appendChild(diagramMakerLogger);
+        const diagramMakerLogger = document.createElement('div');
+        diagramMakerLogger.id = "diagramMakerLogger";
+        containerRef.current.appendChild(diagramMakerLogger);
 
         diagramMakerRef.current = new DiagramMaker(containerRef.current, {
             options: {

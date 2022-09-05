@@ -148,8 +148,6 @@ export function createContextMenu(text: string) {
 }
 
 export function createNodeContextMenu(id: string | undefined, container: HTMLElement) {
-    console.log("mahendra reached")
-    debugger
     if (!id) {
         return;
     }
