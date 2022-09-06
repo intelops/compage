@@ -1,13 +1,8 @@
-import express, {Express, Request, Response} from "express";
+import express, {Express, Request, Response} from 'express';
+import bodyParser from "body-parser";
 import path from "path";
 import fetch from "node-fetch";
-
-export const config = {
-    client_id: process.env.REACT_APP_CLIENT_ID,
-    redirect_uri: process.env.REACT_APP_CLIENT_SECRET,
-    client_secret: process.env.REACT_APP_REDIRECT_URI,
-    proxy_url: process.env.REACT_APP_PROXY_URL
-};
+import {config} from "./constants";
 
 export class Server {
     private app: Express;
@@ -20,6 +15,11 @@ export class Server {
             res.send("You have reached the API!");
         });
 
+        //TODO remove this later, idea is to fetch the auth details from server
+        // this.app.get("/auth_details", (req: Request, res: Response): void => {
+        //     res.send({client_id: config.client_id, redirect_uri: config.redirect_uri});
+        // });
+
         // Enabled Access-Control-Allow-Origin", "*" in the header to by-pass the CORS error.
         app.use((req: Request, res: Response, next) => {
             res.header("Access-Control-Allow-Origin", "*");
@@ -28,6 +28,7 @@ export class Server {
 
         app.post("/authenticate", async (req: Request, res: Response,) => {
             const {code} = req.body;
+            console.log(code)
             // Request to exchange code for an access token
             fetch(`https://github.com/login/oauth/access_token`, {
                 method: "POST",
@@ -38,8 +39,12 @@ export class Server {
                     redirect_uri: config.redirect_uri
                 },
             })
-                .then((response) => response.text())
+                .then((response) => {
+                    console.log(response)
+                    return response.text()
+                })
                 .then((paramsString) => {
+                    console.log("paramsString : ", paramsString)
                     let params = new URLSearchParams(paramsString);
                     const access_token = params.get("access_token");
                     // Request to return data of a user that has been authenticated
@@ -66,3 +71,13 @@ export class Server {
         this.app.listen(port, () => console.log(`Server listening on port ${port}!`));
     }
 }
+
+const app = express();
+
+app.use(bodyParser.json());
+app.use(bodyParser.json({type: "text/*"}));
+app.use(bodyParser.urlencoded({extended: false}));
+
+const PORT = parseInt(process.env.SERVER_PORT) || 5000;
+const server = new Server(app);
+server.start(PORT);

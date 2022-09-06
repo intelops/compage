@@ -13,7 +13,7 @@
     "typescript": "^4.8.2"
   },
   "scripts": {
-    "start": "npx ts-node index.ts",
+    "start": "npx ts-node app/server.ts",
     "build": "npx tsc"
   },
   "devDependencies": {

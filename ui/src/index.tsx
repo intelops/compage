@@ -6,12 +6,12 @@ import reportWebVitals from './reportWebVitals';
 import 'diagram-maker/dist/diagramMaker.css';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+    document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <React.StrictMode>
+        <App/>
+    </React.StrictMode>
 );
 
 const backup = console.error;

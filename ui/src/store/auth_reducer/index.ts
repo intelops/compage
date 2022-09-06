@@ -1,11 +1,10 @@
-import {config} from "~app/Server";
+import {config} from "../../utils/constants";
 
 export const initialState = {
     isLoggedIn: JSON.parse(localStorage.getItem("isLoggedIn")) || false,
     user: JSON.parse(localStorage.getItem("user")) || null,
     client_id: config.client_id,
     redirect_uri: config.redirect_uri,
-    client_secret: config.client_secret,
     proxy_url: config.proxy_url
 };
 

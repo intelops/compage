@@ -1,6 +1,6 @@
 import React, {createContext, useReducer} from 'react';
 import './App.css';
-import {initialState, reducer} from "./store/reducer";
+import {initialState, reducer} from "./store/auth_reducer";
 import {HashRouter as Router, Link, Route, Routes} from "react-router-dom";
 import Login from "./components/Login";
 import Home from "./components/Home";

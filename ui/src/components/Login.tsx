@@ -5,87 +5,101 @@ import {AuthContext} from "../App";
 
 
 export default function Login() {
-  const { state, dispatch } = useContext(AuthContext);
-  const [data, setData] = useState({ errorMessage: "", isLoading: false });
+    const {state, dispatch} = useContext(AuthContext);
+    const [data, setData] = useState({errorMessage: "", isLoading: false});
 
-  const { client_id, redirect_uri } = state;
+    const {client_id, redirect_uri} = state;
 
-  useEffect(() => {
-    // After requesting Github access, Github redirects back to your app with a code parameter
-    const url = window.location.href;
-    const hasCode = url.includes("?code=");
+    useEffect(() => {
+        // After requesting Github access, Github redirects back to your app with a code parameter
+        const url = window.location.href;
+        const hasCode = url.includes("?code=");
 
-    // If Github API returns the code parameter
-    if (hasCode) {
-      const newUrl = url.split("?code=");
-      window.history.pushState({}, null, newUrl[0]);
-      setData({ ...data, isLoading: true });
+        // If Github API returns the code parameter
+        if (hasCode) {
+            const newUrl = url.split("?code=");
+            window.history.pushState({}, null, newUrl[0]);
+            setData({...data, isLoading: true});
 
-      const requestData = {
-        code: newUrl[1]
-      };
+            const requestData = {
+                code: newUrl[1].replace('#/login', '')
+            };
+            console.log(requestData)
+            const proxy_url = state.proxy_url;
 
-      const proxy_url = state.proxy_url;
+            // Use code parameter and other parameters to make POST request to proxy_server
+            fetch(proxy_url, {
+                method: "POST",
+                body: JSON.stringify(requestData)
+            })
+                .then((response: Response) => {
+                    if (!response.ok) {
+                        setData({
+                            isLoading: false,
+                            errorMessage: "Sorry! Login failed, non-200 response"
+                        });
+                    } else return response.json();
+                })
+                .then(data => {
+                    if (JSON.stringify(data).toLowerCase().includes("Bad".toLowerCase())) {
+                        setData({
+                            isLoading: false,
+                            errorMessage: "Sorry! Login failed"
+                        });
+                    } else {
+                        dispatch({
+                            type: "LOGIN",
+                            payload: {user: data, isLoggedIn: true}
+                        });
+                    }
+                })
+                .catch(error => {
+                    setData({
+                        isLoading: false,
+                        errorMessage: "Sorry! Login failed"
+                    });
+                });
+        }
+    }, [state, dispatch, data]);
 
-      // Use code parameter and other parameters to make POST request to proxy_server
-      fetch(proxy_url, {
-        method: "POST",
-        body: JSON.stringify(requestData)
-      })
-        .then(response => response.json())
-        .then(data => {
-          dispatch({
-            type: "LOGIN",
-            payload: { user: data, isLoggedIn: true }
-          });
-        })
-        .catch(error => {
-          setData({
-            isLoading: false,
-            errorMessage: "Sorry! Login failed"
-          });
-        });
+    if (state.isLoggedIn) {
+        return <Navigate to="/"/>;
     }
-  }, [state, dispatch, data]);
 
-  if (state.isLoggedIn) {
-    return <Navigate to="/" />;
-  }
-
-  return (
-    <Wrapper>
-      <section className="container">
-        <div>
-          <h1>Welcome</h1>
-          <span>Super amazing app</span>
-          <span>{data.errorMessage}</span>
-          <div className="login-container">
-            {data.isLoading ? (
-              <div className="loader-container">
-                <div className="loader"></div>
-              </div>
-            ) : (
-              <>
-                {
-                  // Link to request GitHub access
-                }
-                <a
-                  className="login-link"
-                  href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}`}
-                  onClick={() => {
-                    setData({ ...data, errorMessage: "" });
-                  }}
-                >
-                  {/*<GithubIcon>Login with GitHub</GithubIcon>*/}
-                  <span>Login with GitHub</span>
-                </a>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-    </Wrapper>
-  );
+    return (
+        <Wrapper>
+            <section className="container">
+                <div>
+                    <h1>Welcome</h1>
+                    <span>Super amazing app</span>
+                    <span>{data.errorMessage}</span>
+                    <div className="login-container">
+                        {data.isLoading ? (
+                            <div className="loader-container">
+                                <div className="loader"></div>
+                            </div>
+                        ) : (
+                            <>
+                                {
+                                    // Link to request GitHub access
+                                }
+                                <a
+                                    className="login-link"
+                                    href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}`}
+                                    onClick={() => {
+                                        setData({...data, errorMessage: ""});
+                                    }}
+                                >
+                                    {/*<GithubIcon>Login with GitHub</GithubIcon>*/}
+                                    <span>Login with GitHub</span>
+                                </a>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </section>
+        </Wrapper>
+    );
 }
 
 const Wrapper = Styled.section`

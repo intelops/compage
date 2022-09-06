@@ -13,7 +13,7 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "**.ts"
+    "./app/**.ts"
   ],
   "exclude": [
     "./ui"
