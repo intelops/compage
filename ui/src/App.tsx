@@ -1,17 +1,30 @@
-import React from 'react';
+import React, {createContext, useReducer} from 'react';
 import './App.css';
-import {DiagramMakerContainer} from "./components/diagram-maker-container";
-import {getData} from "./data/BoundaryCircular/data";
+import {initialState, reducer} from "./store/reducer";
+import {HashRouter as Router, Link, Route, Routes} from "react-router-dom";
+import Login from "./components/Login";
+import Home from "./components/Home";
+
+export const AuthContext = createContext(null);
 
 export const App = () => {
-    let diagramMakerData = getData(500, 400);
-    return <div className="row">
-        <div className="column">
-            <DiagramMakerContainer initialData={diagramMakerData}/>
-        </div>
-        <div className="column">
-            <h2>Width:</h2>
-            <h2>Height:</h2>
-        </div>
-    </div>
+    const [state, dispatch] = useReducer(reducer, initialState);
+
+    return <AuthContext.Provider
+        value={{
+            state,
+            dispatch
+        }}
+    >
+        <Router>
+            <nav>
+                <Link to="/">Home</Link>
+                <Link to="/about">About us</Link>
+            </nav>
+            <Routes>
+                <Route path="/login" element={<Login/>}/>
+                <Route path="/" element={<Home/>}/>
+            </Routes>
+        </Router>
+    </AuthContext.Provider>
 }
