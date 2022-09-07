@@ -1,9 +1,10 @@
 import React, {createContext, useReducer} from 'react';
 import './App.css';
 import {initialState, reducer} from "./store/auth_reducer";
-import {HashRouter as Router, Link, Route, Routes} from "react-router-dom";
+import {HashRouter as Router, Route, Routes} from "react-router-dom";
 import {Login} from "./components/auth/Login";
 import {Home} from "./components/Home";
+import ResponsiveAppBar from "./components/navbar/navbar";
 
 export const AuthContext = createContext(null);
 
@@ -16,10 +17,7 @@ export const App = () => {
             dispatch
         }}>
         <Router>
-            <nav>
-                <Link to="/">Home</Link>
-                <Link to="/about">About us</Link>
-            </nav>
+            <ResponsiveAppBar></ResponsiveAppBar>
             <Routes>
                 <Route path="/login" element={<Login/>}/>
                 <Route path="/" element={<Home/>}/>
