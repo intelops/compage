@@ -2,8 +2,8 @@ import React, {createContext, useReducer} from 'react';
 import './App.css';
 import {initialState, reducer} from "./store/auth_reducer";
 import {HashRouter as Router, Link, Route, Routes} from "react-router-dom";
-import Login from "./components/Login";
-import Home from "./components/Home";
+import {Login} from "./components/auth/Login";
+import {Home} from "./components/Home";
 
 export const AuthContext = createContext(null);
 
@@ -14,8 +14,7 @@ export const App = () => {
         value={{
             state,
             dispatch
-        }}
-    >
+        }}>
         <Router>
             <nav>
                 <Link to="/">Home</Link>

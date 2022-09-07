@@ -34,7 +34,7 @@ import {
     createToolsPanel,
     createWorkspaceContextMenu,
     updateActionInLogger
-} from "../utils/utils";
+} from "../../utils/utils";
 
 // import BoundaryRectangularData from './BoundaryRectangular/data';
 import {Action, Dispatch} from "redux";
@@ -51,6 +51,12 @@ interface ArgTypes {
     onAction?: (...args: any) => void;
 }
 
+const createDivWithId = (id: string) => {
+    const container = document.createElement('div');
+    container.id = id;
+    return container;
+};
+
 export const DiagramMakerContainer = ({
                                           initialData,
                                           connectorPlacement,
@@ -62,6 +68,7 @@ export const DiagramMakerContainer = ({
                                           plugin,
                                           onAction,
                                       }: ArgTypes) => {
+    const rootRef = useRef() as any;
     const containerRef = useRef() as any;
     const diagramMakerRef = useRef() as any;
 
@@ -77,9 +84,6 @@ export const DiagramMakerContainer = ({
         let onAction: {
             action: 'action',
         }
-        const diagramMakerLogger = document.createElement('div');
-        diagramMakerLogger.id = "diagramMakerLogger";
-        containerRef.current.appendChild(diagramMakerLogger);
 
         diagramMakerRef.current = new DiagramMaker(containerRef.current, {
             options: {
@@ -250,7 +254,9 @@ export const DiagramMakerContainer = ({
             console.log(state);
         });
     }, [plugin, initialData]);
-    return <div /*className="diagram-maker"*/ ref={containerRef}/>
+    return <div ref={rootRef}>
+        <div ref={containerRef}></div>
+    </div>
 }
 
 export function addDevTools() {

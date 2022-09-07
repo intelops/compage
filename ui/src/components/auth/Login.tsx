@@ -1,10 +1,10 @@
 import React, {useContext, useEffect, useState} from "react";
 import {Navigate} from "react-router-dom";
 import Styled from "styled-components";
-import {AuthContext} from "../App";
+import {AuthContext} from "../../App";
+import GitHubIcon from '@mui/icons-material/GitHub';
 
-
-export default function Login() {
+export const Login = () => {
     const {state, dispatch} = useContext(AuthContext);
     const [data, setData] = useState({errorMessage: "", isLoading: false});
 
@@ -79,9 +79,6 @@ export default function Login() {
                             </div>
                         ) : (
                             <>
-                                {
-                                    // Link to request GitHub access
-                                }
                                 <a
                                     className="login-link"
                                     href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}`}
@@ -89,7 +86,7 @@ export default function Login() {
                                         setData({...data, errorMessage: ""});
                                     }}
                                 >
-                                    {/*<GithubIcon>Login with GitHub</GithubIcon>*/}
+                                    <GitHubIcon/>
                                     <span>Login with GitHub</span>
                                 </a>
                             </>
