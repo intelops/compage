@@ -11,11 +11,11 @@ export default function Login() {
     const {client_id, redirect_uri} = state;
 
     useEffect(() => {
-        // After requesting Github access, Github redirects back to your app with a code parameter
+        // After requesting GitHub access, GitHub redirects back to your app with a code parameter
         const url = window.location.href;
         const hasCode = url.includes("?code=");
 
-        // If Github API returns the code parameter
+        // If GitHub API returns the code parameter
         if (hasCode) {
             const newUrl = url.split("?code=");
             window.history.pushState({}, null, newUrl[0]);
@@ -24,7 +24,6 @@ export default function Login() {
             const requestData = {
                 code: newUrl[1].replace('#/login', '')
             };
-            console.log(requestData)
             const proxy_url = state.proxy_url;
 
             // Use code parameter and other parameters to make POST request to proxy_server
@@ -36,15 +35,15 @@ export default function Login() {
                     if (!response.ok) {
                         setData({
                             isLoading: false,
-                            errorMessage: "Sorry! Login failed, non-200 response"
+                            errorMessage: "[Non-200 Response] Sorry! Login failed"
                         });
                     } else return response.json();
                 })
                 .then(data => {
-                    if (JSON.stringify(data).toLowerCase().includes("Bad".toLowerCase())) {
+                    if (JSON.stringify(data).toLowerCase().includes("Bad Credentials".toLowerCase())) {
                         setData({
                             isLoading: false,
-                            errorMessage: "Sorry! Login failed"
+                            errorMessage: "[Bad Credentials] Sorry! Login failed"
                         });
                     } else {
                         dispatch({
@@ -56,7 +55,7 @@ export default function Login() {
                 .catch(error => {
                     setData({
                         isLoading: false,
-                        errorMessage: "Sorry! Login failed"
+                        errorMessage: "[Generic error] Sorry! Login failed"
                     });
                 });
         }

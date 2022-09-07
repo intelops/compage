@@ -1,8 +1,8 @@
 import express, {Express, Request, Response} from 'express';
 import bodyParser from "body-parser";
 import path from "path";
-import fetch from "node-fetch";
 import {config} from "./constants";
+import axios from "axios";
 
 export class Server {
     private app: Express;
@@ -28,39 +28,30 @@ export class Server {
 
         app.post("/authenticate", async (req: Request, res: Response,) => {
             const {code} = req.body;
-            console.log(code)
             // Request to exchange code for an access token
-            fetch(`https://github.com/login/oauth/access_token`, {
-                method: "POST",
-                body: {
+            axios({
+                url: `https://github.com/login/oauth/access_token`, method: "POST", data: {
                     client_id: config.client_id,
                     client_secret: config.client_secret,
                     code: code,
                     redirect_uri: config.redirect_uri
-                },
-            })
-                .then((response) => {
-                    console.log(response)
-                    return response.text()
-                })
-                .then((paramsString) => {
-                    console.log("paramsString : ", paramsString)
-                    let params = new URLSearchParams(paramsString);
-                    const access_token = params.get("access_token");
-                    // Request to return data of a user that has been authenticated
-                    return fetch(`https://api.github.com/user`, {
-                        headers: {
-                            Authorization: `token ${access_token}`,
-                        },
-                    });
-                })
-                .then((response) => response.json())
-                .then((response) => {
-                    return res.status(200).json(response);
-                })
-                .catch((error) => {
+                }
+            }).then(response => {
+                let params = new URLSearchParams(response.data);
+                const access_token = params.get("access_token");
+                // Request to return data of a user that has been authenticated
+                return axios(`https://api.github.com/user`, {
+                    headers: {
+                        Authorization: `token ${access_token}`,
+                    },
+                }).then((response) => {
+                    return res.status(200).json(response.data);
+                }).catch((error) => {
                     return res.status(400).json(error);
                 });
+            }).catch((error) => {
+                return res.status(400).json(error);
+            });
         });
         this.app.get("*", (req: Request, res: Response): void => {
             res.sendFile(path.resolve("./") + "/build/ui/index.html");
