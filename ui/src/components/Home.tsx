@@ -16,7 +16,7 @@ export const Home = () => {
 
     const {avatar_url, name, public_repos, followers, following} = state.user
 
-    let diagramMakerData = getData(500, 400);
+    let diagramMakerData = getData(600, 550);
 
     // const updateDiagramMakerState = (diagramMakerState: string) => {
     //     setDiagramMakerState(diagramMakerState)
@@ -29,14 +29,14 @@ export const Home = () => {
                     <DiagramMakerContainer initialData={diagramMakerData}
                                            /*updateDiagramMakerState={updateDiagramMakerState}*//>
                 </Grid>
-                <Grid item xs={4}>
+                {/*<Grid item xs={4}>*/}
                     {/*<ProfileCard/>*/}
                     {/*<JSONPretty id="jsonPretty" onJSONPrettyError={e => console.error(e)}*/}
                     {/*            data={diagramMakerState}></JSONPretty>*/}
                     {/*<Box>*/}
                     {/*    <div id="diagramMakerLogger"></div>*/}
                     {/*</Box>*/}
-                </Grid>
+                {/*</Grid>*/}
             </Grid>
         </Container>
     );

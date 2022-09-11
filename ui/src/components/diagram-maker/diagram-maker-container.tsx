@@ -167,36 +167,47 @@ export const DiagramMakerContainer = ({
                         console.log("++++++++++++++++++++++++++")
                     }
                     updateActionInLogger(action);
-                    // if (diagramMakerAction.type === DiagramMakerActions.DELETE_ITEMS
-                    //     && diagramMakerAction.payload.nodeIds.length > 0) {
-                    //     return;
-                    // }
+                    if (diagramMakerAction.type === DiagramMakerActions.DELETE_ITEMS
+                        && "payload" in diagramMakerAction
+                        && "nodeIds" in diagramMakerAction.payload
+                        && diagramMakerAction.payload.nodeIds.length > 0) {
+                        return;
+                    }
 
-                    if (diagramMakerAction.type === DiagramMakerActions.NODE_CREATE) {
-                        // // nodes before are even so this odd
-                        // diagramMakerAction.payload.consumerData = {
-                        //     odd: Object.keys(getState().nodes).length % 2 === 0,
-                        // };
+                    if (diagramMakerAction.type === DiagramMakerActions.NODE_CREATE
+                        && "payload" in diagramMakerAction) {
+                        // nodes before are even so this odd
+                        diagramMakerAction.payload["consumerData"] = {
+                            "mahendra": "bagul",
+                            odd: Object.keys(getState().nodes).length % 2 === 0,
+                        };
                         next(diagramMakerAction);
                         return;
                     }
 
-                    if (diagramMakerAction.type === DiagramMakerActions.EDGE_CREATE) {
+                    if (diagramMakerAction.type === DiagramMakerActions.EDGE_CREATE
+                        && "payload" in diagramMakerAction) {
                         next(diagramMakerAction);
-                        const newAction: CreateEdgeAction<{}> = {
-                            type: DiagramMakerActions.EDGE_CREATE,
-                            payload: {
-                                id: "mahendra",
-                                src: "src",
-                                dest: "dest"
-                            }
-                            // payload: {
-                            //     id: `${diagramMakerAction.payload.id}-2`,
-                            //     src: diagramMakerAction.payload.dest,
-                            //     dest: diagramMakerAction.payload.src,
-                            // },
-                        };
-                        setTimeout(() => next(newAction), 1000);
+                        // the below creates reverse edge
+                        // let id, dest, src
+                        // if ("id" in diagramMakerAction.payload) {
+                        //     id = diagramMakerAction.payload.id
+                        // }
+                        // if ("dest" in diagramMakerAction.payload) {
+                        //     dest = diagramMakerAction.payload.dest
+                        // }
+                        // if ("src" in diagramMakerAction.payload) {
+                        //     src = diagramMakerAction.payload.src
+                        // }
+                        // const newAction: CreateEdgeAction<{}> = {
+                        //     type: DiagramMakerActions.EDGE_CREATE,
+                        //     payload: {
+                        //         id: `${id}-2`,
+                        //         src: dest,
+                        //         dest: src,
+                        //     },
+                        // };
+                        // setTimeout(() => next(newAction), 1000);
                     }
                     next(action);
                 } else {
@@ -272,8 +283,13 @@ export const DiagramMakerContainer = ({
                 <div ref={containerRef}></div>
             </Grid>
             <Grid item xs={4} md={4}>
-                <JSONPretty id="jsonPretty" onJSONPrettyError={e => console.error(e)}
-                            data={diagramMakerState}></JSONPretty>
+                <div style={{
+                    width: "500px",
+                    height: "500px",
+                    overflowY: "scroll"
+                }}><JSONPretty id="jsonPretty"
+                               onJSONPrettyError={e => console.error(e)}
+                               data={diagramMakerState}></JSONPretty></div>
             </Grid>
         </Grid>
     </div>

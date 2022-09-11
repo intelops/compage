@@ -178,7 +178,6 @@ export function createWorkspaceContextMenu(container: HTMLElement) {
 
 export function createPanelNode(testId: string, text: string, size?: Size) {
     const newDiv = createDivWithText(text);
-    // newDiv.setAttribute("style", "border: 1px solid black");
     newDiv.classList.add('rectangle', 'example-node', 'potential-node');
     newDiv.setAttribute('data-id', testId);
     newDiv.setAttribute('data-type', 'DiagramMaker.PotentialNode');
@@ -235,8 +234,6 @@ function createToolButton(text: string, eventListener: () => void) {
 
 function createUpdateContainerButton(getDiagramMakerObj: () => DiagramMaker) {
     return createToolButton('UpdateContainer', () => {
-        // Not required - MB
-        // getDiagramMakerObj().api.fit(500, 500)
         getDiagramMakerObj().updateContainer();
     });
 }
@@ -352,7 +349,6 @@ export function createToolsPanel(container: HTMLElement, getDiagramMakerObj: () 
     const newDiv = document.createElement('div');
     newDiv.classList.add('tools');
     newDiv.innerText = 'Tools';
-    // getDiagramMakerObj().api.layout().
     newDiv.appendChild(createUpdateContainerButton(getDiagramMakerObj));
     newDiv.appendChild(createDestroyButton(getDiagramMakerObj));
     newDiv.appendChild(createDragToolButton(getDiagramMakerObj));
