@@ -38,6 +38,8 @@ import {
 
 // import BoundaryRectangularData from './BoundaryRectangular/data';
 import {Action, Dispatch} from "redux";
+import JSONPretty from "react-json-pretty";
+import {Grid} from "@mui/material";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -49,6 +51,7 @@ interface ArgTypes {
     actionInterceptor?: boolean;
     plugin?: boolean;
     onAction?: (...args: any) => void;
+    // updateDiagramMakerState: (diagramMakerState: string) => void
 }
 
 const createDivWithId = (id: string) => {
@@ -67,10 +70,12 @@ export const DiagramMakerContainer = ({
                                           actionInterceptor,
                                           plugin,
                                           onAction,
+                                          // updateDiagramMakerState
                                       }: ArgTypes) => {
     const rootRef = useRef() as any;
     const containerRef = useRef() as any;
     const diagramMakerRef = useRef() as any;
+    const [diagramMakerState, setDiagramMakerState] = React.useState("{}");
 
     React.useEffect(() => {
         // let shape, connectorPlacement, showArrowhead, plugin, edgeBadge
@@ -251,11 +256,26 @@ export const DiagramMakerContainer = ({
         });
         diagramMakerRef.current.store.subscribe((e) => {
             const state = diagramMakerRef.current.store.getState();
-            console.log(state);
+            setDiagramMakerState(JSON.stringify(state))
+            // sendDiagramMakerState(JSON.stringify(state))
+            console.log("state : ", state);
         });
     }, [plugin, initialData]);
+
+    // const sendDiagramMakerState = (diagramMakerState: string) => {
+    //     updateDiagramMakerState(diagramMakerState);
+    // };
+
     return <div ref={rootRef}>
-        <div ref={containerRef}></div>
+        <Grid container spacing={2}>
+            <Grid item xs={8} md={8}>
+                <div ref={containerRef}></div>
+            </Grid>
+            <Grid item xs={4} md={4}>
+                <JSONPretty id="jsonPretty" onJSONPrettyError={e => console.error(e)}
+                            data={diagramMakerState}></JSONPretty>
+            </Grid>
+        </Grid>
     </div>
 }
 

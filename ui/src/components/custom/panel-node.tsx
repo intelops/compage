@@ -1,5 +1,4 @@
 import React from 'react';
-import Draggable from 'react-draggable';
 
 interface PanelNodeProps {
     type: string,
@@ -10,8 +9,6 @@ interface PanelNodeProps {
 
 export const PanelNode = (props: PanelNodeProps) => {
     return <React.Fragment>
-        <Draggable>
-            <div style={{border: "1px solid red", width: props.width, height: props.height}}>{props.text}</div>
-        </Draggable>
+        <div style={{border: "1px solid red", width: props.width, height: props.height}}>{props.text}</div>
     </React.Fragment>;
 }

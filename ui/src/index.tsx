@@ -4,6 +4,7 @@ import './index.css';
 import {App} from './App';
 import reportWebVitals from './reportWebVitals';
 import 'diagram-maker/dist/diagramMaker.css';
+import 'react-json-pretty/themes/monikai.css';
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
