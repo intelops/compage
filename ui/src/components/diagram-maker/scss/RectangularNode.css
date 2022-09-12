@@ -1,0 +1,105 @@
+html, body {
+  height: 100%;
+  width: 100%; }
+
+html .sb-show-main.sb-main-padded, body .sb-show-main.sb-main-padded {
+  padding: 0; }
+
+#diagramMakerContainer {
+  position: relative !important;
+  color: var(--diagram-maker-text-color);
+  height: 100%;
+  width: 100%;
+  overflow: hidden; }
+
+.dm-view .dm-panels {
+  top: 90px;
+  left: 2px; }
+
+.dm-view .dm-panels .dm-panel {
+  overflow-y: auto;
+  width: 160px;
+  height: 300px; }
+
+.dm-view .dm-panels .dm-panel .dm-content {
+  padding: 5px;
+  width: 195px;
+  height: 300px; }
+
+.library {
+  height: 560px;
+  width: 140px;
+  top: 5px;
+  overflow: hidden; }
+
+.library .draggableElement {
+  height: 20px;
+  background: var(--diagram-maker-container_disabled-background-color); }
+
+.example-node {
+  box-sizing: border-box;
+  border: 1px solid var(--diagram-maker-border-color);
+  background-color: var(--diagram-maker-container-background-color);
+  padding: 10px;
+  height: 100%;
+  transition: all .2s ease; }
+
+.example-node.odd {
+  border: 1px solid #00ef73; }
+
+.example-node.even {
+  border: 1px solid blue; }
+
+.example-node.selected {
+  border: 1px solid #0073bb; }
+
+.example-node input, .example-node select {
+  background-color: var(--diagram-maker-input-background-color);
+  border: var(--diagram-maker-input-border);
+  color: var(--diagram-maker-text-color); }
+
+.testInput {
+  background-color: var(--diagram-maker-input-background-color);
+  border: var(--diagram-maker-input-border);
+  color: var(--diagram-maker-text-color);
+  width: 100%; }
+
+.contextMenu {
+  box-shadow: 0 1px 1px 0 var(--diagram-maker-border-shadow-30-perc), 1px 1px 1px 0 var(--diagram-maker-border-shadow-15-perc), -1px 1px 1px 0 var(--diagram-maker-border-shadow-15-perc);
+  border-top: 1px solid var(--diagram-maker-border-color);
+  border-radius: 0;
+  box-sizing: border-box;
+  background-color: var(--diagram-maker-container-background-color);
+  padding: 5px; }
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  .contextMenu {
+    border: 1px solid var(--diagram-maker-border-color); } }
+
+.hello .dm-view .dm-workspace {
+  border: 1px red solid;
+  overflow: hidden;
+  position: relative !important;
+  top: 75px;
+  max-width: 1000px;
+  max-height: 592px; }
+
+.example-node.rectangle {
+  border-radius: 3px; }
+
+.example-node.rectangle.potential-node {
+  width: 110px;
+  height: 50px;
+  margin: auto;
+  margin-top: 6px; }
+
+.example-node.rectangle.connector-node {
+  position: absolute;
+  width: 100%;
+  height: 100%; }
+
+.example-node.rectangle input, .example-node.rectangle select {
+  width: 100%; }
+
+.outer-rectangle {
+  border-radius: 0%; }

@@ -4,7 +4,6 @@ import {AuthContext} from "../App";
 import {getData} from "../data/BoundaryCircular/data";
 import {DiagramMakerContainer} from "./diagram-maker/diagram-maker-container";
 import Container from "@mui/material/Container";
-import {Grid} from "@mui/material";
 
 export const Home = () => {
     const {state, dispatch} = useContext(AuthContext);
@@ -24,20 +23,7 @@ export const Home = () => {
 
     return (
         <Container fixed>
-            <Grid container spacing={2}>
-                <Grid item xs={8}>
-                    <DiagramMakerContainer initialData={diagramMakerData}
-                                           /*updateDiagramMakerState={updateDiagramMakerState}*//>
-                </Grid>
-                {/*<Grid item xs={4}>*/}
-                    {/*<ProfileCard/>*/}
-                    {/*<JSONPretty id="jsonPretty" onJSONPrettyError={e => console.error(e)}*/}
-                    {/*            data={diagramMakerState}></JSONPretty>*/}
-                    {/*<Box>*/}
-                    {/*    <div id="diagramMakerLogger"></div>*/}
-                    {/*</Box>*/}
-                {/*</Grid>*/}
-            </Grid>
+            <DiagramMakerContainer initialData={diagramMakerData}/>
         </Container>
     );
 }

@@ -1,7 +1,7 @@
-@import '../../../node_modules/diagram-maker/dist/diagramMaker.css';
+@import './common.scss';
 
 #diagramMakerLogger {
-  //@include dm-container-shadow;
+  @include dm-container-shadow;
   color: var(--diagram-maker-text-color);
   width: 50%;
   height: 100px;

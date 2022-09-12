@@ -1,0 +1,105 @@
+@mixin dm-container-shadow {
+  box-shadow: 0 1px 1px 0 var(--diagram-maker-border-shadow-30-perc), 1px 1px 1px 0 var(--diagram-maker-border-shadow-15-perc), -1px 1px 1px 0 var(--diagram-maker-border-shadow-15-perc);
+  border-top: 1px solid var(--diagram-maker-border-color);
+  border-radius: 0;
+  box-sizing: border-box;
+
+  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    border: 1px solid var(--diagram-maker-border-color);
+  }
+}
+
+html, body {
+  .sb-show-main.sb-main-padded {
+    padding: 0;
+  }
+
+  height: 100%;
+  width: 100%;
+}
+
+#diagramMakerContainer {
+  position: relative !important;
+  color: var(--diagram-maker-text-color);
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.dm-view{
+  .dm-panels{
+    top: 90px;
+    left: 2px;
+    .dm-panel {
+      overflow-y: auto;
+      width: 160px;
+      height: 300px;
+      .dm-content {
+        padding: 5px;
+        width: 195px;
+        height:  300px;
+      }
+    }
+  }
+
+}
+.library {
+  height: 560px;
+  width: 140px;
+  top: 5px;
+  overflow: hidden;
+
+  .draggableElement {
+    height: 20px;
+    background: var(--diagram-maker-container_disabled-background-color);
+  }
+}
+
+.example-node {
+  box-sizing: border-box;
+  border: 1px solid var(--diagram-maker-border-color);
+  background-color: var(--diagram-maker-container-background-color);
+  padding: 10px;
+  height: 100%;
+  transition: all .2s ease;
+
+  &.odd {
+    border: 1px solid #00ef73;
+  }
+
+  &.even {
+    border: 1px solid blue;
+  }
+
+  &.selected {
+    border: 1px solid #0073bb;
+  }
+
+  & input, & select {
+    background-color: var(--diagram-maker-input-background-color);
+    border: var(--diagram-maker-input-border);
+    color: var(--diagram-maker-text-color);
+  }
+}
+
+.testInput {
+  background-color: var(--diagram-maker-input-background-color);
+  border: var(--diagram-maker-input-border);
+  color: var(--diagram-maker-text-color);
+  width: 100%;
+}
+
+.contextMenu {
+  @include dm-container-shadow;
+  background-color: var(--diagram-maker-container-background-color);
+  padding: 5px;
+}
+
+.hello .dm-view .dm-workspace {
+  border: 1px red solid;
+  overflow: hidden;
+  position: relative !important;
+  top: 75px;
+  max-width: 1000px;
+  max-height: 592px;
+}

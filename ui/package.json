@@ -18,6 +18,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "build:css": "node-sass src/ -o src/ ",
+    "watch:css": "npm run build:css && node-sass src/ -o src/ -w -r",
     "start": "concurrently \"cd ../ && npx ts-node app/server.ts \" \"react-scripts start\" ",
     "build": "react-scripts build && mv ./build ../build/ui",
     "test": "react-scripts test",
@@ -69,6 +71,7 @@
     "@storybook/testing-library": "^0.0.13",
     "@types/jest": "^29.0.0",
     "@types/node": "^18.7.15",
+    "@types/node-sass": "^4.11.3",
     "@types/react": "^18.0.18",
     "@types/react-dom": "^18.0.6",
     "@types/react-router-dom": "^5.3.3",
@@ -78,6 +81,7 @@
     "diagram-maker": "^2.0.1",
     "diagram-maker-plugin-minimap": "^1.0.1",
     "mini-css-extract-plugin": "^2.5.3",
+    "node-sass": "^7.0.3",
     "postcss": "^8.4.6",
     "postcss-loader": "^6.2.1",
     "postcss-scss": "^4.0.3",

@@ -3,7 +3,6 @@ import {
     ConnectorPlacement,
     ConnectorPlacementType,
     ContextMenuRenderCallbacks,
-    CreateEdgeAction,
     DiagramMaker,
     DiagramMakerAction,
     DiagramMakerActions,
@@ -18,6 +17,11 @@ import {
     WorkspaceActions
 } from "diagram-maker";
 import "diagram-maker/dist/diagramMaker.css";
+import "./scss/common.css"
+import "./scss/CircularNode.css"
+import "./scss/RectangularNode.css"
+import "./scss/Logger.css"
+
 import React, {useRef} from "react";
 import {
     createCircularNode,
@@ -72,7 +76,6 @@ export const DiagramMakerContainer = ({
                                           onAction,
                                           // updateDiagramMakerState
                                       }: ArgTypes) => {
-    const rootRef = useRef() as any;
     const containerRef = useRef() as any;
     const diagramMakerRef = useRef() as any;
     const [diagramMakerState, setDiagramMakerState] = React.useState("{}");
@@ -171,7 +174,9 @@ export const DiagramMakerContainer = ({
                         && "payload" in diagramMakerAction
                         && "nodeIds" in diagramMakerAction.payload
                         && diagramMakerAction.payload.nodeIds.length > 0) {
-                        return;
+                        // stops from deleting nodes
+                        // return;
+                        console.log("Deleting node : ", diagramMakerAction.payload.nodeIds)
                     }
 
                     if (diagramMakerAction.type === DiagramMakerActions.NODE_CREATE
@@ -271,25 +276,30 @@ export const DiagramMakerContainer = ({
             // sendDiagramMakerState(JSON.stringify(state))
             console.log("state : ", state);
         });
+        // const names = document.getElementsByClassName('dm-workspace');
+        // if (names.length == 1){
+        //     console.log("names1 :", names)
+        //     names[0].attributes["position"] = "relative"
+        //     console.log("names2 :", names)
+        // }
+
     }, [plugin, initialData]);
 
-    // const sendDiagramMakerState = (diagramMakerState: string) => {
-    //     updateDiagramMakerState(diagramMakerState);
-    // };
-
-    return <div ref={rootRef}>
+    return <div>
         <Grid container spacing={2}>
-            <Grid item xs={8} md={8}>
+            <Grid item xs={12} md={6}>
                 <div ref={containerRef}></div>
             </Grid>
-            <Grid item xs={4} md={4}>
-                <div style={{
-                    width: "500px",
-                    height: "500px",
-                    overflowY: "scroll"
-                }}><JSONPretty id="jsonPretty"
-                               onJSONPrettyError={e => console.error(e)}
-                               data={diagramMakerState}></JSONPretty></div>
+            <Grid item xs={12} md={6}>
+                <JSONPretty id="jsonPretty"
+                            style={{
+                                display: "inline-block",
+                                overflowY: "scroll",
+                                height: "500px",
+                                width: "350px"
+                            }}
+                            onJSONPrettyError={e => console.error(e)}
+                            data={diagramMakerState}/>
             </Grid>
         </Grid>
     </div>

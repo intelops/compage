@@ -31,23 +31,22 @@ export const getData = (parentWidth, parentHeight) => {
         panels: {
             library: {
                 id: 'library',
-                position: {x: 0, y: parentHeight / 3},
-                size: {width: parentWidth/3, height: parentHeight/1.5},
+                position: {x: 10, y: 75},
+                size: {width: 150, height: 350},
                 positionAnchor: PositionAnchor.TOP_LEFT,
             },
             tools: {
                 id: 'tools',
-                position: {x: 0, y:   parentHeight },
-                size: {width: parentWidth/3, height: parentHeight/1.5},
-                positionAnchor: PositionAnchor.TOP_LEFT,
+                position: {x: 10, y: 75},
+                size: {width: 150, height: 350},
+                positionAnchor: PositionAnchor.TOP_RIGHT,
             },
         },
         workspace: {
             scale: 1,
-            position: {x: 0, y: 0},
-            // position: { x: parentWidth, y: 0 },
-            canvasSize: {width: parentWidth, height: parentHeight},
-            viewContainerSize: {width: parentWidth, height: parentHeight},
+            position: {x: 40, y: 75},
+            canvasSize: {width: window.innerWidth * 0.55, height: window.innerHeight * 0.85},
+            viewContainerSize: {width: window.innerWidth * 0.55, height: window.innerHeight * 0.85},
         },
         editor: {mode: EditorMode.DRAG},
     };
