@@ -202,7 +202,7 @@ export function createLibraryPanel(container: HTMLElement) {
 
     // Create element that is draggable at the top of the panel
     const draggableElement = document.createElement('div');
-    draggableElement.innerText = 'drag here';
+    draggableElement.innerText = 'Drag Library';
     draggableElement.classList.add('draggableElement');
     draggableElement.setAttribute('data-event-target', 'true');
     draggableElement.setAttribute('data-draggable', 'true');
@@ -214,12 +214,12 @@ export function createLibraryPanel(container: HTMLElement) {
     newDiv.appendChild(createPanelNode('testId-normal', 'Normal'));
     newDiv.appendChild(createPanelNode('testId-normalWithSize', 'Normal with Size', {width: 50, height: 50}));
     newDiv.appendChild(createPanelNode('testId-topBottom', 'Top Bottom'));
-    newDiv.appendChild(createPanelNode('testId-centered', 'Centered'));
+    // newDiv.appendChild(createPanelNode('testId-centered', 'Centered'));
     newDiv.appendChild(createPanelNode('testId-start', 'Start Node'));
     newDiv.appendChild(createPanelNode('testId-end', 'End Node'));
     newDiv.appendChild(createPanelNode('testId-dead', 'Dead Node'));
-    newDiv.appendChild(createPanelNode('testId-input', 'With Input'));
-    newDiv.appendChild(createPanelNode('testId-dropdown', 'With Dropdown'));
+    // newDiv.appendChild(createPanelNode('testId-input', 'With Input'));
+    // newDiv.appendChild(createPanelNode('testId-dropdown', 'With Dropdown'));
     container.appendChild(newDiv);
     return newDiv;
 }
@@ -349,7 +349,7 @@ export function createToolsPanel(container: HTMLElement, getDiagramMakerObj: () 
     const newDiv = document.createElement('div');
     newDiv.classList.add('tools');
     newDiv.innerText = 'Tools';
-    newDiv.appendChild(createUpdateContainerButton(getDiagramMakerObj));
+    // newDiv.appendChild(createUpdateContainerButton(getDiagramMakerObj));
     newDiv.appendChild(createDestroyButton(getDiagramMakerObj));
     newDiv.appendChild(createDragToolButton(getDiagramMakerObj));
     newDiv.appendChild(createSelectToolButton(getDiagramMakerObj));
@@ -362,9 +362,9 @@ export function createToolsPanel(container: HTMLElement, getDiagramMakerObj: () 
     newDiv.appendChild(createResetZoomButton(getDiagramMakerObj));
     newDiv.appendChild(createUndoButton(getDiagramMakerObj));
     newDiv.appendChild(createRedoButton(getDiagramMakerObj));
-    newDiv.appendChild(createWorkflowLayoutButton(getDiagramMakerObj));
-    newDiv.appendChild(createHierarchicalLayoutButton(getDiagramMakerObj));
-    newDiv.appendChild(createTestInput());
+    // newDiv.appendChild(createWorkflowLayoutButton(getDiagramMakerObj));
+    // newDiv.appendChild(createHierarchicalLayoutButton(getDiagramMakerObj));
+    // newDiv.appendChild(createTestInput());
 
     container.appendChild(newDiv);
 }

@@ -16,6 +16,7 @@ html, body {
 
   height: 100%;
   width: 100%;
+  overflow: hidden;
 }
 
 #diagramMakerContainer {
@@ -24,25 +25,28 @@ html, body {
   height: 100%;
   width: 100%;
   overflow: hidden;
+  border: 1px solid red;
 }
 
-.dm-view{
-  .dm-panels{
+.dm-view {
+  .dm-panels {
     top: 90px;
     left: 2px;
+
     .dm-panel {
-      overflow-y: auto;
-      width: 160px;
-      height: 300px;
+      //overflow-y: auto;
+      //width: 160px;
+      //height: 300px;
       .dm-content {
         padding: 5px;
-        width: 195px;
-        height:  300px;
+        //width: 195px;
+        //height:  300px;
       }
     }
   }
 
 }
+
 .library {
   height: 560px;
   width: 140px;

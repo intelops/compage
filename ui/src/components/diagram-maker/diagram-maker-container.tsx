@@ -28,8 +28,6 @@ import {
     createEdgeContextMenu,
     createLibraryPanel,
     createNodeContextMenu,
-    createNodeWithDropdown,
-    createNodeWithInput,
     createPanelContextMenu,
     createPluginPanel,
     createPotentialNode,
@@ -42,8 +40,8 @@ import {
 
 // import BoundaryRectangularData from './BoundaryRectangular/data';
 import {Action, Dispatch} from "redux";
-import JSONPretty from "react-json-pretty";
 import {Grid} from "@mui/material";
+import JSONPretty from "react-json-pretty";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -55,7 +53,6 @@ interface ArgTypes {
     actionInterceptor?: boolean;
     plugin?: boolean;
     onAction?: (...args: any) => void;
-    // updateDiagramMakerState: (diagramMakerState: string) => void
 }
 
 const createDivWithId = (id: string) => {
@@ -110,12 +107,12 @@ export const DiagramMakerContainer = ({
                         // />, container);
                         return createCircularNode(node, container);
                     }
-                    if (node.typeId === 'testId-input') {
-                        return createNodeWithInput(node, container);
-                    }
-                    if (node.typeId === 'testId-dropdown') {
-                        return createNodeWithDropdown(node, container);
-                    }
+                    // if (node.typeId === 'testId-input') {
+                    //     return createNodeWithInput(node, container);
+                    // }
+                    // if (node.typeId === 'testId-dropdown') {
+                    //     return createNodeWithDropdown(node, container);
+                    // }
                     if (connectorPlacement === ConnectorPlacement.BOUNDARY) {
                         if (shape === Shape.CIRCLE) {
                             return createCircularNode(node, container);
@@ -183,7 +180,7 @@ export const DiagramMakerContainer = ({
                         && "payload" in diagramMakerAction) {
                         // nodes before are even so this odd
                         diagramMakerAction.payload["consumerData"] = {
-                            "mahendra": "bagul",
+                            "test": "data",
                             odd: Object.keys(getState().nodes).length % 2 === 0,
                         };
                         next(diagramMakerAction);
@@ -270,39 +267,36 @@ export const DiagramMakerContainer = ({
             } : undefined,
             initialData
         });
-        diagramMakerRef.current.store.subscribe((e) => {
+
+        const state = diagramMakerRef.current.store.getState();
+        setDiagramMakerState(JSON.stringify(state))
+
+        diagramMakerRef.current.store.subscribe(() => {
             const state = diagramMakerRef.current.store.getState();
             setDiagramMakerState(JSON.stringify(state))
-            // sendDiagramMakerState(JSON.stringify(state))
             console.log("state : ", state);
         });
-        // const names = document.getElementsByClassName('dm-workspace');
-        // if (names.length == 1){
-        //     console.log("names1 :", names)
-        //     names[0].attributes["position"] = "relative"
-        //     console.log("names2 :", names)
-        // }
 
     }, [plugin, initialData]);
 
-    return <div>
-        <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-                <div ref={containerRef}></div>
-            </Grid>
-            <Grid item xs={12} md={6}>
-                <JSONPretty id="jsonPretty"
-                            style={{
-                                display: "inline-block",
-                                overflowY: "scroll",
-                                height: "500px",
-                                width: "350px"
-                            }}
-                            onJSONPrettyError={e => console.error(e)}
-                            data={diagramMakerState}/>
-            </Grid>
+    return <Grid container spacing={1}>
+        <Grid item xs={8} md={8}>
+            <div id="diagramMakerContainer" ref={containerRef}></div>
         </Grid>
-    </div>
+        <Grid item xs={4} md={4} style={{
+            width: "100%",
+            overflow: "hidden"
+        }}>
+            <JSONPretty id="jsonPretty"
+                        style={{
+                            width: "100%",
+                            overflow: "auto",
+                            height: "500px",
+                        }}
+                        onJSONPrettyError={e => console.error(e)}
+                        data={diagramMakerState}/>
+        </Grid>
+    </Grid>
 }
 
 export function addDevTools() {

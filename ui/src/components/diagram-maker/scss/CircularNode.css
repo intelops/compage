@@ -1,6 +1,7 @@
 html, body {
   height: 100%;
-  width: 100%; }
+  width: 100%;
+  overflow: hidden; }
 
 html .sb-show-main.sb-main-padded, body .sb-show-main.sb-main-padded {
   padding: 0; }
@@ -10,21 +11,15 @@ html .sb-show-main.sb-main-padded, body .sb-show-main.sb-main-padded {
   color: var(--diagram-maker-text-color);
   height: 100%;
   width: 100%;
-  overflow: hidden; }
+  overflow: hidden;
+  border: 1px solid red; }
 
 .dm-view .dm-panels {
   top: 90px;
   left: 2px; }
 
-.dm-view .dm-panels .dm-panel {
-  overflow-y: auto;
-  width: 160px;
-  height: 300px; }
-
 .dm-view .dm-panels .dm-panel .dm-content {
-  padding: 5px;
-  width: 195px;
-  height: 300px; }
+  padding: 5px; }
 
 .library {
   height: 560px;
@@ -108,4 +103,6 @@ html .sb-show-main.sb-main-padded, body .sb-show-main.sb-main-padded {
   width: 80px;
   text-align: center;
   border: 1px solid #888;
+  border-radius: 5px; }
+d #888;
   border-radius: 5px; }

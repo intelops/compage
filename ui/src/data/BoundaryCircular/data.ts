@@ -31,13 +31,13 @@ export const getData = (parentWidth, parentHeight) => {
         panels: {
             library: {
                 id: 'library',
-                position: {x: 10, y: 75},
+                position: {x: 0, y: 0},
                 size: {width: 150, height: 350},
                 positionAnchor: PositionAnchor.TOP_LEFT,
             },
             tools: {
                 id: 'tools',
-                position: {x: 10, y: 75},
+                position: {x: 0, y: 0},
                 size: {width: 150, height: 350},
                 positionAnchor: PositionAnchor.TOP_RIGHT,
             },
