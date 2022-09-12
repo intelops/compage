@@ -161,11 +161,11 @@ export const DiagramMakerContainer = ({
                 // onAction(action);
                 if (actionInterceptor) {
                     const diagramMakerAction = action as DiagramMakerAction<{ odd: boolean }, {}>;
-                    if ("payload" in diagramMakerAction) {
-                        console.log("++++++++++++++++++++++++++")
-                        console.log("action : ", diagramMakerAction?.payload)
-                        console.log("++++++++++++++++++++++++++")
-                    }
+                    // if ("payload" in diagramMakerAction) {
+                    //     console.log("++++++++++++++++++++++++++")
+                    //     console.log("action : ", diagramMakerAction?.payload)
+                    //     console.log("++++++++++++++++++++++++++")
+                    // }
                     updateActionInLogger(action);
                     if (diagramMakerAction.type === DiagramMakerActions.DELETE_ITEMS
                         && "payload" in diagramMakerAction
@@ -274,7 +274,7 @@ export const DiagramMakerContainer = ({
         diagramMakerRef.current.store.subscribe(() => {
             const state = diagramMakerRef.current.store.getState();
             setDiagramMakerState(JSON.stringify(state))
-            console.log("state : ", state);
+            // console.log("state : ", state);
         });
 
     }, [plugin, initialData]);

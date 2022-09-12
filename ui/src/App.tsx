@@ -4,7 +4,7 @@ import {initialState, reducer} from "./store/auth_reducer";
 import {HashRouter as Router, Route, Routes} from "react-router-dom";
 import {Login} from "./components/auth/Login";
 import {Home} from "./components/Home";
-import ResponsiveAppBar from "./components/navbar/navbar";
+import Navbar from "./components/navbar/Navbar";
 
 export const AuthContext = createContext(null);
 
@@ -17,7 +17,7 @@ export const App = () => {
             dispatch
         }}>
         <Router>
-            <ResponsiveAppBar></ResponsiveAppBar>
+            <Navbar/>
             <Routes>
                 <Route path="/login" element={<Login/>}/>
                 <Route path="/" element={<Home/>}/>

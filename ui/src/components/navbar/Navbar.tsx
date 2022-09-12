@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useContext} from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -12,17 +13,21 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import {useContext} from "react";
 import {AuthContext} from "../../App";
-import {Navigate} from "react-router-dom";
 
 const pages = ['Products', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const settings = ['Account', 'Logout'];
 
-const ResponsiveAppBar = () => {
+const Navbar = () => {
     const {state, dispatch} = useContext(AuthContext);
-
-    const {avatar_url, name, public_repos, followers, following} = state.user
+    let avatar_url, name, public_repos, followers, following;
+    if (state.user) {
+        name = state.user.name
+        following = state.user.following
+        followers = state.user.followers
+        public_repos = state.user.public_repos
+        avatar_url = state.user.avatar_url
+    }
 
     const handleLogout = () => {
         dispatch({
@@ -47,6 +52,20 @@ const ResponsiveAppBar = () => {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
+
+    function getMenuItem(setting: string) {
+        if (setting === "Logout") {
+            if (state.user) {
+                return <MenuItem key={setting} onClick={handleLogout}>
+                    <Typography textAlign="center">{setting}</Typography>
+                </MenuItem>;
+            }
+            return
+        }
+        return <MenuItem key={setting} onClick={handleCloseUserMenu}>
+            <Typography textAlign="center">{setting}</Typography>
+        </MenuItem>;
+    }
 
     return (
         <AppBar position="static">
@@ -139,9 +158,9 @@ const ResponsiveAppBar = () => {
                     </Box>
 
                     <Box sx={{flexGrow: 0}}>
-                        <Tooltip title="Open settings">
+                        <Tooltip title="Account Details">
                             <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg"/>
+                                <Avatar alt={name} src="/static/images/avatar/2.jpg"/>
                             </IconButton>
                         </Tooltip>
                         <Menu
@@ -160,11 +179,7 @@ const ResponsiveAppBar = () => {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
-                            {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center">{setting}</Typography>
-                                </MenuItem>
-                            ))}
+                            {settings.map((setting) => getMenuItem(setting))}
                         </Menu>
                     </Box>
                 </Toolbar>
@@ -172,4 +187,4 @@ const ResponsiveAppBar = () => {
         </AppBar>
     );
 };
-export default ResponsiveAppBar;
+export default Navbar;
