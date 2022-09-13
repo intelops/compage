@@ -76,6 +76,11 @@ export const DiagramMakerContainer = ({
     const containerRef = useRef() as any;
     const diagramMakerRef = useRef() as any;
     const [diagramMakerState, setDiagramMakerState] = React.useState("{}");
+    if (darkTheme) {
+        document.body.classList.add('dm-dark-theme');
+    } else {
+        document.body.classList.remove('dm-dark-theme');
+    }
 
     // clean unwanted data from state payload.
     const setData = (state: string) => {

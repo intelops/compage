@@ -16,7 +16,7 @@ export const Home = () => {
 
     return (
         <Container fixed>
-            <DiagramMakerContainer initialData={diagramMakerData}/>
+            <DiagramMakerContainer initialData={diagramMakerData} darkTheme={false}/>
         </Container>
     );
 }
