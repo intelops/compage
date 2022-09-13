@@ -77,6 +77,35 @@ export const DiagramMakerContainer = ({
     const diagramMakerRef = useRef() as any;
     const [diagramMakerState, setDiagramMakerState] = React.useState("{}");
 
+    // clean unwanted data from state payload.
+    const setData = (state: string) => {
+        if (state) {
+            const stateJson = JSON.parse(state)
+            delete stateJson.panels
+            delete stateJson.plugins
+            delete stateJson.potentialEdge
+            delete stateJson.potentialNode
+            delete stateJson.editor
+            delete stateJson.undoHistory
+            delete stateJson.workspace
+            // nodes
+            for (let key in stateJson.nodes) {
+                let diagramMakerData = stateJson.nodes[key].diagramMakerData;
+                console.log(diagramMakerData)
+                delete diagramMakerData.position
+                delete diagramMakerData.size
+            }
+            // edges
+            for (let key in stateJson.edges) {
+                let diagramMakerData = stateJson.edges[key].diagramMakerData;
+                console.log(diagramMakerData)
+                delete diagramMakerData.position
+                delete diagramMakerData.size
+            }
+            setDiagramMakerState(JSON.stringify(stateJson))
+        }
+    }
+
     React.useEffect(() => {
         // let shape, connectorPlacement, showArrowhead, plugin, edgeBadge
         let plugin, connectorPlacement
@@ -175,6 +204,11 @@ export const DiagramMakerContainer = ({
                         // return;
                         console.log("Deleting node : ", diagramMakerAction.payload.nodeIds)
                     }
+                    if (diagramMakerAction.type === DiagramMakerActions.NODE_SELECT && "payload" in diagramMakerAction) {
+                        console.log("Select node action : ", diagramMakerAction.payload)
+                        // if return, state won't be updated
+                        // return;
+                    }
 
                     if (diagramMakerAction.type === DiagramMakerActions.NODE_CREATE
                         && "payload" in diagramMakerAction) {
@@ -269,12 +303,11 @@ export const DiagramMakerContainer = ({
         });
 
         const state = diagramMakerRef.current.store.getState();
-        setDiagramMakerState(JSON.stringify(state))
+        setData(JSON.stringify(state))
 
         diagramMakerRef.current.store.subscribe(() => {
             const state = diagramMakerRef.current.store.getState();
-            setDiagramMakerState(JSON.stringify(state))
-            // console.log("state : ", state);
+            setData(JSON.stringify(state))
         });
 
     }, [plugin, initialData]);
