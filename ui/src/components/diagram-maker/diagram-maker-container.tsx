@@ -91,14 +91,12 @@ export const DiagramMakerContainer = ({
             // nodes
             for (let key in stateJson.nodes) {
                 let diagramMakerData = stateJson.nodes[key].diagramMakerData;
-                console.log(diagramMakerData)
                 delete diagramMakerData.position
                 delete diagramMakerData.size
             }
             // edges
             for (let key in stateJson.edges) {
                 let diagramMakerData = stateJson.edges[key].diagramMakerData;
-                console.log(diagramMakerData)
                 delete diagramMakerData.position
                 delete diagramMakerData.size
             }
@@ -205,7 +203,7 @@ export const DiagramMakerContainer = ({
                         console.log("Deleting node : ", diagramMakerAction.payload.nodeIds)
                     }
                     if (diagramMakerAction.type === DiagramMakerActions.NODE_SELECT && "payload" in diagramMakerAction) {
-                        console.log("Select node action : ", diagramMakerAction.payload)
+                        // console.log("Select node action : ", diagramMakerAction.payload)
                         // if return, state won't be updated
                         // return;
                     }
