@@ -38,10 +38,11 @@ import {
     updateActionInLogger
 } from "../../utils/utils";
 
-// import BoundaryRectangularData from './BoundaryRectangular/data';
+import {useBeforeunload} from 'react-beforeunload';
 import {Action, Dispatch} from "redux";
 import {Grid} from "@mui/material";
 import JSONPretty from "react-json-pretty";
+import {getCurrentConfig, getCurrentState, setCurrentConfig, setCurrentState} from "../../service";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -71,19 +72,31 @@ export const DiagramMakerContainer = ({
                                           actionInterceptor,
                                           plugin,
                                           onAction,
-                                          // updateDiagramMakerState
                                       }: ArgTypes) => {
     const containerRef = useRef() as any;
     const diagramMakerRef = useRef() as any;
-    const [diagramMakerState, setDiagramMakerState] = React.useState("{}");
+    const [diagramMaker, setDiagramMaker] = React.useState({
+        state: "{}",
+        config: "{}"
+    });
+
     if (darkTheme) {
         document.body.classList.add('dm-dark-theme');
     } else {
         document.body.classList.remove('dm-dark-theme');
     }
 
+    useBeforeunload((event) => {
+        if ((diagramMaker.state !== "{}" && diagramMaker.state !== getCurrentState()) || (diagramMaker.config !== "{}" && diagramMaker.config !== getCurrentConfig())) {
+            setCurrentState(diagramMaker.state)
+            setCurrentConfig(diagramMaker.config)
+            event.preventDefault();
+        }
+    });
+
     // clean unwanted data from state payload.
     const setData = (state: string) => {
+        const backupState: string = state.slice();
         if (state) {
             const stateJson = JSON.parse(state)
             delete stateJson.panels
@@ -105,7 +118,10 @@ export const DiagramMakerContainer = ({
                 delete diagramMakerData.position
                 delete diagramMakerData.size
             }
-            setDiagramMakerState(JSON.stringify(stateJson))
+            setDiagramMaker({
+                config: backupState,
+                state: JSON.stringify(stateJson)
+            })
         }
     }
 
@@ -305,8 +321,10 @@ export const DiagramMakerContainer = ({
             initialData
         });
 
-        const state = diagramMakerRef.current.store.getState();
-        setData(JSON.stringify(state))
+        let currentConfig = getCurrentConfig();
+        if (currentConfig) {
+            setData(currentConfig)
+        }
 
         diagramMakerRef.current.store.subscribe(() => {
             const state = diagramMakerRef.current.store.getState();
@@ -330,7 +348,7 @@ export const DiagramMakerContainer = ({
                             height: "500px",
                         }}
                         onJSONPrettyError={e => console.error(e)}
-                        data={diagramMakerState}/>
+                        data={diagramMaker.state}/>
         </Grid>
     </Grid>
 }
