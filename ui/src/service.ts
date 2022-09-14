@@ -1,5 +1,5 @@
-const CURRENT_STATE = "STATE";
-const CURRENT_CONFIG = "CONFIG";
+export const CURRENT_STATE = "STATE";
+export const CURRENT_CONFIG = "CONFIG";
 
 export const setCurrentState = (state: string) => {
     localStorage.setItem(CURRENT_STATE, state)

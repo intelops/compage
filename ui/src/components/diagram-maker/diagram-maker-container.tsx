@@ -33,7 +33,6 @@ import {
     createPotentialNode,
     createRectangularConnectorNode,
     createRectangularNode,
-    createToolsPanel,
     createWorkspaceContextMenu,
     updateActionInLogger
 } from "../../utils/utils";
@@ -43,6 +42,7 @@ import {Action, Dispatch} from "redux";
 import {Grid} from "@mui/material";
 import JSONPretty from "react-json-pretty";
 import {getCurrentConfig, getCurrentState, setCurrentConfig, setCurrentState} from "../../service";
+import {ToolPanel} from "../custom/tool-panel";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -87,10 +87,14 @@ export const DiagramMakerContainer = ({
     }
 
     useBeforeunload((event) => {
-        if ((diagramMaker.state !== "{}" && diagramMaker.state !== getCurrentState()) || (diagramMaker.config !== "{}" && diagramMaker.config !== getCurrentConfig())) {
-            setCurrentState(diagramMaker.state)
-            setCurrentConfig(diagramMaker.config)
-            event.preventDefault();
+        if (localStorage.getItem("RESET") === "false") {
+            if ((diagramMaker.state !== "{}" && diagramMaker.state !== getCurrentState()) || (diagramMaker.config !== "{}" && diagramMaker.config !== getCurrentConfig())) {
+                setCurrentState(diagramMaker.state)
+                setCurrentConfig(diagramMaker.config)
+                event.preventDefault();
+            }
+        } else {
+            localStorage.setItem("RESET", "false")
         }
     });
 
@@ -194,7 +198,12 @@ export const DiagramMakerContainer = ({
                             panel: any,
                             state: any,
                             container: HTMLElement,
-                        ) => createToolsPanel(container, () => diagramMakerRef.current),
+                        ) => {
+                            // return createToolsPanel(container, () => diagramMakerRef.current)
+                            return ReactDOM.render(<ToolPanel
+                                text={"Tools"}
+                                height={200} width={130}/>, container);
+                        },
                     }),
                 },
                 //This is the place to identify which element has been clicked

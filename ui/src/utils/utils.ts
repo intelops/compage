@@ -350,7 +350,7 @@ export function createToolsPanel(container: HTMLElement, getDiagramMakerObj: () 
     newDiv.classList.add('tools');
     newDiv.innerText = 'Tools';
     // newDiv.appendChild(createUpdateContainerButton(getDiagramMakerObj));
-    newDiv.appendChild(createDestroyButton(getDiagramMakerObj));
+    // newDiv.appendChild(createDestroyButton(getDiagramMakerObj));
     newDiv.appendChild(createDragToolButton(getDiagramMakerObj));
     newDiv.appendChild(createSelectToolButton(getDiagramMakerObj));
     newDiv.appendChild(createReadOnlyToolButton(getDiagramMakerObj));
