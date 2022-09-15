@@ -9,7 +9,7 @@ import {
     DiagramMakerData,
     DiagramMakerEdge,
     DiagramMakerNode,
-    DiagramMakerPotentialNode,
+    DiagramMakerPotentialNode, EdgeActions,
     Event,
     Shape,
     ShapeType,
@@ -201,7 +201,7 @@ export const DiagramMakerContainer = ({
                         ) => {
                             // return createToolsPanel(container, () => diagramMakerRef.current)
                             return ReactDOM.render(<ToolPanel
-                                text={"Tools"}
+                                diagramMakerRef={() => diagramMakerRef.current}
                                 height={200} width={130}/>, container);
                         },
                     }),
@@ -330,6 +330,10 @@ export const DiagramMakerContainer = ({
             initialData
         });
 
+        // // to populate the current state in json pretty
+        // diagramMakerRef.current.api.dispatch({
+        //     type: EdgeActions.EDGE_MOUSE_OVER,
+        // });
         let currentConfig = getCurrentConfig();
         if (currentConfig) {
             setData(currentConfig)

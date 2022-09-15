@@ -23,10 +23,12 @@ export const Home = () => {
     return (
         <Container fixed>
             <DiagramMakerContainer initialData={diagramMakerData} darkTheme={false}/>
-            <Button onClick={() => {
+            <Button variant="contained" onClick={() => {
                 localStorage.removeItem(CURRENT_CONFIG)
                 localStorage.removeItem(CURRENT_STATE)
                 localStorage.setItem("RESET", "true")
+                // after resetting, needs to manually reload so, avoiding manual step here.
+                window.location.reload();
             }}>Reset state</Button>
         </Container>
     );

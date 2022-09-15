@@ -38,7 +38,7 @@ export const getData = (parentWidth, parentHeight) => {
             tools: {
                 id: 'tools',
                 position: {x: 0, y: 0},
-                size: {width: 35, height: 300},
+                size: {width: 35, height: 290},
                 positionAnchor: PositionAnchor.TOP_RIGHT,
             },
         },
