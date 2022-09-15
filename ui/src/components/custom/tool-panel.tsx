@@ -15,15 +15,11 @@ import {DiagramMaker, EditorMode} from "diagram-maker";
 import Tooltip from "@mui/material/Tooltip";
 
 interface ToolPanelProps {
-    text?: string,
-    width: number,
-    height: number,
     diagramMakerRef: () => DiagramMaker
 }
 
 export const ToolPanel = (props: ToolPanelProps) => {
-    return <React.Fragment>
-        {props?.text}
+    return <div className="tools">
         <Grid container justifyContent="center" sx={{color: 'text.primary'}}>
             <Grid item xs={12}>
                 <Tooltip title="Drag Mode" placement="left-start">
@@ -96,5 +92,5 @@ export const ToolPanel = (props: ToolPanelProps) => {
                 </Tooltip>
             </Grid>
         </Grid>
-    </React.Fragment>;
+    </div>;
 }

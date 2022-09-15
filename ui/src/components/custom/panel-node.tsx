@@ -1,14 +1,20 @@
 import React from 'react';
+import GridViewIcon from '@mui/icons-material/GridView';
+import Chip from '@mui/material/Chip';
 
 interface PanelNodeProps {
     type: string,
     text: string,
-    width: string,
-    height: string
 }
 
 export const PanelNode = (props: PanelNodeProps) => {
     return <React.Fragment>
-        <div style={{border: "1px solid red", width: props.width, height: props.height}}>{props.text}</div>
+        <div className="circle, example-node, potential-node"
+             data-id={props.type}
+             data-type="DiagramMaker.PotentialNode"
+             data-draggable="true"
+             data-event-target="true">
+            <Chip icon={<GridViewIcon/>} label={props.text}/>
+        </div>
     </React.Fragment>;
 }

@@ -43,6 +43,7 @@ import {Grid} from "@mui/material";
 import JSONPretty from "react-json-pretty";
 import {getCurrentConfig, getCurrentState, setCurrentConfig, setCurrentState} from "../../service";
 import {ToolPanel} from "../custom/tool-panel";
+import {LibraryPanel} from "../custom/library-panel";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -185,7 +186,10 @@ export const DiagramMakerContainer = ({
                 } : undefined,
                 potentialNode: (node: DiagramMakerPotentialNode, container: HTMLElement) => createPotentialNode(node, container),
                 panels: {
-                    library: (panel: any, state: any, container: HTMLElement) => createLibraryPanel(container),
+                    library: (panel: any, state: any, container: HTMLElement) => {
+                        // return  createLibraryPanel(container)
+                        return ReactDOM.render(<LibraryPanel/>, container);
+                    },
                     ...(plugin && {
                         plugin: (
                             panel: any,
@@ -201,8 +205,7 @@ export const DiagramMakerContainer = ({
                         ) => {
                             // return createToolsPanel(container, () => diagramMakerRef.current)
                             return ReactDOM.render(<ToolPanel
-                                diagramMakerRef={() => diagramMakerRef.current}
-                                height={200} width={130}/>, container);
+                                diagramMakerRef={() => diagramMakerRef.current}/>, container);
                         },
                     }),
                 },

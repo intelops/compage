@@ -196,20 +196,20 @@ export function createLibraryPanel(container: HTMLElement) {
     }
 
     const newDiv = document.createElement('div');
-    newDiv.setAttribute('data-event-target', 'true');
-    newDiv.setAttribute('data-dropzone', 'true');
+    // newDiv.setAttribute('data-event-target', 'true');
+    // newDiv.setAttribute('data-dropzone', 'true');
     newDiv.classList.add('library');
 
     // Create element that is draggable at the top of the panel
-    const draggableElement = document.createElement('div');
-    draggableElement.innerText = 'Drag Library';
-    draggableElement.classList.add('draggableElement');
-    draggableElement.setAttribute('data-event-target', 'true');
-    draggableElement.setAttribute('data-draggable', 'true');
-    draggableElement.setAttribute('data-type', 'DiagramMaker.PanelDragHandle');
-    draggableElement.setAttribute('data-id', 'library');
-
-    newDiv.appendChild(draggableElement);
+    // const draggableElement = document.createElement('div');
+    // draggableElement.innerText = 'Drag Library';
+    // draggableElement.classList.add('draggableElement');
+    // draggableElement.setAttribute('data-event-target', 'true');
+    // draggableElement.setAttribute('data-draggable', 'true');
+    // draggableElement.setAttribute('data-type', 'DiagramMaker.PanelDragHandle');
+    // draggableElement.setAttribute('data-id', 'library');
+    //
+    // newDiv.appendChild(draggableElement);
 
     newDiv.appendChild(createPanelNode('testId-normal', 'Normal'));
     newDiv.appendChild(createPanelNode('testId-normalWithSize', 'Normal with Size', {width: 50, height: 50}));
