@@ -14,6 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import {AuthContext} from "../../App";
+import Logo from "../../logo.png";
 
 const pages = ['Products', 'Blog'];
 const settings = ['Account', 'Logout'];
@@ -71,24 +72,34 @@ const Navbar = () => {
         <AppBar position="static">
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <AdbIcon sx={{display: {xs: 'none', md: 'flex'}, mr: 1}}/>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="a"
-                        href="/"
-                        sx={{
-                            mr: 2,
-                            display: {xs: 'none', md: 'flex'},
-                            fontFamily: 'monospace',
-                            fontWeight: 700,
-                            letterSpacing: '.3rem',
-                            color: 'inherit',
-                            textDecoration: 'none',
-                        }}
-                    >
-                        COMPAGE
-                    </Typography>
+                    <Toolbar>
+                        <Box
+                            component="img"
+                            sx={{
+                                height: 64,
+                            }}
+                            alt="Your logo."
+                            src={Logo}
+                        />
+                    </Toolbar>
+                    {/*<AdbIcon sx={{display: {xs: 'none', md: 'flex'}, mr: 1}}/>*/}
+                    {/*<Typography*/}
+                    {/*    variant="h6"*/}
+                    {/*    noWrap*/}
+                    {/*    component="a"*/}
+                    {/*    href="/"*/}
+                    {/*    sx={{*/}
+                    {/*        mr: 2,*/}
+                    {/*        display: {xs: 'none', md: 'flex'},*/}
+                    {/*        fontFamily: 'monospace',*/}
+                    {/*        fontWeight: 700,*/}
+                    {/*        letterSpacing: '.3rem',*/}
+                    {/*        color: 'inherit',*/}
+                    {/*        textDecoration: 'none',*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    {/*    COMPAGE*/}
+                    {/*</Typography>*/}
 
                     <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
                         <IconButton
