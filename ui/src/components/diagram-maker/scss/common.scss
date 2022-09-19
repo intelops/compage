@@ -54,11 +54,6 @@ html, body {
   width: 140px;
   top: 5px;
   overflow: hidden;
-
-  .draggableElement {
-    height: 20px;
-    background: var(--diagram-maker-container_disabled-background-color);
-  }
 }
 
 .example-node {

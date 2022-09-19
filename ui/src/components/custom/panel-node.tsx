@@ -9,7 +9,7 @@ interface PanelNodeProps {
 
 export const PanelNode = (props: PanelNodeProps) => {
     return <React.Fragment>
-        <div className="circle, example-node, potential-node"
+        <div style={{marginTop: "10px"}} className="circle, example-node, potential-node"
              data-id={props.type}
              data-type="DiagramMaker.PotentialNode"
              data-draggable="true"
