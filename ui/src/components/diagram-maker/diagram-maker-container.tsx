@@ -147,9 +147,9 @@ export const DiagramMakerContainer = ({
                     ReactDOM.unmountComponentAtNode(container);
                 },
                 node: (node: DiagramMakerNode<{}>, container: HTMLElement) => {
-                    // not required as its now handled in css files
+                    // not required as its now handled in css files.
                     // container.setAttribute("style", "border: 1px solid black");
-                    if (node.typeId === 'testId-normal') {
+                    if (node.typeId === 'testId-centered') {
                         // return ReactDOM.render(<CircularNode
                         //     node={node}
                         // />, container);
@@ -173,7 +173,7 @@ export const DiagramMakerContainer = ({
                     return ReactDOM.render(<EdgeBadge id={edge.id.substring(0, 10)}/>, container);
                 } : undefined,
                 potentialNode: (node: DiagramMakerPotentialNode, container: HTMLElement) => {
-                    return ReactDOM.render(<PotentialNode id={node.typeId}/>, container);
+                    return ReactDOM.render(<PotentialNode typeId={node.typeId}/>, container);
                 },
                 panels: {
                     library: (panel: any, state: any, container: HTMLElement) => {
