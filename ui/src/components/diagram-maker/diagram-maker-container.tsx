@@ -9,7 +9,7 @@ import {
     DiagramMakerData,
     DiagramMakerEdge,
     DiagramMakerNode,
-    DiagramMakerPotentialNode, EdgeActions,
+    DiagramMakerPotentialNode,
     Event,
     Shape,
     ShapeType,
@@ -25,15 +25,10 @@ import "./scss/Logger.css"
 import React, {useRef} from "react";
 import {
     createCircularNode,
-    createEdgeContextMenu,
-    createLibraryPanel,
-    createNodeContextMenu,
-    createPanelContextMenu,
     createPluginPanel,
     createPotentialNode,
     createRectangularConnectorNode,
     createRectangularNode,
-    createWorkspaceContextMenu,
     updateActionInLogger
 } from "../../utils/utils";
 
@@ -44,6 +39,10 @@ import JSONPretty from "react-json-pretty";
 import {getCurrentConfig, getCurrentState, setCurrentConfig, setCurrentState} from "../../service";
 import {ToolPanel} from "../custom/tool-panel";
 import {LibraryPanel} from "../custom/library-panel";
+import {ContextNode} from "../custom/context-node";
+import {ContextEdge} from "../custom/context-edge";
+import {ContextPanel} from "../custom/context-panel";
+import {ContextWorkspace} from "../custom/context-workspace";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -56,12 +55,6 @@ interface ArgTypes {
     plugin?: boolean;
     onAction?: (...args: any) => void;
 }
-
-const createDivWithId = (id: string) => {
-    const container = document.createElement('div');
-    container.id = id;
-    return container;
-};
 
 export const DiagramMakerContainer = ({
                                           initialData,
@@ -211,10 +204,18 @@ export const DiagramMakerContainer = ({
                 },
                 //This is the place to identify which element has been clicked
                 contextMenu: {
-                    node: (id: string | undefined, container: HTMLElement) => createNodeContextMenu(id, container),
-                    edge: (id: string | undefined, container: HTMLElement) => createEdgeContextMenu(id, container),
-                    panel: (id: string | undefined, container: HTMLElement) => createPanelContextMenu(id, container),
-                    workspace: (container: HTMLElement) => createWorkspaceContextMenu(container),
+                    node: (id: string | undefined, container: HTMLElement) => {
+                        return ReactDOM.render(<ContextNode id={id}/>, container);
+                    },
+                    edge: (id: string | undefined, container: HTMLElement) => {
+                        return ReactDOM.render(<ContextEdge id={id}/>, container);
+                    },
+                    panel: (id: string | undefined, container: HTMLElement) => {
+                        return ReactDOM.render(<ContextPanel id={id}/>, container);
+                    },
+                    workspace: (container: HTMLElement) => {
+                        return ReactDOM.render(<ContextWorkspace/>, container);
+                    },
                 } as ContextMenuRenderCallbacks,
             },
             actionInterceptor: (action: Action, next: Dispatch<Action>, getState: () => DiagramMakerData<{}, {}>) => {

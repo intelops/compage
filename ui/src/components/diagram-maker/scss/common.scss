@@ -99,6 +99,7 @@ html, body {
   @include dm-container-shadow;
   background-color: var(--diagram-maker-container-background-color);
   padding: 5px;
+  border: 2px solid red;
 }
 
 .hello .dm-view .dm-workspace {

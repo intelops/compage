@@ -59,7 +59,8 @@ html, body {
   border-radius: 0;
   box-sizing: border-box;
   background-color: var(--diagram-maker-container-background-color);
-  padding: 5px; }
+  padding: 5px;
+  border: 2px solid red; }
   @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
     .contextMenu {
       border: 1px solid var(--diagram-maker-border-color); } }
