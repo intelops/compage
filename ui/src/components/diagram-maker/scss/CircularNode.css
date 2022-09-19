@@ -88,7 +88,6 @@ html .sb-show-main.sb-main-padded, body .sb-show-main.sb-main-padded {
 
 .example-node.circle {
   border-radius: 100%;
-  padding: 25px;
   position: absolute;
   width: 100%;
   height: 100%;

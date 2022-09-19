@@ -147,8 +147,9 @@ export const DiagramMakerContainer = ({
                     ReactDOM.unmountComponentAtNode(container);
                 },
                 node: (node: DiagramMakerNode<{}>, container: HTMLElement) => {
-                    container.setAttribute("style", "border: 1px solid black");
-                    if (node.typeId === 'testId-centered') {
+                    // not required as its now handled in css files
+                    // container.setAttribute("style", "border: 1px solid black");
+                    if (node.typeId === 'testId-normal') {
                         // return ReactDOM.render(<CircularNode
                         //     node={node}
                         // />, container);

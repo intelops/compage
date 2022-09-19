@@ -7,7 +7,6 @@ interface CircularNodeProps {
 
 export const CircularNode = (props: CircularNodeProps) => {
     const id = props.node.id.substring(0, 13);
-    const selected = props.node.diagramMakerData.selected ? "selected" : ""
     return <React.Fragment>
         <div data-type="DiagramMaker.Connector"
              data-draggable="true"
@@ -17,7 +16,7 @@ export const CircularNode = (props: CircularNodeProps) => {
             <div data-type="DiagramMaker.Connector"
                  data-id={props.node.id}
                  data-dropzone="true"
-                 className={`circle example-node selected`}>
+                 className={"circle example-node " + (props.node.diagramMakerData.selected ? "selected " : "")}>
                 {id}
             </div>
         </div>

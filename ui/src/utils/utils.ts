@@ -122,6 +122,12 @@ export function createNodeWithDropdown(node: DiagramMakerNode<any>, container: H
 export function createCircularNode(node: DiagramMakerNode<any>, container: HTMLElement) {
     const id = node.id.substring(0, 13);
     const newDiv = createDivWithText(id);
+    newDiv.style.display = "flex"
+    newDiv.style.flexWrap = "wrap";
+    newDiv.style.justifyContent = "center";
+    newDiv.style.alignItems = "center";
+    newDiv.style.alignContent = "center";
+    newDiv.style.flexDirection = "row";
     newDiv.classList.add('circle', 'example-node');
     if (node.diagramMakerData.selected) {
         newDiv.classList.add('selected');
