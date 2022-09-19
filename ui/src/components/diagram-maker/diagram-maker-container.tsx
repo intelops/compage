@@ -26,7 +26,6 @@ import React, {useRef} from "react";
 import {
     createCircularNode,
     createPluginPanel,
-    createPotentialNode,
     createRectangularConnectorNode,
     createRectangularNode,
     updateActionInLogger
@@ -43,6 +42,8 @@ import {ContextNode} from "../custom/context-node";
 import {ContextEdge} from "../custom/context-edge";
 import {ContextPanel} from "../custom/context-panel";
 import {ContextWorkspace} from "../custom/context-workspace";
+import {EdgeBadge} from "../custom/edge-badge";
+import {PotentialNode} from "../custom/potential-node";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -167,20 +168,14 @@ export const DiagramMakerContainer = ({
                     }
                     return createRectangularNode(node, container);
                 },
-                edge: edgeBadge ? (edge: DiagramMakerEdge<{}>, container: HTMLElement): HTMLElement | undefined => {
-                    if (container.innerHTML === '') {
-                        const element = document.createElement('div');
-                        element.textContent = edge.id.substring(0, 10);
-                        element.classList.add('edgeBadge');
-                        container.appendChild(element);
-                        return element;
-                    }
-                    return undefined;
+                edge: edgeBadge ? (edge: DiagramMakerEdge<{}>, container: HTMLElement) => {
+                    return ReactDOM.render(<EdgeBadge id={edge.id.substring(0, 10)}/>, container);
                 } : undefined,
-                potentialNode: (node: DiagramMakerPotentialNode, container: HTMLElement) => createPotentialNode(node, container),
+                potentialNode: (node: DiagramMakerPotentialNode, container: HTMLElement) => {
+                    return ReactDOM.render(<PotentialNode id={node.typeId}/>, container);
+                },
                 panels: {
                     library: (panel: any, state: any, container: HTMLElement) => {
-                        // return  createLibraryPanel(container)
                         return ReactDOM.render(<LibraryPanel/>, container);
                     },
                     ...(plugin && {
@@ -196,7 +191,6 @@ export const DiagramMakerContainer = ({
                             state: any,
                             container: HTMLElement,
                         ) => {
-                            // return createToolsPanel(container, () => diagramMakerRef.current)
                             return ReactDOM.render(<ToolPanel
                                 diagramMakerRef={() => diagramMakerRef.current}/>, container);
                         },
@@ -307,7 +301,7 @@ export const DiagramMakerContainer = ({
                     connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
                 },
                 'testId-normal': {
-                    size: {width: 150, height: 50},
+                    size: {width: 50, height: 50},
                     connectorPlacementOverride: connectorPlacement || ConnectorPlacement.LEFT_RIGHT,
                     shape: shape || Shape.RECTANGLE,
                 },
@@ -393,13 +387,3 @@ export function handleTestPluginEvent(event: any, diagramMaker: any) {
         });
     }
 }
-
-// function Node({selected, width, height}) {
-//     return (<div
-//         style={{
-//             width, height, background: "white", padding: 8, border: selected ? "1px solid red" : undefined
-//         }}
-//     >
-//         Component
-//     </div>);
-// }
