@@ -14,6 +14,7 @@ export const PanelNode = (props: PanelNodeProps) => {
              data-type="DiagramMaker.PotentialNode"
              data-draggable="true"
              data-event-target="true">
+
             <Chip icon={<GridViewIcon/>} label={props.text}/>
         </div>
     </React.Fragment>;

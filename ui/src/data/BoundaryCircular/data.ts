@@ -5,7 +5,7 @@ export const getData = (parentWidth, parentHeight) => {
         nodes: {
             node1: {
                 id: 'node1',
-                typeId: 'testId-centered',
+                typeId: 'node-type-circle',
                 diagramMakerData: {
                     position: {x: 200, y: 150},
                     size: {width: 65, height: 65},
@@ -13,7 +13,7 @@ export const getData = (parentWidth, parentHeight) => {
             },
             node2: {
                 id: 'node2',
-                typeId: 'testId-normal',
+                typeId: 'node-type-rectangle',
                 diagramMakerData: {
                     position: {x: 400, y: 300},
                     size: {width: 65, height: 65},
@@ -32,7 +32,7 @@ export const getData = (parentWidth, parentHeight) => {
             library: {
                 id: 'library',
                 position: {x: 0, y: 0},
-                size: {width: 150, height: 300},
+                size: {width: 35, height: 290},
                 positionAnchor: PositionAnchor.TOP_LEFT,
             },
             tools: {

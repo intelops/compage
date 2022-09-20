@@ -189,10 +189,10 @@ export function createWorkspaceContextMenu(container: HTMLElement) {
     container.appendChild(createContextMenu('This is the workspace'));
 }
 
-export function createPanelNode(testId: string, text: string, size?: Size) {
+export function createPanelNode(nodeType: string, text: string, size?: Size) {
     const newDiv = createDivWithText(text);
     newDiv.classList.add('rectangle', 'example-node', 'potential-node');
-    newDiv.setAttribute('data-id', testId);
+    newDiv.setAttribute('data-id', nodeType);
     newDiv.setAttribute('data-type', 'DiagramMaker.PotentialNode');
     newDiv.setAttribute('data-draggable', 'true');
     newDiv.setAttribute('data-event-target', 'true');
@@ -224,15 +224,15 @@ export function createLibraryPanel(container: HTMLElement) {
     //
     // newDiv.appendChild(draggableElement);
 
-    newDiv.appendChild(createPanelNode('testId-normal', 'Normal'));
-    newDiv.appendChild(createPanelNode('testId-normalWithSize', 'Normal with Size', {width: 50, height: 50}));
-    newDiv.appendChild(createPanelNode('testId-topBottom', 'Top Bottom'));
-    // newDiv.appendChild(createPanelNode('testId-centered', 'Centered'));
-    newDiv.appendChild(createPanelNode('testId-start', 'Start Node'));
-    newDiv.appendChild(createPanelNode('testId-end', 'End Node'));
-    newDiv.appendChild(createPanelNode('testId-dead', 'Dead Node'));
-    // newDiv.appendChild(createPanelNode('testId-input', 'With Input'));
-    // newDiv.appendChild(createPanelNode('testId-dropdown', 'With Dropdown'));
+    newDiv.appendChild(createPanelNode('node-type-rectangle', 'Normal'));
+    newDiv.appendChild(createPanelNode('node-type-normal-with-size', 'Normal with Size', {width: 50, height: 50}));
+    newDiv.appendChild(createPanelNode('node-type-rectangle-top-bottom', 'Top Bottom'));
+    // newDiv.appendChild(createPanelNode('node-type-circle', 'Centered'));
+    newDiv.appendChild(createPanelNode('node-type-start', 'Start Node'));
+    newDiv.appendChild(createPanelNode('node-type-end', 'End Node'));
+    newDiv.appendChild(createPanelNode('node-type-dead', 'Dead Node'));
+    // newDiv.appendChild(createPanelNode('nodeType-input', 'With Input'));
+    // newDiv.appendChild(createPanelNode('nodeType-dropdown', 'With Dropdown'));
     container.appendChild(newDiv);
     return newDiv;
 }

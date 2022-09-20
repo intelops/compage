@@ -5,7 +5,7 @@ const graph: DiagramMakerData<{}, {}> = {
   nodes: {
     node1: {
       id: 'node1',
-      typeId: 'testId-normal',
+      typeId: 'node-type-rectangle',
       diagramMakerData: {
         position: { x: 200, y: 100 },
         size: { width: 200, height: 100 },
@@ -13,7 +13,7 @@ const graph: DiagramMakerData<{}, {}> = {
     },
     node2: {
       id: 'node2',
-      typeId: 'testId-normal',
+      typeId: 'node-type-rectangle',
       diagramMakerData: {
         position: { x: 300, y: 400 },
         size: { width: 200, height: 100 },
@@ -21,7 +21,7 @@ const graph: DiagramMakerData<{}, {}> = {
     },
     node3: {
       id: 'node3',
-      typeId: 'testId-normal',
+      typeId: 'node-type-rectangle',
       diagramMakerData: {
         position: { x: 600, y: 100 },
         size: { width: 200, height: 100 },
@@ -29,7 +29,7 @@ const graph: DiagramMakerData<{}, {}> = {
     },
     node4: {
       id: 'node4',
-      typeId: 'testId-normal',
+      typeId: 'node-type-rectangle',
       diagramMakerData: {
         position: { x: 900, y: 250 },
         size: { width: 200, height: 100 },

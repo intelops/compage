@@ -13,7 +13,6 @@ import {
     Event,
     Shape,
     ShapeType,
-    VisibleConnectorTypes,
     WorkspaceActions
 } from "diagram-maker";
 import "diagram-maker/dist/diagramMaker.css";
@@ -44,6 +43,7 @@ import {ContextPanel} from "../custom/context-panel";
 import {ContextWorkspace} from "../custom/context-workspace";
 import {EdgeBadge} from "../custom/edge-badge";
 import {PotentialNode} from "../custom/potential-node";
+import {getNodeTypeConfig} from "../../utils/nodeTypeConfig";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -149,7 +149,7 @@ export const DiagramMakerContainer = ({
                 node: (node: DiagramMakerNode<{}>, container: HTMLElement) => {
                     // not required as its now handled in css files.
                     // container.setAttribute("style", "border: 1px solid black");
-                    if (node.typeId === 'testId-centered') {
+                    if (node.typeId === 'node-type-circle') {
                         // return ReactDOM.render(<CircularNode
                         //     node={node}
                         // />, container);
@@ -157,10 +157,10 @@ export const DiagramMakerContainer = ({
                             alert("double clicked");
                         });
                     }
-                    // if (node.typeId === 'testId-input') {
+                    // if (node.typeId === 'node-type-input') {
                     //     return createNodeWithInput(node, container);
                     // }
-                    // if (node.typeId === 'testId-dropdown') {
+                    // if (node.typeId === 'node-type-dropdown') {
                     //     return createNodeWithDropdown(node, container);
                     // }
                     if (connectorPlacement === ConnectorPlacement.BOUNDARY) {
@@ -283,49 +283,7 @@ export const DiagramMakerContainer = ({
                     next(action);
                 }
             },
-            nodeTypeConfig: {
-                'testId-centered': {
-                    size: {width: 65, height: 65},
-                    connectorPlacementOverride: ConnectorPlacement.CENTERED,
-                },
-                'testId-dead': {
-                    size: {width: 65, height: 65},
-                    connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
-                    visibleConnectorTypes: VisibleConnectorTypes.NONE,
-                },
-                'testId-dropdown': {
-                    size: {width: 65, height: 65},
-                    connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
-                },
-                'testId-end': {
-                    size: {width: 65, height: 65},
-                    connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
-                    visibleConnectorTypes: VisibleConnectorTypes.INPUT_ONLY,
-                },
-                'testId-input': {
-                    size: {width: 65, height: 65},
-                    connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
-                },
-                'testId-normal': {
-                    size: {width: 65, height: 65},
-                    connectorPlacementOverride: connectorPlacement || ConnectorPlacement.LEFT_RIGHT,
-                    shape: shape || Shape.RECTANGLE,
-                },
-                'testId-normalWithSize': {
-                    size: {width: 65, height: 65},
-                    connectorPlacementOverride: connectorPlacement || ConnectorPlacement.LEFT_RIGHT,
-                    shape: shape || Shape.RECTANGLE,
-                },
-                'testId-start': {
-                    size: {width: 65, height: 65},
-                    connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
-                    visibleConnectorTypes: VisibleConnectorTypes.OUTPUT_ONLY,
-                },
-                'testId-topBottom': {
-                    size: {width: 65, height: 65},
-                    connectorPlacementOverride: ConnectorPlacement.TOP_BOTTOM,
-                },
-            },
+            nodeTypeConfig: getNodeTypeConfig(connectorPlacement, shape),
         }, {
             consumerEnhancer: addDevTools(),
             eventListener: plugin ? (event) => {

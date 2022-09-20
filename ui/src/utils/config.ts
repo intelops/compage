@@ -1,22 +1,22 @@
 export const getConfig = (typeId: string) => {
     switch (typeId) {
-        case "testId-centered":
-            console.log("It is a testId-centered.");
+        case "node-type-circle":
+            console.log("It is a node-type-circle.");
             return "circle"
-        case "testId-normal":
-            console.log("It is a testId-normal.");
+        case "node-type-rectangle":
+            console.log("It is a node-type-rectangle.");
             return "rectangle"
-        case "testId-topBottom":
-            console.log("It is a testId-topBottom.");
+        case "node-type-rectangle-top-bottom":
+            console.log("It is a node-type-rectangle-top-bottom.");
             return ""
-        case "testId-start":
-            console.log("It is a testId-start.");
+        case "node-type-start":
+            console.log("It is a node-type-start.");
             return ""
-        case "testId-end":
-            console.log("It is a testId-end.");
+        case "node-type-end":
+            console.log("It is a node-type-end.");
             return ""
-        case "testId-dead":
-            console.log("It is a testId-dead.");
+        case "node-type-dead":
+            console.log("It is a node-type-dead.");
             return ""
         default:
             console.log("No such type exists!");
