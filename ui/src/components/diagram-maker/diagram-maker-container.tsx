@@ -154,7 +154,7 @@ export const DiagramMakerContainer = ({
                         //     node={node}
                         // />, container);
                         return createCircularNode(node, container, () => {
-                            alert("double clicked");
+                            alert("Selected : " + node.typeId + " : " + node.id);
                         });
                     }
                     // if (node.typeId === 'node-type-input') {
@@ -166,13 +166,18 @@ export const DiagramMakerContainer = ({
                     if (connectorPlacement === ConnectorPlacement.BOUNDARY) {
                         if (shape === Shape.CIRCLE) {
                             return createCircularNode(node, container, () => {
-                                    alert("double clicked");
+                                    alert("Selected : " + node.typeId + " : " + node.id);
                                 }
                             );
                         }
-                        return createRectangularConnectorNode(node, container);
+                        return createRectangularConnectorNode(node, container, () => {
+                            alert("Selected : " + node.typeId + " : " + node.id);
+                        });
                     }
-                    return createRectangularNode(node, container);
+                    return createRectangularNode(node, container, () => {
+                        // diagramMakerRef.current.api.dispatch()
+                        alert("Selected : " + node.typeId + " : " + node.id);
+                    });
                 },
                 edge: edgeBadge ? (edge: DiagramMakerEdge<{}>, container: HTMLElement) => {
                     return ReactDOM.render(<EdgeBadge id={edge.id.substring(0, 10)}/>, container);
@@ -246,7 +251,6 @@ export const DiagramMakerContainer = ({
                         && "payload" in diagramMakerAction) {
                         diagramMakerAction.payload["consumerData"] = {
                             "test": "data",
-                            odd: Object.keys(getState().nodes).length % 2 === 0,
                         };
                         next(diagramMakerAction);
                         return;

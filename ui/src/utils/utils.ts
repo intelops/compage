@@ -8,7 +8,7 @@ export function createDivWithText(text: string) {
     return newDiv;
 }
 
-export function createRectangularNode(node: DiagramMakerNode<{ odd?: boolean }>, container: HTMLElement) {
+export function createRectangularNode(node: DiagramMakerNode<{ odd?: boolean }>, container: HTMLElement, eventListener: () => void) {
     const id = node.id.substring(0, 13);
     const newDiv = createDivWithText(id);
     newDiv.classList.add('rectangle', 'example-node');
@@ -21,12 +21,13 @@ export function createRectangularNode(node: DiagramMakerNode<{ odd?: boolean }>,
     if (node.diagramMakerData.selected) {
         newDiv.classList.add('selected');
     }
+    newDiv.addEventListener('dblclick', eventListener);
     container.innerHTML = '';
     container.appendChild(newDiv);
     return newDiv;
 }
 
-export function createRectangularConnectorNode(node: DiagramMakerNode<{ odd?: boolean }>, container: HTMLElement) {
+export function createRectangularConnectorNode(node: DiagramMakerNode<{ odd?: boolean }>, container: HTMLElement, eventListener: () => void) {
     const id = node.id.substring(0, 13);
     const newDiv = createDivWithText(id);
     newDiv.classList.add('rectangle', 'example-node', 'connector-node');
@@ -43,6 +44,7 @@ export function createRectangularConnectorNode(node: DiagramMakerNode<{ odd?: bo
     newDiv.setAttribute('data-id', node.id);
     newDiv.setAttribute('data-type', 'DiagramMaker.Connector');
     newDiv.setAttribute('data-dropzone', 'true');
+    newDiv.addEventListener('dblclick', eventListener);
     container.appendChild(connectorDiv);
     container.appendChild(newDiv);
     return newDiv;
