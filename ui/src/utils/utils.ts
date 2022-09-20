@@ -9,7 +9,7 @@ export function createDivWithText(text: string) {
 }
 
 export function createRectangularNode(node: DiagramMakerNode<{ odd?: boolean }>, container: HTMLElement, eventListener: () => void) {
-    const id = node.id.substring(0, 13);
+    const id = node.id.substring(0, 10);
     const newDiv = createDivWithText(id);
     newDiv.classList.add('rectangle', 'example-node');
     newDiv.style.display = "flex"
@@ -102,7 +102,7 @@ export function createNodeWithDropdown(node: DiagramMakerNode<any>, container: H
 }
 
 export function createCircularNode(node: DiagramMakerNode<any>, container: HTMLElement, eventListener: () => void) {
-    const id = node.id.substring(0, 13);
+    const id = node.id.substring(0, 10);
     const newDiv = createDivWithText(id);
     newDiv.style.display = "flex"
     newDiv.style.flexWrap = "wrap";

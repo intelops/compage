@@ -4,7 +4,7 @@ import {AuthContext} from "../App";
 import {getData} from "../data/BoundaryCircular/data";
 import {DiagramMakerContainer} from "./diagram-maker/diagram-maker-container";
 import Container from "@mui/material/Container";
-import {CURRENT_CONFIG, CURRENT_STATE, getCurrentConfig} from "../service";
+import {getCurrentConfig, removeCurrentConfig, removeCurrentState, setReset} from "../utils/service";
 import Button from "@mui/material/Button";
 
 export const Home = () => {
@@ -24,9 +24,9 @@ export const Home = () => {
         <Container fixed>
             <DiagramMakerContainer initialData={diagramMakerData} darkTheme={false}/>
             <Button variant="contained" onClick={() => {
-                localStorage.removeItem(CURRENT_CONFIG)
-                localStorage.removeItem(CURRENT_STATE)
-                localStorage.setItem("RESET", "true")
+                removeCurrentConfig()
+                removeCurrentState()
+                setReset(true)
                 // after resetting, needs to manually reload so, avoiding manual step here.
                 window.location.reload();
             }}>Reset state</Button>

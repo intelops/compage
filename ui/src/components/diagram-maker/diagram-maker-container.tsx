@@ -15,13 +15,20 @@ import {
     ShapeType,
     WorkspaceActions
 } from "diagram-maker";
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+
 import "diagram-maker/dist/diagramMaker.css";
 import "./scss/common.css"
 import "./scss/CircularNode.css"
 import "./scss/RectangularNode.css"
 import "./scss/Logger.css"
 
-import React, {useRef} from "react";
+import React, {ChangeEvent, useRef} from "react";
 import {
     createCircularNode,
     createPluginPanel,
@@ -34,7 +41,15 @@ import {useBeforeunload} from 'react-beforeunload';
 import {Action, Dispatch} from "redux";
 import {Grid} from "@mui/material";
 import JSONPretty from "react-json-pretty";
-import {getCurrentConfig, getCurrentState, setCurrentConfig, setCurrentState} from "../../service";
+import {
+    getCurrentConfig,
+    getCurrentState,
+    getModifiedState,
+    setCurrentConfig,
+    setCurrentState,
+    setReset,
+    shouldReset
+} from "../../utils/service";
 import {ToolPanel} from "../custom/tool-panel";
 import {LibraryPanel} from "../custom/library-panel";
 import {ContextNode} from "../custom/context-node";
@@ -75,6 +90,70 @@ export const DiagramMakerContainer = ({
         config: "{}"
     });
 
+    const [componentType, setComponentType] = React.useState("");
+    const [dialogState, setDialogState] = React.useState({
+        isOpen: false,
+        id: "",
+        type: "",
+        payload: {}
+    });
+
+    const handleComponentTypeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setComponentType(event.target.value);
+    };
+
+    const handleClose = () => {
+        setDialogState({isOpen: false, id: "", type: "", payload: {}})
+    };
+
+    const handleSet = (event: React.MouseEvent<HTMLElement>) => {
+        event.preventDefault();
+        let modifiedState = getModifiedState();
+        if (modifiedState) {
+            const parsedModifiedState = JSON.parse(modifiedState);
+            console.log("parsedModifiedState : ", parsedModifiedState)
+            if (dialogState.type === "node") {
+                // parsedModifiedState["nodes"] = parsedModifiedState["nodes"].push(dialogState.payload)
+                console.log("node : " + dialogState.payload)
+            } else if (dialogState.type === "edge") {
+                // parsedModifiedState["edges"] = parsedModifiedState["edges"].push(dialogState.payload)
+                console.log("edge : " + dialogState.payload)
+            }
+        }
+
+        console.log(componentType)
+
+        setDialogState({isOpen: false, id: "", type: "node", payload: {}})
+    }
+
+    const getDialog = () => {
+        if (dialogState.isOpen) {
+            return <React.Fragment>
+                <Dialog open={dialogState.isOpen} onClose={handleClose}>
+                    <DialogTitle>Add more properties for {dialogState.type} : {dialogState.id}</DialogTitle>
+                    <DialogContent>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="componentType"
+                            label="Component Type"
+                            type="text"
+                            value={componentType}
+                            onChange={handleComponentTypeChange}
+                            fullWidth
+                            variant="standard"
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose}>Cancel</Button>
+                        <Button onClick={handleSet}>Update</Button>
+                    </DialogActions>
+                </Dialog>
+            </React.Fragment>
+        }
+        return "";
+    }
+
     if (darkTheme) {
         document.body.classList.add('dm-dark-theme');
     } else {
@@ -82,14 +161,14 @@ export const DiagramMakerContainer = ({
     }
 
     useBeforeunload((event) => {
-        if (localStorage.getItem("RESET") === "false") {
+        if (shouldReset()) {
             if ((diagramMaker.state !== "{}" && diagramMaker.state !== getCurrentState()) || (diagramMaker.config !== "{}" && diagramMaker.config !== getCurrentConfig())) {
                 setCurrentState(diagramMaker.state)
                 setCurrentConfig(diagramMaker.config)
                 event.preventDefault();
             }
         } else {
-            localStorage.setItem("RESET", "false")
+            setReset(false)
         }
     });
 
@@ -154,7 +233,7 @@ export const DiagramMakerContainer = ({
                         //     node={node}
                         // />, container);
                         return createCircularNode(node, container, () => {
-                            alert("Selected : " + node.typeId + " : " + node.id);
+                            setDialogState({isOpen: true, id: node.id, type: "node", payload: {}})
                         });
                     }
                     // if (node.typeId === 'node-type-input') {
@@ -166,17 +245,16 @@ export const DiagramMakerContainer = ({
                     if (connectorPlacement === ConnectorPlacement.BOUNDARY) {
                         if (shape === Shape.CIRCLE) {
                             return createCircularNode(node, container, () => {
-                                    alert("Selected : " + node.typeId + " : " + node.id);
+                                    setDialogState({isOpen: true, id: node.id, type: "node", payload: {}})
                                 }
                             );
                         }
                         return createRectangularConnectorNode(node, container, () => {
-                            alert("Selected : " + node.typeId + " : " + node.id);
+                            setDialogState({isOpen: true, id: node.id, type: "node", payload: {}})
                         });
                     }
                     return createRectangularNode(node, container, () => {
-                        // diagramMakerRef.current.api.dispatch()
-                        alert("Selected : " + node.typeId + " : " + node.id);
+                        setDialogState({isOpen: true, id: node.id, type: "node", payload: {}})
                     });
                 },
                 edge: edgeBadge ? (edge: DiagramMakerEdge<{}>, container: HTMLElement) => {
@@ -313,6 +391,7 @@ export const DiagramMakerContainer = ({
 
     return <Grid container spacing={1}>
         <Grid item xs={8} md={8}>
+            {getDialog()}
             <div id="diagramMakerContainer" ref={containerRef}></div>
         </Grid>
         <Grid item xs={4} md={4} style={{
