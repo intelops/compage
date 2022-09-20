@@ -72,6 +72,30 @@ interface ArgTypes {
     onAction?: (...args: any) => void;
 }
 
+function cleanse(state: string) {
+    const stateJson = JSON.parse(state)
+    delete stateJson.panels
+    delete stateJson.plugins
+    delete stateJson.potentialEdge
+    delete stateJson.potentialNode
+    delete stateJson.editor
+    delete stateJson.undoHistory
+    delete stateJson.workspace
+    // nodes
+    for (let key in stateJson.nodes) {
+        let diagramMakerData = stateJson.nodes[key].diagramMakerData;
+        delete diagramMakerData.position
+        delete diagramMakerData.size
+    }
+    // edges
+    for (let key in stateJson.edges) {
+        let diagramMakerData = stateJson.edges[key].diagramMakerData;
+        delete diagramMakerData.position
+        delete diagramMakerData.size
+    }
+    return stateJson;
+}
+
 export const DiagramMakerContainer = ({
                                           initialData,
                                           connectorPlacement,
@@ -176,26 +200,7 @@ export const DiagramMakerContainer = ({
     const setData = (state: string) => {
         const backupState: string = state.slice();
         if (state) {
-            const stateJson = JSON.parse(state)
-            delete stateJson.panels
-            delete stateJson.plugins
-            delete stateJson.potentialEdge
-            delete stateJson.potentialNode
-            delete stateJson.editor
-            delete stateJson.undoHistory
-            delete stateJson.workspace
-            // nodes
-            for (let key in stateJson.nodes) {
-                let diagramMakerData = stateJson.nodes[key].diagramMakerData;
-                delete diagramMakerData.position
-                delete diagramMakerData.size
-            }
-            // edges
-            for (let key in stateJson.edges) {
-                let diagramMakerData = stateJson.edges[key].diagramMakerData;
-                delete diagramMakerData.position
-                delete diagramMakerData.size
-            }
+            const stateJson = cleanse(state);
             setDiagramMaker({
                 config: backupState,
                 state: JSON.stringify(stateJson)
@@ -330,12 +335,14 @@ export const DiagramMakerContainer = ({
                         diagramMakerAction.payload["consumerData"] = {
                             "test": "data",
                         };
+                        diagramMakerAction.payload["id"] = diagramMakerAction.payload["id"].substring(3, 10)
                         next(diagramMakerAction);
                         return;
                     }
 
                     if (diagramMakerAction.type === DiagramMakerActions.EDGE_CREATE
                         && "payload" in diagramMakerAction) {
+                        diagramMakerAction.payload["id"] = diagramMakerAction.payload["id"].substring(3, 10)
                         next(diagramMakerAction);
                         // the below creates reverse edge
                         // let id, dest, src

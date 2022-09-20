@@ -10,6 +10,7 @@ export const getData = (parentWidth, parentHeight) => {
                     position: {x: 200, y: 150},
                     size: {width: 65, height: 65},
                 },
+                consumerData: {}
             },
             node2: {
                 id: 'node2',
@@ -18,6 +19,7 @@ export const getData = (parentWidth, parentHeight) => {
                     position: {x: 400, y: 300},
                     size: {width: 65, height: 65},
                 },
+                consumerData: {}
             },
         },
         edges: {
@@ -26,6 +28,7 @@ export const getData = (parentWidth, parentHeight) => {
                 src: 'node1',
                 dest: 'node2',
                 diagramMakerData: {},
+                consumerData: {}
             },
         },
         panels: {
