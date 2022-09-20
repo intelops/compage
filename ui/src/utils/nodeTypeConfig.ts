@@ -43,6 +43,16 @@ export const getNodeTypeConfig = (connectorPlacement, shape: ShapeType.CIRCLE) =
             size: {width: 65, height: 65},
             connectorPlacementOverride: ConnectorPlacement.TOP_BOTTOM,
         },
+        'node-type-start-top-bottom': {
+            size: {width: 65, height: 65},
+            visibleConnectorTypes: VisibleConnectorTypes.OUTPUT_ONLY,
+            connectorPlacementOverride: ConnectorPlacement.TOP_BOTTOM,
+        },
+        'node-type-end-top-bottom': {
+            size: {width: 65, height: 65},
+            visibleConnectorTypes: VisibleConnectorTypes.INPUT_ONLY,
+            connectorPlacementOverride: ConnectorPlacement.TOP_BOTTOM,
+        },
     };
 }
 

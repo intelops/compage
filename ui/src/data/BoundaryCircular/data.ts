@@ -35,7 +35,7 @@ export const getData = (parentWidth, parentHeight) => {
             library: {
                 id: 'library',
                 position: {x: 0, y: 0},
-                size: {width: 35, height: 290},
+                size: {width: 35, height: 310},
                 positionAnchor: PositionAnchor.TOP_LEFT,
             },
             tools: {

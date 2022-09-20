@@ -44,7 +44,6 @@ import JSONPretty from "react-json-pretty";
 import {
     getCurrentConfig,
     getCurrentState,
-    getModifiedState,
     setCurrentConfig,
     setCurrentState,
     setReset,
@@ -114,40 +113,51 @@ export const DiagramMakerContainer = ({
         config: "{}"
     });
 
-    const [componentType, setComponentType] = React.useState("");
+    const [payload, setPayload] = React.useState({
+        componentType: ""
+    });
     const [dialogState, setDialogState] = React.useState({
         isOpen: false,
         id: "",
         type: "",
-        payload: {}
     });
 
     const handleComponentTypeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setComponentType(event.target.value);
+        setPayload({
+            componentType: event.target.value
+        });
     };
 
     const handleClose = () => {
-        setDialogState({isOpen: false, id: "", type: "", payload: {}})
+        setDialogState({isOpen: false, id: "", type: ""})
     };
 
+    //TODO need to update the custom data to some other localstorage key and update the state continuously. Below impl doesn't work
     const handleSet = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        let modifiedState = getModifiedState();
-        if (modifiedState) {
-            const parsedModifiedState = JSON.parse(modifiedState);
-            console.log("parsedModifiedState : ", parsedModifiedState)
-            if (dialogState.type === "node") {
-                // parsedModifiedState["nodes"] = parsedModifiedState["nodes"].push(dialogState.payload)
-                console.log("node : " + dialogState.payload)
-            } else if (dialogState.type === "edge") {
-                // parsedModifiedState["edges"] = parsedModifiedState["edges"].push(dialogState.payload)
-                console.log("edge : " + dialogState.payload)
+        if (dialogState.type === "node") {
+            console.log("node : " + payload.componentType)
+            let parsedState = JSON.parse(diagramMaker.state);
+            if (parsedState) {
+                parsedState.nodes[dialogState.id].consumerData = {
+                    componentType: payload.componentType
+                }
             }
+            console.log("node parsedState : ", parsedState)
+            setData(JSON.stringify(parsedState), false)
+        } else if (dialogState.type === "edge") {
+            console.log("edge : " + payload.componentType)
+            let parsedState = JSON.parse(diagramMaker.state);
+            if (parsedState) {
+                parsedState.edges[dialogState.id].consumerData = {
+                    componentType: payload.componentType + "edge"
+                }
+            }
+            console.log("edge parsedState : ", parsedState)
+            setData(JSON.stringify(parsedState), false)
         }
-
-        console.log(componentType)
-
-        setDialogState({isOpen: false, id: "", type: "node", payload: {}})
+        setPayload({componentType: ""})
+        setDialogState({isOpen: false, id: "", type: "node"})
     }
 
     const getDialog = () => {
@@ -162,7 +172,7 @@ export const DiagramMakerContainer = ({
                             id="componentType"
                             label="Component Type"
                             type="text"
-                            value={componentType}
+                            value={payload.componentType}
                             onChange={handleComponentTypeChange}
                             fullWidth
                             variant="standard"
@@ -197,14 +207,21 @@ export const DiagramMakerContainer = ({
     });
 
     // clean unwanted data from state payload.
-    const setData = (state: string) => {
+    const setData = (state: string, updateConfig = true) => {
         const backupState: string = state.slice();
         if (state) {
             const stateJson = cleanse(state);
-            setDiagramMaker({
-                config: backupState,
-                state: JSON.stringify(stateJson)
-            })
+            if (updateConfig) {
+                setDiagramMaker({
+                    config: backupState,
+                    state: JSON.stringify(stateJson)
+                })
+            } else {
+                setDiagramMaker({
+                    ...diagramMaker,
+                    state: JSON.stringify(stateJson)
+                })
+            }
         }
     }
 
@@ -238,7 +255,7 @@ export const DiagramMakerContainer = ({
                         //     node={node}
                         // />, container);
                         return createCircularNode(node, container, () => {
-                            setDialogState({isOpen: true, id: node.id, type: "node", payload: {}})
+                            setDialogState({isOpen: true, id: node.id, type: "node"})
                         });
                     }
                     // if (node.typeId === 'node-type-input') {
@@ -250,16 +267,16 @@ export const DiagramMakerContainer = ({
                     if (connectorPlacement === ConnectorPlacement.BOUNDARY) {
                         if (shape === Shape.CIRCLE) {
                             return createCircularNode(node, container, () => {
-                                    setDialogState({isOpen: true, id: node.id, type: "node", payload: {}})
+                                    setDialogState({isOpen: true, id: node.id, type: "node"})
                                 }
                             );
                         }
                         return createRectangularConnectorNode(node, container, () => {
-                            setDialogState({isOpen: true, id: node.id, type: "node", payload: {}})
+                            setDialogState({isOpen: true, id: node.id, type: "node"})
                         });
                     }
                     return createRectangularNode(node, container, () => {
-                        setDialogState({isOpen: true, id: node.id, type: "node", payload: {}})
+                        setDialogState({isOpen: true, id: node.id, type: "node"})
                     });
                 },
                 edge: edgeBadge ? (edge: DiagramMakerEdge<{}>, container: HTMLElement) => {
