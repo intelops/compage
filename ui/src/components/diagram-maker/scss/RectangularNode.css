@@ -3,8 +3,9 @@ html, body {
   height: 100%;
   width: 100%;
   overflow: hidden; }
-  html .sb-show-main.sb-main-padded, body .sb-show-main.sb-main-padded {
-    padding: 0; }
+
+html .sb-show-main.sb-main-padded, body .sb-show-main.sb-main-padded {
+  padding: 0; }
 
 #diagramMakerContainer {
   position: relative !important;
@@ -17,8 +18,9 @@ html, body {
 .dm-view .dm-panels {
   top: 90px;
   left: 2px; }
-  .dm-view .dm-panels .dm-panel .dm-content {
-    padding: 5px; }
+
+.dm-view .dm-panels .dm-panel .dm-content {
+  padding: 5px; }
 
 .library {
   height: 560px;
@@ -33,16 +35,20 @@ html, body {
   padding: 10px;
   height: 100%;
   transition: all .2s ease; }
-  .example-node.odd {
-    border: 1px solid #00ef73; }
-  .example-node.even {
-    border: 1px solid blue; }
-  .example-node.selected {
-    border: 1px solid #0073bb; }
-  .example-node input, .example-node select {
-    background-color: var(--diagram-maker-input-background-color);
-    border: var(--diagram-maker-input-border);
-    color: var(--diagram-maker-text-color); }
+
+.example-node.odd {
+  border: 1px solid #00ef73; }
+
+.example-node.even {
+  border: 1px solid blue; }
+
+.example-node.selected {
+  border: 1px solid #0073bb; }
+
+.example-node input, .example-node select {
+  background-color: var(--diagram-maker-input-background-color);
+  border: var(--diagram-maker-input-border);
+  color: var(--diagram-maker-text-color); }
 
 .testInput {
   background-color: var(--diagram-maker-input-background-color);
@@ -58,9 +64,10 @@ html, body {
   background-color: var(--diagram-maker-container-background-color);
   padding: 5px;
   border: 2px solid red; }
-  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-    .contextMenu {
-      border: 1px solid var(--diagram-maker-border-color); } }
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  .contextMenu {
+    border: 1px solid var(--diagram-maker-border-color); } }
 
 .hello .dm-view .dm-workspace {
   border: 1px red solid;
@@ -72,17 +79,20 @@ html, body {
 
 .example-node.rectangle {
   border-radius: 3px; }
-  .example-node.rectangle.potential-node {
-    width: 110px;
-    height: 50px;
-    margin: auto;
-    margin-top: 6px; }
-  .example-node.rectangle.connector-node {
-    position: absolute;
-    width: 100%;
-    height: 100%; }
-  .example-node.rectangle input, .example-node.rectangle select {
-    width: 100%; }
+
+.example-node.rectangle.potential-node {
+  width: 110px;
+  height: 50px;
+  margin: auto;
+  margin-top: 6px; }
+
+.example-node.rectangle.connector-node {
+  position: absolute;
+  width: 100%;
+  height: 100%; }
+
+.example-node.rectangle input, .example-node.rectangle select {
+  width: 100%; }
 
 .outer-rectangle {
   border-radius: 0%; }

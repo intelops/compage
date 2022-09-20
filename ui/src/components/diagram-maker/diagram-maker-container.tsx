@@ -153,7 +153,9 @@ export const DiagramMakerContainer = ({
                         // return ReactDOM.render(<CircularNode
                         //     node={node}
                         // />, container);
-                        return createCircularNode(node, container);
+                        return createCircularNode(node, container, () => {
+                            alert("double clicked");
+                        });
                     }
                     // if (node.typeId === 'testId-input') {
                     //     return createNodeWithInput(node, container);
@@ -163,7 +165,10 @@ export const DiagramMakerContainer = ({
                     // }
                     if (connectorPlacement === ConnectorPlacement.BOUNDARY) {
                         if (shape === Shape.CIRCLE) {
-                            return createCircularNode(node, container);
+                            return createCircularNode(node, container, () => {
+                                    alert("double clicked");
+                                }
+                            );
                         }
                         return createRectangularConnectorNode(node, container);
                     }
@@ -280,44 +285,44 @@ export const DiagramMakerContainer = ({
             },
             nodeTypeConfig: {
                 'testId-centered': {
-                    size: {width: 100, height: 100},
+                    size: {width: 65, height: 65},
                     connectorPlacementOverride: ConnectorPlacement.CENTERED,
                 },
                 'testId-dead': {
-                    size: {width: 150, height: 50},
+                    size: {width: 65, height: 65},
                     connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
                     visibleConnectorTypes: VisibleConnectorTypes.NONE,
                 },
                 'testId-dropdown': {
-                    size: {width: 150, height: 50},
+                    size: {width: 65, height: 65},
                     connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
                 },
                 'testId-end': {
-                    size: {width: 150, height: 50},
+                    size: {width: 65, height: 65},
                     connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
                     visibleConnectorTypes: VisibleConnectorTypes.INPUT_ONLY,
                 },
                 'testId-input': {
-                    size: {width: 150, height: 50},
+                    size: {width: 65, height: 65},
                     connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
                 },
                 'testId-normal': {
-                    size: {width: 50, height: 50},
+                    size: {width: 65, height: 65},
                     connectorPlacementOverride: connectorPlacement || ConnectorPlacement.LEFT_RIGHT,
                     shape: shape || Shape.RECTANGLE,
                 },
                 'testId-normalWithSize': {
-                    size: {width: 150, height: 50},
+                    size: {width: 65, height: 65},
                     connectorPlacementOverride: connectorPlacement || ConnectorPlacement.LEFT_RIGHT,
                     shape: shape || Shape.RECTANGLE,
                 },
                 'testId-start': {
-                    size: {width: 150, height: 50},
+                    size: {width: 65, height: 65},
                     connectorPlacementOverride: ConnectorPlacement.LEFT_RIGHT,
                     visibleConnectorTypes: VisibleConnectorTypes.OUTPUT_ONLY,
                 },
                 'testId-topBottom': {
-                    size: {width: 150, height: 50},
+                    size: {width: 65, height: 65},
                     connectorPlacementOverride: ConnectorPlacement.TOP_BOTTOM,
                 },
             },

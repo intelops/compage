@@ -31,6 +31,12 @@ export function createRectangularNode(node: DiagramMakerNode<{ odd?: boolean }>,
     const id = node.id.substring(0, 13);
     const newDiv = createDivWithText(id);
     newDiv.classList.add('rectangle', 'example-node');
+    newDiv.style.display = "flex"
+    newDiv.style.flexWrap = "wrap";
+    newDiv.style.justifyContent = "center";
+    newDiv.style.alignItems = "center";
+    newDiv.style.alignContent = "center";
+    newDiv.style.flexDirection = "row";
     if (node.diagramMakerData.selected) {
         newDiv.classList.add('selected');
     }
@@ -119,7 +125,7 @@ export function createNodeWithDropdown(node: DiagramMakerNode<any>, container: H
     return newDiv;
 }
 
-export function createCircularNode(node: DiagramMakerNode<any>, container: HTMLElement) {
+export function createCircularNode(node: DiagramMakerNode<any>, container: HTMLElement, eventListener: () => void) {
     const id = node.id.substring(0, 13);
     const newDiv = createDivWithText(id);
     newDiv.style.display = "flex"
@@ -142,6 +148,7 @@ export function createCircularNode(node: DiagramMakerNode<any>, container: HTMLE
     newDiv.setAttribute('data-id', node.id);
     newDiv.setAttribute('data-type', 'DiagramMaker.Connector');
     newDiv.setAttribute('data-dropzone', 'true');
+    newDiv.addEventListener('dblclick', eventListener);
     container.appendChild(connectorDiv);
     container.appendChild(newDiv);
     return newDiv;

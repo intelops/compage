@@ -5,10 +5,10 @@ export const getData = (parentWidth, parentHeight) => {
         nodes: {
             node1: {
                 id: 'node1',
-                typeId: 'testId-normal',
+                typeId: 'testId-centered',
                 diagramMakerData: {
                     position: {x: 200, y: 150},
-                    size: {width: 50, height: 50},
+                    size: {width: 65, height: 65},
                 },
             },
             node2: {
@@ -16,7 +16,7 @@ export const getData = (parentWidth, parentHeight) => {
                 typeId: 'testId-normal',
                 diagramMakerData: {
                     position: {x: 400, y: 300},
-                    size: {width: 50, height: 50},
+                    size: {width: 65, height: 65},
                 },
             },
         },
