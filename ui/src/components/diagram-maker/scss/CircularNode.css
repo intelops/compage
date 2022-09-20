@@ -36,12 +36,6 @@ html .sb-show-main.sb-main-padded, body .sb-show-main.sb-main-padded {
   height: 100%;
   transition: all .2s ease; }
 
-.example-node.odd {
-  border: 1px solid #00ef73; }
-
-.example-node.even {
-  border: 1px solid blue; }
-
 .example-node.selected {
   border: 1px solid #0073bb; }
 

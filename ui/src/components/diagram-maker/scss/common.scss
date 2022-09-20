@@ -36,13 +36,8 @@ html, body {
     left: 2px;
 
     .dm-panel {
-      //overflow-y: auto;
-      //width: 160px;
-      //height: 300px;
       .dm-content {
         padding: 5px;
-        //width: 195px;
-        //height:  300px;
       }
     }
   }
@@ -63,14 +58,6 @@ html, body {
   padding: 10px;
   height: 100%;
   transition: all .2s ease;
-
-  &.odd {
-    border: 1px solid #00ef73;
-  }
-
-  &.even {
-    border: 1px solid blue;
-  }
 
   &.selected {
     border: 1px solid #0073bb;

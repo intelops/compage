@@ -244,7 +244,6 @@ export const DiagramMakerContainer = ({
 
                     if (diagramMakerAction.type === DiagramMakerActions.NODE_CREATE
                         && "payload" in diagramMakerAction) {
-                        // nodes before are even so this odd
                         diagramMakerAction.payload["consumerData"] = {
                             "test": "data",
                             odd: Object.keys(getState().nodes).length % 2 === 0,
