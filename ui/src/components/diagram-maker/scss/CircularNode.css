@@ -13,7 +13,7 @@ html .sb-show-main.sb-main-padded, body .sb-show-main.sb-main-padded {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  border: 1px solid red; }
+  border: 1px solid black; }
 
 .dm-view .dm-panels {
   top: 90px;
@@ -57,14 +57,14 @@ html .sb-show-main.sb-main-padded, body .sb-show-main.sb-main-padded {
   box-sizing: border-box;
   background-color: var(--diagram-maker-container-background-color);
   padding: 5px;
-  border: 2px solid red; }
+  border: 2px solid black; }
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
   .contextMenu {
     border: 1px solid var(--diagram-maker-border-color); } }
 
 .hello .dm-view .dm-workspace {
-  border: 1px red solid;
+  border: 1px black solid;
   overflow: hidden;
   position: relative !important;
   top: 75px;

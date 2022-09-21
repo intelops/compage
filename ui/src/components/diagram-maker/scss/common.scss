@@ -27,7 +27,7 @@ html, body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  border: 1px solid red;
+  border: 1px solid black;
 }
 
 .dm-view {
@@ -81,11 +81,11 @@ html, body {
   @include dm-container-shadow;
   background-color: var(--diagram-maker-container-background-color);
   padding: 5px;
-  border: 2px solid red;
+  border: 2px solid black;
 }
 
 .hello .dm-view .dm-workspace {
-  border: 1px red solid;
+  border: 1px black solid;
   overflow: hidden;
   position: relative !important;
   top: 75px;
