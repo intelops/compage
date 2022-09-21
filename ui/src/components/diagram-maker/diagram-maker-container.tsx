@@ -44,8 +44,10 @@ import JSONPretty from "react-json-pretty";
 import {
     getCurrentConfig,
     getCurrentState,
+    getModifiedState,
     setCurrentConfig,
     setCurrentState,
+    setModifiedState,
     setReset,
     shouldReset
 } from "../../utils/service";
@@ -73,6 +75,20 @@ interface ArgTypes {
 
 const cleanse = (state: string) => {
     const stateJson = JSON.parse(state)
+    // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
+    // update state from localstorage with additional properties added from UI (Post node creation)
+    let modifiedState = getModifiedState();
+    if (modifiedState && modifiedState !== "{}") {
+        let parsedModifiedState = JSON.parse(modifiedState);
+        for (const k in parsedModifiedState.nodes) {
+            //TODO just update keys
+            stateJson.nodes[k].consumerData = parsedModifiedState.nodes[k].consumerData
+        }
+        for (const k in parsedModifiedState.edges) {
+            //TODO just update keys
+            stateJson.edges[k].consumerData = parsedModifiedState.edges[k].consumerData
+        }
+    }
     delete stateJson.panels
     delete stateJson.plugins
     delete stateJson.potentialEdge
@@ -137,20 +153,49 @@ export const DiagramMakerContainer = ({
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     const handleSet = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        // idea is to update the diagramMaker.state directly
-        const stateJson = JSON.parse(diagramMaker.state)
-        // update state with current fields on dialog box directly
-        if (dialogState.type === "node") {
-            stateJson.nodes[dialogState.id].consumerData = {
-                componentType: payload.componentType
-            }
-        } else if (dialogState.type === "edge") {
-            stateJson.edges[dialogState.id].consumerData = {
-                componentType: payload.componentType + "edge"
+        // retrieve current modifiedState
+        // logic is to store the dialog-state in localstorage and then refer it in updating state.
+        let modifiedState = getModifiedState();
+        let parsedModifiedState
+        debugger
+        if (modifiedState && modifiedState !== "{}") {
+            parsedModifiedState = JSON.parse(modifiedState);
+        } else {
+            parsedModifiedState = {
+                nodes: {},
+                edges: {}
             }
         }
+        // update modifiedState with current fields on dialog box
+        if (dialogState.type === "node") {
+            if (!(dialogState.id in parsedModifiedState.nodes)) {
+                parsedModifiedState.nodes[dialogState.id] = {
+                    consumerData: {
+                        componentType: payload.componentType
+                    }
+                }
+            } else {
+                parsedModifiedState.nodes[dialogState.id].consumerData = {
+                    componentType: payload.componentType
+                }
+            }
+        } else if (dialogState.type === "edge") {
+            if (!(dialogState.id in parsedModifiedState.edges)) {
+                parsedModifiedState.edges[dialogState.id] = {
+                    consumerData: {
+                        componentType: payload.componentType + "edges"
+                    }
+                }
+            } else {
+                parsedModifiedState.edges[dialogState.id].consumerData = {
+                    componentType: payload.componentType
+                }
+            }
+        }
+        // update modifiedState in the localstorage
+        setModifiedState(JSON.stringify(parsedModifiedState))
         //send update to the components
-        setData(JSON.stringify(stateJson), false)
+        setData(diagramMaker.state, false)
         setPayload({componentType: ""})
         setDialogState({isOpen: false, id: "", type: ""})
     }
@@ -193,10 +238,6 @@ export const DiagramMakerContainer = ({
         if (shouldReset()) {
             if ((diagramMaker.state !== "{}" && diagramMaker.state !== getCurrentState()) || (diagramMaker.config !== "{}" && diagramMaker.config !== getCurrentConfig())) {
                 setCurrentState(diagramMaker.state)
-                const copiedCurrentState = {
-                    nodes: diagramMaker.state["nodes"],
-                    edges: diagramMaker.state["edges"],
-                }
                 setCurrentConfig(diagramMaker.config)
                 event.preventDefault();
             }
@@ -205,7 +246,6 @@ export const DiagramMakerContainer = ({
         }
     });
 
-    // clean unwanted data from state payload.
     const setData = (state: string, updateConfig = true) => {
         const backupState: string = state.slice();
         if (state) {

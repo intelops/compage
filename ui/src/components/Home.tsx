@@ -8,6 +8,7 @@ import {
     getCurrentConfig,
     removeCurrentConfig,
     removeCurrentState,
+    removeModifiedState,
     setReset
 } from "../utils/service";
 import Button from "@mui/material/Button";
@@ -31,6 +32,7 @@ export const Home = () => {
             <Button variant="contained" onClick={() => {
                 removeCurrentConfig()
                 removeCurrentState()
+                removeModifiedState()
                 setReset(true)
                 // after resetting, needs to manually reload so, avoiding manual step here.
                 window.location.reload();
