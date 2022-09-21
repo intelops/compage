@@ -42,3 +42,7 @@ export const setModifiedState = (payload: string) => {
 export const getModifiedState = () => {
     return localStorage.getItem(MODIFIED_STATE)
 }
+
+export const removeModifiedState = () => {
+    localStorage.removeItem(MODIFIED_STATE)
+}
