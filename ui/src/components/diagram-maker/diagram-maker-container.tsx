@@ -44,10 +44,8 @@ import JSONPretty from "react-json-pretty";
 import {
     getCurrentConfig,
     getCurrentState,
-    getModifiedState, removeModifiedState,
     setCurrentConfig,
     setCurrentState,
-    setModifiedState,
     setReset,
     shouldReset
 } from "../../utils/service";
@@ -75,27 +73,6 @@ interface ArgTypes {
 
 const cleanse = (state: string) => {
     const stateJson = JSON.parse(state)
-    // update state with additional properties added from UI (Post node creation)
-    // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
-    let modifiedState = getModifiedState();
-    // if (!modifiedState || modifiedState === "{}") {
-    //     setModifiedState(JSON.stringify({
-    //         nodes: stateJson.nodes,
-    //         edges: stateJson.edges,
-    //     }))
-    //     modifiedState = getModifiedState()
-    // }
-    let parsedModifiedState = JSON.parse(modifiedState);
-    debugger
-    for (const k in parsedModifiedState.nodes) {
-        //TODO just update keys
-        stateJson.nodes[k].consumerData = parsedModifiedState.nodes[k].consumerData
-    }
-    for (const k in parsedModifiedState.edges) {
-        //TODO just update keys
-        stateJson.edges[k].consumerData = parsedModifiedState.edges[k].consumerData
-    }
-    removeModifiedState()
     delete stateJson.panels
     delete stateJson.plugins
     delete stateJson.potentialEdge
@@ -156,35 +133,24 @@ export const DiagramMakerContainer = ({
     };
 
     //TODO need to update the custom data to some other localstorage key and update the state continuously. Below impl doesn't work
+    // update state with additional properties added from UI (Post node creation)
+    // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     const handleSet = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        // retrieve current modifiedState
-        // logic is to store the dialog-state in localstorage variable and then use it in state update.
-        // modifiedState is cleared when other state information is removed
-        let modifiedState = getModifiedState();
-        if (!modifiedState || modifiedState === "{}") {
-            const stateJson = JSON.parse(diagramMaker.state)
-            setModifiedState(JSON.stringify({
-                nodes: stateJson.nodes,
-                edges: stateJson.edges,
-            }))
-            modifiedState = getModifiedState()
-        }
-        let parsedModifiedState = JSON.parse(modifiedState);
-        // update modifiedState with current fields on dialog box
+        // idea is to update the diagramMaker.state directly
+        const stateJson = JSON.parse(diagramMaker.state)
+        // update state with current fields on dialog box directly
         if (dialogState.type === "node") {
-            parsedModifiedState.nodes[dialogState.id].consumerData = {
+            stateJson.nodes[dialogState.id].consumerData = {
                 componentType: payload.componentType
             }
         } else if (dialogState.type === "edge") {
-            parsedModifiedState.edges[dialogState.id].consumerData = {
+            stateJson.edges[dialogState.id].consumerData = {
                 componentType: payload.componentType + "edge"
             }
         }
-        // update modifiedState in the localstorage
-        setModifiedState(JSON.stringify(parsedModifiedState))
         //send update to the components
-        setData(diagramMaker.state, false)
+        setData(JSON.stringify(stateJson), false)
         setPayload({componentType: ""})
         setDialogState({isOpen: false, id: "", type: ""})
     }
@@ -231,7 +197,6 @@ export const DiagramMakerContainer = ({
                     nodes: diagramMaker.state["nodes"],
                     edges: diagramMaker.state["edges"],
                 }
-                setModifiedState(JSON.stringify(copiedCurrentState))
                 setCurrentConfig(diagramMaker.config)
                 event.preventDefault();
             }
