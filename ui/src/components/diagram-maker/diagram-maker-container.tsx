@@ -319,7 +319,9 @@ export const DiagramMakerContainer = ({
                     });
                 },
                 edge: edgeBadge ? (edge: DiagramMakerEdge<{}>, container: HTMLElement) => {
-                    return ReactDOM.render(<EdgeBadge id={edge.id.substring(0, 10)}/>, container);
+                    return ReactDOM.render(<EdgeBadge id={edge.id} handleDblClick={() => {
+                        setDialogState({isOpen: true, id: edge.id, type: "edge"})
+                    }}/>, container);
                 } : undefined,
                 potentialNode: (node: DiagramMakerPotentialNode, container: HTMLElement) => {
                     return ReactDOM.render(<PotentialNode typeId={node.typeId}/>, container);

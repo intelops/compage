@@ -2,16 +2,17 @@ import React from 'react';
 
 interface EdgeBadgeProps {
     id: string
+    handleDblClick: any
 }
 
 
 export const EdgeBadge = (props: EdgeBadgeProps) => {
+    const id = props.id.substring(0, 10)
     return <React.Fragment>
         <div className="edgeBadge" onDoubleClick={() => {
-            // setDialogState({isOpen: true, id: node.id, type: "node", payload: {}})
-            alert("Selected : " + props.id)
+            {props.handleDblClick()}
         }}>
-            {props.id}
+            {id}
         </div>
     </React.Fragment>;
 }

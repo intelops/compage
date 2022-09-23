@@ -69,8 +69,6 @@ export const Login = () => {
         <Wrapper>
             <section className="container">
                 <div>
-                    <h1>Welcome</h1>
-                    <span>Super amazing app</span>
                     <span>{data.errorMessage}</span>
                     <div className="login-container">
                         {data.isLoading ? (
