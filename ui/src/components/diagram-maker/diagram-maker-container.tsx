@@ -15,12 +15,6 @@ import {
     ShapeType,
     WorkspaceActions
 } from "diagram-maker";
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 
 import "diagram-maker/dist/diagramMaker.css";
 import "./scss/common.css"
@@ -60,6 +54,7 @@ import {ContextWorkspace} from "../custom/context-workspace";
 import {EdgeBadge} from "../custom/edge-badge";
 import {PotentialNode} from "../custom/potential-node";
 import {getNodeTypeConfig} from "../../utils/nodeTypeConfig";
+import {NewPropertiesComponent} from "./NewProperties";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -80,14 +75,36 @@ const cleanse = (state: string) => {
     let modifiedState = getModifiedState();
     if (modifiedState && modifiedState !== "{}") {
         let parsedModifiedState = JSON.parse(modifiedState);
-        for (const k in parsedModifiedState.nodes) {
+        //sometimes it may happen that the user removes node/edge from the diagram but modifiedState had no knowledge of it. In that case, we can check for the keys presence in the state and if not found, get the node/edge removed from state.
+        const toBeRemovedNodes = []
+        for (const [key, value] of Object.entries(parsedModifiedState.nodes)) {
             //TODO just update keys
-            stateJson.nodes[k].consumerData = parsedModifiedState.nodes[k].consumerData
+            if (key in stateJson.nodes) {
+                stateJson.nodes[key].consumerData = parsedModifiedState.nodes[key].consumerData
+            } else {
+                toBeRemovedNodes.push(key)
+            }
         }
-        for (const k in parsedModifiedState.edges) {
+        const toBeRemovedEdges = []
+
+        for (const key of Object.keys(parsedModifiedState.edges)) {
             //TODO just update keys
-            stateJson.edges[k].consumerData = parsedModifiedState.edges[k].consumerData
+            if (key in stateJson.edges) {
+                stateJson.edges[key].consumerData = parsedModifiedState.edges[key].consumerData
+            } else {
+                toBeRemovedEdges.push(key)
+            }
         }
+        // remove the nodes which aren't in the state anymore.
+        for (const element of toBeRemovedNodes) {
+            delete parsedModifiedState.nodes[element]
+        }
+        // remove the edges which aren't in the state anymore.
+        for (const element of toBeRemovedEdges) {
+            delete parsedModifiedState.edges[element]
+        }
+        // update back to localstorage.
+        setModifiedState(JSON.stringify(parsedModifiedState))
     }
     delete stateJson.panels
     delete stateJson.plugins
@@ -202,28 +219,8 @@ export const DiagramMakerContainer = ({
 
     const getDialog = () => {
         if (dialogState.isOpen) {
-            return <React.Fragment>
-                <Dialog open={dialogState.isOpen} onClose={handleClose}>
-                    <DialogTitle>Add more properties for {dialogState.type} : {dialogState.id}</DialogTitle>
-                    <DialogContent>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="componentType"
-                            label="Component Type"
-                            type="text"
-                            value={payload.componentType}
-                            onChange={handleComponentTypeChange}
-                            fullWidth
-                            variant="standard"
-                        />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleClose}>Cancel</Button>
-                        <Button onClick={handleSet}>Update</Button>
-                    </DialogActions>
-                </Dialog>
-            </React.Fragment>
+            return <NewPropertiesComponent dialogState={dialogState} onClose={handleClose} payload={payload}
+                                           onChange={handleComponentTypeChange} onClick={handleSet}/>
         }
         return "";
     }
