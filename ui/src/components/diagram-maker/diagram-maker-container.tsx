@@ -274,8 +274,10 @@ export const DiagramMakerContainer = ({
                             message = "Are you sure you want to delete the edge(s) : [" + diagramMakerAction.payload.edgeIds + "]";
                             result = "Deleting edge(s) : [" + diagramMakerAction.payload.edgeIds + "]"
                         }
-                        if (!window.confirm(message)) {
-                            return;
+                        if (diagramMakerAction.payload.nodeIds.length > 0 || diagramMakerAction.payload.edgeIds.length > 0) {
+                            if (!window.confirm(message)) {
+                                return;
+                            }
                         }
                         console.log(result)
                     }
