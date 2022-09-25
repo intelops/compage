@@ -5,7 +5,8 @@ import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import {getModifiedState, setModifiedState} from "../../utils/service";
+import {setModifiedState} from "../../utils/service";
+import {getParsedModifiedState} from "../diagram-maker/helper/helper";
 
 interface NewEdgePropertiesProps {
     isOpen: boolean,
@@ -14,21 +15,17 @@ interface NewEdgePropertiesProps {
 }
 
 export const NewEdgePropertiesComponent = (props: NewEdgePropertiesProps) => {
+    let parsedModifiedState = getParsedModifiedState();
+
+    const [payload, setPayload] = React.useState({
+        componentType: parsedModifiedState?.edges[props.edgeId]?.consumerData["componentType"],
+    });
+
     // TODO this is a hack as there is no EDGE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state with additional properties added from UI (Post edge creation)
     const handleSet = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        // retrieve current modifiedState
-        // logic is to store the dialog-state in localstorage and then refer it in updating state.
-        let modifiedState = getModifiedState();
-        let parsedModifiedState
-        if (modifiedState && modifiedState !== "{}") {
-            parsedModifiedState = JSON.parse(modifiedState);
-        } else {
-            parsedModifiedState = {
-                nodes: {},
-                edges: {}            }
-        }
+        let parsedModifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
         if (!(props.edgeId in parsedModifiedState.edges)) {
             parsedModifiedState.edges[props.edgeId] = {
@@ -46,10 +43,6 @@ export const NewEdgePropertiesComponent = (props: NewEdgePropertiesProps) => {
         setPayload({componentType: ""})
         props.onClose()
     }
-
-    const [payload, setPayload] = React.useState({
-        componentType: "",
-    });
 
     const handleComponentTypeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setPayload({

@@ -5,7 +5,8 @@ import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import {getModifiedState, setModifiedState} from "../../utils/service";
+import {setModifiedState} from "../../utils/service";
+import {getParsedModifiedState} from "../diagram-maker/helper/helper";
 
 interface NewNodePropertiesProps {
     isOpen: boolean,
@@ -14,22 +15,22 @@ interface NewNodePropertiesProps {
 }
 
 export const NewNodePropertiesComponent = (props: NewNodePropertiesProps) => {
+    let parsedModifiedState = getParsedModifiedState();
+
+    const [payload, setPayload] = React.useState({
+        componentType: parsedModifiedState?.nodes[props.nodeId]?.consumerData["componentType"],
+        // language: "",
+        // isServer: false,
+        // isClient: false,
+        // // api resources to be generated
+        // resources: [],
+    });
+
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state with additional properties added from UI (Post node creation)
     const handleSet = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        // retrieve current modifiedState
-        // logic is to store the dialog-state in localstorage and then refer it in updating state.
-        let modifiedState = getModifiedState();
-        let parsedModifiedState
-        if (modifiedState && modifiedState !== "{}") {
-            parsedModifiedState = JSON.parse(modifiedState);
-        } else {
-            parsedModifiedState = {
-                nodes: {},
-                edges: {}
-            }
-        }
+        let parsedModifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
         if (!(props.nodeId in parsedModifiedState.nodes)) {
             parsedModifiedState.nodes[props.nodeId] = {
@@ -47,15 +48,6 @@ export const NewNodePropertiesComponent = (props: NewNodePropertiesProps) => {
         setPayload({componentType: ""})
         props.onClose()
     }
-
-    const [payload, setPayload] = React.useState({
-        componentType: "",
-        // language: "",
-        // isServer: false,
-        // isClient: false,
-        // // api resources to be generated
-        // resources: [],
-    });
 
     const handleComponentTypeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setPayload({

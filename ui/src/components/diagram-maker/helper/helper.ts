@@ -62,3 +62,18 @@ export const cleanse = (state: string) => {
     }
     return stateJson;
 }
+
+export const getParsedModifiedState = () => {
+    // retrieve current modifiedState
+    // logic is to store the dialog-state in localstorage and then refer it in updating state.
+    let modifiedState = getModifiedState();
+
+    if (modifiedState && modifiedState !== "{}") {
+        return JSON.parse(modifiedState);
+    } else {
+        return {
+            nodes: {},
+            edges: {}
+        }
+    }
+}
