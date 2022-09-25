@@ -18,12 +18,14 @@ export const NewNodePropertiesComponent = (props: NewNodePropertiesProps) => {
     let parsedModifiedState = getParsedModifiedState();
 
     const [payload, setPayload] = React.useState({
-        componentType: parsedModifiedState?.nodes[props.nodeId]?.consumerData["componentType"],
-        // language: "",
-        // isServer: false,
-        // isClient: false,
-        // // api resources to be generated
-        // resources: [],
+        name: parsedModifiedState.nodes[props.nodeId]?.consumerData["name"] !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData["name"] : "",
+        type: parsedModifiedState.nodes[props.nodeId]?.consumerData["type"] !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData["type"] : "",
+        language: parsedModifiedState.nodes[props.nodeId]?.consumerData["language"] !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData["language"] : "",
+        isServer: parsedModifiedState.nodes[props.nodeId]?.consumerData["isServer"] !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData["isServer"] : false,
+        isClient: parsedModifiedState.nodes[props.nodeId]?.consumerData["isClient"] !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData["isClient"] : false,
+        // api resources to be generated
+        resources: [],
+        url: parsedModifiedState?.nodes[props.nodeId]?.consumerData["url"] !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData["url"] : "",
     });
 
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
@@ -35,23 +37,72 @@ export const NewNodePropertiesComponent = (props: NewNodePropertiesProps) => {
         if (!(props.nodeId in parsedModifiedState.nodes)) {
             parsedModifiedState.nodes[props.nodeId] = {
                 consumerData: {
-                    componentType: payload.componentType
+                    type: payload.type,
+                    name: payload.name,
+                    isServer: payload.isServer,
+                    isClient: payload.isClient,
+                    language: payload.language,
+                    url: payload.url
                 }
             }
         } else {
             parsedModifiedState.nodes[props.nodeId].consumerData = {
-                componentType: payload.componentType
+                type: payload.type,
+                name: payload.name,
+                isServer: payload.isServer,
+                isClient: payload.isClient,
+                language: payload.language,
+                url: payload.url
             }
         }
         // update modifiedState in the localstorage
         setModifiedState(JSON.stringify(parsedModifiedState))
-        setPayload({componentType: ""})
+        setPayload({
+            ...payload,
+            type: ""
+        })
         props.onClose()
     }
 
-    const handleComponentTypeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleTypeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setPayload({
-            componentType: event.target.value
+            ...payload,
+            type: event.target.value
+        });
+    };
+
+    const handleNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setPayload({
+            ...payload,
+            name: event.target.value
+        });
+    };
+
+    const handleLanguageChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setPayload({
+            ...payload,
+            language: event.target.value
+        });
+    };
+
+    const handleIsClientChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setPayload({
+            ...payload,
+            isClient: event.target.value
+        });
+    };
+
+    const handleIsServerChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setPayload({
+            ...payload,
+            isServer: event.target.value
+        });
+    };
+
+    const handleUrlChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setPayload({
+            ...payload,
+            url: event.target.value
         });
     };
 
@@ -62,11 +113,66 @@ export const NewNodePropertiesComponent = (props: NewNodePropertiesProps) => {
                 <TextField
                     autoFocus
                     margin="dense"
-                    id="componentType"
-                    label="Component Type"
+                    id="name"
+                    label="Name of Component"
                     type="text"
-                    value={payload.componentType}
-                    onChange={handleComponentTypeChange}
+                    value={payload.name}
+                    onChange={handleNameChange}
+                    fullWidth
+                    variant="standard"
+                />
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    id="type"
+                    label="Type of Component"
+                    type="text"
+                    value={payload.type}
+                    onChange={handleTypeChange}
+                    fullWidth
+                    variant="standard"
+                />
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    id="language"
+                    label="Language"
+                    type="text"
+                    value={payload.language}
+                    onChange={handleLanguageChange}
+                    fullWidth
+                    variant="standard"
+                />
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    id="isServer"
+                    label="Is Server ?"
+                    type="text"
+                    value={payload.isServer}
+                    onChange={handleIsServerChange}
+                    fullWidth
+                    variant="standard"
+                />
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    id="isClient"
+                    label="Is Client ?"
+                    type="text"
+                    value={payload.isClient}
+                    onChange={handleIsClientChange}
+                    fullWidth
+                    variant="standard"
+                />
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    id="url"
+                    label="Url"
+                    type="text"
+                    value={payload.url}
+                    onChange={handleUrlChange}
                     fullWidth
                     variant="standard"
                 />

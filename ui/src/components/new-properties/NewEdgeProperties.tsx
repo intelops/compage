@@ -30,7 +30,7 @@ export const NewEdgePropertiesComponent = (props: NewEdgePropertiesProps) => {
         if (!(props.edgeId in parsedModifiedState.edges)) {
             parsedModifiedState.edges[props.edgeId] = {
                 consumerData: {
-                    componentType: payload.componentType + "edges"
+                    componentType: payload.componentType + "_edge"
                 }
             }
         } else {

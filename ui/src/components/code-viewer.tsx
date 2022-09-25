@@ -13,7 +13,7 @@ import MailIcon from '@mui/icons-material/Mail';
 
 type Anchor = 'right';
 
-export default function SwipeAbleTemporaryDrawer() {
+export const SwipeAbleTemporaryDrawer = () => {
     const [state, setState] = React.useState({
         right: false,
     });
