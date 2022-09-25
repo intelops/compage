@@ -8,13 +8,14 @@ import Button from "@mui/material/Button";
 import {getModifiedState, setModifiedState} from "../../utils/service";
 
 interface NewEdgePropertiesProps {
-    dialogState: { isOpen: boolean; id: string; type: string },
+    isOpen: boolean,
+    edgeId: string,
     onClose: () => void,
 }
 
 export const NewEdgePropertiesComponent = (props: NewEdgePropertiesProps) => {
-    // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
-    // update state with additional properties added from UI (Post node creation)
+    // TODO this is a hack as there is no EDGE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
+    // update state with additional properties added from UI (Post edge creation)
     const handleSet = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
         // retrieve current modifiedState
@@ -26,33 +27,18 @@ export const NewEdgePropertiesComponent = (props: NewEdgePropertiesProps) => {
         } else {
             parsedModifiedState = {
                 nodes: {},
-                edges: {}
-            }
+                edges: {}            }
         }
         // update modifiedState with current fields on dialog box
-        if (props.dialogState.type === "node") {
-            if (!(props.dialogState.id in parsedModifiedState.nodes)) {
-                parsedModifiedState.nodes[props.dialogState.id] = {
-                    consumerData: {
-                        componentType: payload.componentType
-                    }
-                }
-            } else {
-                parsedModifiedState.nodes[props.dialogState.id].consumerData = {
-                    componentType: payload.componentType
+        if (!(props.edgeId in parsedModifiedState.edges)) {
+            parsedModifiedState.edges[props.edgeId] = {
+                consumerData: {
+                    componentType: payload.componentType + "edges"
                 }
             }
-        } else if (props.dialogState.type === "edge") {
-            if (!(props.dialogState.id in parsedModifiedState.edges)) {
-                parsedModifiedState.edges[props.dialogState.id] = {
-                    consumerData: {
-                        componentType: payload.componentType + "edges"
-                    }
-                }
-            } else {
-                parsedModifiedState.edges[props.dialogState.id].consumerData = {
-                    componentType: payload.componentType
-                }
+        } else {
+            parsedModifiedState.edges[props.edgeId].consumerData = {
+                componentType: payload.componentType
             }
         }
         // update modifiedState in the localstorage
@@ -63,11 +49,6 @@ export const NewEdgePropertiesComponent = (props: NewEdgePropertiesProps) => {
 
     const [payload, setPayload] = React.useState({
         componentType: "",
-        // language: "",
-        // isServer: false,
-        // isClient: false,
-        // // api resources to be generated
-        // resources: [],
     });
 
     const handleComponentTypeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
@@ -77,8 +58,8 @@ export const NewEdgePropertiesComponent = (props: NewEdgePropertiesProps) => {
     };
 
     return <React.Fragment>
-        <Dialog open={props.dialogState.isOpen} onClose={props.onClose}>
-            <DialogTitle>Add more properties for {props.dialogState.type} : {props.dialogState.id}</DialogTitle>
+        <Dialog open={props.isOpen} onClose={props.onClose}>
+            <DialogTitle>Edge properties : {props.edgeId}</DialogTitle>
             <DialogContent>
                 <TextField
                     autoFocus

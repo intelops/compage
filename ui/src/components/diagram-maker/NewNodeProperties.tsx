@@ -8,7 +8,8 @@ import Button from "@mui/material/Button";
 import {getModifiedState, setModifiedState} from "../../utils/service";
 
 interface NewNodePropertiesProps {
-    dialogState: { isOpen: boolean; id: string; type: string },
+    isOpen: boolean,
+    nodeId: string,
     onClose: () => void,
 }
 
@@ -30,29 +31,15 @@ export const NewNodePropertiesComponent = (props: NewNodePropertiesProps) => {
             }
         }
         // update modifiedState with current fields on dialog box
-        if (props.dialogState.type === "node") {
-            if (!(props.dialogState.id in parsedModifiedState.nodes)) {
-                parsedModifiedState.nodes[props.dialogState.id] = {
-                    consumerData: {
-                        componentType: payload.componentType
-                    }
-                }
-            } else {
-                parsedModifiedState.nodes[props.dialogState.id].consumerData = {
+        if (!(props.nodeId in parsedModifiedState.nodes)) {
+            parsedModifiedState.nodes[props.nodeId] = {
+                consumerData: {
                     componentType: payload.componentType
                 }
             }
-        } else if (props.dialogState.type === "edge") {
-            if (!(props.dialogState.id in parsedModifiedState.edges)) {
-                parsedModifiedState.edges[props.dialogState.id] = {
-                    consumerData: {
-                        componentType: payload.componentType + "edges"
-                    }
-                }
-            } else {
-                parsedModifiedState.edges[props.dialogState.id].consumerData = {
-                    componentType: payload.componentType
-                }
+        } else {
+            parsedModifiedState.nodes[props.nodeId].consumerData = {
+                componentType: payload.componentType
             }
         }
         // update modifiedState in the localstorage
@@ -77,8 +64,8 @@ export const NewNodePropertiesComponent = (props: NewNodePropertiesProps) => {
     };
 
     return <React.Fragment>
-        <Dialog open={props.dialogState.isOpen} onClose={props.onClose}>
-            <DialogTitle>Properties - {props.dialogState.type} : {props.dialogState.id}</DialogTitle>
+        <Dialog open={props.isOpen} onClose={props.onClose}>
+            <DialogTitle>Node Properties : {props.nodeId}</DialogTitle>
             <DialogContent>
                 <TextField
                     autoFocus

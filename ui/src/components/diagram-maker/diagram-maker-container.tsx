@@ -164,9 +164,9 @@ export const DiagramMakerContainer = ({
     const getDialog = () => {
         if (dialogState.isOpen) {
             if (dialogState.type === 'node') {
-                return <NewNodePropertiesComponent dialogState={dialogState} onClose={handleClose}/>
+                return <NewNodePropertiesComponent isOpen={dialogState.isOpen} nodeId={dialogState.id}  onClose={handleClose}/>
             } else if (dialogState.type === 'edge') {
-                return <NewEdgePropertiesComponent dialogState={dialogState} onClose={handleClose}/>
+                return <NewEdgePropertiesComponent isOpen={dialogState.isOpen} edgeId={dialogState.id} onClose={handleClose}/>
             }
             return ""
         }
