@@ -8,6 +8,8 @@ import Button from "@mui/material/Button";
 import {setModifiedState} from "../../utils/service";
 import {getParsedModifiedState} from "../diagram-maker/helper/helper";
 import Divider from "@mui/material/Divider";
+import MenuItem from "@mui/material/MenuItem";
+import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 
 interface NewNodePropertiesProps {
     isOpen: boolean,
@@ -86,17 +88,17 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const handleIsClientChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleIsClientChange = (event: ChangeEvent<HTMLInputElement>) => {
         setPayload({
             ...payload,
-            isClient: event.target.value
+            isClient: event.target.checked
         });
     };
 
-    const handleIsServerChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleIsServerChange = (event: ChangeEvent<HTMLInputElement>) => {
         setPayload({
             ...payload,
-            isServer: event.target.value
+            isServer: event.target.checked
         });
     };
 
@@ -107,77 +109,80 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
+    const languages = ["NodeJs", "Java", "Golang"]
     return <React.Fragment>
         <Dialog open={props.isOpen} onClose={props.onClose}>
             <DialogTitle>Node Properties : {props.nodeId}</DialogTitle>
             <Divider/>
             <DialogContent>
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="name"
-                    label="Name of Component"
-                    type="text"
-                    value={payload.name}
-                    onChange={handleNameChange}
-                    fullWidth
-                    variant="outlined"
-                />
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="type"
-                    label="Type of Component"
-                    type="text"
-                    value={payload.type}
-                    onChange={handleTypeChange}
-                    fullWidth
-                    variant="outlined"
-                />
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="language"
-                    label="Language"
-                    type="text"
-                    value={payload.language}
-                    onChange={handleLanguageChange}
-                    fullWidth
-                    variant="outlined"
-                />
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="isServer"
-                    label="Is Server ?"
-                    type="text"
-                    value={payload.isServer}
-                    onChange={handleIsServerChange}
-                    fullWidth
-                    variant="outlined"
-                />
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="isClient"
-                    label="Is Client ?"
-                    type="text"
-                    value={payload.isClient}
-                    onChange={handleIsClientChange}
-                    fullWidth
-                    variant="outlined"
-                />
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="url"
-                    label="Url"
-                    type="text"
-                    value={payload.url}
-                    onChange={handleUrlChange}
-                    fullWidth
-                    variant="outlined"
-                />
+                <Stack direction="column" spacing={2}>
+                    <TextField
+                        size="medium"
+                        margin="dense"
+                        id="name"
+                        label="Name of Component"
+                        type="text"
+                        value={payload.name}
+                        onChange={handleNameChange}
+                        variant="outlined"
+                    />
+                    <TextField
+                        size="medium"
+                        margin="dense"
+                        id="type"
+                        label="Type of Component"
+                        type="text"
+                        value={payload.type}
+                        onChange={handleTypeChange}
+                        variant="outlined"
+                    />
+                    <TextField
+                        size="medium"
+                        select
+                        margin="dense"
+                        id="language"
+                        label="Language"
+                        type="text"
+                        value={payload.language}
+                        onChange={handleLanguageChange}
+                        variant="outlined"
+                    >
+                        <MenuItem value="">
+                            <em>Create new</em>
+                        </MenuItem>
+                        {languages.map((language: string) => (
+                            <MenuItem key={language} value={language}>
+                                {language}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                    <FormControlLabel
+                        label="Is Server?"
+                        control={<Checkbox
+                            size="medium"
+                            checked={payload.isServer}
+                            onChange={handleIsServerChange}
+                        />}
+                    />
+                    <FormControlLabel
+                        label="Is Client?"
+                        control={<Checkbox
+                            size="medium"
+                            checked={payload.isClient}
+                            onChange={handleIsClientChange}
+                        />}
+                    />
+                    <TextField
+                        size="medium"
+                        margin="dense"
+                        id="url"
+                        label="Url"
+                        type="text"
+                        value={payload.url}
+                        onChange={handleUrlChange}
+                        variant="outlined"
+                    />
+                </Stack>
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>

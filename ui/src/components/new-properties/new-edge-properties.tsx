@@ -8,6 +8,7 @@ import Button from "@mui/material/Button";
 import {setModifiedState} from "../../utils/service";
 import {getParsedModifiedState} from "../diagram-maker/helper/helper";
 import Divider from "@mui/material/Divider";
+import {Stack} from "@mui/material";
 
 interface NewEdgePropertiesProps {
     isOpen: boolean,
@@ -56,17 +57,18 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             <DialogTitle>Edge properties : {props.edgeId}</DialogTitle>
             <Divider/>
             <DialogContent>
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="type"
-                    label="Type of Component"
-                    type="text"
-                    value={payload.type}
-                    onChange={handleTypeChange}
-                    fullWidth
-                    variant="standard"
-                />
+                <Stack direction="column" spacing={2}>
+                    <TextField
+                        size="medium"
+                        margin="dense"
+                        id="type"
+                        label="Type of Component"
+                        type="text"
+                        value={payload.type}
+                        onChange={handleTypeChange}
+                        variant="outlined"
+                    />
+                </Stack>
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
