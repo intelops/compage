@@ -117,6 +117,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             <DialogContent>
                 <Stack direction="column" spacing={2}>
                     <TextField
+                        required
                         size="medium"
                         margin="dense"
                         id="name"
@@ -127,6 +128,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         variant="outlined"
                     />
                     <TextField
+                        required
                         size="medium"
                         margin="dense"
                         id="type"
@@ -137,6 +139,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         variant="outlined"
                     />
                     <TextField
+                        required
                         size="medium"
                         select
                         margin="dense"
@@ -145,8 +148,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         type="text"
                         value={payload.language}
                         onChange={handleLanguageChange}
-                        variant="outlined"
-                    >
+                        variant="outlined">
                         <MenuItem value="">
                             <em>Create new</em>
                         </MenuItem>
@@ -186,7 +188,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
-                <Button variant="contained" onClick={handleUpdate}>Update</Button>
+                <Button variant="contained"
+                        onClick={handleUpdate}
+                        disabled={payload.name === "" || payload.type === "" || payload.language === ""}>Update</Button>
             </DialogActions>
         </Dialog>
     </React.Fragment>;

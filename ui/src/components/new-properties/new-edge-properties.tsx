@@ -59,6 +59,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             <DialogContent>
                 <Stack direction="column" spacing={2}>
                     <TextField
+                        required
                         size="medium"
                         margin="dense"
                         id="type"
@@ -72,7 +73,9 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
-                <Button variant="contained" onClick={handleUpdate}>Update</Button>
+                <Button variant="contained"
+                        onClick={handleUpdate}
+                        disabled={payload.type === ""}>Update</Button>
             </DialogActions>
         </Dialog>
     </React.Fragment>;
