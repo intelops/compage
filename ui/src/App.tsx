@@ -2,9 +2,9 @@ import React, {createContext, useReducer} from 'react';
 import './App.css';
 import {initialState, reducer} from "./store/auth_reducer";
 import {HashRouter as Router, Route, Routes} from "react-router-dom";
-import {Login} from "./components/auth/Login";
-import {Home} from "./components/Home";
-import Navbar from "./components/navbar/Navbar";
+import {Login} from "./components/auth/login";
+import {Home} from "./components/home";
+import Navbar from "./components/navbar/navbar";
 
 export const AuthContext = createContext(null);
 

@@ -51,8 +51,8 @@ import {ContextWorkspace} from "../custom/context-workspace";
 import {EdgeBadge} from "../custom/edge-badge";
 import {PotentialNode} from "../custom/potential-node";
 import {getNodeTypeConfig} from "./helper/node-type-ui";
-import {NewEdgePropertiesComponent} from "../new-properties/NewEdgeProperties";
-import {NewNodePropertiesComponent} from "../new-properties/NewNodeProperties";
+import {NewEdgeProperties} from "../new-properties/new-edge-properties";
+import {NewNodeProperties} from "../new-properties/new-node-properties";
 import {cleanse} from "./helper/helper";
 
 interface ArgTypes {
@@ -99,11 +99,13 @@ export const DiagramMakerContainer = ({
     const showDialog = () => {
         if (dialogState.isOpen) {
             if (dialogState.type === 'node') {
-                return <NewNodePropertiesComponent isOpen={dialogState.isOpen} nodeId={dialogState.id}
-                                                   onClose={handleDialogClose}/>
+                return <NewNodeProperties isOpen={dialogState.isOpen}
+                                          nodeId={dialogState.id}
+                                          onClose={handleDialogClose}/>
             } else if (dialogState.type === 'edge') {
-                return <NewEdgePropertiesComponent isOpen={dialogState.isOpen} edgeId={dialogState.id}
-                                                   onClose={handleDialogClose}/>
+                return <NewEdgeProperties isOpen={dialogState.isOpen}
+                                          edgeId={dialogState.id}
+                                          onClose={handleDialogClose}/>
             }
         }
         return "";

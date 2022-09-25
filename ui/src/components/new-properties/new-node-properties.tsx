@@ -14,7 +14,7 @@ interface NewNodePropertiesProps {
     onClose: () => void,
 }
 
-export const NewNodePropertiesComponent = (props: NewNodePropertiesProps) => {
+export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     let parsedModifiedState = getParsedModifiedState();
 
     const [payload, setPayload] = React.useState({
@@ -30,7 +30,7 @@ export const NewNodePropertiesComponent = (props: NewNodePropertiesProps) => {
 
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state with additional properties added from UI (Post node creation)
-    const handleSet = (event: React.MouseEvent<HTMLElement>) => {
+    const handleUpdate = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
         let parsedModifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
@@ -179,7 +179,7 @@ export const NewNodePropertiesComponent = (props: NewNodePropertiesProps) => {
             </DialogContent>
             <DialogActions>
                 <Button onClick={props.onClose}>Cancel</Button>
-                <Button onClick={handleSet}>Update</Button>
+                <Button onClick={handleUpdate}>Update</Button>
             </DialogActions>
         </Dialog>
     </React.Fragment>;

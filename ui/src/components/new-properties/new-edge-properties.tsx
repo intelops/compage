@@ -14,39 +14,39 @@ interface NewEdgePropertiesProps {
     onClose: () => void,
 }
 
-export const NewEdgePropertiesComponent = (props: NewEdgePropertiesProps) => {
+export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     let parsedModifiedState = getParsedModifiedState();
 
     const [payload, setPayload] = React.useState({
-        componentType: parsedModifiedState?.edges[props.edgeId]?.consumerData["componentType"],
+        type: parsedModifiedState.nodes[props.edgeId]?.consumerData["type"] !== undefined ? parsedModifiedState.nodes[props.edgeId].consumerData["type"] : "",
     });
 
     // TODO this is a hack as there is no EDGE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state with additional properties added from UI (Post edge creation)
-    const handleSet = (event: React.MouseEvent<HTMLElement>) => {
+    const handleUpdate = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
         let parsedModifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
         if (!(props.edgeId in parsedModifiedState.edges)) {
             parsedModifiedState.edges[props.edgeId] = {
                 consumerData: {
-                    componentType: payload.componentType + "_edge"
+                    type: payload.type + "_edge"
                 }
             }
         } else {
             parsedModifiedState.edges[props.edgeId].consumerData = {
-                componentType: payload.componentType
+                type: payload.type
             }
         }
         // update modifiedState in the localstorage
         setModifiedState(JSON.stringify(parsedModifiedState))
-        setPayload({componentType: ""})
+        setPayload({type: ""})
         props.onClose()
     }
 
-    const handleComponentTypeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleTypeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setPayload({
-            componentType: event.target.value
+            type: event.target.value
         });
     };
 
@@ -57,18 +57,18 @@ export const NewEdgePropertiesComponent = (props: NewEdgePropertiesProps) => {
                 <TextField
                     autoFocus
                     margin="dense"
-                    id="componentType"
-                    label="Component Type"
+                    id="type"
+                    label="Type of Component"
                     type="text"
-                    value={payload.componentType}
-                    onChange={handleComponentTypeChange}
+                    value={payload.type}
+                    onChange={handleTypeChange}
                     fullWidth
                     variant="standard"
                 />
             </DialogContent>
             <DialogActions>
                 <Button onClick={props.onClose}>Cancel</Button>
-                <Button onClick={handleSet}>Update</Button>
+                <Button onClick={handleUpdate}>Update</Button>
             </DialogActions>
         </Dialog>
     </React.Fragment>;
