@@ -9,9 +9,7 @@ interface EdgeBadgeProps {
 export const EdgeBadge = (props: EdgeBadgeProps) => {
     const id = props.id.substring(0, 10)
     return <React.Fragment>
-        <div className="edgeBadge" onDoubleClick={() => {
-            {props.handleDblClick()}
-        }}>
+        <div className="edgeBadge" onDoubleClick={props.handleDblClick}>
             {id}
         </div>
     </React.Fragment>;

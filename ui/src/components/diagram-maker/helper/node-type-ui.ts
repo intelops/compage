@@ -56,3 +56,4 @@ export const getNodeTypeConfig = (connectorPlacement, shape: ShapeType.CIRCLE) =
     };
 }
 
+

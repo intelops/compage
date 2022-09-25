@@ -27,8 +27,7 @@ import {
     createCircularNode,
     createPluginPanel,
     createRectangularConnectorNode,
-    createRectangularNode,
-    updateActionInLogger
+    createRectangularNode
 } from "../../utils/utils";
 
 import {useBeforeunload} from 'react-beforeunload';
@@ -38,10 +37,8 @@ import JSONPretty from "react-json-pretty";
 import {
     getCurrentConfig,
     getCurrentState,
-    getModifiedState,
     setCurrentConfig,
     setCurrentState,
-    setModifiedState,
     setReset,
     shouldReset
 } from "../../utils/service";
@@ -53,9 +50,10 @@ import {ContextPanel} from "../custom/context-panel";
 import {ContextWorkspace} from "../custom/context-workspace";
 import {EdgeBadge} from "../custom/edge-badge";
 import {PotentialNode} from "../custom/potential-node";
-import {getNodeTypeConfig} from "../../utils/nodeTypeConfig";
-import {NewEdgePropertiesComponent} from "./NewEdgeProperties";
-import {NewNodePropertiesComponent} from "./NewNodeProperties";
+import {getNodeTypeConfig} from "./helper/node-type-ui";
+import {NewEdgePropertiesComponent} from "../new-properties/NewEdgeProperties";
+import {NewNodePropertiesComponent} from "../new-properties/NewNodeProperties";
+import {cleanse} from "./helper/helper";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -67,69 +65,6 @@ interface ArgTypes {
     actionInterceptor?: boolean;
     plugin?: boolean;
     onAction?: (...args: any) => void;
-}
-
-const cleanse = (state: string) => {
-    const stateJson = JSON.parse(state)
-    // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
-    // update state from localstorage with additional properties added from UI (Post node creation)
-    let modifiedState = getModifiedState();
-    if (modifiedState && modifiedState !== "{}") {
-        let parsedModifiedState = JSON.parse(modifiedState);
-        //sometimes it may happen that the user removes node from the diagram but modifiedState had no knowledge of it. In that case, we can check for the keys presence in the state and if not found, get the node removed from state.
-        const toBeRemovedNodes = []
-        for (const [key, value] of Object.entries(parsedModifiedState.nodes)) {
-            //TODO just update keys
-            if (key in stateJson.nodes) {
-                stateJson.nodes[key].consumerData = parsedModifiedState.nodes[key].consumerData
-            } else {
-                //node has been deleted but modifiedState still has the reference, we have to explicitly remove the node
-                toBeRemovedNodes.push(key)
-            }
-        }
-        //sometimes it may happen that the user removes edge from the diagram but modifiedState had no knowledge of it. In that case, we can check for the keys presence in the state and if not found, get the edge removed from state.
-        const toBeRemovedEdges = []
-        for (const key of Object.keys(parsedModifiedState.edges)) {
-            //TODO just update keys
-            if (key in stateJson.edges) {
-                stateJson.edges[key].consumerData = parsedModifiedState.edges[key].consumerData
-            } else {
-                //edge has been deleted but modifiedState still has the reference, we have to explicitly remove the edge
-                toBeRemovedEdges.push(key)
-            }
-        }
-        // remove the nodes which aren't in the state anymore.
-        for (const element of toBeRemovedNodes) {
-            delete parsedModifiedState.nodes[element]
-        }
-        // remove the edges which aren't in the state anymore.
-        for (const element of toBeRemovedEdges) {
-            delete parsedModifiedState.edges[element]
-        }
-        // update back to localstorage.
-        setModifiedState(JSON.stringify(parsedModifiedState))
-    }
-    //delete unwanted stuff from state.
-    delete stateJson.panels
-    delete stateJson.plugins
-    delete stateJson.potentialEdge
-    delete stateJson.potentialNode
-    delete stateJson.editor
-    delete stateJson.undoHistory
-    delete stateJson.workspace
-    // nodes
-    for (let key in stateJson.nodes) {
-        let diagramMakerData = stateJson.nodes[key].diagramMakerData;
-        delete diagramMakerData.position
-        delete diagramMakerData.size
-    }
-    // edges
-    for (let key in stateJson.edges) {
-        let diagramMakerData = stateJson.edges[key].diagramMakerData;
-        delete diagramMakerData.position
-        delete diagramMakerData.size
-    }
-    return stateJson;
 }
 
 export const DiagramMakerContainer = ({
@@ -156,19 +91,20 @@ export const DiagramMakerContainer = ({
         type: "",
     });
 
-    const handleClose = () => {
+    const handleDialogClose = () => {
         setDialogState({isOpen: false, id: "", type: ""})
         setData(diagramMaker.state, false)
     };
 
-    const getDialog = () => {
+    const showDialog = () => {
         if (dialogState.isOpen) {
             if (dialogState.type === 'node') {
-                return <NewNodePropertiesComponent isOpen={dialogState.isOpen} nodeId={dialogState.id}  onClose={handleClose}/>
+                return <NewNodePropertiesComponent isOpen={dialogState.isOpen} nodeId={dialogState.id}
+                                                   onClose={handleDialogClose}/>
             } else if (dialogState.type === 'edge') {
-                return <NewEdgePropertiesComponent isOpen={dialogState.isOpen} edgeId={dialogState.id} onClose={handleClose}/>
+                return <NewEdgePropertiesComponent isOpen={dialogState.isOpen} edgeId={dialogState.id}
+                                                   onClose={handleDialogClose}/>
             }
-            return ""
         }
         return "";
     }
@@ -318,14 +254,30 @@ export const DiagramMakerContainer = ({
                     //     console.log("action : ", diagramMakerAction?.payload)
                     //     console.log("++++++++++++++++++++++++++")
                     // }
-                    updateActionInLogger(action);
+
+                    // We aren't showing the action details in logger anymore. Keeping for future reference
+                    // updateActionInLogger(action);
                     if (diagramMakerAction.type === DiagramMakerActions.DELETE_ITEMS
                         && "payload" in diagramMakerAction
-                        && "nodeIds" in diagramMakerAction.payload
-                        && diagramMakerAction.payload.nodeIds.length > 0) {
+                        && "nodeIds" in diagramMakerAction.payload) {
                         // stops from deleting nodes
                         // return;
-                        console.log("Deleting node : ", diagramMakerAction.payload.nodeIds)
+                        let message;
+                        let result;
+                        if (diagramMakerAction.payload.nodeIds.length > 0 && diagramMakerAction.payload.edgeIds.length > 0) {
+                            message = "Are you sure you want to delete the node(s) : [" + diagramMakerAction.payload.nodeIds + "] and edge(s) : [" + diagramMakerAction.payload.edgeIds + "]";
+                            result = "Deleting node(s) : [" + diagramMakerAction.payload.nodeIds + "] and edge(s) : [" + diagramMakerAction.payload.edgeIds + "]"
+                        } else if (diagramMakerAction.payload.nodeIds.length > 0) {
+                            message = "Are you sure you want to delete the node(s) : [" + diagramMakerAction.payload.nodeIds + "]";
+                            result = "Deleting node(s) : [" + diagramMakerAction.payload.nodeIds + "]"
+                        } else if (diagramMakerAction.payload.edgeIds.length > 0) {
+                            message = "Are you sure you want to delete the edge(s) : [" + diagramMakerAction.payload.edgeIds + "]";
+                            result = "Deleting edge(s) : [" + diagramMakerAction.payload.edgeIds + "]"
+                        }
+                        if (!window.confirm(message)) {
+                            return;
+                        }
+                        console.log(result)
                     }
                     if (diagramMakerAction.type === DiagramMakerActions.NODE_SELECT && "payload" in diagramMakerAction) {
                         // console.log("Select node action : ", diagramMakerAction.payload)
@@ -370,7 +322,8 @@ export const DiagramMakerContainer = ({
                     }
                     next(action);
                 } else {
-                    updateActionInLogger(action);
+                    // We aren't showing the action details in logger anymore. Keeping for future reference
+                    // updateActionInLogger(action);
                     next(action);
                 }
             },
@@ -401,7 +354,7 @@ export const DiagramMakerContainer = ({
 
     return <Grid container spacing={1}>
         <Grid item xs={8} md={8}>
-            {getDialog()}
+            {showDialog()}
             <div id="diagramMakerContainer" ref={containerRef}></div>
         </Grid>
         <Grid item xs={4} md={4} style={{
