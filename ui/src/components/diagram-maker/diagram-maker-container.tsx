@@ -22,7 +22,7 @@ import "./scss/CircularNode.css"
 import "./scss/RectangularNode.css"
 import "./scss/Logger.css"
 
-import React, {ChangeEvent, useRef} from "react";
+import React, {useRef} from "react";
 import {
     createCircularNode,
     createPluginPanel,
@@ -149,81 +149,20 @@ export const DiagramMakerContainer = ({
         config: "{}"
     });
 
-    const [payload, setPayload] = React.useState({
-        componentType: ""
-    });
     const [dialogState, setDialogState] = React.useState({
         isOpen: false,
         id: "",
         type: "",
     });
 
-    const handleComponentTypeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setPayload({
-            componentType: event.target.value
-        });
-    };
-
     const handleClose = () => {
         setDialogState({isOpen: false, id: "", type: ""})
-    };
-
-    //TODO need to update the custom data to some other localstorage key and update the state continuously. Below impl doesn't work
-    // update state with additional properties added from UI (Post node creation)
-    // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
-    const handleSet = (event: React.MouseEvent<HTMLElement>) => {
-        event.preventDefault();
-        // retrieve current modifiedState
-        // logic is to store the dialog-state in localstorage and then refer it in updating state.
-        let modifiedState = getModifiedState();
-        let parsedModifiedState
-        debugger
-        if (modifiedState && modifiedState !== "{}") {
-            parsedModifiedState = JSON.parse(modifiedState);
-        } else {
-            parsedModifiedState = {
-                nodes: {},
-                edges: {}
-            }
-        }
-        // update modifiedState with current fields on dialog box
-        if (dialogState.type === "node") {
-            if (!(dialogState.id in parsedModifiedState.nodes)) {
-                parsedModifiedState.nodes[dialogState.id] = {
-                    consumerData: {
-                        componentType: payload.componentType
-                    }
-                }
-            } else {
-                parsedModifiedState.nodes[dialogState.id].consumerData = {
-                    componentType: payload.componentType
-                }
-            }
-        } else if (dialogState.type === "edge") {
-            if (!(dialogState.id in parsedModifiedState.edges)) {
-                parsedModifiedState.edges[dialogState.id] = {
-                    consumerData: {
-                        componentType: payload.componentType + "edges"
-                    }
-                }
-            } else {
-                parsedModifiedState.edges[dialogState.id].consumerData = {
-                    componentType: payload.componentType
-                }
-            }
-        }
-        // update modifiedState in the localstorage
-        setModifiedState(JSON.stringify(parsedModifiedState))
-        //send update to the components
         setData(diagramMaker.state, false)
-        setPayload({componentType: ""})
-        setDialogState({isOpen: false, id: "", type: ""})
-    }
+    };
 
     const getDialog = () => {
         if (dialogState.isOpen) {
-            return <NewPropertiesComponent dialogState={dialogState} onClose={handleClose} payload={payload}
-                                           onChange={handleComponentTypeChange} onClick={handleSet}/>
+            return <NewPropertiesComponent dialogState={dialogState} onClose={handleClose}/>
         }
         return "";
     }
