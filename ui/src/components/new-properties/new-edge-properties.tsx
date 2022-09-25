@@ -7,6 +7,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import {setModifiedState} from "../../utils/service";
 import {getParsedModifiedState} from "../diagram-maker/helper/helper";
+import Divider from "@mui/material/Divider";
 
 interface NewEdgePropertiesProps {
     isOpen: boolean,
@@ -53,6 +54,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     return <React.Fragment>
         <Dialog open={props.isOpen} onClose={props.onClose}>
             <DialogTitle>Edge properties : {props.edgeId}</DialogTitle>
+            <Divider/>
             <DialogContent>
                 <TextField
                     autoFocus
@@ -67,8 +69,8 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={props.onClose}>Cancel</Button>
-                <Button onClick={handleUpdate}>Update</Button>
+                <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
+                <Button variant="contained" onClick={handleUpdate}>Update</Button>
             </DialogActions>
         </Dialog>
     </React.Fragment>;
