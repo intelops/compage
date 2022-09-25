@@ -54,7 +54,8 @@ import {ContextWorkspace} from "../custom/context-workspace";
 import {EdgeBadge} from "../custom/edge-badge";
 import {PotentialNode} from "../custom/potential-node";
 import {getNodeTypeConfig} from "../../utils/nodeTypeConfig";
-import {NewPropertiesComponent} from "./NewProperties";
+import {NewEdgePropertiesComponent} from "./NewEdgeProperties";
+import {NewNodePropertiesComponent} from "./NewNodeProperties";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -162,7 +163,12 @@ export const DiagramMakerContainer = ({
 
     const getDialog = () => {
         if (dialogState.isOpen) {
-            return <NewPropertiesComponent dialogState={dialogState} onClose={handleClose}/>
+            if (dialogState.type === 'node') {
+                return <NewNodePropertiesComponent dialogState={dialogState} onClose={handleClose}/>
+            } else if (dialogState.type === 'edge') {
+                return <NewEdgePropertiesComponent dialogState={dialogState} onClose={handleClose}/>
+            }
+            return ""
         }
         return "";
     }

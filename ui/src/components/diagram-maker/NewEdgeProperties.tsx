@@ -7,12 +7,12 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import {getModifiedState, setModifiedState} from "../../utils/service";
 
-interface NewPropertiesProps {
+interface NewEdgePropertiesProps {
     dialogState: { isOpen: boolean; id: string; type: string },
     onClose: () => void,
 }
 
-export const NewPropertiesComponent = (props: NewPropertiesProps) => {
+export const NewEdgePropertiesComponent = (props: NewEdgePropertiesProps) => {
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state with additional properties added from UI (Post node creation)
     const handleSet = (event: React.MouseEvent<HTMLElement>) => {
@@ -62,7 +62,12 @@ export const NewPropertiesComponent = (props: NewPropertiesProps) => {
     }
 
     const [payload, setPayload] = React.useState({
-        componentType: ""
+        componentType: "",
+        // language: "",
+        // isServer: false,
+        // isClient: false,
+        // // api resources to be generated
+        // resources: [],
     });
 
     const handleComponentTypeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
