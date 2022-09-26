@@ -1,5 +1,14 @@
 @import './common.scss';
 
+.rectangle-image {
+  width: 65px;
+  height: 65px;
+  background-size: cover;
+  background-repeat: no-repeat, no-repeat;
+  margin: 0;
+  padding: 0;
+}
+
 .example-node {
   &.rectangle {
     border-radius: 3px;

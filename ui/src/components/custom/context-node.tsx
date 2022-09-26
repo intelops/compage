@@ -25,7 +25,7 @@ export const ContextNode = (props: ContextNodeProps) => {
     }
     return <React.Fragment>
         <div className="contextMenu">
-        <strong> Node </strong>: {props.id}
+            <strong> Node </strong>: {props.id}
             <Divider/>
             <strong>Name</strong> : {payload.name}
             <br/>
@@ -33,9 +33,9 @@ export const ContextNode = (props: ContextNodeProps) => {
             <br/>
             <strong>Language</strong> : {payload.language}
             <br/>
-            <strong>IsServer</strong>: {payload.isServer}
+            <strong>IsServer</strong>: {payload.isServer ? "Yes" : "No"}
             <br/>
-            <strong>IsClient</strong>: {payload.isClient}
+            <strong>IsClient</strong>: {payload.isClient ? "Yes" : "No"}
         </div>
     </React.Fragment>;
 }

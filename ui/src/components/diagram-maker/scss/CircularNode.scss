@@ -7,7 +7,16 @@
   width: 120%;
   height: 120%;
   border-radius: 100%;
-  background-color: rgba(0,0,0,0.2);
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.circle-image {
+  width: 65px;
+  height: 65px;
+  background-size: cover;
+  background-repeat: no-repeat, no-repeat;
+  margin: 0;
+  padding: 0;
 }
 
 .example-node {

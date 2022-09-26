@@ -10,6 +10,7 @@ import {getParsedModifiedState} from "../diagram-maker/helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
+import * as url from "url";
 
 interface NewNodePropertiesProps {
     isOpen: boolean,
@@ -58,11 +59,18 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 url: payload.url
             }
         }
+        const nodeElement = document.getElementById(props.nodeId);
+        nodeElement.style.backgroundImage = `url('${payload.url}')`;
         // update modifiedState in the localstorage
         setModifiedState(JSON.stringify(parsedModifiedState))
         setPayload({
-            ...payload,
-            type: ""
+            name:"",
+            type: "",
+            language: "",
+            url: "",
+            isClient: false,
+            isServer: false,
+            resources: []
         })
         props.onClose()
     }

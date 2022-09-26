@@ -9,6 +9,7 @@ import {setModifiedState} from "../../utils/service";
 import {getParsedModifiedState} from "../diagram-maker/helper/helper";
 import Divider from "@mui/material/Divider";
 import {Stack} from "@mui/material";
+import MenuItem from "@mui/material/MenuItem";
 
 interface NewEdgePropertiesProps {
     isOpen: boolean,
@@ -20,7 +21,9 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     let parsedModifiedState = getParsedModifiedState();
 
     const [payload, setPayload] = React.useState({
-        type: parsedModifiedState.nodes[props.edgeId]?.consumerData["type"] !== undefined ? parsedModifiedState.nodes[props.edgeId].consumerData["type"] : "",
+        name: parsedModifiedState.edges[props.edgeId]?.consumerData["name"] !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData["name"] : "",
+        type: parsedModifiedState.edges[props.edgeId]?.consumerData["type"] !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData["type"] : "",
+        protocol: parsedModifiedState.edges[props.edgeId]?.consumerData["protocol"] !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData["protocol"] : "",
     });
 
     // TODO this is a hack as there is no EDGE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
@@ -32,25 +35,50 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         if (!(props.edgeId in parsedModifiedState.edges)) {
             parsedModifiedState.edges[props.edgeId] = {
                 consumerData: {
-                    type: payload.type + "_edge"
+                    type: payload.type + "_edge",
+                    name: payload.name,
+                    protocol: payload.protocol
                 }
             }
         } else {
             parsedModifiedState.edges[props.edgeId].consumerData = {
-                type: payload.type
+                type: payload.type + "_edge",
+                name: payload.name,
+                protocol: payload.protocol
             }
         }
         // update modifiedState in the localstorage
         setModifiedState(JSON.stringify(parsedModifiedState))
-        setPayload({type: ""})
+        setPayload({
+            name: "",
+            type: "",
+            protocol: "",
+        })
         props.onClose()
     }
 
     const handleTypeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setPayload({
+            ...payload,
             type: event.target.value
         });
     };
+
+    const handleNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setPayload({
+            ...payload,
+            name: event.target.value
+        });
+    };
+
+    const handleProtocolChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setPayload({
+            ...payload,
+            protocol: event.target.value
+        });
+    };
+
+    const protocols = ["http", "websocket", "Golang"]
 
     return <React.Fragment>
         <Dialog open={props.isOpen} onClose={props.onClose}>
@@ -62,6 +90,17 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                         required
                         size="medium"
                         margin="dense"
+                        id="name"
+                        label="Name of Component"
+                        type="text"
+                        value={payload.name}
+                        onChange={handleNameChange}
+                        variant="outlined"
+                    />
+                    <TextField
+                        required
+                        size="medium"
+                        margin="dense"
                         id="type"
                         label="Type of Component"
                         type="text"
@@ -69,13 +108,33 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                         onChange={handleTypeChange}
                         variant="outlined"
                     />
+                    <TextField
+                        required
+                        size="medium"
+                        select
+                        margin="dense"
+                        id="protocol"
+                        label="Protocol"
+                        type="text"
+                        value={payload.protocol}
+                        onChange={handleProtocolChange}
+                        variant="outlined">
+                        <MenuItem value="">
+                            <em>Create new</em>
+                        </MenuItem>
+                        {protocols.map((protocol: string) => (
+                            <MenuItem key={protocol} value={protocol}>
+                                {protocol}
+                            </MenuItem>
+                        ))}
+                    </TextField>
                 </Stack>
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
                 <Button variant="contained"
                         onClick={handleUpdate}
-                        disabled={payload.type === ""}>Update</Button>
+                        disabled={payload.type === "" || payload.name === "" || payload.protocol === ""}>Update</Button>
             </DialogActions>
         </Dialog>
     </React.Fragment>;
