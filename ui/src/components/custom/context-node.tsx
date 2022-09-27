@@ -23,19 +23,49 @@ export const ContextNode = (props: ContextNodeProps) => {
     if (!props.id) {
         return <React.Fragment/>;
     }
+
+    const getName = () => {
+        if (payload.name) {
+            return <><strong>Name</strong> : {payload.name}</>;
+        }
+        return ""
+    }
+
+    const getType = () => {
+        if (payload.type) {
+            return <><strong>Type</strong>: {payload.type}</>;
+        }
+        return ""
+    }
+
+    const getLanguage = () => {
+        if (payload.language) {
+            return <><strong>Language</strong> : {payload.language}</>;
+        }
+        return ""
+    }
+
+    const getIsServer = () => {
+        return <><strong>IsServer</strong>: {payload.isServer ? "Yes" : "No"}</>;
+    }
+
+    const getIsClient = () => {
+        return <><strong>IsClient</strong>: {payload.isClient ? "Yes" : "No"}</>;
+    }
+
     return <React.Fragment>
         <div className="contextMenu">
             <strong> Node </strong>: {props.id}
             <Divider/>
-            <strong>Name</strong> : {payload.name}
+            {getName()}
             <br/>
-            <strong>Type</strong>: {payload.type}
+            {getType()}
             <br/>
-            <strong>Language</strong> : {payload.language}
+            {getLanguage()}
             <br/>
-            <strong>IsServer</strong>: {payload.isServer ? "Yes" : "No"}
+            {getIsServer()}
             <br/>
-            <strong>IsClient</strong>: {payload.isClient ? "Yes" : "No"}
+            {getIsClient()}
         </div>
     </React.Fragment>;
 }
