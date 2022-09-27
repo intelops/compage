@@ -38,7 +38,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         event.preventDefault();
         let parsedModifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
+        // P.S. - We will have the fields in consumerData which are on dialogBox, so we can assign them directly. We also refer the older values when payload state is initialized, so the older values will be persisted as they are if not changed.
         if (!(props.nodeId in parsedModifiedState.nodes)) {
+            // adding consumerData to new node in modifiedState
             parsedModifiedState.nodes[props.nodeId] = {
                 consumerData: {
                     type: payload.type,
@@ -50,6 +52,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 }
             }
         } else {
+            // adding consumerData to existing node in modifiedState
             parsedModifiedState.nodes[props.nodeId].consumerData = {
                 type: payload.type,
                 name: payload.name,
@@ -64,7 +67,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         // update modifiedState in the localstorage
         setModifiedState(JSON.stringify(parsedModifiedState))
         setPayload({
-            name:"",
+            name: "",
             type: "",
             language: "",
             url: "",

@@ -32,7 +32,9 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         event.preventDefault();
         let parsedModifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
+        // P.S. - We will have the fields in consumerData which are on dialogBox, so we can assign them directly. We also refer the older values when payload state is initialized, so the older values will be persisted as they are if not changed.
         if (!(props.edgeId in parsedModifiedState.edges)) {
+            // adding consumerData to new edge in modifiedState
             parsedModifiedState.edges[props.edgeId] = {
                 consumerData: {
                     type: payload.type + "_edge",
@@ -41,6 +43,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                 }
             }
         } else {
+            // adding consumerData to existing edge in modifiedState
             parsedModifiedState.edges[props.edgeId].consumerData = {
                 type: payload.type + "_edge",
                 name: payload.name,
@@ -78,7 +81,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         });
     };
 
-    const protocols = ["http", "websocket", "Golang"]
+    const protocols = ["http", "websocket", "grpc"]
 
     return <React.Fragment>
         <Dialog open={props.isOpen} onClose={props.onClose}>
