@@ -10,9 +10,8 @@ export const cleanse = (state: string) => {
         //sometimes it may happen that the user removes node from the diagram but modifiedState had no knowledge of it. In that case, we can check for the keys presence in the state and if not found, get the node removed from state.
         const toBeRemovedNodes = []
         for (const key of Object.keys(parsedModifiedState.nodes)) {
-            //TODO just update keys
             if (key in stateJson.nodes) {
-                stateJson.nodes[key].consumerData = parsedModifiedState.nodes[key].consumerData
+                stateJson.nodes[key].consumerData = {...stateJson.nodes[key].consumerData, ...parsedModifiedState.nodes[key].consumerData}
             } else {
                 //node has been deleted but modifiedState still has the reference, we have to explicitly remove the node
                 toBeRemovedNodes.push(key)
@@ -21,9 +20,8 @@ export const cleanse = (state: string) => {
         //sometimes it may happen that the user removes edge from the diagram but modifiedState had no knowledge of it. In that case, we can check for the keys presence in the state and if not found, get the edge removed from state.
         const toBeRemovedEdges = []
         for (const key of Object.keys(parsedModifiedState.edges)) {
-            //TODO just update keys
             if (key in stateJson.edges) {
-                stateJson.edges[key].consumerData = parsedModifiedState.edges[key].consumerData
+                stateJson.edges[key].consumerData = {...stateJson.edges[key].consumerData, ...parsedModifiedState.edges[key].consumerData}
             } else {
                 //edge has been deleted but modifiedState still has the reference, we have to explicitly remove the edge
                 toBeRemovedEdges.push(key)

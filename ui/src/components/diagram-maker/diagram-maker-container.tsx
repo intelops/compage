@@ -291,9 +291,16 @@ export const DiagramMakerContainer = ({
 
                     if (diagramMakerAction.type === DiagramMakerActions.NODE_CREATE
                         && "payload" in diagramMakerAction) {
-                        diagramMakerAction.payload["consumerData"] = {
-                            "test": "data",
-                        };
+                        if (diagramMakerAction.payload["typeId"] === "node-type-rectangle") {
+                            diagramMakerAction.payload["consumerData"] = {
+                                "node-type": "rectangle",
+                            };
+                        }
+                        if (diagramMakerAction.payload["typeId"] === "node-type-circle") {
+                            diagramMakerAction.payload["consumerData"] = {
+                                "node-type": "circle",
+                            };
+                        }
                         diagramMakerAction.payload["id"] = diagramMakerAction.payload["id"].substring(3, 10)
                         next(diagramMakerAction);
                         return;
