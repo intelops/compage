@@ -24,10 +24,10 @@ export const Home = () => {
     if (currentConfig && currentConfig !== "{}") {
         diagramMakerData = JSON.parse(currentConfig);
     } else {
-        diagramMakerData = getData(600, 550);
+        diagramMakerData = getData(1050, 550);
     }
     return (
-        <Container fixed>
+        <React.Fragment>
             <DiagramMakerContainer initialData={diagramMakerData} darkTheme={false}/>
             <Button variant="contained" onClick={() => {
                 removeCurrentConfig()
@@ -37,6 +37,6 @@ export const Home = () => {
                 // after resetting, needs to manually reload so, avoiding manual step here.
                 window.location.reload();
             }}>Reset state</Button>
-        </Container>
+        </React.Fragment>
     );
 }

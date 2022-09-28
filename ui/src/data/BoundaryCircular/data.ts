@@ -48,8 +48,8 @@ export const getData = (parentWidth, parentHeight) => {
         workspace: {
             scale: 1,
             position: {x: 40, y: 75},
-            canvasSize: {width: window.innerWidth * 0.55, height: window.innerHeight * 0.85},
-            viewContainerSize: {width: window.innerWidth * 0.55, height: window.innerHeight * 0.85},
+            canvasSize: {width: window.innerWidth, height: window.innerHeight},
+            viewContainerSize: {width: window.innerWidth, height: window.innerHeight},
         },
         editor: {mode: EditorMode.DRAG},
     };

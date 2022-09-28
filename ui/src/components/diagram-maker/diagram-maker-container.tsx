@@ -33,7 +33,6 @@ import {
 import {useBeforeunload} from 'react-beforeunload';
 import {Action, Dispatch} from "redux";
 import {Grid} from "@mui/material";
-import JSONPretty from "react-json-pretty";
 import {
     getCurrentConfig,
     getCurrentState,
@@ -54,6 +53,7 @@ import {getNodeTypeConfig} from "./helper/node-type-ui";
 import {NewEdgeProperties} from "../new-properties/new-edge-properties";
 import {NewNodeProperties} from "../new-properties/new-node-properties";
 import {cleanse} from "./helper/helper";
+import JSONPretty from "react-json-pretty";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -363,12 +363,17 @@ export const DiagramMakerContainer = ({
 
     }, [plugin, initialData]);
 
-    return <Grid container spacing={1}>
-        <Grid item xs={8} md={8}>
+    return <Grid container spacing={1} sx={{height:'100%'}}>
+        <Grid item xs={10} md={10} style={{
+            width: "100%",
+            height: "500px"
+        }}>
             {showDialog()}
-            <div id="diagramMakerContainer" ref={containerRef}></div>
+            <div style={{
+                overflow: "auto"
+            }} id="diagramMakerContainer" ref={containerRef}></div>
         </Grid>
-        <Grid item xs={4} md={4} style={{
+        <Grid item xs={2} md={2} style={{
             width: "100%",
             overflow: "hidden"
         }}>
