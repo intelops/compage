@@ -6,9 +6,11 @@ import axios from "axios";
 
 export class Server {
     private app: Express;
+    private userTokens: Map<string, string>;
 
     constructor(app: Express) {
         this.app = app;
+        this.userTokens = new Map();
         this.app.use(express.static(path.resolve("./") + "/build/ui"));
 
         this.app.get("/api", (req: Request, res: Response): void => {
@@ -23,6 +25,9 @@ export class Server {
         // Enabled Access-Control-Allow-Origin", "*" in the header to by-pass the CORS error.
         app.use((req: Request, res: Response, next) => {
             res.header("Access-Control-Allow-Origin", "*");
+            //Needed for PUT requests
+            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+            res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
             next();
         });
 
@@ -45,7 +50,10 @@ export class Server {
                         Authorization: `token ${access_token}`,
                     },
                 }).then((response) => {
-                    return res.status(200).json({"data": response.data, "token": access_token});
+                    //save token to temporary_map
+                    //TODO if server restarted, the map becomes empty and have to reauthorize the user
+                    this.userTokens.set(response.data.login, access_token)
+                    return res.status(200).json(response.data);
                 }).catch((error) => {
                     return res.status(400).json(error);
                 });
@@ -53,6 +61,46 @@ export class Server {
                 return res.status(400).json(error);
             });
         });
+        app.post("/create_repo", async (req: Request, res: Response,) => {
+            const {name, description, user} = req.body;
+            axios({
+                headers: {
+                    Accept: "application/vnd.github+json",
+                    Authorization: `Bearer ${this.userTokens.get(user)}`,
+                },
+                url: `https://api.github.com/user/repos`, method: "POST", data: {
+                    name: name,
+                    description: description,
+                    private: true,
+                }
+            }).then(response => {
+                return res.status(200).json(response.data);
+            }).catch((error) => {
+                return res.status(400).json(error);
+            });
+        });
+
+        app.put("/commit_changes", async (req: Request, res: Response,) => {
+            const {message, committer, content, repo_name} = req.body;
+            axios({
+                headers: {
+                    Accept: "application/vnd.github+json",
+                    Authorization: `Bearer ${this.userTokens.get(committer.name)}`,
+                },
+                url: `https://api.github.com/repos/${committer.name}/${repo_name}/contents/.compage/config.json`,
+                method: "PUT",
+                data: {
+                    message: message,
+                    content: content,
+                    committer: committer,
+                }
+            }).then((response) => {
+                return res.status(200).json(response.data);
+            }).catch((error) => {
+                return res.status(400).json(error);
+            });
+        });
+
         this.app.get("*", (req: Request, res: Response): void => {
             res.sendFile(path.resolve("./") + "/build/ui/index.html");
         });

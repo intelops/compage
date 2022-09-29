@@ -28,10 +28,10 @@ export const Login = () => {
             const requestData = {
                 code: newUrl[1].substring(0, newUrl[1].indexOf("&")),
             };
-            const proxy_url = state.proxy_url;
+            const proxy_url_authenticate = state.proxy_url_authenticate;
 
             // Use code parameter and other parameters to make POST request to proxy_server
-            fetch(proxy_url, {
+            fetch(proxy_url_authenticate, {
                 method: "POST",
                 body: JSON.stringify(requestData)
             })

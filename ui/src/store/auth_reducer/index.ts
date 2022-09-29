@@ -5,7 +5,9 @@ export const initialState = {
     user: JSON.parse(localStorage.getItem("user")) || null,
     client_id: config.client_id,
     redirect_uri: config.redirect_uri,
-    proxy_url: config.proxy_url
+    proxy_url_authenticate: config.proxy_url_authenticate,
+    proxy_url_commit_changes: config.proxy_url_commit_changes,
+    proxy_url_create_repo: config.proxy_url_create_repo
 };
 
 export const reducer = (state, action) => {
