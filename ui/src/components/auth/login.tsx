@@ -3,26 +3,30 @@ import {Navigate} from "react-router-dom";
 import Styled from "styled-components";
 import {AuthContext} from "../../App";
 import GitHubIcon from '@mui/icons-material/GitHub';
+import {v4 as uuidv4} from 'uuid';
 
 export const Login = () => {
     const {state, dispatch} = useContext(AuthContext);
     const [data, setData] = useState({errorMessage: "", isLoading: false});
 
     const {client_id, redirect_uri} = state;
+    const stateString = uuidv4();
+    const scope = "user repo";
 
     useEffect(() => {
         // After requesting GitHub access, GitHub redirects back to your app with a code parameter
         const url = window.location.href;
-        const hasCode = url.includes("?code=");
 
+        const hasCode = url.includes("?code=");
+        const hasState = url.includes("&state=")
         // If GitHub API returns the code parameter
-        if (hasCode) {
+        if (hasCode && hasState) {
             const newUrl = url.split("?code=");
             window.history.pushState({}, null, newUrl[0]);
             setData({...data, isLoading: true});
 
             const requestData = {
-                code: newUrl[1].replace('#/login', '')
+                code: newUrl[1].substring(0, newUrl[1].indexOf("&")),
             };
             const proxy_url = state.proxy_url;
 
@@ -40,16 +44,18 @@ export const Login = () => {
                     } else return response.json();
                 })
                 .then(data => {
-                    if (JSON.stringify(data).toLowerCase().includes("Bad Credentials".toLowerCase())) {
-                        setData({
-                            isLoading: false,
-                            errorMessage: "[Bad Credentials] Sorry! Login failed"
-                        });
-                    } else {
-                        dispatch({
-                            type: "LOGIN",
-                            payload: {user: data, isLoggedIn: true}
-                        });
+                    if (data) {
+                        if (JSON.stringify(data).toLowerCase().includes("Bad Credentials".toLowerCase())) {
+                            setData({
+                                isLoading: false,
+                                errorMessage: "[Bad Credentials] Sorry! Login failed"
+                            });
+                        } else {
+                            dispatch({
+                                type: "LOGIN",
+                                payload: {user: data, isLoggedIn: true}
+                            });
+                        }
                     }
                 })
                 .catch(error => {
@@ -79,7 +85,7 @@ export const Login = () => {
                             <>
                                 <a
                                     className="login-link"
-                                    href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}`}
+                                    href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&state=${stateString}`}
                                     onClick={() => {
                                         setData({...data, errorMessage: ""});
                                     }}

@@ -45,7 +45,7 @@ export class Server {
                         Authorization: `token ${access_token}`,
                     },
                 }).then((response) => {
-                    return res.status(200).json(response.data);
+                    return res.status(200).json({"data": response.data, "token": access_token});
                 }).catch((error) => {
                     return res.status(400).json(error);
                 });
