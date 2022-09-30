@@ -1,4 +1,4 @@
-import {getModifiedState, setModifiedState} from "../../../utils/service";
+import {getCurrentConfig, getModifiedState, setModifiedState} from "../../../utils/service";
 
 export const cleanse = (state: string) => {
     const stateJson = JSON.parse(state)
@@ -74,4 +74,8 @@ export const getParsedModifiedState = () => {
             edges: {}
         }
     }
+}
+
+export const getBase64EncodedStringForConfig = () => {
+    return window.btoa(getCurrentConfig());
 }

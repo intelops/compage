@@ -1,5 +1,6 @@
 export const CURRENT_STATE = "STATE";
 export const CURRENT_CONFIG = "CONFIG";
+export const CURRENT_REPO_NAME = "CURRENT_REPO_NAME";
 export const RESET = "RESET";
 export const MODIFIED_STATE = "MODIFIED_STATE";
 
@@ -21,6 +22,18 @@ export const setCurrentConfig = (config: string) => {
 
 export const getCurrentConfig = () => {
     return localStorage.getItem(CURRENT_CONFIG)
+}
+
+export const setRepoName= (repoName: string) => {
+    localStorage.setItem(CURRENT_REPO_NAME, repoName)
+}
+
+export const getRepoName = () => {
+    return localStorage.getItem(CURRENT_REPO_NAME)
+}
+
+export const removeRepoName = () => {
+    return localStorage.removeItem(CURRENT_REPO_NAME)
 }
 
 export const removeCurrentConfig = () => {

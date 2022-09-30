@@ -4,6 +4,8 @@ import {AuthContext} from "../App";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import {Stack} from "@mui/material";
+import {getRepoName} from "../utils/service";
+import {getBase64EncodedStringForConfig} from "./diagram-maker/helper/helper";
 
 export const Sample = () => {
     const {state} = useContext(AuthContext);
@@ -11,18 +13,18 @@ export const Sample = () => {
     if (!state.isLoggedIn) {
         return <Navigate to="/login"/>;
     }
-    const commitChange = () => {
+    const commitChange = (message: string) => {
         const requestBody = {
-            message: "sample message",
+            message: message || "updated config.json",
             committer: {
                 name: state.user.login,
                 email: state.user.email || "mahendra.b@intelops.dev"
             },
-            content: "bWFoZW5kcmFCYWd1bAo=",
-            repo_name: "Sample1"
+            content: getBase64EncodedStringForConfig(),
+            repo_name: getRepoName()
         };
         const proxy_url_commit_changes = state.proxy_url_commit_changes;
-        debugger
+
         // Use code parameter and other parameters to make POST request to proxy_server
         fetch(proxy_url_commit_changes, {
             method: "PUT",
@@ -46,9 +48,9 @@ export const Sample = () => {
                 console.log(error)
             });
     }
-    const createRepo = () => {
+    const createRepo = (repoName: string, repoDescription: string) => {
         const requestBody = {
-            name: "Sample1", description: "a sample description", user: state.user.login
+            name: repoName, description: repoDescription, user: state.user.login
         };
         const proxy_url_create_repo = state.proxy_url_create_repo;
 
@@ -79,11 +81,19 @@ export const Sample = () => {
     return (
         <React.Fragment>
             <Container>
-                <Stack spacing={3} style={{padding:"10px"}}>
-                    <Button variant="contained" onClick={createRepo}>
+                <Stack spacing={3} style={{padding: "10px"}}>
+                    <Button variant="contained" onClick={
+                        () => {
+                            createRepo("Sample1", "Sample repo description")
+                        }
+                    }>
                         Create a Repo
                     </Button>
-                    <Button variant="contained" onClick={commitChange}>
+                    <Button variant="contained" onClick={
+                        () => {
+                            commitChange("")
+                        }
+                    }>
                         Commit changes
                     </Button>
                 </Stack>
