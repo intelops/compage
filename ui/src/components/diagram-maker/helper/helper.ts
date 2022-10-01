@@ -77,5 +77,6 @@ export const getParsedModifiedState = () => {
 }
 
 export const getBase64EncodedStringForConfig = () => {
-    return window.btoa(getCurrentConfig());
+    // Ada validation
+    return window.btoa(getCurrentConfig() || "compage sample");
 }
