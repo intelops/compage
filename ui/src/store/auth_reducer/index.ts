@@ -7,6 +7,7 @@ export const initialState = {
     redirect_uri: config.redirect_uri,
     proxy_url_authenticate: config.proxy_url_authenticate,
     proxy_url_commit_changes: config.proxy_url_commit_changes,
+    proxy_url_pull_changes: config.proxy_url_pull_changes,
     proxy_url_create_repo: config.proxy_url_create_repo
 };
 

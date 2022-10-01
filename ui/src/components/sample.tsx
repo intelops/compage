@@ -18,7 +18,14 @@ export const Sample = () => {
     if (!state.isLoggedIn) {
         return <Navigate to="/login"/>;
     }
-    const commitChange = (message: string): Promise<Response> => {
+    const pullChanges = (repo_name: string): Promise<Response> => {
+        const proxy_url_pull_changes = state.proxy_url_pull_changes + "?user=" + state.user.login + "&repo_name=" + (repo_name || getRepoName());
+        // Use code parameter and other parameters to make POST request to proxy_server
+        return fetch(proxy_url_pull_changes, {
+            method: "GET",
+        });
+    }
+    const commitChanges = (message: string): Promise<Response> => {
         const requestBody = {
             message: message || "updated config.json",
             committer: {
@@ -116,14 +123,14 @@ export const Sample = () => {
                     </Button>
                     <Button variant="contained" onClick={
                         () => {
-                            commitChange("")
+                            commitChanges("")
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
                                             ...operationState,
                                             message: "-Received Non-200 response : " + response.status,
                                             severity: 'error',
-                                            operation: "commitChange",
+                                            operation: "commitChanges",
                                             isOpen: true
                                         })
                                     } else return response.json();
@@ -135,7 +142,7 @@ export const Sample = () => {
                                                 ...operationState,
                                                 message: "-Received response : " + data,
                                                 severity: 'error',
-                                                operation: "commitChange",
+                                                operation: "commitChanges",
                                                 isOpen: true
                                             })
                                         } else {
@@ -143,7 +150,7 @@ export const Sample = () => {
                                                 ...operationState,
                                                 message: "-Received response : " + data,
                                                 severity: 'success',
-                                                operation: "commitChange",
+                                                operation: "commitChanges",
                                                 isOpen: true
                                             })
                                         }
@@ -154,13 +161,61 @@ export const Sample = () => {
                                         ...operationState,
                                         message: "-Received error : " + error,
                                         severity: 'error',
-                                        operation: "commitChange",
+                                        operation: "commitChanges",
                                         isOpen: true
                                     })
                                 });
                         }
                     }>
                         Commit changes
+                    </Button>
+                    <Button variant="contained" onClick={
+                        () => {
+                            pullChanges("Sample1")
+                                .then((response: Response) => {
+                                    if (!response.ok) {
+                                        setOperationState({
+                                            ...operationState,
+                                            message: "-Received Non-200 response : " + response.status,
+                                            severity: 'error',
+                                            operation: "pullChanges",
+                                            isOpen: true
+                                        })
+                                    } else return response.json();
+                                })
+                                .then(data => {
+                                    if (data) {
+                                        if (JSON.stringify(data).toLowerCase().includes("Bad Credentials".toLowerCase())) {
+                                            setOperationState({
+                                                ...operationState,
+                                                message: "-Received response : " + data,
+                                                severity: 'error',
+                                                operation: "pullChanges",
+                                                isOpen: true
+                                            })
+                                        } else {
+                                            setOperationState({
+                                                ...operationState,
+                                                message: "-Received response : " + data,
+                                                severity: 'success',
+                                                operation: "pullChanges",
+                                                isOpen: true
+                                            })
+                                        }
+                                    }
+                                })
+                                .catch(error => {
+                                    setOperationState({
+                                        ...operationState,
+                                        message: "-Received error : " + error,
+                                        severity: 'error',
+                                        operation: "commitChanges",
+                                        isOpen: true
+                                    })
+                                });
+                        }
+                    }>
+                        Pull changes
                     </Button>
                 </Stack>
             </Container>

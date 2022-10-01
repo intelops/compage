@@ -58,7 +58,7 @@ export class Server {
                     return res.status(400).json(error);
                 });
             }).catch((error) => {
-                return res.status(400).json(error);
+                return res.status(500).json(error);
             });
         });
         app.post("/create_repo", async (req: Request, res: Response,) => {
@@ -74,13 +74,14 @@ export class Server {
                     private: true,
                 }
             }).then(response => {
+                if (response.status !== 200) {
+                    return res.status(response.status).json(response.statusText)
+                }
                 return res.status(200).json(response.data);
             }).catch((error) => {
-                console.log("error : ", error)
-                return res.status(400).json(error);
+                return res.status(500).json(error);
             });
         });
-
         app.put("/commit_changes", async (req: Request, res: Response,) => {
             const {message, committer, content, repo_name} = req.body;
             axios({
@@ -96,9 +97,30 @@ export class Server {
                     committer: committer,
                 }
             }).then((response) => {
+                if (response.status !== 200) {
+                    return res.status(response.status).json(response.statusText)
+                }
                 return res.status(200).json(response.data);
             }).catch((error) => {
                 return res.status(400).json(error);
+            });
+        });
+        app.get("/pull_changes", async (req: Request, res: Response,) => {
+            const {user, repo_name} = req.params;
+            axios({
+                headers: {
+                    Accept: "application/vnd.github+json",
+                    Authorization: `Bearer ${this.userTokens.get(user)}`,
+                },
+                url: `https://api.github.com/repos/${user}/${repo_name}/contents/.compage/config.json`,
+                method: "GET",
+            }).then((response) => {
+                if (response.status !== 200) {
+                    return res.status(response.status).json(response.statusText)
+                }
+                return res.status(200).json(response.data);
+            }).catch((error) => {
+                return res.status(500).json(error);
             });
         });
 
