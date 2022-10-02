@@ -45,6 +45,7 @@ export class Server {
             }).then(response => {
                 let params = new URLSearchParams(response.data);
                 const access_token = params.get("access_token");
+                console.log("access_token : ", access_token)
                 // Request to return data of a user that has been authenticated
                 return axios(`https://api.github.com/user`, {
                     headers: {
@@ -63,11 +64,11 @@ export class Server {
             });
         });
         app.post("/create_repo", async (req: Request, res: Response,) => {
-            if (!this.userTokens.get(req.body.userName)) {
+            const {repoName, description, userName} = req.body;
+            if (this.userTokens.get(userName) === undefined) {
                 // TODO change message and may impl later
                 return res.status(401).json("server restarted and lost the local cache of tokens")
             }
-            const {repoName, description, userName} = req.body;
             axios({
                 headers: {
                     Accept: "application/vnd.github+json",
@@ -88,17 +89,18 @@ export class Server {
             });
         });
         app.get("/list_repos", async (req: Request, res: Response,) => {
-            if (!this.userTokens.get(req.params.userName)) {
+            const {userName} = req.query;
+            if (this.userTokens.get(<string>userName) === undefined) {
                 // TODO change message and may impl later
                 return res.status(401).json("server restarted and lost the localcache of tokens")
             }
-            const {userName} = req.params;
             axios({
                 headers: {
                     Accept: "application/vnd.github+json",
-                    Authorization: `Bearer ${this.userTokens.get(userName)}`,
+                    Authorization: `Bearer ${this.userTokens.get(<string>userName)}`,
                 },
-                url: `https://api.github.com/users/${userName}/repos`, method: "GET"
+                url: `https://api.github.com/user/repos`,
+                method: "GET"
             }).then(response => {
                 if (response.status !== 200) {
                     return res.status(response.status).json(response.statusText)
@@ -109,11 +111,11 @@ export class Server {
             });
         });
         app.put("/commit_changes", async (req: Request, res: Response,) => {
-            if (!this.userTokens.get(req.body.userName)) {
+            const {message, userName, email, content, repoName} = req.body;
+            if (this.userTokens.get(userName) === undefined) {
                 // TODO change message and may impl later
                 return res.status(401).json("server restarted and lost the local cache of tokens")
             }
-            const {message, userName, email, content, repoName} = req.body;
             axios({
                 headers: {
                     Accept: "application/vnd.github+json",
@@ -139,15 +141,15 @@ export class Server {
             });
         });
         app.get("/pull_changes", async (req: Request, res: Response,) => {
-            if (!this.userTokens.get(req.params.userName)) {
+            const {userName, repoName} = req.query;
+            if (this.userTokens.get(<string>userName) === undefined) {
                 // TODO change message and may impl later
                 return res.status(401).json("server restarted and lost the local cache of tokens")
             }
-            const {userName, repoName} = req.params;
             axios({
                 headers: {
                     Accept: "application/vnd.github+json",
-                    Authorization: `Bearer ${this.userTokens.get(userName)}`,
+                    Authorization: `Bearer ${this.userTokens.get(<string>userName)}`,
                 },
                 url: `https://api.github.com/repos/${userName}/${repoName}/contents/.compage/config.json`,
                 method: "GET",
@@ -161,20 +163,26 @@ export class Server {
             });
         });
         app.get("/logout", async (req: Request, res: Response,) => {
-            if (!this.userTokens.get(req.params.userName)) {
+            // console.log("req.query.userName : ", req.query.userName)
+            const {userName} = req.query
+            if (this.userTokens.get(<string>userName) === undefined) {
                 // TODO change message and may impl later
                 return res.status(401).json("server restarted and lost the local cache of tokens")
             }
-            const {userName} = req.params;
+            const bearerToken = `${this.getBasicAuthenticationPair()}`
+            console.log("bearerToken : ", bearerToken)
+            const accessToken = this.userTokens.get(<string>userName)
+            console.log("accessToken : ", accessToken)
+            console.log("config.client_id: ", config.client_id)
             axios({
                 headers: {
                     Accept: "application/vnd.github+json",
-                    Authorization: `Bearer ${this.getBasicAuthenticationPair()}`,
+                    Authorization: `Bearer ${bearerToken}`,
                 },
                 url: `https://api.github.com/applications/${config.client_id}/token`,
                 method: "PATCH",
                 data: {
-                    access_token: this.userTokens.get(userName)
+                    access_token: accessToken
                 }
             }).then((response) => {
                 if (response.status !== 200) {
@@ -186,11 +194,11 @@ export class Server {
             });
         });
         app.get("/check_token", async (req: Request, res: Response,) => {
-            if (!this.userTokens.get(req.params.userName)) {
+            const {userName} = req.query;
+            if (this.userTokens.get(<string>userName) === undefined) {
                 // TODO change message and may impl later
                 return res.status(401).json("server restarted and lost the local cache of tokens")
             }
-            const {userName} = req.params;
             axios({
                 headers: {
                     Accept: "application/vnd.github+json",
@@ -199,7 +207,7 @@ export class Server {
                 url: `https://api.github.com/applications/${config.client_id}/token`,
                 method: "POST",
                 data: {
-                    access_token: this.userTokens.get(userName)
+                    access_token: this.userTokens.get(<string>userName)
                 }
             }).then((response) => {
                 if (response.status !== 200) {

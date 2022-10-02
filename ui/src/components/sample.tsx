@@ -74,8 +74,18 @@ export const Sample = () => {
         setOperationState({...operationState, isOpen: false, message: "", severity: "", operation: ""})
     }
 
-    function isRepoNameExists(data: any) {
-        console.log("data : ", data)
+    interface GithubRepo {
+        name: string,
+        private: boolean,
+        full_name: string
+    }
+
+    const isRepoNameExists = (newRepoName: string, githubRepos: GithubRepo[]) => {
+        for (const githubRepo of githubRepos) {
+            if (newRepoName === githubRepo.name) {
+                return true
+            }
+        }
         return false
     }
 
@@ -98,7 +108,7 @@ export const Sample = () => {
                                     if (!response.ok) {
                                         setOperationState({
                                             ...operationState,
-                                            message: "-Received Non-200 response : " + response.status,
+                                            message: " : Received Non-200 response : " + response.status,
                                             severity: 'error',
                                             operation: "listRepos",
                                             isOpen: true
@@ -110,27 +120,21 @@ export const Sample = () => {
                                         if (JSON.stringify(data).toLowerCase().includes("Bad Credentials".toLowerCase())) {
                                             setOperationState({
                                                 ...operationState,
-                                                message: "-Received response : " + data,
+                                                message: " : Received response : " + data,
                                                 severity: 'error',
                                                 operation: "listRepos",
                                                 isOpen: true
                                             })
                                         } else {
-                                            setOperationState({
-                                                ...operationState,
-                                                message: "-Received response : " + data,
-                                                severity: 'success',
-                                                operation: "listRepos",
-                                                isOpen: true
-                                            })
-                                            if (!isRepoNameExists(data)) {
+                                            const newRepoName = "Sample2";
+                                            if (!isRepoNameExists(newRepoName, data)) {
                                                 // check for repo existence
-                                                createRepo("Sample1", "Sample repo description")
+                                                createRepo(newRepoName, "Sample repo description")
                                                     .then((response: Response) => {
                                                         if (!response.ok) {
                                                             setOperationState({
                                                                 ...operationState,
-                                                                message: "-Received Non-200 response : " + response.status,
+                                                                message: " : Received Non-200 response : " + response.status,
                                                                 severity: 'error',
                                                                 operation: "createRepo",
                                                                 isOpen: true
@@ -142,7 +146,7 @@ export const Sample = () => {
                                                             if (JSON.stringify(data).toLowerCase().includes("Bad Credentials".toLowerCase())) {
                                                                 setOperationState({
                                                                     ...operationState,
-                                                                    message: "-Received response : " + data,
+                                                                    message: " : Received response : " + data,
                                                                     severity: 'error',
                                                                     operation: "createRepo",
                                                                     isOpen: true
@@ -150,7 +154,7 @@ export const Sample = () => {
                                                             } else {
                                                                 setOperationState({
                                                                     ...operationState,
-                                                                    message: "-Received response : " + data,
+                                                                    message: " : Received response : " + data,
                                                                     severity: 'success',
                                                                     operation: "createRepo",
                                                                     isOpen: true
@@ -161,7 +165,7 @@ export const Sample = () => {
                                                     .catch(error => {
                                                         setOperationState({
                                                             ...operationState,
-                                                            message: "-Received error : " + error,
+                                                            message: " : Received error : " + error,
                                                             severity: 'error',
                                                             operation: "createRepo",
                                                             isOpen: true
@@ -170,7 +174,7 @@ export const Sample = () => {
                                             } else {
                                                 setOperationState({
                                                     ...operationState,
-                                                    message: "Repo name exists! - Please choose different name for the repo",
+                                                    message: " : Repo [" + newRepoName + "] name exists! - Please choose different name for the repo.",
                                                     severity: 'error',
                                                     operation: "createRepo",
                                                     isOpen: true
@@ -182,7 +186,7 @@ export const Sample = () => {
                                 .catch(error => {
                                     setOperationState({
                                         ...operationState,
-                                        message: "-Received error : " + error,
+                                        message: " : Received error : " + error,
                                         severity: 'error',
                                         operation: "listRepos",
                                         isOpen: true
@@ -199,7 +203,7 @@ export const Sample = () => {
                                     if (!response.ok) {
                                         setOperationState({
                                             ...operationState,
-                                            message: "-Received Non-200 response : " + response.status,
+                                            message: " : Received Non-200 response : " + response.status,
                                             severity: 'error',
                                             operation: "commitChanges",
                                             isOpen: true
@@ -211,7 +215,7 @@ export const Sample = () => {
                                         if (JSON.stringify(data).toLowerCase().includes("Bad Credentials".toLowerCase())) {
                                             setOperationState({
                                                 ...operationState,
-                                                message: "-Received response : " + data,
+                                                message: " : Received response : " + data,
                                                 severity: 'error',
                                                 operation: "commitChanges",
                                                 isOpen: true
@@ -219,7 +223,7 @@ export const Sample = () => {
                                         } else {
                                             setOperationState({
                                                 ...operationState,
-                                                message: "-Received response : " + data,
+                                                message: " : Received response : " + data,
                                                 severity: 'success',
                                                 operation: "commitChanges",
                                                 isOpen: true
@@ -230,7 +234,7 @@ export const Sample = () => {
                                 .catch(error => {
                                     setOperationState({
                                         ...operationState,
-                                        message: "-Received error : " + error,
+                                        message: " : Received error : " + error,
                                         severity: 'error',
                                         operation: "commitChanges",
                                         isOpen: true
@@ -247,7 +251,7 @@ export const Sample = () => {
                                     if (!response.ok) {
                                         setOperationState({
                                             ...operationState,
-                                            message: "-Received Non-200 response : " + response.status,
+                                            message: " : Received Non-200 response : " + response.status,
                                             severity: 'error',
                                             operation: "pullChanges",
                                             isOpen: true
@@ -259,7 +263,7 @@ export const Sample = () => {
                                         if (JSON.stringify(data).toLowerCase().includes("Bad Credentials".toLowerCase())) {
                                             setOperationState({
                                                 ...operationState,
-                                                message: "-Received response : " + data,
+                                                message: " : Received response : " + data,
                                                 severity: 'error',
                                                 operation: "pullChanges",
                                                 isOpen: true
@@ -267,7 +271,7 @@ export const Sample = () => {
                                         } else {
                                             setOperationState({
                                                 ...operationState,
-                                                message: "-Received response : " + data,
+                                                message: " : Received response : " + data,
                                                 severity: 'success',
                                                 operation: "pullChanges",
                                                 isOpen: true
@@ -278,7 +282,7 @@ export const Sample = () => {
                                 .catch(error => {
                                     setOperationState({
                                         ...operationState,
-                                        message: "-Received error : " + error,
+                                        message: " : Received error : " + error,
                                         severity: 'error',
                                         operation: "commitChanges",
                                         isOpen: true

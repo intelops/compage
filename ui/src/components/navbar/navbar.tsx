@@ -43,6 +43,11 @@ const Navbar = () => {
                         isLoading: false,
                         errorMessage: "[Non-200 Response] Sorry! Logout failed"
                     });
+                    if (response.status === 401) {
+                        dispatch({
+                            type: "LOGOUT"
+                        });
+                    }
                 } else return response.json();
             })
             .then(data => {
