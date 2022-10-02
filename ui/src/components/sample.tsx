@@ -4,7 +4,7 @@ import {AuthContext} from "../App";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import {Alert, Snackbar, Stack} from "@mui/material";
-import {getRepoName} from "../utils/service";
+import {getCurrentRepoDetails, setCurrentRepoDetails} from "../utils/service";
 import {getBase64EncodedStringForConfig} from "./diagram-maker/helper/helper";
 
 export const Sample = () => {
@@ -19,7 +19,7 @@ export const Sample = () => {
         return <Navigate to="/login"/>;
     }
     const pullChanges = (repoName: string): Promise<Response> => {
-        const proxy_url_pull_changes = state.proxy_url_pull_changes + "?userName=" + state.user.login + "&repoName=" + (repoName || getRepoName());
+        const proxy_url_pull_changes = state.proxy_url_pull_changes + "?userName=" + state.user.login + "&repoName=" + (repoName || getCurrentRepoDetails().repoName);
         // Use code parameter and other parameters to make POST request to proxy_server
         return fetch(proxy_url_pull_changes, {
             method: "GET",
@@ -33,7 +33,8 @@ export const Sample = () => {
                 email: state.user.email || "mahendra.b@intelops.dev"
             },
             content: getBase64EncodedStringForConfig(),
-            repoName: getRepoName()
+            sha: getCurrentRepoDetails().details.sha,
+            repoName: getCurrentRepoDetails().repoName || "Sample1"
         };
         const proxy_url_commit_changes = state.proxy_url_commit_changes;
 
@@ -89,6 +90,23 @@ export const Sample = () => {
         return false
     }
 
+    interface GithubRepoContent {
+        name: string,
+        path: boolean,
+        sha: string,
+        content: string,
+        type: string
+        encoding: string,
+    }
+
+    const handleResponse = (repoName: string, githubRepoContent: GithubRepoContent) => {
+        const currentRepoDetails = {
+            repoName: repoName,
+            details: githubRepoContent
+        }
+        setCurrentRepoDetails(JSON.stringify(currentRepoDetails))
+    }
+
     return (
         <React.Fragment>
             <Container>
@@ -126,7 +144,7 @@ export const Sample = () => {
                                                 isOpen: true
                                             })
                                         } else {
-                                            const newRepoName = "Sample2";
+                                            const newRepoName = "Sample1";
                                             if (!isRepoNameExists(newRepoName, data)) {
                                                 // check for repo existence
                                                 createRepo(newRepoName, "Sample repo description")
@@ -159,6 +177,7 @@ export const Sample = () => {
                                                                     operation: "createRepo",
                                                                     isOpen: true
                                                                 })
+                                                                setCurrentRepoDetails(newRepoName)
                                                             }
                                                         }
                                                     })
@@ -203,7 +222,7 @@ export const Sample = () => {
                                     if (!response.ok) {
                                         setOperationState({
                                             ...operationState,
-                                            message: " : Received Non-200 response : " + response.status,
+                                            message: " : Received Non-200 response : " + JSON.stringify(response),
                                             severity: 'error',
                                             operation: "commitChanges",
                                             isOpen: true
@@ -246,7 +265,8 @@ export const Sample = () => {
                     </Button>
                     <Button variant="contained" onClick={
                         () => {
-                            pullChanges("Sample1")
+                            const repoName = "Sample1"
+                            pullChanges(repoName)
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
@@ -271,11 +291,12 @@ export const Sample = () => {
                                         } else {
                                             setOperationState({
                                                 ...operationState,
-                                                message: " : Received response : " + data,
+                                                message: " : Received response : " + JSON.stringify(data),
                                                 severity: 'success',
                                                 operation: "pullChanges",
                                                 isOpen: true
                                             })
+                                            handleResponse(repoName, data)
                                         }
                                     }
                                 })

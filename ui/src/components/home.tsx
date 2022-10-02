@@ -2,7 +2,7 @@ import React, {useContext} from "react";
 import {Navigate} from "react-router-dom";
 import {AuthContext} from "../App";
 import {getData} from "../data/BoundaryCircular/data";
-import {getCurrentConfig, getRepoName} from "../utils/service";
+import {getCurrentConfig, getCurrentRepoDetails} from "../utils/service";
 import {Sample} from "./sample";
 
 export const Home = () => {
@@ -11,7 +11,7 @@ export const Home = () => {
     if (!state.isLoggedIn) {
         return <Navigate to="/login"/>;
     }
-    if (!getRepoName()) {
+    if (!getCurrentRepoDetails()) {
         // choose from existing or create a new project
     } else{
         // open existing project

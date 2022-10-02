@@ -11,7 +11,7 @@ export const Login = () => {
 
     const {client_id, redirect_uri} = state;
     const stateString = uuidv4();
-    const scope = "user repo";
+    const scope = "user repo workflow";
 
     useEffect(() => {
         // After requesting GitHub access, GitHub redirects back to your app with a code parameter
@@ -76,7 +76,9 @@ export const Login = () => {
             <section className="container">
                 <div>
                     <span>{data.errorMessage}</span>
-                    <div className="login-container">
+                    <div className="login-container" style={{
+                        cursor: "pointer"
+                    }}>
                         {data.isLoading ? (
                             <div className="loader-container">
                                 <div className="loader"></div>
@@ -84,6 +86,9 @@ export const Login = () => {
                         ) : (
                             <>
                                 <a
+                                    style={{
+                                        cursor: "pointer"
+                                    }}
                                     className="login-link"
                                     href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&state=${stateString}`}
                                     onClick={() => {
@@ -91,7 +96,9 @@ export const Login = () => {
                                     }}
                                 >
                                     <GitHubIcon/>
-                                    <span>Login with GitHub</span>
+                                    <span>
+                                        Login with GitHub
+                                    </span>
                                 </a>
                             </>
                         )}
