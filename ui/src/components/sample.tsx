@@ -18,8 +18,8 @@ export const Sample = () => {
     if (!state.isLoggedIn) {
         return <Navigate to="/login"/>;
     }
-    const pullChanges = (repo_name: string): Promise<Response> => {
-        const proxy_url_pull_changes = state.proxy_url_pull_changes + "?user=" + state.user.login + "&repo_name=" + (repo_name || getRepoName());
+    const pullChanges = (repoName: string): Promise<Response> => {
+        const proxy_url_pull_changes = state.proxy_url_pull_changes + "?userName=" + state.user.login + "&repoName=" + (repoName || getRepoName());
         // Use code parameter and other parameters to make POST request to proxy_server
         return fetch(proxy_url_pull_changes, {
             method: "GET",
@@ -29,11 +29,11 @@ export const Sample = () => {
         const requestBody = {
             message: message || "updated config.json",
             committer: {
-                name: state.user.login,
+                userName: state.user.login,
                 email: state.user.email || "mahendra.b@intelops.dev"
             },
             content: getBase64EncodedStringForConfig(),
-            repo_name: getRepoName()
+            repoName: getRepoName()
         };
         const proxy_url_commit_changes = state.proxy_url_commit_changes;
 
@@ -45,7 +45,7 @@ export const Sample = () => {
     }
     const createRepo = (repoName: string, repoDescription: string): Promise<Response> => {
         const requestBody = {
-            name: repoName, description: repoDescription, user: state.user.login
+            repoName: repoName, description: repoDescription, userName: state.user.login
         };
         const proxy_url_create_repo = state.proxy_url_create_repo;
 
@@ -55,9 +55,28 @@ export const Sample = () => {
             body: JSON.stringify(requestBody)
         });
     }
+    const listRepos = (): Promise<Response> => {
+        const proxy_url_list_repos = state.proxy_url_list_repos;
+        // Use code parameter and other parameters to make POST request to proxy_server
+        return fetch(proxy_url_list_repos, {
+            method: "GET",
+        });
+    }
+    const checkToken = (): Promise<Response> => {
+        const proxy_url_check_token = state.proxy_url_check_token + "?userName=" + state.user.login;
+        // Use code parameter and other parameters to make POST request to proxy_server
+        return fetch(proxy_url_check_token, {
+            method: "GET",
+        });
+    }
 
     function handleClose() {
         setOperationState({...operationState, isOpen: false, message: "", severity: "", operation: ""})
+    }
+
+    function isRepoNameExists(data: any) {
+        console.log("data : ", data)
+        return false
     }
 
     return (
@@ -66,7 +85,7 @@ export const Sample = () => {
                 <Stack spacing={3} style={{padding: "10px"}}>
                     <Snackbar open={operationState.isOpen} autoHideDuration={6000} onClose={handleClose}>
                         <Alert onClose={handleClose}
-                               severity={operationState.severity == "success" ? "success" : operationState.severity == "error" ? "error" : operationState.severity == "info" ? "info" : "warning"}
+                               severity={operationState.severity === "success" ? "success" : operationState.severity === "error" ? "error" : operationState.severity === "info" ? "info" : "warning"}
                                sx={{width: '100%'}}>
                             {operationState.severity}
                             {operationState.message}
@@ -74,14 +93,14 @@ export const Sample = () => {
                     </Snackbar>
                     <Button variant="contained" onClick={
                         () => {
-                            createRepo("Sample1", "Sample repo description")
+                            listRepos()
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
                                             ...operationState,
                                             message: "-Received Non-200 response : " + response.status,
                                             severity: 'error',
-                                            operation: "createRepo",
+                                            operation: "listRepos",
                                             isOpen: true
                                         })
                                     } else return response.json();
@@ -93,7 +112,7 @@ export const Sample = () => {
                                                 ...operationState,
                                                 message: "-Received response : " + data,
                                                 severity: 'error',
-                                                operation: "createRepo",
+                                                operation: "listRepos",
                                                 isOpen: true
                                             })
                                         } else {
@@ -101,9 +120,62 @@ export const Sample = () => {
                                                 ...operationState,
                                                 message: "-Received response : " + data,
                                                 severity: 'success',
-                                                operation: "createRepo",
+                                                operation: "listRepos",
                                                 isOpen: true
                                             })
+                                            if (!isRepoNameExists(data)) {
+                                                // check for repo existence
+                                                createRepo("Sample1", "Sample repo description")
+                                                    .then((response: Response) => {
+                                                        if (!response.ok) {
+                                                            setOperationState({
+                                                                ...operationState,
+                                                                message: "-Received Non-200 response : " + response.status,
+                                                                severity: 'error',
+                                                                operation: "createRepo",
+                                                                isOpen: true
+                                                            })
+                                                        } else return response.json();
+                                                    })
+                                                    .then(data => {
+                                                        if (data) {
+                                                            if (JSON.stringify(data).toLowerCase().includes("Bad Credentials".toLowerCase())) {
+                                                                setOperationState({
+                                                                    ...operationState,
+                                                                    message: "-Received response : " + data,
+                                                                    severity: 'error',
+                                                                    operation: "createRepo",
+                                                                    isOpen: true
+                                                                })
+                                                            } else {
+                                                                setOperationState({
+                                                                    ...operationState,
+                                                                    message: "-Received response : " + data,
+                                                                    severity: 'success',
+                                                                    operation: "createRepo",
+                                                                    isOpen: true
+                                                                })
+                                                            }
+                                                        }
+                                                    })
+                                                    .catch(error => {
+                                                        setOperationState({
+                                                            ...operationState,
+                                                            message: "-Received error : " + error,
+                                                            severity: 'error',
+                                                            operation: "createRepo",
+                                                            isOpen: true
+                                                        })
+                                                    });
+                                            } else {
+                                                setOperationState({
+                                                    ...operationState,
+                                                    message: "Repo name exists! - Please choose different name for the repo",
+                                                    severity: 'error',
+                                                    operation: "createRepo",
+                                                    isOpen: true
+                                                })
+                                            }
                                         }
                                     }
                                 })
@@ -112,10 +184,9 @@ export const Sample = () => {
                                         ...operationState,
                                         message: "-Received error : " + error,
                                         severity: 'error',
-                                        operation: "createRepo",
+                                        operation: "listRepos",
                                         isOpen: true
                                     })
-                                    console.log(error)
                                 });
                         }
                     }>

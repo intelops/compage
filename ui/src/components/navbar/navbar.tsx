@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useContext} from 'react';
+import {useContext, useState} from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -21,6 +21,7 @@ const settings = ['Account', 'Logout'];
 
 const Navbar = () => {
     const {state, dispatch} = useContext(AuthContext);
+    const [data, setData] = useState({errorMessage: "", isLoading: false});
     let avatar_url, name, public_repos, followers, following;
     if (state.user) {
         name = state.user.name
@@ -31,9 +32,39 @@ const Navbar = () => {
     }
 
     const handleLogout = () => {
-        dispatch({
-            type: "LOGOUT"
-        });
+        const proxy_url_logout = state.proxy_url_logout + "?userName=" + state.user.login;
+        // Use code parameter and other parameters to make POST request to proxy_server
+        fetch(proxy_url_logout, {
+            method: "GET",
+        })
+            .then((response: Response) => {
+                if (!response.ok) {
+                    setData({
+                        isLoading: false,
+                        errorMessage: "[Non-200 Response] Sorry! Logout failed"
+                    });
+                } else return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    if (JSON.stringify(data).toLowerCase().includes("Bad Credentials".toLowerCase())) {
+                        setData({
+                            isLoading: false,
+                            errorMessage: "[Bad Credentials] Sorry! Logout failed"
+                        });
+                    } else {
+                        dispatch({
+                            type: "LOGOUT"
+                        });
+                    }
+                }
+            })
+            .catch(error => {
+                setData({
+                    isLoading: false,
+                    errorMessage: "[error] Sorry! Logout failed : " + error
+                });
+            });
     }
 
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -57,9 +88,16 @@ const Navbar = () => {
     function getMenuItem(setting: string) {
         if (setting === "Logout") {
             if (state.user) {
-                return <MenuItem key={setting} onClick={handleLogout}>
-                    <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>;
+                let element
+                data.isLoading ? (
+                    element = <div className="loader-container">
+                        <div className="loader"></div>
+                    </div>
+                ) : (
+                    element = <MenuItem key={setting} onClick={handleLogout}>
+                        <Typography textAlign="center">{setting}</Typography>
+                    </MenuItem>);
+                return element
             }
             return
         }
@@ -68,7 +106,8 @@ const Navbar = () => {
         </MenuItem>;
     }
 
-    return (
+    return <>
+        <span>{data.errorMessage}</span>
         <AppBar position="static">
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
@@ -196,6 +235,6 @@ const Navbar = () => {
                 </Toolbar>
             </Container>
         </AppBar>
-    );
+    </>;
 };
 export default Navbar;
