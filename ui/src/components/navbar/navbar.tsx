@@ -15,6 +15,7 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import {AuthContext} from "../../App";
 import Logo from "../../logo.png";
+import {backendEndpoints} from "../../store/auth_reducer";
 
 const pages = ['Products', 'Blog'];
 const settings = ['Account', 'Logout'];
@@ -32,7 +33,7 @@ const Navbar = () => {
     }
 
     const handleLogout = () => {
-        const proxy_url_logout = state.proxy_url_logout + "?userName=" + state.user.login;
+        const proxy_url_logout = backendEndpoints.proxy_url_logout + "?userName=" + state.user.login;
         // Use code parameter and other parameters to make POST request to proxy_server
         fetch(proxy_url_logout, {
             method: "GET",

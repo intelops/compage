@@ -5,6 +5,7 @@ import {HashRouter as Router, Route, Routes} from "react-router-dom";
 import {Login} from "./components/auth/login";
 import {Home} from "./components/home";
 import Navbar from "./components/navbar/navbar";
+import {Repo} from "./components/repo/repo";
 
 export const AuthContext = createContext(null);
 
@@ -20,6 +21,7 @@ export const App = () => {
             <Navbar/>
             <Routes>
                 <Route path="/login" element={<Login/>}/>
+                <Route path="/repo" element={<Repo/>}/>
                 <Route path="/" element={<Home/>}/>
             </Routes>
         </Router>

@@ -4,6 +4,7 @@ import Styled from "styled-components";
 import {AuthContext} from "../../App";
 import GitHubIcon from '@mui/icons-material/GitHub';
 import {v4 as uuidv4} from 'uuid';
+import {backendEndpoints} from "../../store/auth_reducer";
 
 export const Login = () => {
     const {state, dispatch} = useContext(AuthContext);
@@ -28,10 +29,9 @@ export const Login = () => {
             const requestData = {
                 code: newUrl[1].substring(0, newUrl[1].indexOf("&")),
             };
-            const proxy_url_authenticate = state.proxy_url_authenticate;
 
             // Use code parameter and other parameters to make POST request to proxy_server
-            fetch(proxy_url_authenticate, {
+            fetch(backendEndpoints.proxy_url_authenticate, {
                 method: "POST",
                 body: JSON.stringify(requestData)
             })

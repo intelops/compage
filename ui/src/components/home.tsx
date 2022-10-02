@@ -11,9 +11,10 @@ export const Home = () => {
     if (!state.isLoggedIn) {
         return <Navigate to="/login"/>;
     }
-    if (!getCurrentRepoDetails()) {
+    if (getCurrentRepoDetails() !== undefined) {
         // choose from existing or create a new project
-    } else{
+        // return <Navigate to="/repo"/>;
+    } else {
         // open existing project
         // check for config if its present in the localstorage
         // if not pull state from github

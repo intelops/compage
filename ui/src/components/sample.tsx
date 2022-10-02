@@ -4,8 +4,9 @@ import {AuthContext} from "../App";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import {Alert, Snackbar, Stack} from "@mui/material";
-import {getCurrentRepoDetails, setCurrentRepoDetails} from "../utils/service";
-import {getBase64EncodedStringForConfig} from "./diagram-maker/helper/helper";
+import {setCurrentRepoDetails} from "../utils/service";
+import {commitChanges, createRepo, listRepos, pullChanges} from "../backend/rest-service";
+import {GithubRepo, GithubRepoContent} from "../backend/models";
 
 export const Sample = () => {
     const {state} = useContext(AuthContext);
@@ -18,67 +19,9 @@ export const Sample = () => {
     if (!state.isLoggedIn) {
         return <Navigate to="/login"/>;
     }
-    const pullChanges = (repoName: string): Promise<Response> => {
-        const proxy_url_pull_changes = state.proxy_url_pull_changes + "?userName=" + state.user.login + "&repoName=" + (repoName || getCurrentRepoDetails().repoName);
-        // Use code parameter and other parameters to make POST request to proxy_server
-        return fetch(proxy_url_pull_changes, {
-            method: "GET",
-        });
-    }
-    const commitChanges = (message: string): Promise<Response> => {
-        const requestBody = {
-            message: message || "updated config.json",
-            committer: {
-                userName: state.user.login,
-                email: state.user.email || "mahendra.b@intelops.dev"
-            },
-            content: getBase64EncodedStringForConfig(),
-            sha: getCurrentRepoDetails().details.sha,
-            repoName: getCurrentRepoDetails().repoName || "Sample1"
-        };
-        const proxy_url_commit_changes = state.proxy_url_commit_changes;
-
-        // Use code parameter and other parameters to make POST request to proxy_server
-        return fetch(proxy_url_commit_changes, {
-            method: "PUT",
-            body: JSON.stringify(requestBody)
-        });
-    }
-    const createRepo = (repoName: string, repoDescription: string): Promise<Response> => {
-        const requestBody = {
-            repoName: repoName, description: repoDescription, userName: state.user.login
-        };
-        const proxy_url_create_repo = state.proxy_url_create_repo;
-
-        // Use code parameter and other parameters to make POST request to proxy_server
-        return fetch(proxy_url_create_repo, {
-            method: "POST",
-            body: JSON.stringify(requestBody)
-        });
-    }
-    const listRepos = (): Promise<Response> => {
-        const proxy_url_list_repos = state.proxy_url_list_repos;
-        // Use code parameter and other parameters to make POST request to proxy_server
-        return fetch(proxy_url_list_repos, {
-            method: "GET",
-        });
-    }
-    const checkToken = (): Promise<Response> => {
-        const proxy_url_check_token = state.proxy_url_check_token + "?userName=" + state.user.login;
-        // Use code parameter and other parameters to make POST request to proxy_server
-        return fetch(proxy_url_check_token, {
-            method: "GET",
-        });
-    }
 
     function handleClose() {
         setOperationState({...operationState, isOpen: false, message: "", severity: "", operation: ""})
-    }
-
-    interface GithubRepo {
-        name: string,
-        private: boolean,
-        full_name: string
     }
 
     const isRepoNameExists = (newRepoName: string, githubRepos: GithubRepo[]) => {
@@ -88,15 +31,6 @@ export const Sample = () => {
             }
         }
         return false
-    }
-
-    interface GithubRepoContent {
-        name: string,
-        path: boolean,
-        sha: string,
-        content: string,
-        type: string
-        encoding: string,
     }
 
     const handleResponse = (repoName: string, githubRepoContent: GithubRepoContent) => {
@@ -121,7 +55,7 @@ export const Sample = () => {
                     </Snackbar>
                     <Button variant="contained" onClick={
                         () => {
-                            listRepos()
+                            listRepos(state.user.login)
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
@@ -147,7 +81,7 @@ export const Sample = () => {
                                             const newRepoName = "Sample1";
                                             if (!isRepoNameExists(newRepoName, data)) {
                                                 // check for repo existence
-                                                createRepo(newRepoName, "Sample repo description")
+                                                createRepo(state.user.login, newRepoName, "Sample repo description")
                                                     .then((response: Response) => {
                                                         if (!response.ok) {
                                                             setOperationState({
@@ -217,7 +151,7 @@ export const Sample = () => {
                     </Button>
                     <Button variant="contained" onClick={
                         () => {
-                            commitChanges("")
+                            commitChanges(state.user.login, state.user.email, "Sample message")
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
@@ -266,7 +200,7 @@ export const Sample = () => {
                     <Button variant="contained" onClick={
                         () => {
                             const repoName = "Sample1"
-                            pullChanges(repoName)
+                            pullChanges(state.user.login, repoName)
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
