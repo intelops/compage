@@ -111,29 +111,30 @@ export class Server {
             });
         });
         app.put("/commit_changes", async (req: Request, res: Response,) => {
-            const {message, userName, email, content, repoName} = req.body;
-            if (this.userTokens.get(userName) === undefined) {
+            const {message, committer, content, repoName, sha} = req.body;
+            if (this.userTokens.get(committer.userName) === undefined) {
                 // TODO change message and may impl later
                 return res.status(401).json("server restarted and lost the local cache of tokens")
             }
             axios({
                 headers: {
                     Accept: "application/vnd.github+json",
-                    Authorization: `Bearer ${this.userTokens.get(userName)}`,
+                    Authorization: `Bearer ${this.userTokens.get(committer.userName)}`,
                 },
-                url: `https://api.github.com/repos/${userName}/${repoName}/contents/.compage/config.json`,
+                url: `https://api.github.com/repos/${committer.userName}/${repoName}/contents/.compage/config.json`,
                 method: "PUT",
                 data: {
                     message: message,
                     content: content,
                     committer: {
-                        name: userName,
-                        email: email
+                        name: committer.userName,
+                        email: committer.email
                     },
+                    sha: sha
                 }
             }).then((response) => {
                 if (response.status !== 200) {
-                    return res.status(response.status).json(response.statusText)
+                    return res.status(response.status).json(response)
                 }
                 return res.status(200).json(response.data);
             }).catch((error) => {
@@ -163,7 +164,6 @@ export class Server {
             });
         });
         app.get("/logout", async (req: Request, res: Response,) => {
-            // console.log("req.query.userName : ", req.query.userName)
             const {userName} = req.query
             if (this.userTokens.get(<string>userName) === undefined) {
                 // TODO change message and may impl later
