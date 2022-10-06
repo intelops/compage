@@ -192,6 +192,47 @@ export const Repo = () => {
         return ""
     }
 
+    const getName = () => {
+        if (data.isCreateNew) {
+            return <TextField
+                required
+                fullWidth
+                margin="dense"
+                id="name"
+                label="Name of Repository"
+                type="text"
+                value={data.currentRepo}
+                onChange={handleNewRepoChange}
+                variant="outlined"
+            />;
+        }
+        return "";
+    }
+
+    const getExistingRepos = () => {
+        if (!data.isCreateNew) {
+            return <TextField
+                required
+                fullWidth
+                select
+                disabled={data.isCreateNew}
+                margin="dense"
+                id="repo"
+                label="Existing Repos"
+                type="text"
+                value={data.currentRepo}
+                onChange={handleExistingReposChange}
+                variant="outlined">
+                {data.repos.map((repo: GithubRepo) => (
+                    <MenuItem key={repo.name} value={repo.name}>
+                        {repo.full_name}
+                    </MenuItem>
+                ))}
+            </TextField>;
+        }
+        return ""
+    }
+
     return <>
         {data.isLoading && <p>Wait I'm Loading repos for you</p>}
 
@@ -208,36 +249,9 @@ export const Repo = () => {
                             onChange={handleIsCreateNewChange}
                         />}
                     />
-                    <TextField
-                        required
-                        fullWidth
-                        margin="dense"
-                        id="name"
-                        label="Name of Repository"
-                        type="text"
-                        value={data.currentRepo}
-                        onChange={handleNewRepoChange}
-                        variant="outlined"
-                    />
+                    {getName()}
                     {getDescription()}
-                    <TextField
-                        required
-                        fullWidth
-                        select
-                        disabled={data.isCreateNew}
-                        margin="dense"
-                        id="repo"
-                        label="Existing Repos"
-                        type="text"
-                        value={data.currentRepo}
-                        onChange={handleExistingReposChange}
-                        variant="outlined">
-                        {data.repos.map((repo: GithubRepo) => (
-                            <MenuItem key={repo.name} value={repo.name}>
-                                {repo.full_name}
-                            </MenuItem>
-                        ))}
-                    </TextField>
+                    {getExistingRepos()}
                 </Stack>
             </DialogContent>
             <DialogActions>
