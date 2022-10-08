@@ -1,5 +1,4 @@
-import React, {ChangeEvent, useContext, useEffect, useState} from "react";
-import {AuthContext} from "../../App";
+import React, {ChangeEvent, useEffect, useState} from "react";
 import {Navigate, useNavigate} from "react-router-dom";
 import {createRepo, listRepos, pullChanges} from "../../backend/rest-service";
 import {GithubRepo} from "../../backend/models";
@@ -13,10 +12,11 @@ import MenuItem from "@mui/material/MenuItem";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import {setCurrentRepoDetails} from "../../utils/service";
+import {useAppSelector} from "../../hooks/redux-hooks";
 
 export const Repo = () => {
     const navigate = useNavigate()
-    const {state, dispatch} = useContext(AuthContext);
+    const authDetails = useAppSelector(state => state.authDetails);
     const [data, setData] = useState({
         errorMessage: "",
         isLoading: true,
@@ -38,20 +38,19 @@ export const Repo = () => {
     }
 
     useEffect(() => {
-        listRepos(state.user.login)
+        listRepos(authDetails.user.login)
             .then(items => {
                 setData({...data, isOpen: true, isLoading: false, repos: getRepos(items)})
             })
-    }, [])
-
-    if (!state.isLoggedIn) {
+    }, [setData])
+    if (!authDetails.user.login) {
         return <Navigate to="/login"/>;
     }
 
     const handleCreate = () => {
         // give a call to create repo if it's new
         if (data.isCreateNew) {
-            createRepo(state.user.login, data.currentRepo, data.description)
+            createRepo(authDetails.user.login, data.currentRepo, data.description)
                 .then(createdItem => {
                     if (createdItem) {
                         if (JSON.stringify(createdItem).toLowerCase().includes("Bad Credentials".toLowerCase())) {
@@ -92,7 +91,7 @@ export const Repo = () => {
         }
         // set the current repo retails post response from server
         // give call to pull the latest contents
-        pullChanges(state.user.login, data.currentRepo)
+        pullChanges(authDetails.user.login, data.currentRepo)
             .then(pulledItem => {
                 if (pulledItem) {
                     if (JSON.stringify(pulledItem).toLowerCase().includes("Bad Credentials".toLowerCase())) {

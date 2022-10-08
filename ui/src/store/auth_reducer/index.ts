@@ -1,8 +1,6 @@
 import {config} from "../../utils/constants";
 
-export const initialState = {
-    isLoggedIn: JSON.parse(localStorage.getItem("isLoggedIn")) || false,
-    user: JSON.parse(localStorage.getItem("user")) || null,
+export const authConfig = {
     client_id: config.client_id,
     redirect_uri: config.redirect_uri,
 };
@@ -16,27 +14,3 @@ export const backendEndpoints = {
     proxy_url_check_token: config.proxy_url_check_token,
     proxy_url_logout: config.proxy_url_logout,
 }
-
-export const reducer = (state, action) => {
-    switch (action.type) {
-        case "LOGIN": {
-            localStorage.setItem("isLoggedIn", JSON.stringify(action.payload.isLoggedIn))
-            localStorage.setItem("user", JSON.stringify(action.payload.user))
-            return {
-                ...state,
-                isLoggedIn: action.payload.isLoggedIn,
-                user: action.payload.user
-            };
-        }
-        case "LOGOUT": {
-            localStorage.clear()
-            return {
-                ...state,
-                isLoggedIn: false,
-                user: null
-            };
-        }
-        default:
-            return state;
-    }
-};

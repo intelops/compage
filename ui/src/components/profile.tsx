@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {useContext} from 'react';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
@@ -7,11 +6,11 @@ import CardContent from '@mui/material/CardContent';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import {red} from '@mui/material/colors';
-import {AuthContext} from "../App";
+import {useAppSelector} from "../hooks/redux-hooks";
 
 export const ProfileCard = () => {
-    const {state} = useContext(AuthContext);
-    const {avatar_url, bio, name, public_repos, followers, following} = state.user
+    const authDetails = useAppSelector(state => state.authDetails);
+    const {avatar_url, bio, name, public_repos, followers, following} = authDetails.user
 
     return (
         <Card sx={{maxWidth: 345}}>

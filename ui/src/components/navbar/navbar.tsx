@@ -13,27 +13,28 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import {AuthContext} from "../../App";
 import Logo from "../../logo.png";
 import {backendEndpoints} from "../../store/auth_reducer";
+import {useAppSelector} from "../../hooks/redux-hooks";
 
 const pages = ['Products', 'Blog'];
 const settings = ['Account', 'Logout'];
 
 const Navbar = () => {
-    const {state, dispatch} = useContext(AuthContext);
+    const authDetails = useAppSelector(state => state.authDetails);
+
     const [data, setData] = useState({errorMessage: "", isLoading: false});
     let avatar_url, name, public_repos, followers, following;
-    if (state.user) {
-        name = state.user.name
-        following = state.user.following
-        followers = state.user.followers
-        public_repos = state.user.public_repos
-        avatar_url = state.user.avatar_url
+    if (authDetails.user) {
+        name = authDetails.user.name
+        following = authDetails.user.following
+        followers = authDetails.user.followers
+        public_repos = authDetails.user.public_repos
+        avatar_url = authDetails.user.avatar_url
     }
 
     const handleLogout = () => {
-        const proxy_url_logout = backendEndpoints.proxy_url_logout + "?userName=" + state.user.login;
+        const proxy_url_logout = backendEndpoints.proxy_url_logout + "?userName=" + authDetails.user.login;
         // Use code parameter and other parameters to make POST request to proxy_server
         fetch(proxy_url_logout, {
             method: "GET",
@@ -45,9 +46,9 @@ const Navbar = () => {
                         errorMessage: "[Non-200 Response] Sorry! Logout failed"
                     });
                     if (response.status === 401) {
-                        dispatch({
-                            type: "LOGOUT"
-                        });
+                        // dispatch({
+                        //     type: "LOGOUT"
+                        // });
                     }
                 } else return response.json();
             })
@@ -59,9 +60,9 @@ const Navbar = () => {
                             errorMessage: "[Bad Credentials] Sorry! Logout failed"
                         });
                     } else {
-                        dispatch({
-                            type: "LOGOUT"
-                        });
+                        // dispatch({
+                        //     type: "LOGOUT"
+                        // });
                     }
                 }
             })
@@ -93,7 +94,7 @@ const Navbar = () => {
 
     function getMenuItem(setting: string) {
         if (setting === "Logout") {
-            if (state.user) {
+            if (authDetails.user.login) {
                 let element
                 data.isLoading ? (
                     element = <div className="loader-container">

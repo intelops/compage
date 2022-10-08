@@ -1,73 +1,34 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {Navigate} from "react-router-dom";
 import Styled from "styled-components";
-import {AuthContext} from "../../App";
 import GitHubIcon from '@mui/icons-material/GitHub';
 import {v4 as uuidv4} from 'uuid';
-import {backendEndpoints} from "../../store/auth_reducer";
+import {useAppDispatch, useAppSelector} from "../../hooks/redux-hooks";
+import {fetchUser} from "../../store/login-actions";
+import {authConfig} from "../../store/auth_reducer";
 
 export const Login = () => {
-    const {state, dispatch} = useContext(AuthContext);
-    const [data, setData] = useState({errorMessage: "", isLoading: false});
+    const dispatch = useAppDispatch();
+    const authDetails = useAppSelector(state => state.authDetails);
 
-    const {client_id, redirect_uri} = state;
+    const {client_id, redirect_uri} = authConfig;
     const stateString = uuidv4();
     const scope = "user repo workflow";
 
     useEffect(() => {
         // After requesting GitHub access, GitHub redirects back to your app with a code parameter
         const url = window.location.href;
-
         const hasCode = url.includes("?code=");
         const hasState = url.includes("&state=")
         // If GitHub API returns the code parameter
         if (hasCode && hasState) {
             const newUrl = url.split("?code=");
             window.history.pushState({}, null, newUrl[0]);
-            setData({...data, isLoading: true});
-
-            const requestData = {
-                code: newUrl[1].substring(0, newUrl[1].indexOf("&")),
-            };
-
-            // Use code parameter and other parameters to make POST request to proxy_server
-            fetch(backendEndpoints.proxy_url_authenticate, {
-                method: "POST",
-                body: JSON.stringify(requestData)
-            })
-                .then((response: Response) => {
-                    if (!response.ok) {
-                        setData({
-                            isLoading: false,
-                            errorMessage: "[Non-200 Response] Sorry! Login failed"
-                        });
-                    } else return response.json();
-                })
-                .then(data => {
-                    if (data) {
-                        if (JSON.stringify(data).toLowerCase().includes("Bad Credentials".toLowerCase())) {
-                            setData({
-                                isLoading: false,
-                                errorMessage: "[Bad Credentials] Sorry! Login failed"
-                            });
-                        } else {
-                            dispatch({
-                                type: "LOGIN",
-                                payload: {user: data, isLoggedIn: true}
-                            });
-                        }
-                    }
-                })
-                .catch(error => {
-                    setData({
-                        isLoading: false,
-                        errorMessage: "[Generic error] Sorry! Login failed"
-                    });
-                });
+            dispatch(fetchUser(newUrl[1].substring(0, newUrl[1].indexOf("&"))))
         }
-    }, [state, dispatch, data]);
+    }, [dispatch]);
 
-    if (state.isLoggedIn) {
+    if (authDetails.user.login) {
         return <Navigate to="/"/>;
     }
 
@@ -75,33 +36,21 @@ export const Login = () => {
         <Wrapper>
             <section className="container">
                 <div>
-                    <span>{data.errorMessage}</span>
                     <div className="login-container" style={{
                         cursor: "pointer"
                     }}>
-                        {data.isLoading ? (
-                            <div className="loader-container">
-                                <div className="loader"></div>
-                            </div>
-                        ) : (
-                            <>
-                                <a
-                                    style={{
-                                        cursor: "pointer"
-                                    }}
-                                    className="login-link"
-                                    href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&state=${stateString}`}
-                                    onClick={() => {
-                                        setData({...data, errorMessage: ""});
-                                    }}
-                                >
-                                    <GitHubIcon/>
-                                    <span>
-                                        Login with GitHub
-                                    </span>
-                                </a>
-                            </>
-                        )}
+                        <a
+                            style={{
+                                cursor: "pointer"
+                            }}
+                            className="login-link"
+                            href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&state=${stateString}`}
+                        >
+                            <GitHubIcon/>
+                            <span>
+                                Login with GitHub
+                            </span>
+                        </a>
                     </div>
                 </div>
             </section>

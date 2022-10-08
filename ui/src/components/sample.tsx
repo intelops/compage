@@ -1,22 +1,23 @@
-import React, {useContext, useState} from "react";
+import React, {useState} from "react";
 import {Navigate} from "react-router-dom";
-import {AuthContext} from "../App";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import {Alert, Snackbar, Stack} from "@mui/material";
 import {setCurrentRepoDetails} from "../utils/service";
 import {commitChanges, createRepo, listRepos, pullChanges} from "../backend/rest-service";
 import {GithubRepo, GithubRepoContent} from "../backend/models";
+import {useAppSelector} from "../hooks/redux-hooks";
 
 export const Sample = () => {
-    const {state} = useContext(AuthContext);
+    const authDetails = useAppSelector(state => state.authDetails);
+
     const [operationState, setOperationState] = useState({
         severity: "",
         message: "",
         operation: "",
         isOpen: false
     })
-    if (!state.isLoggedIn) {
+    if (!authDetails.user.login) {
         return <Navigate to="/login"/>;
     }
 
@@ -55,7 +56,7 @@ export const Sample = () => {
                     </Snackbar>
                     <Button variant="contained" onClick={
                         () => {
-                            listRepos(state.user.login)
+                            listRepos(authDetails.user.login)
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
@@ -81,7 +82,7 @@ export const Sample = () => {
                                             const newRepoName = "Sample1";
                                             if (!isRepoNameExists(newRepoName, data)) {
                                                 // check for repo existence
-                                                createRepo(state.user.login, newRepoName, "Sample repo description")
+                                                createRepo(authDetails.user.login, newRepoName, "Sample repo description")
                                                     .then((response: Response) => {
                                                         if (!response.ok) {
                                                             setOperationState({
@@ -151,7 +152,7 @@ export const Sample = () => {
                     </Button>
                     <Button variant="contained" onClick={
                         () => {
-                            commitChanges(state.user.login, state.user.email, "Sample message")
+                            commitChanges(authDetails.user.login, authDetails.user.email, "Sample message")
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
@@ -200,7 +201,7 @@ export const Sample = () => {
                     <Button variant="contained" onClick={
                         () => {
                             const repoName = "Sample1"
-                            pullChanges(state.user.login, repoName)
+                            pullChanges(authDetails.user.login, repoName)
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({

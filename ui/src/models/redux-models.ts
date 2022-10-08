@@ -1,3 +1,18 @@
+export interface LoginModel {
+    login?: string,
+    email?: string,
+    name?: string,
+    following: string,
+    followers: string,
+    public_repos: string,
+    avatar_url: string,
+    bio: string
+}
+
+export interface LoginArrayModel {
+    user: LoginModel
+}
+
 export interface TodoModel {
     "userId": number,
     "id": number,
