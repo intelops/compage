@@ -9,8 +9,8 @@ import {red} from '@mui/material/colors';
 import {useAppSelector} from "../hooks/redux-hooks";
 
 export const ProfileCard = () => {
-    const authDetails = useAppSelector(state => state.authDetails);
-    const {avatar_url, bio, name, public_repos, followers, following} = authDetails.user
+    const authentication = useAppSelector(state => state.authentication);
+    const {avatar_url, bio, name, public_repos, followers, following} = authentication.user
 
     return (
         <Card sx={{maxWidth: 345}}>

@@ -4,14 +4,13 @@ import Styled from "styled-components";
 import GitHubIcon from '@mui/icons-material/GitHub';
 import {v4 as uuidv4} from 'uuid';
 import {useAppDispatch, useAppSelector} from "../../hooks/redux-hooks";
-import {fetchUser} from "../../store/login-actions";
-import {authConfig} from "../../store/auth_reducer";
+import {fetchUser} from "../../store/authentication-actions";
+import {config} from "../../utils/constants";
 
 export const Login = () => {
     const dispatch = useAppDispatch();
-    const authDetails = useAppSelector(state => state.authDetails);
-
-    const {client_id, redirect_uri} = authConfig;
+    const authentication = useAppSelector(state => state.authentication);
+    const {client_id, redirect_uri} = config;
     const stateString = uuidv4();
     const scope = "user repo workflow";
 
@@ -28,7 +27,7 @@ export const Login = () => {
         }
     }, [dispatch]);
 
-    if (authDetails.user.login) {
+    if (authentication.user.login) {
         return <Navigate to="/"/>;
     }
 

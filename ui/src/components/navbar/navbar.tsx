@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useContext, useState} from 'react';
+import {useState} from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -14,27 +14,27 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import Logo from "../../logo.png";
-import {backendEndpoints} from "../../store/auth_reducer";
 import {useAppSelector} from "../../hooks/redux-hooks";
+import {config} from "../../utils/constants";
 
 const pages = ['Products', 'Blog'];
 const settings = ['Account', 'Logout'];
 
 const Navbar = () => {
-    const authDetails = useAppSelector(state => state.authDetails);
+    const authentication = useAppSelector(state => state.authentication);
 
     const [data, setData] = useState({errorMessage: "", isLoading: false});
     let avatar_url, name, public_repos, followers, following;
-    if (authDetails.user) {
-        name = authDetails.user.name
-        following = authDetails.user.following
-        followers = authDetails.user.followers
-        public_repos = authDetails.user.public_repos
-        avatar_url = authDetails.user.avatar_url
+    if (authentication.user) {
+        name = authentication.user.name
+        following = authentication.user.following
+        followers = authentication.user.followers
+        public_repos = authentication.user.public_repos
+        avatar_url = authentication.user.avatar_url
     }
 
     const handleLogout = () => {
-        const proxy_url_logout = backendEndpoints.proxy_url_logout + "?userName=" + authDetails.user.login;
+        const proxy_url_logout = config.proxy_url_logout + "?userName=" + authentication.user.login;
         // Use code parameter and other parameters to make POST request to proxy_server
         fetch(proxy_url_logout, {
             method: "GET",
@@ -94,7 +94,7 @@ const Navbar = () => {
 
     function getMenuItem(setting: string) {
         if (setting === "Logout") {
-            if (authDetails.user.login) {
+            if (authentication.user.login) {
                 let element
                 data.isLoading ? (
                     element = <div className="loader-container">

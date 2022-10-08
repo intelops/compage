@@ -1,4 +1,4 @@
-export interface LoginModel {
+export interface AuthenticationModel {
     login?: string,
     email?: string,
     name?: string,
@@ -9,8 +9,8 @@ export interface LoginModel {
     bio: string
 }
 
-export interface LoginArrayModel {
-    user: LoginModel
+export interface AuthenticationArrayModel {
+    user: AuthenticationModel
 }
 
 export interface TodoModel {

@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React from "react";
 import {Navigate} from "react-router-dom";
 import {getData} from "../data/BoundaryCircular/data";
 import {getCurrentConfig, getCurrentRepoDetails} from "../utils/service";
@@ -6,9 +6,8 @@ import Todo from "./Todo";
 import {useAppSelector} from "../hooks/redux-hooks";
 
 export const Home = () => {
-    const authDetails = useAppSelector(state => state.authDetails);
-
-    if (!authDetails.user.login) {
+    const authentication = useAppSelector(state => state.authentication);
+    if (!authentication.user.login) {
         return <Navigate to="/login"/>;
     }
     if (getCurrentRepoDetails() === null || getCurrentRepoDetails() === undefined) {

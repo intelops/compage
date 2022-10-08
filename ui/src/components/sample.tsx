@@ -9,7 +9,7 @@ import {GithubRepo, GithubRepoContent} from "../backend/models";
 import {useAppSelector} from "../hooks/redux-hooks";
 
 export const Sample = () => {
-    const authDetails = useAppSelector(state => state.authDetails);
+    const authentication = useAppSelector(state => state.authentication);
 
     const [operationState, setOperationState] = useState({
         severity: "",
@@ -17,7 +17,7 @@ export const Sample = () => {
         operation: "",
         isOpen: false
     })
-    if (!authDetails.user.login) {
+    if (!authentication.user.login) {
         return <Navigate to="/login"/>;
     }
 
@@ -56,7 +56,7 @@ export const Sample = () => {
                     </Snackbar>
                     <Button variant="contained" onClick={
                         () => {
-                            listRepos(authDetails.user.login)
+                            listRepos(authentication.user.login)
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
@@ -82,7 +82,7 @@ export const Sample = () => {
                                             const newRepoName = "Sample1";
                                             if (!isRepoNameExists(newRepoName, data)) {
                                                 // check for repo existence
-                                                createRepo(authDetails.user.login, newRepoName, "Sample repo description")
+                                                createRepo(authentication.user.login, newRepoName, "Sample repo description")
                                                     .then((response: Response) => {
                                                         if (!response.ok) {
                                                             setOperationState({
@@ -152,7 +152,7 @@ export const Sample = () => {
                     </Button>
                     <Button variant="contained" onClick={
                         () => {
-                            commitChanges(authDetails.user.login, authDetails.user.email, "Sample message")
+                            commitChanges(authentication.user.login, authentication.user.email, "Sample message")
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
@@ -201,7 +201,7 @@ export const Sample = () => {
                     <Button variant="contained" onClick={
                         () => {
                             const repoName = "Sample1"
-                            pullChanges(authDetails.user.login, repoName)
+                            pullChanges(authentication.user.login, repoName)
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({

@@ -1,9 +1,9 @@
-import {backendEndpoints} from "../store/auth_reducer";
 import {getCurrentRepoDetails} from "../utils/service";
 import {getBase64EncodedStringForConfig} from "../components/diagram-maker/helper/helper";
+import {config} from "../utils/constants";
 
 export const pullChanges = (userName: string, repoName: string): Promise<Response> => {
-    const proxy_url_pull_changes = backendEndpoints.proxy_url_pull_changes + "?userName=" + userName + "&repoName=" + (repoName || getCurrentRepoDetails().repoName);
+    const proxy_url_pull_changes = config.proxy_url_pull_changes + "?userName=" + userName + "&repoName=" + (repoName || getCurrentRepoDetails().repoName);
     // Use code parameter and other parameters to make POST request to proxy_server
     return fetch(proxy_url_pull_changes, {
         method: "GET",
@@ -20,7 +20,7 @@ export const commitChanges = (userName: string, userEmail: string, message: stri
         sha: getCurrentRepoDetails().details.sha,
         repoName: getCurrentRepoDetails().repoName
     };
-    const proxy_url_commit_changes = backendEndpoints.proxy_url_commit_changes;
+    const proxy_url_commit_changes = config.proxy_url_commit_changes;
 
     // Use code parameter and other parameters to make POST request to proxy_server
     return fetch(proxy_url_commit_changes, {
@@ -34,17 +34,17 @@ export const createRepo = (userName: string, repoName: string, repoDescription: 
     };
 
     // Use code parameter and other parameters to make POST request to proxy_server
-    return fetch(backendEndpoints.proxy_url_create_repo, {
+    return fetch(config.proxy_url_create_repo, {
         method: "POST",
         body: JSON.stringify(requestBody)
     }).then(data => data.json());
 }
 export const listRepos = (userName: string) => {
-    const proxy_url_list_repos = backendEndpoints.proxy_url_list_repos + "?userName=" + userName
+    const proxy_url_list_repos = config.proxy_url_list_repos + "?userName=" + userName
     return fetch(proxy_url_list_repos).then(data => data.json())
 }
 const checkToken = (userName: string): Promise<Response> => {
-    const proxy_url_check_token = backendEndpoints.proxy_url_check_token + "?userName=" + userName;
+    const proxy_url_check_token = config.proxy_url_check_token + "?userName=" + userName;
     // Use code parameter and other parameters to make POST request to proxy_server
     return fetch(proxy_url_check_token, {
         method: "GET",

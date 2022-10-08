@@ -16,7 +16,7 @@ import {useAppSelector} from "../../hooks/redux-hooks";
 
 export const Repo = () => {
     const navigate = useNavigate()
-    const authDetails = useAppSelector(state => state.authDetails);
+    const authentication = useAppSelector(state => state.authentication);
     const [data, setData] = useState({
         errorMessage: "",
         isLoading: true,
@@ -38,19 +38,20 @@ export const Repo = () => {
     }
 
     useEffect(() => {
-        listRepos(authDetails.user.login)
+        listRepos(authentication.user.login)
             .then(items => {
                 setData({...data, isOpen: true, isLoading: false, repos: getRepos(items)})
             })
     }, [setData])
-    if (!authDetails.user.login) {
+
+    if (!authentication.user.login) {
         return <Navigate to="/login"/>;
     }
 
     const handleCreate = () => {
         // give a call to create repo if it's new
         if (data.isCreateNew) {
-            createRepo(authDetails.user.login, data.currentRepo, data.description)
+            createRepo(authentication.user.login, data.currentRepo, data.description)
                 .then(createdItem => {
                     if (createdItem) {
                         if (JSON.stringify(createdItem).toLowerCase().includes("Bad Credentials".toLowerCase())) {
@@ -91,7 +92,7 @@ export const Repo = () => {
         }
         // set the current repo retails post response from server
         // give call to pull the latest contents
-        pullChanges(authDetails.user.login, data.currentRepo)
+        pullChanges(authentication.user.login, data.currentRepo)
             .then(pulledItem => {
                 if (pulledItem) {
                     if (JSON.stringify(pulledItem).toLowerCase().includes("Bad Credentials".toLowerCase())) {
@@ -225,11 +226,13 @@ export const Repo = () => {
                 value={data.currentRepo}
                 onChange={handleExistingReposChange}
                 variant="outlined">
-                {data.repos.map((repo: GithubRepo) => (
-                    <MenuItem key={repo.name} value={repo.name}>
-                        {repo.full_name}
-                    </MenuItem>
-                ))}
+                {
+                    !data && data.repos.map((repo: GithubRepo) => (
+                        <MenuItem key={repo.name} value={repo.name}>
+                            {repo.full_name}
+                        </MenuItem>
+                    ))
+                }
             </TextField>;
         }
         return ""

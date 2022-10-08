@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import {BrowserRouter, Link, Route, Routes} from "react-router-dom";
-import {Login} from "./components/auth/login";
+import {Login} from "./components/authentication/login";
 import {Home} from "./components/home";
 import Navbar from "./components/navbar/navbar";
 import {Repo} from "./components/repo/repo";
