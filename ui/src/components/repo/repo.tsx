@@ -1,6 +1,6 @@
 import React, {ChangeEvent, useContext, useEffect, useState} from "react";
 import {AuthContext} from "../../App";
-import {Navigate} from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
 import {createRepo, listRepos, pullChanges} from "../../backend/rest-service";
 import {GithubRepo} from "../../backend/models";
 import Dialog from "@mui/material/Dialog";
@@ -15,6 +15,7 @@ import Button from "@mui/material/Button";
 import {setCurrentRepoDetails} from "../../utils/service";
 
 export const Repo = () => {
+    const navigate = useNavigate()
     const {state, dispatch} = useContext(AuthContext);
     const [data, setData] = useState({
         errorMessage: "",
@@ -32,8 +33,8 @@ export const Repo = () => {
     }
 
     const handleClose = () => {
-        console.log("handleClose");
         setData({...data, isOpen: false})
+        navigate('/home');
     }
 
     useEffect(() => {
@@ -134,6 +135,8 @@ export const Repo = () => {
             details: "githubRepoContent"
         }
         setCurrentRepoDetails(JSON.stringify(currentRepoDetails))
+        setData({...data, isOpen: false})
+        navigate('/home');
     }
 
     const handleExistingReposChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {

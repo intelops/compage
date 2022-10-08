@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@200&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap');
+
+.todo-container {
+    display: flex;
+    justify-content: space-evenly;
+    min-width: 100%;
+    font-weight: bold;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.todo-child1 {
+    min-width: 5%;
+}
+
+.todo-child2 {
+    min-width: 5%;
+}
+
+.todo-child2 {
+    min-width: 5%;
+}
+
+.todo-child3 {
+    min-width: 90%;
+    text-align: left;
+}
+
+button {
+    font-family: 'Montserrat', sans-serif;
+    background: none;
+    margin-left: 1rem;
+    text-align: center;
+    padding: 0.6rem 1.2rem 0.6rem 1.2rem;
+    outline: none;
+    color: white;
+    background: #290e6d;
+    border-radius: 10px;
+    transition: 0.25s;
+}
+
+h3 {
+    font-family: 'Montserrat', sans-serif;
+}
+
+label {
+    font-family: 'Montserrat', sans-serif;
+}
