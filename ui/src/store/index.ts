@@ -19,17 +19,15 @@ const authenticationPersistConfig = {
     storage: storageSession,
 }
 
-const rootReducer = combineReducers({
-    todo: todoSlice.reducer,
+const persistedRootReducer = combineReducers({
+    todo: persistReducer(rootPersistConfig, todoSlice.reducer),
     authentication: persistReducer(authenticationPersistConfig, authenticationSlice.reducer),
 })
-
-const persistedReducer = persistReducer(rootPersistConfig, rootReducer)
 
 export const store = configureStore(
     {
         devTools: process.env.NODE_ENV !== 'production',
-        reducer: persistedReducer,
+        reducer: persistedRootReducer,
         // middleware: [thunk]
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
