@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+import './index.scss';
 import {App} from './App';
 import reportWebVitals from './reportWebVitals';
 import 'diagram-maker/dist/diagramMaker.css';
@@ -8,6 +8,7 @@ import 'react-json-pretty/themes/monikai.css';
 import {Provider} from "react-redux";
 import {persistor, store} from './store';
 import {PersistGate} from 'redux-persist/integration/react';
+import ReduxToastr from 'react-redux-toastr'
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -18,6 +19,16 @@ root.render(
             <PersistGate loading={null} persistor={persistor}>
                 <App/>
             </PersistGate>
+            <ReduxToastr
+                timeOut={3000}
+                newestOnTop={false}
+                preventDuplicates
+                position="bottom-right"
+                getState={(state) => state.toastr} // This is the default
+                transitionIn="fadeIn"
+                transitionOut="fadeOut"
+                progressBar
+                closeOnToastrClick/>
         </Provider>
     </React.StrictMode>
 );

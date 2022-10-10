@@ -7,6 +7,7 @@ import {persistReducer, persistStore} from 'redux-persist';
 // import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storageSession from 'reduxjs-toolkit-persist/lib/storage/session'
 import {FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE} from "reduxjs-toolkit-persist";
+import {reducer as toastrReducer} from 'react-redux-toastr'
 
 const rootPersistConfig = {
     key: 'root',
@@ -22,6 +23,7 @@ const authenticationPersistConfig = {
 const persistedRootReducer = combineReducers({
     todo: persistReducer(rootPersistConfig, todoSlice.reducer),
     authentication: persistReducer(authenticationPersistConfig, authenticationSlice.reducer),
+    toastr: toastrReducer
 })
 
 export const store = configureStore(

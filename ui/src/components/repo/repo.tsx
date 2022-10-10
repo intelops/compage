@@ -13,6 +13,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import {setCurrentRepoDetails} from "../../utils/service";
 import {useAppSelector} from "../../hooks/redux-hooks";
+import {toastr} from 'react-redux-toastr'
 
 export const Repo = () => {
     const navigate = useNavigate()
@@ -261,6 +262,9 @@ export const Repo = () => {
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary" onClick={handleClose}>Cancel</Button>
+                <Button
+                    onClick={() => toastr.error('The title', 'The message')}
+                    type="button">Toastr Success</Button>
                 <Button variant="contained"
                         onClick={handleCreate}
                         disabled={data.currentRepo === "" || !isValid()}>Choose</Button>
