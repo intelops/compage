@@ -1,7 +1,9 @@
 import {useAppDispatch, useAppSelector} from "../hooks/redux-hooks";
-import {fetchParticularTodo, fetchTodos} from '../store/todo-actions';
+import {fetchParticularTodo} from '../store/todo-actions';
 import {useState} from 'react'
 import './Todo.css'
+import {fetchTodos} from "../service/todoService";
+import {selectStatus} from "../store/todo-slice";
 
 const Todo = () => {
     const [todo_id, setTodo_id] = useState(1);
@@ -9,7 +11,7 @@ const Todo = () => {
     const alltodos = useAppSelector(state => state.todo.all_todos);
     const particularTodo = useAppSelector(state => state.todo.particular_todo);
     const clickHandler = () => {
-        dispatch(fetchTodos())
+        // dispatch(fetchTodos())
     }
     const searchHandler = () => {
         dispatch(fetchParticularTodo(todo_id))
@@ -23,10 +25,19 @@ const Todo = () => {
         }
         return true
     }
+    const status = useAppSelector(selectStatus);
+
+    // When clicked, dispatch `fetchTodos`:
+    const handleClick = () => dispatch(fetchTodos(10));
 
     return (
         <>
             <div>
+                <button type="button" onClick={handleClick}>
+                    {status === "loading"
+                        ? "Loading todos..."
+                        : "Load todos"}
+                </button>
                 <label>Enter the todo id : </label>
                 <input onChange={(event) => {
                     setTodo_id(parseInt(event.target.value))
@@ -36,7 +47,7 @@ const Todo = () => {
                     <h3>Particular TODO </h3>
                     {
                         checkparticularTodo() &&
-                        (<div className="todo-container" key={particularTodo.id}>
+                        (<div className="todo-container" key={particularTodo.userId + particularTodo.id}>
                             <p className="todo-child1">{particularTodo.id}</p>
                             <p className="todo-child2">{particularTodo.userId}</p>
                             <p className="todo-child3">{particularTodo.title}</p>
@@ -57,7 +68,7 @@ const Todo = () => {
                     </div>
                     {checkTodo() &&
                         alltodos.map((todo) => (
-                            <div className="todo-container" key={todo.id}>
+                            <div className="todo-container" /*key={todo.userId + todo.id}*/>
                                 <p className="todo-child1">{todo.id}</p>
                                 <p className="todo-child2">{todo.userId}</p>
                                 <p className="todo-child3">{todo.title}</p>

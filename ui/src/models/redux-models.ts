@@ -21,6 +21,11 @@ export interface TodoModel {
 }
 
 export interface TodoArrayModel {
+    // In `status` we will watch
+    // if todos are being loaded.
+    status: "loading" | "idle";
+    // `error` will contain an error message.
+    error: string | null;
     all_todos: TodoModel[],
     particular_todo: TodoModel
 }
