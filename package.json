@@ -7,6 +7,7 @@
   "license": "MIT",
   "private": "true",
   "dependencies": {
+    "@grpc/grpc-js": "^1.7.3",
     "@types/express": "^4.17.13",
     "axios": "^0.27.2",
     "dotenv": "^16.0.2",
