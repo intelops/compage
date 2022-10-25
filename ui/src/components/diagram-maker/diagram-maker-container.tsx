@@ -293,12 +293,12 @@ export const DiagramMakerContainer = ({
                         && "payload" in diagramMakerAction) {
                         if (diagramMakerAction.payload["typeId"] === "node-type-rectangle") {
                             diagramMakerAction.payload["consumerData"] = {
-                                "node-type": "rectangle",
+                                "nodeType": "rectangle",
                             };
                         }
                         if (diagramMakerAction.payload["typeId"] === "node-type-circle") {
                             diagramMakerAction.payload["consumerData"] = {
-                                "node-type": "circle",
+                                "nodeType": "circle",
                             };
                         }
                         diagramMakerAction.payload["id"] = diagramMakerAction.payload["id"].substring(3, 10)
