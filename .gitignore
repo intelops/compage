@@ -1,3 +1,5 @@
 /node_modules/
 /compage/build/
 /compage/node_modules/
+/compage-core/.devspace/
+/compage-core/.idea/
