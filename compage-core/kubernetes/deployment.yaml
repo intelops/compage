@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: compage
+  name: compage-core
+  labels:
+    app: compage-core
+spec:
+  selector:
+    matchLabels:
+      app: compage-core
+  template:
+    metadata:
+      labels:
+        app: compage-core
+        name: compage-core
+    spec:
+      containers:
+        - name: compage-core
+          image: mahendraintelops/compage-core
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 50051
+              name: grpc
+          readinessProbe:
+            tcpSocket:
+              port: grpc
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: grpc
+            initialDelaySeconds: 15
+            periodSeconds: 30
