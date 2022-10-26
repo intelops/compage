@@ -12,7 +12,7 @@ pipelines:
   # You can run this pipeline via `devspace deploy` (or `devspace run-pipeline deploy`)
   deploy:
     run: |-
-      run_dependencies --all                            # 1. Deploy any projects this project needs (see "dependencies")
+      run_dependencies --all --sequential               # 1. Deploy any projects this project needs (see "dependencies")
       build_images --all -t $(git describe --always)    # 2. Build, tag (git commit hash) and push all images (see "images")
       create_deployments --all                          # 3. Deploy Helm charts and manifests specfied as "deployments"
 
@@ -79,9 +79,6 @@ commands:
       echo 'Anyone using this project can invoke it via "devspace run migrate-db"'
 
 # Define dependencies to other projects with a devspace.yaml
-# dependencies:
-#   api:
-#     git: https://...  # Git-based dependencies
-#     tag: v1.0.0
-#   ui:
-#     path: ./ui        # Path-based dependencies (for monorepos)
+dependencies:
+   compage-core:
+     path: ../compage-core        # Path-based dependencies (for monorepos)

@@ -40,6 +40,7 @@ deployments:
         service:
           ports:
             - port: 8080
+            - port: 50051
 
 # This is a list of `dev` containers that are based on the containers created by your deployments
 dev:
