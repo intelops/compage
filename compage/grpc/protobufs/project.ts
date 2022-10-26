@@ -28,5 +28,5 @@ export const getProjectGrpcClient = () => {
     const ProjectService = grpc.loadPackageDefinition(
         packageDefinition).project.ProjectService;
 
-    return new ProjectService(`localhost:50051`, grpc.credentials.createInsecure());
+    return new ProjectService(`192.168.1.124:50051`, grpc.credentials.createInsecure());
 }

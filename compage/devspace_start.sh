@@ -9,6 +9,7 @@ else
    if [ -f "package.json" ]; then
       echo "Installing NPM Dependencies"
       npm install
+      npm i -g ts-node
    fi
 fi
 

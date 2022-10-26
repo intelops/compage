@@ -1,4 +1,4 @@
-FROM node:13.14-alpine
+FROM node:16.18-alpine
 
 # Set working directory
 WORKDIR /app
@@ -6,6 +6,7 @@ WORKDIR /app
 # Add package.json to WORKDIR and install dependencies
 COPY package*.json ./
 RUN npm install
+RUN npm install -g ts-node
 
 # Add source code files to WORKDIR
 COPY . .
@@ -14,4 +15,4 @@ COPY . .
 EXPOSE 5000
 
 # Container start command (DO NOT CHANGE and see note below)
-CMD ["npm", "start"]
+CMD ["ts-node", "server.ts"]
