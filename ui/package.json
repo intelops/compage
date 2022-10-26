@@ -21,8 +21,7 @@
   "scripts": {
     "build:css": "node-sass src/ -o src/ ",
     "watch:css": "npm run build:css && node-sass src/ -o src/ -w -r",
-    "start": "concurrently \"cd ../ && npx ts-node compage/server.ts \" \"react-scripts start\" ",
-    "start-ui": "react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build && mv ./build ../compage/build/ui",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

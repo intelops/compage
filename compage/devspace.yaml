@@ -63,13 +63,10 @@ dev:
       - command: kubectl
       - command: helm
       - command: git
-    # Forward the following ports to be able access your application via localhost
+    # Forward the following ports to be able to access your application via localhost
     ports:
       - port: "9229"
       - port: "5000"
-    # Open the following URLs once they return an HTTP status code other than 502 or 503
-    open:
-      - url: http://localhost:5000
 
 # Use the `commands` section to define repeatable dev workflows for this project 
 commands:

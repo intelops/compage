@@ -12,4 +12,5 @@ export const config = {
     proxy_url_list_repos: process.env.REACT_APP_PROXY_URL_LIST_REPOS,
     proxy_url_check_token: process.env.REACT_APP_PROXY_URL_CHECK_TOKEN,
     proxy_url_logout: process.env.REACT_APP_PROXY_URL_LOGOUT,
+    proxy_url_generate_project: process.env.REACT_APP_PROXY_URL_GENERATE_PROJECT,
 };

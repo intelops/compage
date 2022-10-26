@@ -1,14 +1,5 @@
 'use strict';
 
-export const generateProject = (client, payload) => {
-    client.GenerateProject(payload, (err, response) => {
-        if (err) {
-            console.log(err)
-        }
-        console.log("response received : ", response);
-    });
-}
-
 export const getProjectGrpcClient = () => {
     const PROTO_PATH = __dirname + '/project.proto';
     const grpc = require('@grpc/grpc-js');

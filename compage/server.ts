@@ -4,25 +4,20 @@ import path from "path";
 import {config} from "./util/constants";
 import axios from "axios";
 import {btoa} from "buffer";
-import {generateProject, getProjectGrpcClient} from "./grpc/protobufs/project";
+import {getProjectGrpcClient} from "./grpc/protobufs/project";
 
 export class Server {
     private app: Express;
     private userTokens: Map<string, string>;
+    private projectGrpcClient: any;
 
     constructor(app: Express) {
         this.app = app;
         this.userTokens = new Map();
         this.app.use(express.static(path.resolve("./") + "/build/ui"));
+        this.projectGrpcClient = getProjectGrpcClient();
 
         this.app.get("/api", (req: Request, res: Response): void => {
-            const projectGrpcClient = getProjectGrpcClient();
-            generateProject(projectGrpcClient, {
-                "name": "project1",
-                "user": "myuser",
-                "yaml": "{\n    \"edges\": {\n      \"edge-62\": {\n        \"dest\": \"node-dc\",\n        \"id\": \"edge-62\",\n        \"src\": \"node-1d\"\n      },\n      \"edge-40\": {\n        \"dest\": \"node-ee\",\n        \"id\": \"edge-40\",\n        \"src\": \"node-dc\"\n      },\n      \"edge-84\": {\n        \"dest\": \"node-ee\",\n        \"id\": \"edge-84\",\n        \"src\": \"node-a6\"\n      },\n      \"edge-74\": {\n        \"dest\": \"node-1d\",\n        \"id\": \"edge-74\",\n        \"src\": \"node-a6\"\n      }\n    },\n    \"nodes\": {\n      \"node-1d\": {\n        \"id\": \"node-1d\",\n        \"typeId\": \"node-type-circle\",\n        \"consumerData\": {\n          \"nodeType\": \"circle\",\n          \"type\": \"intermediate-1\",\n          \"name\": \"service-b\",\n          \"isServer\": true,\n          \"isClient\": true,\n          \"language\": \"Java\",\n          \"url\": \"\"\n        }\n      },\n      \"node-dc\": {\n        \"id\": \"node-dc\",\n        \"typeId\": \"node-type-rectangle\",\n        \"consumerData\": {\n          \"nodeType\": \"rectangle\",\n          \"type\": \"backend\",\n          \"name\": \"service-d\",\n          \"isServer\": true,\n          \"isClient\": false,\n          \"language\": \"Golang\",\n          \"url\": \"\"\n        }\n      },\n      \"node-ee\": {\n        \"id\": \"node-ee\",\n        \"typeId\": \"node-type-circle\",\n        \"consumerData\": {\n          \"nodeType\": \"circle\",\n          \"type\": \"intermediate-2\",\n          \"name\": \"service-c\",\n          \"isServer\": true,\n          \"isClient\": true,\n          \"language\": \"NodeJs\",\n          \"url\": \"\"\n        }\n      },\n      \"node-a6\": {\n        \"id\": \"node-a6\",\n        \"typeId\": \"node-type-start-top-bottom\",\n        \"consumerData\": {\n          \"type\": \"frontend\",\n          \"name\": \"service-a\",\n          \"isServer\": true,\n          \"isClient\": true,\n          \"language\": \"NodeJs\",\n          \"url\": \"\"\n        }\n      }\n    }\n  }",
-                "repository": "L"
-            })
             res.send("You have reached the API!");
         });
 
@@ -225,6 +220,32 @@ export class Server {
             }).catch((error) => {
                 return res.status(500).json(error);
             });
+        });
+        // generateProject (grpc calls to compage-core)
+        app.post("/generate_project", async (req: Request, res: Response,) => {
+            console.log("reached")
+            const {repoName, yaml, projectName, userName} = req.body;
+            if (this.userTokens.get(userName) === undefined) {
+                // TODO change message and may impl later
+                return res.status(401).json("server restarted and lost the local cache of tokens")
+            }
+            try {
+                const payload = {
+                    "name": projectName,
+                    "user": userName,
+                    "yaml": yaml,
+                    "repository": repoName
+                }
+                this.projectGrpcClient.GenerateProject(payload, (err, response) => {
+                    if (err) {
+                        return res.status(500).json(err);
+                    }
+                    console.log(response)
+                    return res.status(200).json(response.fileChunk);
+                });
+            } catch (err) {
+                return res.status(500).json(err);
+            }
         });
 
         this.app.get("*", (req: Request, res: Response): void => {

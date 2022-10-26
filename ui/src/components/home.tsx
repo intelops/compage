@@ -12,6 +12,7 @@ import {
 import {useAppSelector} from "../hooks/redux-hooks";
 import {DiagramMakerContainer} from "./diagram-maker/diagram-maker-container";
 import Button from "@mui/material/Button";
+import {generateProject} from "../backend/rest-service";
 
 export const Home = () => {
     const authentication = useAppSelector(state => state.authentication);
@@ -34,7 +35,47 @@ export const Home = () => {
     } else {
         diagramMakerData = getData(1050, 550);
     }
-    // return <Todo></Todo>
+
+    const genProject = () => {
+        console.log("generated project")
+        generateProject("mahendraintelops", "samplerepo1", "device-backend", "sss").then(generatedProject => {
+            debugger
+            if (generatedProject) {
+                if (JSON.stringify(generatedProject).toLowerCase().includes("Bad Credentials".toLowerCase())) {
+                    //TODO
+                    // setOperationState({
+                    //     ...operationState,
+                    //     message: " : Received response : " + createdItem,
+                    //     severity: 'error',
+                    //     operation: "createRepo",
+                    //     isOpen: true
+                    // })
+                } else {
+                    //TODO
+                    // setOperationState({
+                    //     ...operationState,
+                    //     message: " : Received response : " + createdItem,
+                    //     severity: 'success',
+                    //     operation: "createRepo",
+                    //     isOpen: true
+                    // })
+                    console.log(generatedProject)
+                }
+            }
+        }).catch(error => {
+            debugger
+            console.log(error)
+            //TODO
+            // setOperationState({
+            //     ...operationState,
+            //     message: " : Received error : " + error,
+            //     severity: 'error',
+            //     operation: "createRepo",
+            //     isOpen: true
+            // })
+        });
+    }
+
     return (
         <React.Fragment>
             <DiagramMakerContainer initialData={diagramMakerData} darkTheme={false}/>
@@ -46,6 +87,9 @@ export const Home = () => {
                 // after resetting, needs to manually reload so, avoiding manual step here.
                 window.location.reload();
             }}>Reset state</Button>
+            <Button variant="outlined" onClick={() => {
+                genProject()
+            }}>Generate Project</Button>
         </React.Fragment>
     );
 }

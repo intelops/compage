@@ -39,6 +39,20 @@ export const createRepo = (userName: string, repoName: string, repoDescription: 
         body: JSON.stringify(requestBody)
     }).then(data => data.json());
 }
+export const generateProject = (userName: string, repoName: string, projectName: string, yaml: string):
+    Promise<Response> => {
+    const requestBody = {
+        repoName: repoName, projectName: projectName, userName: userName, yaml: yaml
+    };
+    // Use code parameter and other parameters to make POST request to proxy_server
+    return fetch(config.proxy_url_generate_project, {
+        method: "POST",
+        headers: {
+            contentType: "application/json"
+        },
+        body: JSON.stringify(requestBody)
+    }).then(data => data.json());
+}
 export const listRepos = (userName: string) => {
     const proxy_url_list_repos = config.proxy_url_list_repos + "?userName=" + userName
     return fetch(proxy_url_list_repos).then(data => data.json())
