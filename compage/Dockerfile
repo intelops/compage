@@ -5,14 +5,18 @@ WORKDIR /app
 
 # Add package.json to WORKDIR and install dependencies
 COPY package*.json ./
-RUN npm install
-RUN npm install -g ts-node
+COPY yarn*.lock ./
 
-# Add source code files to WORKDIR
-COPY . .
+RUN npm install
+RUN npm install pm2 -g
+RUN npm run build
+
+# Copy build files
+COPY ./dist .
+COPY protobufs .
 
 # Application port (optional)
 EXPOSE 5000
 
 # Container start command (DO NOT CHANGE and see note below)
-CMD ["ts-node", "server.ts"]
+CMD ["pm2-runtime","app.js"]

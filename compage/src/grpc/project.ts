@@ -1,7 +1,7 @@
 'use strict';
 
 export const getProjectGrpcClient = () => {
-    const PROTO_PATH = __dirname + '/project.proto';
+    const PROTO_PATH = './protobufs/project.proto';
     const grpc = require('@grpc/grpc-js');
     const protoLoader = require('@grpc/proto-loader');
 
@@ -19,5 +19,5 @@ export const getProjectGrpcClient = () => {
     const ProjectService = grpc.loadPackageDefinition(
         packageDefinition).project.ProjectService;
 
-    return new ProjectService(`compagecoreapp:50051`, grpc.credentials.createInsecure());
+    return new ProjectService(`localhost:50051`, grpc.credentials.createInsecure());
 }

@@ -80,5 +80,5 @@ commands:
 
 # Define dependencies to other projects with a devspace.yaml
 dependencies:
-   compage-core:
-     path: ../compage-core        # Path-based dependencies (for monorepos)
+  compage-core:
+    path: ../compage-core        # Path-based dependencies (for monorepos)
