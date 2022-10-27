@@ -2,8 +2,9 @@ import express, {Application, Request, Response, Router} from 'express';
 import "dotenv/config";
 import bodyParser from 'body-parser';
 import helmet from "helmet";
-import grpcRouter from "./routes/grpc";
+import compageRouter from "./routes/compage";
 import githubRouter from "./routes/github";
+import authRouter from "./routes/auth";
 
 const app: Application = express();
 
@@ -26,8 +27,9 @@ app.get('/', (req: Request, res: Response) => {
 })
 
 const routes = Router();
-routes.use('/grpc', grpcRouter);
+routes.use('/compage', compageRouter);
 routes.use('/github', githubRouter);
+routes.use('/auth', authRouter);
 app.use(routes)
 
 app.get("*", (req, res) => {

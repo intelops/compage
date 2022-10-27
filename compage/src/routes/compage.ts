@@ -1,11 +1,11 @@
 import {getProjectGrpcClient} from "../grpc/project";
 import {Router} from "express";
 
-const grpcRouter = Router();
+const compageRouter = Router();
 
 const projectGrpcClient = getProjectGrpcClient()
 // generateProject (grpc calls to compage-core)
-grpcRouter.post("/generate_project", async (req, res) => {
+compageRouter.post("/generate_project", async (req, res) => {
     const {repoName, yaml, projectName, userName} = req.body;
     try {
         const payload = {
@@ -25,4 +25,4 @@ grpcRouter.post("/generate_project", async (req, res) => {
     }
 });
 
-export default grpcRouter;
+export default compageRouter;
