@@ -48,7 +48,7 @@ export const generateProject = (userName: string, repoName: string, projectName:
     return fetch(config.proxy_url_generate_project, {
         method: "POST",
         headers: {
-            contentType: "application/json"
+            "Content-Type": "application/json"
         },
         body: JSON.stringify(requestBody)
     }).then(data => data.json());
