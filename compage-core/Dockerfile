@@ -29,6 +29,7 @@ COPY --from=build /app/main /
 
 # Application port (optional)
 EXPOSE 8080
+EXPOSE 50051
 
 # Container start command for production
 CMD ["/main"]

@@ -25,8 +25,6 @@ app.get('/', (req: Request, res: Response) => {
     res.send('TS App is Running')
 })
 
-const PORT = process.env.PORT;
-
 const routes = Router();
 routes.use('/grpc', grpcRouter);
 routes.use('/github', githubRouter);
@@ -36,6 +34,6 @@ app.get("*", (req, res) => {
     return res.status(200).json("you have reached default route");
 });
 
-app.listen(PORT, () => {
-    console.log(`server is running on PORT ${PORT}`)
+app.listen(5000, () => {
+    console.log(`server is running on PORT ${5000}`)
 })

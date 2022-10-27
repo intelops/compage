@@ -25,14 +25,4 @@ grpcRouter.post("/generate_project", async (req, res) => {
     }
 });
 
-grpcRouter.get('/api', async (req, res) => {
-    const user = {
-        firstName: "Mahendra",
-        lastName: "Bagul",
-        email: "bagulm123@gmail.com"
-    };
-
-    return res.send({user});
-})
-
 export default grpcRouter;
