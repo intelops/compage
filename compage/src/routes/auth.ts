@@ -2,10 +2,9 @@ import {config} from "../util/constants";
 import axios from "axios";
 import {btoa} from "buffer";
 import {Router} from "express";
+import {getUser, setUser} from "./store";
 
 const authRouter = Router();
-
-const userTokens = new Map();
 
 const getBasicAuthenticationPair = () => {
     return btoa(config.client_id + ":" + config.client_secret);
@@ -33,7 +32,7 @@ authRouter.post("/authenticate", async (req, res) => {
         }).then((response) => {
             //save token to temporary_map
             //TODO if server restarted, the map becomes empty and have to reauthorize the user
-            userTokens.set(response.data.login, access_token)
+            setUser(response.data.login, <string>access_token)
             return res.status(200).json(response.data);
         }).catch((error) => {
             return res.status(400).json(error);
@@ -44,13 +43,13 @@ authRouter.post("/authenticate", async (req, res) => {
 });
 authRouter.get("/logout", async (req, res) => {
     const {userName} = req.query
-    if (userTokens.get(<string>userName) === undefined) {
+    if (getUser(<string>userName) === undefined) {
         // TODO change message and may impl later
         return res.status(401).json("server restarted and lost the local cache of tokens")
     }
     const bearerToken = `${getBasicAuthenticationPair()}`
     console.log("bearerToken : ", bearerToken)
-    const accessToken = userTokens.get(<string>userName)
+    const accessToken = getUser(<string>userName)
     console.log("accessToken : ", accessToken)
     console.log("config.client_id: ", config.client_id)
     axios({
@@ -74,7 +73,7 @@ authRouter.get("/logout", async (req, res) => {
 });
 authRouter.get("/check_token", async (req, res) => {
     const {userName} = req.query;
-    if (userTokens.get(<string>userName) === undefined) {
+    if (getUser(<string>userName) === undefined) {
         // TODO change message and may impl later
         return res.status(401).json("server restarted and lost the local cache of tokens")
     }
@@ -86,7 +85,7 @@ authRouter.get("/check_token", async (req, res) => {
         url: `https://api.github.com/applications/${config.client_id}/token`,
         method: "POST",
         data: {
-            access_token: userTokens.get(<string>userName)
+            access_token: getUser(<string>userName)
         }
     }).then((response) => {
         if (response.status !== 200) {
