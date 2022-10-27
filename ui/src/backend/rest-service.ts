@@ -57,7 +57,7 @@ export const listRepos = (userName: string) => {
     const proxy_url_list_repos = config.proxy_url_list_repos + "?userName=" + userName
     return fetch(proxy_url_list_repos).then(data => data.json())
 }
-const checkToken = (userName: string): Promise<Response> => {
+export const checkToken = (userName: string): Promise<Response> => {
     const proxy_url_check_token = config.proxy_url_check_token + "?userName=" + userName;
     // Use code parameter and other parameters to make POST request to proxy_server
     return fetch(proxy_url_check_token, {
