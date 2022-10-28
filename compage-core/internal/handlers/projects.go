@@ -11,27 +11,15 @@ import (
 	"net/http"
 )
 
-func Deleting(context *gin.Context) {
-	context.JSON(http.StatusOK, gin.H{
-		"message": "deleting",
-	})
-}
-
-func Patching(context *gin.Context) {
-	context.JSON(http.StatusOK, gin.H{
-		"message": "patching",
-	})
-}
-
 func Ping(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"message": "pong",
 	})
 }
 
-func GenerateProject(context *gin.Context) {
+func CreateProject(context *gin.Context) {
 	// Validate input
-	var input core.GenerateProjectInput
+	var input core.ProjectInput
 	if err := context.ShouldBindJSON(&input); err != nil {
 		log.Error(err)
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -57,17 +45,17 @@ func GenerateProject(context *gin.Context) {
 	context.FileAttachment(utils.GetTarFilePath(project.Name), utils.GetTarFilePath(project.Name))
 }
 
-func RegenerateProject(context *gin.Context) {
+func UpdateProject(context *gin.Context) {
 	// Validate input
-	var input core.RegenerateProjectInput
+	var input core.ProjectInput
 	if err := context.ShouldBindJSON(&input); err != nil {
 		log.Error(err)
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	// Start regenerate-project flow
-	fmt.Println("input.User : ", input.User)
+	fmt.Println("input.User : ", input.UserName)
 	context.JSON(http.StatusOK, gin.H{
-		"message": "regenerateProject" + input.User,
+		"message": "UpdateProject" + input.UserName,
 	})
 }

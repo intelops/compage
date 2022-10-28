@@ -1,5 +1,5 @@
 import Api from './Api';
-import {TodoModel} from '../models/redux-models';
+import {CompageModel} from '../models/redux-models';
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {toastr} from 'react-redux-toastr'
 
@@ -10,7 +10,7 @@ export default {
     },
     async getParticularTodo(todo_id: number) {
         const response = await Api().get('todos');
-        const filterElement = response.data.filter((todo: TodoModel) => todo.id === todo_id)[0];
+        const filterElement = response.data.filter((todo: CompageModel) => todo.id === todo_id)[0];
         toastr.info('Response Received', JSON.stringify(filterElement))
         return filterElement;
     }
@@ -21,7 +21,7 @@ type FetchTodosError = {
     message: string;
 };
 
-export const fetchTodos = createAsyncThunk<TodoModel[],
+export const fetchTodos = createAsyncThunk<CompageModel[],
     number,
     { rejectValue: FetchTodosError }>(
     // The first argument is the action name:
@@ -46,7 +46,7 @@ export const fetchTodos = createAsyncThunk<TodoModel[],
             });
         }
         // Get the JSON from the response:
-        const data: TodoModel[] = await response.json();
+        const data: CompageModel[] = await response.json();
 
         console.log(data)
         // Return result:

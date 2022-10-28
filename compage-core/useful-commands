@@ -1,10 +1,10 @@
 // form-data curl commands
-curl -X POST -F 'name=compage' -F 'email=compage@example.com' http://localhost:8080/generate_project
-curl -X PUT -F 'name=compage' -F 'email=compage@example.com' http://localhost:8080/regenerate_project
+curl -X POST -F 'name=compage' -F 'email=compage@example.com' http://localhost:8080/create_project
+curl -X PUT -F 'name=compage' -F 'email=compage@example.com' http://localhost:8080/update_project
 
 // request-body curl commands
-curl -X PUT http://localhost:8080/regenerate_project  -H 'Content-Type: application/json' -d '{"user":"myuser","yaml":"my_yaml"}'
-curl -X POST http://localhost:8080/generate_project  -H 'Content-Type: application/json' -d '{"user":"myuser","yaml":"my_yaml"}'
+curl -X PUT http://localhost:8080/update_project  -H 'Content-Type: application/json' -d '{"user":"myuser","yaml":"my_yaml"}'
+curl -X POST http://localhost:8080/create_project  -H 'Content-Type: application/json' -d '{"user":"myuser","yaml":"my_yaml"}'
 
 // request Body
 {

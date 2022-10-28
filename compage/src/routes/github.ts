@@ -6,10 +6,6 @@ import {getUser} from "./store";
 
 const githubRouter = Router();
 
-const getBasicAuthenticationPair = () => {
-    return btoa(config.client_id + ":" + config.client_secret);
-}
-
 githubRouter.post("/create_repo", async (req, res) => {
     const {repoName, description, userName} = req.body;
     if (getUser(userName) === undefined) {

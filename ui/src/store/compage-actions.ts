@@ -1,10 +1,10 @@
-import todoSlice from './todo-slice'
+import compageSlice from './compage-slice'
 import {AnyAction, ThunkAction} from '@reduxjs/toolkit'
 import {RootState} from './index'
-import {TodoModel} from "../models/redux-models";
-import TodoService from "../service/todoService";
+import {CompageModel} from "../models/redux-models";
+import TodoService from "../service/compage-service";
 
-export const todoActions = todoSlice.actions
+export const compageActions = compageSlice.actions
 
 // export const fetchTodos = (): ThunkAction<void, RootState, unknown, AnyAction> => {
 //     return async (dispatch, getState) => {
@@ -17,7 +17,7 @@ export const todoActions = todoSlice.actions
 // }
 export const fetchParticularTodo = (todo_id: number): ThunkAction<void, RootState, unknown, AnyAction> => {
     return async (dispatch, getState) => {
-        const response: TodoModel = await TodoService.getParticularTodo(todo_id);
-        dispatch(todoActions.setParticularTodo(response))
+        const response: CompageModel = await TodoService.getParticularTodo(todo_id);
+        dispatch(compageActions.setParticularTodo(response))
     }
 }

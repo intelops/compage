@@ -2,7 +2,7 @@ import authenticationSlice from './authentication-slice'
 import {AnyAction, ThunkAction} from '@reduxjs/toolkit'
 import {RootState} from './index'
 import {AuthenticationModel} from "../models/redux-models";
-import AuthenticationService from "../service/authenticationService";
+import AuthenticationService from "../service/authentication-service";
 
 export const authenticationActions = authenticationSlice.actions
 

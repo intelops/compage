@@ -1,5 +1,5 @@
 //TODO externalise the below keys
-import BackendBaseURL from "../service/BackendApi";
+import BackendBaseURL from "../service/backend-api";
 
 export const config = {
     client_id: "5f8b8208ffa000316d2d",

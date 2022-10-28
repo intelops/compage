@@ -4,7 +4,8 @@ option go_package = "./project";
 package project;
 
 service ProjectService {
-  rpc GenerateProject (ProjectRequest) returns (ProjectResponse) {}
+  rpc CreateProject (ProjectRequest) returns (ProjectResponse) {}
+  rpc UpdateProject (ProjectRequest) returns (ProjectResponse) {}
 }
 
 message ProjectRequest {

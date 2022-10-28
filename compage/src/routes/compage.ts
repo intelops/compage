@@ -18,7 +18,7 @@ compageRouter.post("/generate_project", async (req, res) => {
             if (err) {
                 return res.status(500).json(err);
             }
-            return res.status(200).json(response.fileChunk);
+            return res.status(200).json(response.fileChunk.toString());
         });
     } catch (err) {
         return res.status(500).json(err);

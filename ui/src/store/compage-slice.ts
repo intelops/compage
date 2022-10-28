@@ -1,9 +1,9 @@
-import {TodoArrayModel, TodoModel} from "../models/redux-models";
+import {CompageArrayModel, CompageModel} from "../models/redux-models";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {fetchTodos} from "../service/todoService";
+import {fetchTodos} from "../service/compage-service";
 import {RootState} from "./index";
 
-const initialTodoState: TodoArrayModel = {
+const initialCompageState: CompageArrayModel = {
     error: null,
     status: "idle",
     all_todos: [],
@@ -15,14 +15,14 @@ const initialTodoState: TodoArrayModel = {
     }
 }
 
-const todoSlice = createSlice({
-    name: 'todo',
-    initialState: initialTodoState,
+const compageSlice = createSlice({
+    name: 'compage',
+    initialState: initialCompageState,
     reducers: {
-        setTodos(state, action: PayloadAction<TodoModel[]>) {
+        setTodos(state, action: PayloadAction<CompageModel[]>) {
             state.all_todos = action.payload;
         },
-        setParticularTodo(state, action: PayloadAction<TodoModel>) {
+        setParticularTodo(state, action: PayloadAction<CompageModel>) {
             state.particular_todo = action.payload;
         }
     },
@@ -44,7 +44,7 @@ const todoSlice = createSlice({
         // When a server responses with the data,
         // `fetchTodos.fulfilled` is fired:
         builder.addCase(fetchTodos.fulfilled,
-            (state, { payload }) => {
+            (state, {payload}) => {
                 // We add all the new todos into the state
                 // and change `status` back to `idle`:
                 state.all_todos.push(...payload);
@@ -53,7 +53,7 @@ const todoSlice = createSlice({
 
         // When a server responses with an error:
         builder.addCase(fetchTodos.rejected,
-            (state, { payload }) => {
+            (state, {payload}) => {
                 // We show the error message
                 // and change `status` back to `idle` again.
                 if (payload) state.error = payload.message;
@@ -61,6 +61,6 @@ const todoSlice = createSlice({
             });
     },
 })
-export default todoSlice;
+export default compageSlice;
 export const selectStatus = (state: RootState) =>
-    state.todo.status;
+    state.compage.status;

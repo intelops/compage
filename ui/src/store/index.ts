@@ -1,5 +1,5 @@
 import {combineReducers, configureStore} from '@reduxjs/toolkit';
-import todoSlice from './todo-slice'
+import compageSlice from './compage-slice'
 import authenticationSlice from "./authentication-slice";
 import storage from 'redux-persist/lib/storage';
 import {persistReducer, persistStore} from 'redux-persist';
@@ -21,7 +21,7 @@ const authenticationPersistConfig = {
 }
 
 const persistedRootReducer = combineReducers({
-    todo: persistReducer(rootPersistConfig, todoSlice.reducer),
+    compage: persistReducer(rootPersistConfig, compageSlice.reducer),
     authentication: persistReducer(authenticationPersistConfig, authenticationSlice.reducer),
     toastr: toastrReducer
 })

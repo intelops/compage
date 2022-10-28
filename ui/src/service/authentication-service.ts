@@ -1,4 +1,4 @@
-import {AuthBackendApi} from "./BackendApi";
+import {AuthBackendApi} from "./backend-api";
 
 export default {
     async authenticate(code: string) {

@@ -29,12 +29,22 @@ func StartGrpcServer() error {
 	return s.Serve(lis)
 }
 
-// GenerateProject implements project.GenerateProject
-func (s *server) GenerateProject(ctx context.Context, in *project.ProjectRequest) (*project.ProjectResponse, error) {
+// CreateProject implements project.CreateProject
+func (s *server) CreateProject(ctx context.Context, in *project.ProjectRequest) (*project.ProjectResponse, error) {
 	projectGrpc, err := grpc.GetProject(in)
 	if err != nil {
 		return nil, err
 	}
 	fmt.Println(projectGrpc.CompageYaml)
-	return &project.ProjectResponse{FileChunk: []byte("mahendra")}, nil
+	return &project.ProjectResponse{Name: projectGrpc.Name, FileChunk: []byte(projectGrpc.Repository)}, nil
+}
+
+// UpdateProject implements project.UpdateProject
+func (s *server) UpdateProject(ctx context.Context, in *project.ProjectRequest) (*project.ProjectResponse, error) {
+	projectGrpc, err := grpc.GetProject(in)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(projectGrpc.CompageYaml)
+	return &project.ProjectResponse{Name: projectGrpc.Name, FileChunk: []byte(projectGrpc.Repository)}, nil
 }

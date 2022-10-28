@@ -13,19 +13,19 @@ export interface AuthenticationArrayModel {
     user: AuthenticationModel
 }
 
-export interface TodoModel {
+export interface CompageModel {
     "userId": number,
     "id": number,
     "title": string,
     "completed": boolean
 }
 
-export interface TodoArrayModel {
+export interface CompageArrayModel {
     // In `status` we will watch
     // if todos are being loaded.
     status: "loading" | "idle";
     // `error` will contain an error message.
     error: string | null;
-    all_todos: TodoModel[],
-    particular_todo: TodoModel
+    all_todos: CompageModel[],
+    particular_todo: CompageModel
 }
