@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	"github.com/kube-tarian/compage-core/cmd/grpc/project"
+	project "github.com/kube-tarian/compage-core/gen/api/v1"
 	"github.com/kube-tarian/compage-core/internal/converter"
 	"github.com/kube-tarian/compage-core/internal/core"
 )
@@ -12,8 +12,8 @@ func GetProject(input *project.ProjectRequest) (*core.Project, error) {
 		return nil, err
 	}
 	return &core.Project{
-		CompageYaml: compageYaml,
-		Name:        input.Name,
-		Repository:  input.Repository,
+		CompageYaml:    compageYaml,
+		Name:           input.GetProjectName(),
+		RepositoryName: input.RepositoryName,
 	}, nil
 }

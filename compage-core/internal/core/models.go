@@ -10,9 +10,9 @@ type ModificationDetails struct {
 }
 
 type Project struct {
-	Name        string `json:"name"`
-	Repository  string `json:"repository"`
-	CompageYaml *CompageYaml
+	Name           string `json:"name"`
+	RepositoryName string `json:"repositoryName"`
+	CompageYaml    *CompageYaml
 	ModificationDetails
 }
 

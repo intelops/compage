@@ -3,8 +3,10 @@ package grpc
 import (
 	"bytes"
 	_ "embed"
-	"github.com/kube-tarian/compage-core/cmd/grpc/file"
+	"fmt"
 	project "github.com/kube-tarian/compage-core/gen/api/v1"
+	"github.com/kube-tarian/compage-core/internal/converter/grpc"
+	"github.com/kube-tarian/compage-core/internal/file"
 	"io"
 
 	"google.golang.org/grpc/codes"
@@ -24,12 +26,41 @@ func New() project.ProjectServiceServer {
 	return server{}
 }
 
-func (s server) CreateProject(req *project.ProjectRequest, server project.ProjectService_CreateProjectServer) error {
-	if req.GetName() == "" {
-		return status.Error(codes.InvalidArgument, "Name is required")
+// CreateProject implements api.v1.CreateProject
+func (s server) CreateProject(projectRequest *project.ProjectRequest, server project.ProjectService_CreateProjectServer) error {
+	projectGrpc, err := grpc.GetProject(projectRequest)
+	if err != nil {
+		return err
 	}
+	fmt.Println(projectGrpc.CompageYaml)
+	// createProject
+	// create tar file
 
-	f, ok := getFile(req.Name)
+	return sendFile(projectRequest, server)
+}
+
+// UpdateProject implements api.v1.UpdateProject
+func (s server) UpdateProject(projectRequest *project.ProjectRequest, server project.ProjectService_UpdateProjectServer) error {
+	projectGrpc, err := grpc.GetProject(projectRequest)
+	if err != nil {
+		return err
+	}
+	fmt.Println(projectGrpc.CompageYaml)
+	// createProject
+	// create tar file
+
+	return sendFile(projectRequest, server)
+}
+
+func getFile(fileName string) (*file.File, bool) {
+	if fileName != "gopher" {
+		return nil, false
+	}
+	return file.NewFile("gopher", "png", len(gopher), bytes.NewReader(gopher)), true
+}
+
+func sendFile(projectRequest *project.ProjectRequest, server project.ProjectService_CreateProjectServer) error {
+	f, ok := getFile(projectRequest.ProjectName)
 	if !ok {
 		return status.Error(codes.NotFound, "file is not found")
 	}
@@ -37,10 +68,8 @@ func (s server) CreateProject(req *project.ProjectRequest, server project.Projec
 	if err != nil {
 		return status.Error(codes.Internal, "error during sending header")
 	}
-
 	fileChunk := &project.ProjectResponse{FileChunk: make([]byte, chunkSize)}
 	var n int
-
 Loop:
 	for {
 		n, err = f.Read(fileChunk.FileChunk)
@@ -59,21 +88,3 @@ Loop:
 	}
 	return nil
 }
-
-func getFile(fileName string) (*file.File, bool) {
-	if fileName != "gopher" {
-		return nil, false
-	}
-	return file.NewFile("gopher", "png", len(gopher), bytes.NewReader(gopher)), true
-}
-
-//// UpdateProject implements project.UpdateProject
-//func (s server) UpdateProject(ctx context.Context, in *project.ProjectRequest) (*project.ProjectResponse, error) {
-//	projectGrpc, err := compageGrpc.GetProject(in)
-//	if err != nil {
-//		return nil, err
-//	}
-//	fmt.Println(projectGrpc.CompageYaml)
-//
-//	return &project.ProjectResponse{FileChunk: []byte(projectGrpc.Repository)}, nil
-//}
