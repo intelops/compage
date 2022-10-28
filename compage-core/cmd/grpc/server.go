@@ -1,50 +1,79 @@
 package grpc
 
 import (
-	"context"
-	"fmt"
-	"github.com/kube-tarian/compage-core/cmd/grpc/project"
-	"github.com/kube-tarian/compage-core/internal/converter/grpc"
-	log "github.com/sirupsen/logrus"
-	goGrpc "google.golang.org/grpc"
-	"net"
-	"os"
+	"bytes"
+	_ "embed"
+	"github.com/kube-tarian/compage-core/cmd/grpc/file"
+	project "github.com/kube-tarian/compage-core/gen/api/v1"
+	"io"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
+
+//go:embed static/gopher.png
+var gopher []byte
+
+var chunkSize = 1024 * 3
 
 type server struct {
 	project.UnimplementedProjectServiceServer
 }
 
-func StartGrpcServer() error {
-	port := os.Getenv("SERVER_PORT")
-	if port == "" {
-		port = "50051"
-	}
-	lis, err := net.Listen("tcp", "0.0.0.0:"+port)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	s := goGrpc.NewServer()
-	project.RegisterProjectServiceServer(s, &server{})
-	return s.Serve(lis)
+func New() project.ProjectServiceServer {
+	return server{}
 }
 
-// CreateProject implements project.CreateProject
-func (s *server) CreateProject(ctx context.Context, in *project.ProjectRequest) (*project.ProjectResponse, error) {
-	projectGrpc, err := grpc.GetProject(in)
-	if err != nil {
-		return nil, err
+func (s server) CreateProject(req *project.ProjectRequest, server project.ProjectService_CreateProjectServer) error {
+	if req.GetName() == "" {
+		return status.Error(codes.InvalidArgument, "Name is required")
 	}
-	fmt.Println(projectGrpc.CompageYaml)
-	return &project.ProjectResponse{Name: projectGrpc.Name, FileChunk: []byte(projectGrpc.Repository)}, nil
+
+	f, ok := getFile(req.Name)
+	if !ok {
+		return status.Error(codes.NotFound, "file is not found")
+	}
+	err := server.SendHeader(f.Metadata())
+	if err != nil {
+		return status.Error(codes.Internal, "error during sending header")
+	}
+
+	fileChunk := &project.ProjectResponse{FileChunk: make([]byte, chunkSize)}
+	var n int
+
+Loop:
+	for {
+		n, err = f.Read(fileChunk.FileChunk)
+		switch err {
+		case nil:
+		case io.EOF:
+			break Loop
+		default:
+			return status.Errorf(codes.Internal, "io.ReadAll: %v", err)
+		}
+		fileChunk.FileChunk = fileChunk.FileChunk[:n]
+		serverErr := server.Send(fileChunk)
+		if serverErr != nil {
+			return status.Errorf(codes.Internal, "server.Send: %v", serverErr)
+		}
+	}
+	return nil
 }
 
-// UpdateProject implements project.UpdateProject
-func (s *server) UpdateProject(ctx context.Context, in *project.ProjectRequest) (*project.ProjectResponse, error) {
-	projectGrpc, err := grpc.GetProject(in)
-	if err != nil {
-		return nil, err
+func getFile(fileName string) (*file.File, bool) {
+	if fileName != "gopher" {
+		return nil, false
 	}
-	fmt.Println(projectGrpc.CompageYaml)
-	return &project.ProjectResponse{Name: projectGrpc.Name, FileChunk: []byte(projectGrpc.Repository)}, nil
+	return file.NewFile("gopher", "png", len(gopher), bytes.NewReader(gopher)), true
 }
+
+//// UpdateProject implements project.UpdateProject
+//func (s server) UpdateProject(ctx context.Context, in *project.ProjectRequest) (*project.ProjectResponse, error) {
+//	projectGrpc, err := compageGrpc.GetProject(in)
+//	if err != nil {
+//		return nil, err
+//	}
+//	fmt.Println(projectGrpc.CompageYaml)
+//
+//	return &project.ProjectResponse{FileChunk: []byte(projectGrpc.Repository)}, nil
+//}

@@ -2,9 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/kube-tarian/compage-core/cmd/grpc"
+	server "github.com/kube-tarian/compage-core/cmd/grpc"
+	project "github.com/kube-tarian/compage-core/gen/api/v1"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
+	"net"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -14,9 +20,32 @@ func main() {
 	//}
 
 	fmt.Println("starting gRPC server...")
-	if err := grpc.StartGrpcServer(); err != nil {
+	startGrpcServer()
+}
+
+func startGrpcServer() {
+	listener, err := net.Listen("tcp", "0.0.0.0:8809")
+	if err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+	var opts []grpc.ServerOption
+
+	grpcServer := grpc.NewServer(opts...)
+	impl := server.New()
+	project.RegisterProjectServiceServer(grpcServer, impl)
+	reflection.Register(grpcServer)
+
+	go func() {
+		if err := grpcServer.Serve(listener); err != nil {
+			log.Printf("grpcServer.Serve: %v", err)
+		}
+	}()
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	<-done
+	grpcServer.GracefulStop()
+	log.Printf("Server stopped")
 }
 
 func init() {
