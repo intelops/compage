@@ -9,7 +9,7 @@ export const config = {
     proxy_url_logout: BackendBaseURL + "/auth/logout",
 
     // compageRoutes
-    proxy_url_generate_project: BackendBaseURL + "/compage/generate_project",
+    proxy_url_create_project: BackendBaseURL + "/compage/create_project",
 
     // githubRoutes
     proxy_url_create_repo: BackendBaseURL + "/github/create_repo",

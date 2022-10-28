@@ -5,7 +5,7 @@ const compageRouter = Router();
 
 const projectGrpcClient = getProjectGrpcClient()
 // generateProject (grpc calls to compage-core)
-compageRouter.post("/generate_project", async (req, res) => {
+compageRouter.post("/create_project", async (req, res) => {
     const {repoName, yaml, projectName, userName} = req.body;
     try {
         const payload = {
@@ -14,11 +14,11 @@ compageRouter.post("/generate_project", async (req, res) => {
             "yaml": yaml,
             "repository": repoName
         }
-        projectGrpcClient.GenerateProject(payload, (err: any, response: { fileChunk: any; }) => {
+        projectGrpcClient.GenerateProject(payload, (err: any, response: { name: string, fileChunk: any; }) => {
             if (err) {
                 return res.status(500).json(err);
             }
-            return res.status(200).json(response.fileChunk.toString());
+            return res.status(200).json({name: response.name, fileChunk: response.fileChunk.toString()});
         });
     } catch (err) {
         return res.status(500).json(err);

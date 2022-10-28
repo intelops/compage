@@ -1,3 +1,4 @@
+// Auth
 export interface AuthenticationModel {
     login?: string,
     email?: string,
@@ -13,19 +14,26 @@ export interface AuthenticationArrayModel {
     user: AuthenticationModel
 }
 
-export interface CompageModel {
-    "userId": number,
-    "id": number,
-    "title": string,
-    "completed": boolean
+// compage
+export interface GenerateProjectRequest {
+    userName: string,
+    repoName: string,
+    projectName: string,
+    yaml: string
 }
 
-export interface CompageArrayModel {
+export interface GeneratedProjectModel {
+    "name": string,
+    "fileChunk": any
+}
+
+export interface GeneratedProjectArrayModel {
     // In `status` we will watch
     // if todos are being loaded.
     status: "loading" | "idle";
     // `error` will contain an error message.
     error: string | null;
-    all_todos: CompageModel[],
-    particular_todo: CompageModel
+    generatedProject: GeneratedProjectModel
 }
+
+// github

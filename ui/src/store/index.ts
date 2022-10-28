@@ -1,4 +1,4 @@
-import {combineReducers, configureStore} from '@reduxjs/toolkit';
+import {combineReducers, configureStore, ThunkAction} from '@reduxjs/toolkit';
 import compageSlice from './compage-slice'
 import authenticationSlice from "./authentication-slice";
 import storage from 'redux-persist/lib/storage';
@@ -8,6 +8,7 @@ import {persistReducer, persistStore} from 'redux-persist';
 import storageSession from 'reduxjs-toolkit-persist/lib/storage/session'
 import {FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE} from "reduxjs-toolkit-persist";
 import {reducer as toastrReducer} from 'react-redux-toastr'
+import {Action} from "redux";
 
 const rootPersistConfig = {
     key: 'root',
@@ -43,3 +44,7 @@ export const store = configureStore(
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
 export const persistor = persistStore(store);
+export type AppThunk<ReturnType = void> = ThunkAction<ReturnType,
+    RootState,
+    unknown,
+    Action<string>>;

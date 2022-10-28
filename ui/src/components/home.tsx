@@ -13,6 +13,7 @@ import {useAppSelector} from "../hooks/redux-hooks";
 import {DiagramMakerContainer} from "./diagram-maker/diagram-maker-container";
 import Button from "@mui/material/Button";
 import {generateProject} from "../backend/rest-service";
+import GenerateProject from "./generate-project";
 
 export const Home = () => {
     const authentication = useAppSelector(state => state.authentication);
@@ -90,9 +91,10 @@ export const Home = () => {
                 // after resetting, needs to manually reload so, avoiding manual step here.
                 window.location.reload();
             }}>Reset state</Button>
-            <Button variant="outlined" onClick={() => {
-                genProject()
-            }}>Generate Project</Button>
+            {/*<Button variant="outlined" onClick={() => {*/}
+            {/*    genProject()*/}
+            {/*}}>Generate Project</Button>*/}
+            <GenerateProject></GenerateProject>
         </React.Fragment>
     );
 }

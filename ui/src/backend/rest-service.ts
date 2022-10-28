@@ -45,7 +45,7 @@ export const generateProject = (userName: string, repoName: string, projectName:
         repoName: repoName, projectName: projectName, userName: userName, yaml: yaml
     };
     // Use code parameter and other parameters to make POST request to proxy_server
-    return fetch(config.proxy_url_generate_project, {
+    return fetch(config.proxy_url_create_project, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

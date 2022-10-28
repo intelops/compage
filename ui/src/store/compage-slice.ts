@@ -1,17 +1,14 @@
-import {CompageArrayModel, CompageModel} from "../models/redux-models";
+import {GeneratedProjectArrayModel, GeneratedProjectModel} from "../models/redux-models";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {fetchTodos} from "../service/compage-service";
+import {generateProject} from "../service/compage-service";
 import {RootState} from "./index";
 
-const initialCompageState: CompageArrayModel = {
+const initialCompageState: GeneratedProjectArrayModel = {
     error: null,
     status: "idle",
-    all_todos: [],
-    particular_todo: {
-        "userId": 0,
-        "id": 0,
-        "title": "",
-        "completed": false
+    generatedProject: {
+        "name": "",
+        "fileChunk": undefined
     }
 }
 
@@ -19,21 +16,18 @@ const compageSlice = createSlice({
     name: 'compage',
     initialState: initialCompageState,
     reducers: {
-        setTodos(state, action: PayloadAction<CompageModel[]>) {
-            state.all_todos = action.payload;
-        },
-        setParticularTodo(state, action: PayloadAction<CompageModel>) {
-            state.particular_todo = action.payload;
+        setGeneratedProject(state, action: PayloadAction<GeneratedProjectModel>) {
+            console.log("action.payload : " + action.payload)
+            state.generatedProject = action.payload;
         }
     },
 
     // In `extraReducers` we declare
     // all the actions:
     extraReducers: (builder) => {
-
         // When we send a request,
-        // `fetchTodos.pending` is being fired:
-        builder.addCase(fetchTodos.pending, (state) => {
+        // `generateProject.pending` is being fired:
+        builder.addCase(generateProject.pending, (state) => {
             // At that moment,
             // we change status to `loading`
             // and clear all the previous errors:
@@ -42,17 +36,18 @@ const compageSlice = createSlice({
         });
 
         // When a server responses with the data,
-        // `fetchTodos.fulfilled` is fired:
-        builder.addCase(fetchTodos.fulfilled,
+        // `generateProject.fulfilled` is fired:
+        builder.addCase(generateProject.fulfilled,
             (state, {payload}) => {
                 // We add all the new todos into the state
                 // and change `status` back to `idle`:
-                state.all_todos.push(...payload);
+                // TODO may be problematic
+                state.generatedProject = payload[0];
                 state.status = "idle";
             });
 
         // When a server responses with an error:
-        builder.addCase(fetchTodos.rejected,
+        builder.addCase(generateProject.rejected,
             (state, {payload}) => {
                 // We show the error message
                 // and change `status` back to `idle` again.
