@@ -11,8 +11,8 @@ func GetProject(input core.ProjectInput) (*core.Project, error) {
 		return nil, err
 	}
 	return &core.Project{
-		CompageYaml: compageYaml,
-		Name:        input.ProjectName,
-		Repository:  input.RepositoryName,
+		CompageYaml:    compageYaml,
+		Name:           input.ProjectName,
+		RepositoryName: input.RepositoryName,
 	}, nil
 }

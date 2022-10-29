@@ -1,4 +1,4 @@
 package utils
 
-const DownloadPath = "/tmp/"
+const DownloadPath = "/tmp"
 const FileExtension = ".tar.gz"

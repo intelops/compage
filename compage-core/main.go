@@ -24,7 +24,7 @@ func main() {
 }
 
 func startGrpcServer() {
-	listener, err := net.Listen("tcp", "0.0.0.0:8809")
+	listener, err := net.Listen("tcp", "0.0.0.0:50051")
 	if err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

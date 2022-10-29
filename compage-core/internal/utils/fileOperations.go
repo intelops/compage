@@ -2,99 +2,142 @@ package utils
 
 import (
 	"archive/tar"
+	"bytes"
 	"compress/gzip"
+	"github.com/kube-tarian/compage-core/internal/utils/file"
+	log "github.com/sirupsen/logrus"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
-func GetTarFileName(name string) string {
+func GetProjectTarFileName(name string) string {
 	return strings.ToLower(name) + FileExtension
 }
 
-func GetTarFilePath(name string) string {
-	return GetDirName(name) + "/" + GetTarFileName(name)
+func GetProjectTarFilePath(name string) string {
+	return GetProjectDirectoryName(name) + "/" + GetProjectTarFileName(name)
 }
 
-func GetDirName(name string) string {
-	return DownloadPath + strings.ToLower(name)
+func GetProjectDirectoryName(name string) string {
+	return DownloadPath + "/" + strings.ToLower(name)
 }
 
-func CreateArchive(files []string, buf io.Writer) error {
-	// Create new Writers for gzip and tar
-	// These writers are chained. Writing to the tar writer will
-	// write to the gzip writer which in turn will write to
-	// the "buf" writer
-	gw := gzip.NewWriter(buf)
-	defer func(gw *gzip.Writer) {
-		_ = gw.Close()
-	}(gw)
-	tw := tar.NewWriter(gw)
-	defer func(tw *tar.Writer) {
-		_ = tw.Close()
-	}(tw)
-
-	// Iterate over files and add them to the tar archive
-	for _, file := range files {
-		if err := addToArchive(tw, file); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func addToArchive(tw *tar.Writer, filename string) error {
-	// Open the file which will be written into the archive
-	file, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	defer func(file *os.File) {
-		_ = file.Close()
-	}(file)
-
-	// Get FileInfo about our file providing file size, mode, etc.
-	info, err := file.Stat()
-	if err != nil {
-		return err
-	}
-
-	// Create a tar Header from the FileInfo data
-	header, err := tar.FileInfoHeader(info, info.Name())
-	if err != nil {
-		return err
-	}
-
-	// Use full path as name (FileInfoHeader only takes the basename)
-	// If we don't do this the directory strucuture would
-	// not be preserved
-	// https://golang.org/src/archive/tar/common.go?#L626
-	header.Name = filename
-
-	// Write file header to the tar archive
-	err = tw.WriteHeader(header)
-	if err != nil {
-		return err
-	}
-
-	// Copy file content to tar archive
-	_, err = io.Copy(tw, file)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func CreateDirectory(name string) (string, error) {
-	dirName := GetDirName(name)
+func CreateProjectDirectory(name string) (string, error) {
+	dirName := GetProjectDirectoryName(name)
 	if err := os.MkdirAll(dirName, os.ModePerm); err != nil {
 		return "", err
 	}
 	return dirName, nil
 }
 
-func CreateTarFile(name string) {
+func CreateTarFile(projectName, projectDirectory string) error {
+	projectFiles := listProjectFiles(projectDirectory)
+	projectTarFileName := GetProjectTarFilePath(projectName)
+	outFile, err := os.Create(projectTarFileName)
+	if err != nil {
+		_ = os.Remove(projectTarFileName)
+		log.Error("error creating archive file")
+		return err
+	}
+	defer func(outFile *os.File) {
+		_ = outFile.Close()
+	}(outFile)
+	err = createTarAndGz(projectFiles, outFile)
+	if err != nil {
+		_ = os.Remove(projectTarFileName)
+		log.Error("error creating an archive file." + err.Error())
+		return err
+	}
+	log.Debug("archiving and file compression completed.")
+	return nil
+}
 
+func createTarAndGz(projectFiles []string, buffer io.Writer) error {
+	gzipWriter := gzip.NewWriter(buffer)
+	defer func(gzipWriter *gzip.Writer) {
+		_ = gzipWriter.Close()
+	}(gzipWriter)
+	tarWriter := tar.NewWriter(gzipWriter)
+	defer func(tarWriter *tar.Writer) {
+		_ = tarWriter.Close()
+	}(tarWriter)
+	for _, f := range projectFiles {
+		err := addToTar(tarWriter, f)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+	}
+	return nil
+}
+
+func addToTar(tarWriter *tar.Writer, filename string) error {
+	f, err := os.Open(filename)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	defer func(file *os.File) {
+		_ = file.Close()
+	}(f)
+	info, err := f.Stat()
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	header, err := tar.FileInfoHeader(info, info.Name())
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	header.Name = filename
+	err = tarWriter.WriteHeader(header)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	_, err = io.Copy(tarWriter, f)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	return nil
+}
+
+func listProjectFiles(projectDirectoryPath string) []string {
+	var files []string
+	err := filepath.Walk(projectDirectoryPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+		if !ignorablePaths(path) && !info.IsDir() {
+			//TODO Needs to fix problem with below impl as it searches in current dir
+			//files = append(files, strings.Replace(path, projectDirectoryPath, "", -1))
+			files = append(files, path)
+		}
+		return nil
+	})
+	if err != nil {
+		log.Error(err)
+	}
+	return files
+}
+
+func ignorablePaths(path string) bool {
+	return strings.Contains(path, ".git") || strings.Contains(path, ".idea")
+}
+
+func GetFile(tarFilePath string) (*file.File, bool) {
+	if tarFilePath == "" {
+		return nil, false
+	}
+	data, err := os.ReadFile(tarFilePath)
+	if err != nil {
+		return nil, false
+	}
+	return file.NewFile(tarFilePath, "tar.gz", len(data), bytes.NewReader(data)), true
 }

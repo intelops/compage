@@ -42,7 +42,7 @@ func CreateProject(context *gin.Context) {
 	//context.JSON(http.StatusOK, gin.H{
 	//	"message": "generateProject" + input.User,
 	//})
-	context.FileAttachment(utils.GetTarFilePath(project.Name), utils.GetTarFilePath(project.Name))
+	context.FileAttachment(utils.GetProjectTarFilePath(project.Name), utils.GetProjectTarFilePath(project.Name))
 }
 
 func UpdateProject(context *gin.Context) {
