@@ -2,13 +2,9 @@ import {getProjectGrpcClient} from "../grpc/project";
 import {Router} from "express";
 import * as fs from "fs";
 import * as os from "os";
-import {
-    cloneExistingProjectFromGithub,
-    CloneExistingProjectFromGithubRequest,
-    pushToExistingProjectOnGithub,
-    PushToExistingProjectOnGithubRequest
-} from "../util/simple-git-operations";
+import {pushToExistingProjectOnGithub, PushToExistingProjectOnGithubRequest} from "../util/simple-git/existing-project";
 import {getUser} from "./store";
+import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
 
 const rimraf = require("rimraf");
 const tar = require('tar')
