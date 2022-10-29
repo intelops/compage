@@ -23,11 +23,15 @@ func runTemplates(project *core.Project, projectDirectory string) error {
 		log.Error(err)
 		return err
 	}
-	_, _ = file.Write([]byte("mahendra intelops"))
-	log.Debug("File created successfully")
 	defer func(file *os.File) {
 		_ = file.Close()
 	}(file)
+
+	n, err := file.Write([]byte("mahendra intelops"))
+	if err != nil {
+		return err
+	}
+	log.Debug("file created successfully and written with %v bytes", n)
 
 	return utils.CreateTarFile(project.Name, projectDirectory)
 }

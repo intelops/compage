@@ -3,7 +3,10 @@ package grpc
 import (
 	_ "embed"
 	project "github.com/kube-tarian/compage-core/gen/api/v1"
+	"github.com/kube-tarian/compage-core/internal/converter/grpc"
+	"github.com/kube-tarian/compage-core/internal/service"
 	"github.com/kube-tarian/compage-core/internal/utils"
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"io"
@@ -22,19 +25,28 @@ func New() project.ProjectServiceServer {
 
 // CreateProject implements api.v1.CreateProject
 func (s server) CreateProject(projectRequest *project.ProjectRequest, server project.ProjectService_CreateProjectServer) error {
-	//projectGrpc, err := grpc.GetProject(projectRequest)
-	//if err != nil {
-	//	return err
-	//}
-	//fmt.Println(projectGrpc.CompageYaml)
-	// createProject
-	err := utils.CreateTarFile(projectRequest.ProjectName, utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
+	// convert to core project
+	projectGrpc, err := grpc.GetProject(projectRequest)
+	if err != nil {
+		return err
+	}
+
+	// trigger project generation
+	if err := service.Generator(projectGrpc); err != nil {
+		log.Error(err)
+		return err
+	}
+
+	// CreateTarFile creates tar file for the project geneated
+	err = utils.CreateTarFile(projectGrpc.Name, utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
 	if err != nil {
 		return err
 	}
 	defer func(name string) {
 		_ = os.Remove(name)
 	}(utils.GetProjectTarFileName(projectRequest.GetProjectName()))
+
+	// stream file to grpc client
 	return sendFile(projectRequest, server)
 }
 
