@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"io"
+	"os"
 )
 
 var chunkSize = 1024 * 3
@@ -31,6 +32,9 @@ func (s server) CreateProject(projectRequest *project.ProjectRequest, server pro
 	if err != nil {
 		return err
 	}
+	defer func(name string) {
+		_ = os.Remove(name)
+	}(utils.GetProjectTarFileName(projectRequest.GetProjectName()))
 	return sendFile(projectRequest, server)
 }
 

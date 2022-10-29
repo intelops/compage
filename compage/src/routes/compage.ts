@@ -1,6 +1,8 @@
 import {getProjectGrpcClient} from "../grpc/project";
 import {Router} from "express";
+import * as fs from "fs";
 
+const tar = require('tar')
 const compageRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
 
@@ -14,20 +16,78 @@ compageRouter.post("/create_project", async (req, res) => {
             "yaml": yaml,
             "repositoryName": repoName
         }
-        projectGrpcClient.CreateProject(payload, (err: any, response: { fileChunk: any; }) => {
-            if (err) {
-                console.log(err)
-                return res.status(500).json(err);
+        const projectDir = `/tmp/${projectName}_downloaded`
+        try {
+            fs.mkdirSync(projectDir, {recursive: true});
+        } catch (err: any) {
+            if (err.code !== 'EEXIST') {
+                return res.status(500).json({
+                    repositoryName: repoName,
+                    userName: userName,
+                    projectName: projectName,
+                    message: "",
+                    error: `unable to create project : ${projectName} directory with error : ${err}`
+                });
             }
-            const fileChunk = response.fileChunk;
-            console.log(fileChunk)
-            return res.status(200).json({fileChunk: fileChunk.toString()});
+        }
+        const projectTarFilePath = `${projectDir}/${projectName}_downloaded.tar.gz`;
+        let call = projectGrpcClient.CreateProject(payload);
+        call.on('data', async (response: { fileChunk: any }) => {
+            if (response.fileChunk) {
+                fs.appendFileSync(projectTarFilePath, response.fileChunk);
+                console.debug(`Writing tar file chunk to: ${projectTarFilePath}`);
+            }
+        });
+        call.on('end', () => {
+            const files = fs.readdirSync(projectDir);
+            files.forEach(file => {
+                console.log("file : ", file);
+            });
+
+            // extract tar file
+            fs.createReadStream(projectTarFilePath).pipe(
+                tar.extract({
+                    strip: 1,
+                    C: projectDir
+                })
+            )
+
+            // save to github
+
+            // remove directory created
+            // delete directory recursively
+            try {
+                fs.rmSync(`${projectDir}`, {recursive: true})
+                return res.status(200).json({
+                    repositoryName: repoName,
+                    userName: userName,
+                    projectName: projectName,
+                    message: `created project: ${projectName} and saved in repository : ${repoName} successfully`,
+                    error: ""
+                });
+            } catch (err) {
+                console.error(err);
+                return res.status(500).json({
+                    repositoryName: repoName,
+                    userName: userName,
+                    projectName: projectName,
+                    message: "",
+                    error: `unable to clean project : ${projectName} directory`
+                });
+            }
         });
     } catch (err) {
-        console.log(err)
-        return res.status(500).json(err);
+        console.error(err)
+        return res.status(500).json({
+            repositoryName: repoName,
+            userName: userName,
+            projectName: projectName,
+            message: "",
+            error: `unable to create project : ${projectName}`
+        });
     }
 });
+
 // updateProject (grpc calls to compage-core)
 compageRouter.post("/update_project", async (req, res) => {
     const {repoName, yaml, projectName, userName} = req.body;
