@@ -6,7 +6,7 @@ import {getUser} from "./store";
 
 const githubRouter = Router();
 
-githubRouter.post("/create_repo", async (req, res) => {
+githubRouter.post("/create_repository", async (req, res) => {
     const {repoName, description, userName} = req.body;
     if (getUser(userName) === undefined) {
         // TODO change message and may impl later
@@ -31,7 +31,8 @@ githubRouter.post("/create_repo", async (req, res) => {
         return res.status(500).json(error);
     });
 });
-githubRouter.get("/list_repos", async (req, res) => {
+
+githubRouter.get("/list_repositories", async (req, res) => {
     const {userName} = req.query;
     if (getUser(<string>userName) === undefined) {
         // TODO change message and may impl later
@@ -53,7 +54,8 @@ githubRouter.get("/list_repos", async (req, res) => {
         return res.status(500).json(error);
     });
 });
-githubRouter.put("/commit_changes", async (req, res) => {
+
+githubRouter.put("/commit_compage_yaml", async (req, res) => {
     const {message, committer, content, repoName, sha} = req.body;
     if (getUser(committer.userName) === undefined) {
         // TODO change message and may impl later
@@ -84,7 +86,8 @@ githubRouter.put("/commit_changes", async (req, res) => {
         return res.status(400).json(error);
     });
 });
-githubRouter.get("/pull_changes", async (req, res) => {
+
+githubRouter.get("/pull_compage_yaml", async (req, res) => {
     const {userName, repoName} = req.query;
     if (getUser(<string>userName) === undefined) {
         // TODO change message and may impl later

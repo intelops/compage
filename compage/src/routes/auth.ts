@@ -41,6 +41,7 @@ authRouter.post("/authenticate", async (req, res) => {
         return res.status(500).json(error);
     });
 });
+
 authRouter.get("/logout", async (req, res) => {
     const {userName} = req.query
     if (getUser(<string>userName) === undefined) {
@@ -71,6 +72,7 @@ authRouter.get("/logout", async (req, res) => {
         return res.status(500).json(error);
     });
 });
+
 authRouter.get("/check_token", async (req, res) => {
     const {userName} = req.query;
     if (getUser(<string>userName) === undefined) {
