@@ -1,7 +1,9 @@
 import {getProjectGrpcClient} from "../grpc/project";
 import {Router} from "express";
 import * as fs from "fs";
+import * as os from "os";
 
+const rimraf = require("rimraf");
 const tar = require('tar')
 const compageRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
@@ -16,7 +18,7 @@ compageRouter.post("/create_project", async (req, res) => {
             "yaml": yaml,
             "repositoryName": repoName
         }
-        const projectDir = `/tmp/${projectName}_downloaded`
+        const projectDir = `${os.tmpdir()}/${projectName}_downloaded`
         try {
             fs.mkdirSync(projectDir, {recursive: true});
         } catch (err: any) {
@@ -39,10 +41,11 @@ compageRouter.post("/create_project", async (req, res) => {
             }
         });
         call.on('end', () => {
-            const files = fs.readdirSync(projectDir);
-            files.forEach(file => {
-                console.log("file : ", file);
-            });
+            // TODO need to be removed later. Its currently required for debugging.
+            // const files = fs.readdirSync(projectDir);
+            // files.forEach(file => {
+            //     console.log("file : ", file);
+            // });
 
             // extract tar file
             fs.createReadStream(projectTarFilePath).pipe(
@@ -53,28 +56,20 @@ compageRouter.post("/create_project", async (req, res) => {
             )
 
             // save to github
+            console.log(`saved ${projectDir} to gihub`)
 
-            // remove directory created
-            // delete directory recursively
-            try {
-                fs.rmSync(`${projectDir}`, {recursive: true})
-                return res.status(200).json({
-                    repositoryName: repoName,
-                    userName: userName,
-                    projectName: projectName,
-                    message: `created project: ${projectName} and saved in repository : ${repoName} successfully`,
-                    error: ""
-                });
-            } catch (err) {
-                console.error(err);
-                return res.status(500).json({
-                    repositoryName: repoName,
-                    userName: userName,
-                    projectName: projectName,
-                    message: "",
-                    error: `unable to clean project : ${projectName} directory`
-                });
-            }
+            // remove directory created, delete directory recursively
+            rimraf(projectDir, () => {
+                console.debug(`${projectDir} is cleaned up`);
+            });
+
+            return res.status(200).json({
+                repositoryName: repoName,
+                userName: userName,
+                projectName: projectName,
+                message: `created project: ${projectName} and saved in repository : ${repoName} successfully`,
+                error: ""
+            });
         });
     } catch (err) {
         console.error(err)
