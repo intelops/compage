@@ -1,10 +1,10 @@
-export interface GithubRepo {
+export interface GithubRepository {
     name: string,
     private: boolean,
     full_name: string
 }
 
-export interface GithubRepoContent {
+export interface GithubRepositoryContent {
     name: string,
     path: boolean,
     sha: string,

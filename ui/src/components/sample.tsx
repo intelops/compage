@@ -3,9 +3,9 @@ import {Navigate} from "react-router-dom";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import {Alert, Snackbar, Stack} from "@mui/material";
-import {setCurrentRepoDetails} from "../utils/service";
-import {commitChanges, createRepo, listRepos, pullChanges} from "../backend/rest-service";
-import {GithubRepo, GithubRepoContent} from "../backend/models";
+import {setCurrentRepositoryDetails} from "../utils/service";
+import {commitCompageYaml, createRepository, listRepositories, pullCompageYaml} from "../backend/rest-service";
+import {GithubRepository, GithubRepositoryContent} from "../backend/models";
 import {useAppSelector} from "../hooks/redux-hooks";
 
 export const Sample = () => {
@@ -25,21 +25,21 @@ export const Sample = () => {
         setOperationState({...operationState, isOpen: false, message: "", severity: "", operation: ""})
     }
 
-    const isRepoNameExists = (newRepoName: string, githubRepos: GithubRepo[]) => {
-        for (const githubRepo of githubRepos) {
-            if (newRepoName === githubRepo.name) {
+    const isRepositoryNameExists = (newRepositoryName: string, githubRepositories: GithubRepository[]) => {
+        for (const githubRepository of githubRepositories) {
+            if (newRepositoryName === githubRepository.name) {
                 return true
             }
         }
         return false
     }
 
-    const handleResponse = (repoName: string, githubRepoContent: GithubRepoContent) => {
-        const currentRepoDetails = {
-            repoName: repoName,
-            details: githubRepoContent
+    const handleResponse = (repositoryName: string, githubRepositoryContent: GithubRepositoryContent) => {
+        const currentRepositoryDetails = {
+            repositoryName: repositoryName,
+            details: githubRepositoryContent
         }
-        setCurrentRepoDetails(JSON.stringify(currentRepoDetails))
+        setCurrentRepositoryDetails(JSON.stringify(currentRepositoryDetails))
     }
 
     return (
@@ -56,7 +56,7 @@ export const Sample = () => {
                     </Snackbar>
                     <Button variant="contained" onClick={
                         () => {
-                            listRepos(authentication.user.login)
+                            listRepositories(authentication.user.login)
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
@@ -79,10 +79,10 @@ export const Sample = () => {
                                                 isOpen: true
                                             })
                                         } else {
-                                            const newRepoName = "Sample1";
-                                            if (!isRepoNameExists(newRepoName, data)) {
+                                            const newRepositoryName = "Sample1";
+                                            if (!isRepositoryNameExists(newRepositoryName, data)) {
                                                 // check for repo existence
-                                                createRepo(authentication.user.login, newRepoName, "Sample repo description")
+                                                createRepository(authentication.user.login, newRepositoryName, "Sample repo description")
                                                     .then((response: Response) => {
                                                         if (!response.ok) {
                                                             setOperationState({
@@ -112,7 +112,7 @@ export const Sample = () => {
                                                                     operation: "createRepo",
                                                                     isOpen: true
                                                                 })
-                                                                setCurrentRepoDetails(newRepoName)
+                                                                setCurrentRepositoryDetails(newRepositoryName)
                                                             }
                                                         }
                                                     })
@@ -128,7 +128,7 @@ export const Sample = () => {
                                             } else {
                                                 setOperationState({
                                                     ...operationState,
-                                                    message: " : Repo [" + newRepoName + "] name exists! - Please choose different name for the repo.",
+                                                    message: " : Repo [" + newRepositoryName + "] name exists! - Please choose different name for the repo.",
                                                     severity: 'error',
                                                     operation: "createRepo",
                                                     isOpen: true
@@ -152,7 +152,7 @@ export const Sample = () => {
                     </Button>
                     <Button variant="contained" onClick={
                         () => {
-                            commitChanges(authentication.user.login, authentication.user.email, "Sample message")
+                            commitCompageYaml(authentication.user.login, authentication.user.email, "Sample message")
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
@@ -200,8 +200,8 @@ export const Sample = () => {
                     </Button>
                     <Button variant="contained" onClick={
                         () => {
-                            const repoName = "Sample1"
-                            pullChanges(authentication.user.login, repoName)
+                            const repositoryName = "Sample1"
+                            pullCompageYaml(authentication.user.login, repositoryName)
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
@@ -231,7 +231,7 @@ export const Sample = () => {
                                                 operation: "pullChanges",
                                                 isOpen: true
                                             })
-                                            handleResponse(repoName, data)
+                                            handleResponse(repositoryName, data)
                                         }
                                     }
                                 })

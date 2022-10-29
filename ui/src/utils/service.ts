@@ -24,15 +24,15 @@ export const getCurrentConfig = () => {
     return localStorage.getItem(CURRENT_CONFIG)
 }
 
-export const setCurrentRepoDetails = (currentRepoDetails: string) => {
+export const setCurrentRepositoryDetails = (currentRepoDetails: string) => {
     localStorage.setItem(CURRENT_REPO_DETAILS, currentRepoDetails)
 }
 
-export const getCurrentRepoDetails = () => {
+export const getCurrentRepositoryDetails = () => {
     return JSON.parse(localStorage.getItem(CURRENT_REPO_DETAILS))
 }
 
-export const removeCurrentRepoDetails = () => {
+export const removeCurrentRepositoryDetails = () => {
     return localStorage.removeItem(CURRENT_REPO_DETAILS)
 }
 

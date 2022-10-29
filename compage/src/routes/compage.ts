@@ -10,13 +10,13 @@ const projectGrpcClient = getProjectGrpcClient();
 
 // createProject (grpc calls to compage-core)
 compageRouter.post("/create_project", async (req, res) => {
-    const {repoName, yaml, projectName, userName} = req.body;
+    const {repositoryName, yaml, projectName, userName} = req.body;
     try {
         const payload = {
             "projectName": projectName,
             "userName": userName,
             "yaml": yaml,
-            "repositoryName": repoName
+            "repositoryName": repositoryName
         }
         const projectDir = `${os.tmpdir()}/${projectName}_downloaded`
         try {
@@ -24,7 +24,7 @@ compageRouter.post("/create_project", async (req, res) => {
         } catch (err: any) {
             if (err.code !== 'EEXIST') {
                 return res.status(500).json({
-                    repositoryName: repoName,
+                    repositoryName: repositoryName,
                     userName: userName,
                     projectName: projectName,
                     message: "",
@@ -64,17 +64,17 @@ compageRouter.post("/create_project", async (req, res) => {
             });
 
             return res.status(200).json({
-                repositoryName: repoName,
+                repositoryName: repositoryName,
                 userName: userName,
                 projectName: projectName,
-                message: `created project: ${projectName} and saved in repository : ${repoName} successfully`,
+                message: `created project: ${projectName} and saved in repository : ${repositoryName} successfully`,
                 error: ""
             });
         });
     } catch (err) {
         console.error(err)
         return res.status(500).json({
-            repositoryName: repoName,
+            repositoryName: repositoryName,
             userName: userName,
             projectName: projectName,
             message: "",
@@ -85,13 +85,13 @@ compageRouter.post("/create_project", async (req, res) => {
 
 // updateProject (grpc calls to compage-core)
 compageRouter.post("/update_project", async (req, res) => {
-    const {repoName, yaml, projectName, userName} = req.body;
+    const {repositoryName, yaml, projectName, userName} = req.body;
     try {
         const payload = {
             "projectName": projectName,
             "userName": userName,
             "yaml": yaml,
-            "repositoryName": repoName
+            "repositoryName": repositoryName
         }
         projectGrpcClient.UpdateProject(payload, (err: any, response: { fileChunk: any; }) => {
             if (err) {

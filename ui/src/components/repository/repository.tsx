@@ -1,7 +1,7 @@
 import React, {ChangeEvent, useEffect, useState} from "react";
 import {Navigate, useNavigate} from "react-router-dom";
-import {createRepo, listRepos, pullChanges} from "../../backend/rest-service";
-import {GithubRepo} from "../../backend/models";
+import {createRepository, listRepositories, pullCompageYaml} from "../../backend/rest-service";
+import {GithubRepository} from "../../backend/models";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import Divider from "@mui/material/Divider";
@@ -11,24 +11,24 @@ import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import {setCurrentRepoDetails} from "../../utils/service";
+import {setCurrentRepositoryDetails} from "../../utils/service";
 import {useAppSelector} from "../../hooks/redux-hooks";
 import {toastr} from 'react-redux-toastr'
 
-export const Repo = () => {
+export const Repository = () => {
     const navigate = useNavigate()
     const authentication = useAppSelector(state => state.authentication);
     const [data, setData] = useState({
         errorMessage: "",
         isLoading: true,
         isOpen: false,
-        repos: [],
-        currentRepo: "",
+        repositories: [],
+        currentRepository: "",
         isCreateNew: false,
         description: ""
     });
 
-    const getRepos = (items: GithubRepo[]) => {
+    const getRepositories = (items: GithubRepository[]) => {
         console.log("items : ", items)
         return items;
     }
@@ -39,9 +39,9 @@ export const Repo = () => {
     }
 
     useEffect(() => {
-        listRepos(authentication.user.login)
+        listRepositories(authentication.user.login)
             .then(items => {
-                setData({...data, isOpen: true, isLoading: false, repos: getRepos(items)})
+                setData({...data, isOpen: true, isLoading: false, repositories: getRepositories(items)})
             })
     }, [setData])
 
@@ -50,9 +50,9 @@ export const Repo = () => {
     }
 
     const handleCreate = () => {
-        // give a call to create repo if it's new
+        // give a call to create repository if it's new
         if (data.isCreateNew) {
-            createRepo(authentication.user.login, data.currentRepo, data.description)
+            createRepository(authentication.user.login, data.currentRepository, data.description)
                 .then(createdItem => {
                     if (createdItem) {
                         if (JSON.stringify(createdItem).toLowerCase().includes("Bad Credentials".toLowerCase())) {
@@ -61,7 +61,7 @@ export const Repo = () => {
                             //     ...operationState,
                             //     message: " : Received response : " + createdItem,
                             //     severity: 'error',
-                            //     operation: "createRepo",
+                            //     operation: "createRepository",
                             //     isOpen: true
                             // })
                         } else {
@@ -70,13 +70,13 @@ export const Repo = () => {
                             //     ...operationState,
                             //     message: " : Received response : " + createdItem,
                             //     severity: 'success',
-                            //     operation: "createRepo",
+                            //     operation: "createRepository",
                             //     isOpen: true
                             // })
-                            const currentRepoDetails = {
-                                repoName: data.currentRepo,
+                            const currentRepositoryDetails = {
+                                repositoryName: data.currentRepository,
                             }
-                            setCurrentRepoDetails(JSON.stringify(currentRepoDetails))
+                            setCurrentRepositoryDetails(JSON.stringify(currentRepositoryDetails))
                         }
                     }
                 })
@@ -86,14 +86,14 @@ export const Repo = () => {
                     //     ...operationState,
                     //     message: " : Received error : " + error,
                     //     severity: 'error',
-                    //     operation: "createRepo",
+                    //     operation: "createRepository",
                     //     isOpen: true
                     // })
                 });
         }
-        // set the current repo retails post response from server
+        // set the current repository retails post response from server
         // give call to pull the latest contents
-        pullChanges(authentication.user.login, data.currentRepo)
+        pullCompageYaml(authentication.user.login, data.currentRepository)
             .then(pulledItem => {
                 if (pulledItem) {
                     if (JSON.stringify(pulledItem).toLowerCase().includes("Bad Credentials".toLowerCase())) {
@@ -102,7 +102,7 @@ export const Repo = () => {
                         //     ...operationState,
                         //     message: " : Received response : " + createdItem,
                         //     severity: 'error',
-                        //     operation: "createRepo",
+                        //     operation: "createRepository",
                         //     isOpen: true
                         // })
                     } else {
@@ -111,13 +111,13 @@ export const Repo = () => {
                         //     ...operationState,
                         //     message: " : Received response : " + createdItem,
                         //     severity: 'success',
-                        //     operation: "createRepo",
+                        //     operation: "createRepository",
                         //     isOpen: true
                         // })
-                        const currentRepoDetails = {
-                            repoName: data.currentRepo,
+                        const currentRepositoryDetails = {
+                            repositoryName: data.currentRepository,
                         }
-                        setCurrentRepoDetails(JSON.stringify(currentRepoDetails))
+                        setCurrentRepositoryDetails(JSON.stringify(currentRepositoryDetails))
                     }
                 }
             }).catch(error => {
@@ -126,31 +126,31 @@ export const Repo = () => {
             //     ...operationState,
             //     message: " : Received error : " + error,
             //     severity: 'error',
-            //     operation: "createRepo",
+            //     operation: "createRepository",
             //     isOpen: true
             // })
         });
-        const currentRepoDetails = {
-            repoName: data.currentRepo,
+        const currentRepositoryDetails = {
+            repositoryName: data.currentRepository,
             //TODO
-            details: "githubRepoContent"
+            details: "githubRepositoryContent"
         }
-        setCurrentRepoDetails(JSON.stringify(currentRepoDetails))
+        setCurrentRepositoryDetails(JSON.stringify(currentRepositoryDetails))
         setData({...data, isOpen: false})
         navigate('/home');
     }
 
-    const handleExistingReposChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleExistingRepositoriesChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setData({
             ...data,
-            currentRepo: event.target.value
+            currentRepository: event.target.value
         });
     };
 
-    const handleNewRepoChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleNewRepositoryChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setData({
             ...data,
-            currentRepo: event.target.value
+            currentRepository: event.target.value
         });
     };
 
@@ -170,8 +170,8 @@ export const Repo = () => {
 
     const isValid = () => {
         if (data.isCreateNew) {
-            for (const repo of data.repos) {
-                if (data.currentRepo === repo.name) {
+            for (const repository of data.repositories) {
+                if (data.currentRepository === repository.name) {
                     return false
                 }
             }
@@ -205,15 +205,15 @@ export const Repo = () => {
                 id="name"
                 label="Name of Repository"
                 type="text"
-                value={data.currentRepo}
-                onChange={handleNewRepoChange}
+                value={data.currentRepository}
+                onChange={handleNewRepositoryChange}
                 variant="outlined"
             />;
         }
         return "";
     }
 
-    const getExistingRepos = () => {
+    const getExistingRepositories = () => {
         if (!data.isCreateNew) {
             return <TextField
                 required
@@ -221,16 +221,16 @@ export const Repo = () => {
                 select
                 disabled={data.isCreateNew}
                 margin="dense"
-                id="repo"
-                label="Existing Repos"
+                id="repository"
+                label="Existing Repositories"
                 type="text"
-                value={data.currentRepo}
-                onChange={handleExistingReposChange}
+                value={data.currentRepository}
+                onChange={handleExistingRepositoriesChange}
                 variant="outlined">
                 {
-                    !data && data.repos.map((repo: GithubRepo) => (
-                        <MenuItem key={repo.name} value={repo.name}>
-                            {repo.full_name}
+                    !data && data.repositories.map((githubRepository: GithubRepository) => (
+                        <MenuItem key={githubRepository.name} value={githubRepository.name}>
+                            {githubRepository.full_name}
                         </MenuItem>
                     ))
                 }
@@ -257,7 +257,7 @@ export const Repo = () => {
                     />
                     {getName()}
                     {getDescription()}
-                    {getExistingRepos()}
+                    {getExistingRepositories()}
                 </Stack>
             </DialogContent>
             <DialogActions>
@@ -267,7 +267,7 @@ export const Repo = () => {
                     type="button">Toastr Success</Button>
                 <Button variant="contained"
                         onClick={handleCreate}
-                        disabled={data.currentRepo === "" || !isValid()}>Choose</Button>
+                        disabled={data.currentRepository === "" || !isValid()}>Choose</Button>
             </DialogActions>
         </Dialog>
 

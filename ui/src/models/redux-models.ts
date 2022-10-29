@@ -17,7 +17,7 @@ export interface AuthenticationArrayModel {
 // compage
 export interface GenerateProjectRequest {
     userName: string,
-    repoName: string,
+    repositoryName: string,
     projectName: string,
     yaml: string
 }

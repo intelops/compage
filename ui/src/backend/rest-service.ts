@@ -1,15 +1,15 @@
-import {getCurrentRepoDetails} from "../utils/service";
+import {getCurrentRepositoryDetails} from "../utils/service";
 import {getBase64EncodedStringForConfig} from "../components/diagram-maker/helper/helper";
 import {config} from "../utils/constants";
 
-export const pullChanges = (userName: string, repoName: string): Promise<Response> => {
-    const proxy_url_pull_compage_yaml = config.proxy_url_pull_compage_yaml + "?userName=" + userName + "&repoName=" + (repoName || getCurrentRepoDetails().repoName);
+export const pullCompageYaml = (userName: string, repositoryName: string): Promise<Response> => {
+    const proxy_url_pull_compage_yaml = config.proxy_url_pull_compage_yaml + "?userName=" + userName + "&repositoryName=" + (repositoryName || getCurrentRepositoryDetails().repositoryName);
     // Use code parameter and other parameters to make POST request to proxy_server
     return fetch(proxy_url_pull_compage_yaml, {
         method: "GET",
     }).then(data => data.json());
 }
-export const commitChanges = (userName: string, userEmail: string, message: string): Promise<Response> => {
+export const commitCompageYaml = (userName: string, userEmail: string, message: string): Promise<Response> => {
     const requestBody = {
         message: message,
         committer: {
@@ -17,8 +17,8 @@ export const commitChanges = (userName: string, userEmail: string, message: stri
             email: userEmail
         },
         content: getBase64EncodedStringForConfig(),
-        sha: getCurrentRepoDetails().details.sha,
-        repoName: getCurrentRepoDetails().repoName
+        sha: getCurrentRepositoryDetails().details.sha,
+        repositoryName: getCurrentRepositoryDetails().repositoryName
     };
     const proxy_url_commit_compage_yaml = config.proxy_url_commit_compage_yaml;
 
@@ -28,9 +28,9 @@ export const commitChanges = (userName: string, userEmail: string, message: stri
         body: JSON.stringify(requestBody)
     }).then(data => data.json());
 }
-export const createRepo = (userName: string, repoName: string, repoDescription: string): Promise<Response> => {
+export const createRepository = (userName: string, repositoryName: string, repoDescription: string): Promise<Response> => {
     const requestBody = {
-        repoName: repoName, description: repoDescription, userName: userName
+        repositoryName: repositoryName, description: repoDescription, userName: userName
     };
 
     // Use code parameter and other parameters to make POST request to proxy_server
@@ -39,10 +39,10 @@ export const createRepo = (userName: string, repoName: string, repoDescription: 
         body: JSON.stringify(requestBody)
     }).then(data => data.json());
 }
-export const generateProject = (userName: string, repoName: string, projectName: string, yaml: string):
+export const createProject = (userName: string, repositoryName: string, projectName: string, yaml: string):
     Promise<Response> => {
     const requestBody = {
-        repoName: repoName, projectName: projectName, userName: userName, yaml: yaml
+        repositoryName: repositoryName, projectName: projectName, userName: userName, yaml: yaml
     };
     // Use code parameter and other parameters to make POST request to proxy_server
     return fetch(config.proxy_url_create_project, {
@@ -53,7 +53,7 @@ export const generateProject = (userName: string, repoName: string, projectName:
         body: JSON.stringify(requestBody)
     }).then(data => data.json());
 }
-export const listRepos = (userName: string) => {
+export const listRepositories = (userName: string) => {
     const proxy_url_list_repositories = config.proxy_url_list_repositories + "?userName=" + userName
     return fetch(proxy_url_list_repositories).then(data => data.json())
 }
