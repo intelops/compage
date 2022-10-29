@@ -36,6 +36,7 @@ app.get("*", (req, res) => {
     return res.status(200).json("you have reached default route");
 });
 
-app.listen(5000, () => {
-    console.log(`server is running on PORT ${5000}`)
+const PORT = 5000
+app.listen(PORT, () => {
+    console.log(`server is running on PORT ${PORT}`)
 })

@@ -19,7 +19,7 @@ export const getProjectGrpcClient = () => {
     );
 
     const ProjectService = grpc.loadPackageDefinition(
-        packageDefinition).project.ProjectService;
+        packageDefinition).api.v1.ProjectService;
 
     return new ProjectService(`${config.compage_core_url}`, grpc.credentials.createInsecure());
 }

@@ -1,21 +1,20 @@
 syntax = "proto3";
 
-option go_package = "./project";
-package project;
+package api.v1;
+option go_package = "github.com/kube-tarian/compage-core/gen/api/v1;project";
 
 service ProjectService {
-  rpc CreateProject (ProjectRequest) returns (ProjectResponse) {}
-  rpc UpdateProject (ProjectRequest) returns (ProjectResponse) {}
+  rpc CreateProject (ProjectRequest) returns (stream ProjectResponse) {}
+  rpc UpdateProject (ProjectRequest) returns (stream ProjectResponse) {}
 }
 
 message ProjectRequest {
   string yaml = 1;
-  string user = 2;
-  string name = 3;
-  string repository = 4;
+  string userName = 2;
+  string projectName = 3;
+  string repositoryName = 4;
 }
 
 message ProjectResponse{
-  string name = 1;
-  bytes fileChunk = 2;
+  bytes fileChunk = 1;
 }
