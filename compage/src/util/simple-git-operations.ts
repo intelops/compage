@@ -1,6 +1,6 @@
 import {simpleGit, SimpleGit, SimpleGitOptions} from 'simple-git';
 
-export interface PushProjectToGithubRequest {
+export interface PushNewProjectToGithubRequest {
     projectPath: string,
     repositoryName: string,
     userName: string,
@@ -8,49 +8,68 @@ export interface PushProjectToGithubRequest {
     email: string
 }
 
-export const pushProjectToGithub = (pushProjectToGithubRequest: PushProjectToGithubRequest) => {
+export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: PushNewProjectToGithubRequest) => {
     const options: Partial<SimpleGitOptions> = {
-        baseDir: pushProjectToGithubRequest.projectPath,
+        baseDir: pushNewProjectToGithubRequest.projectPath,
         binary: 'git',
         maxConcurrentProcesses: 6,
         trimmed: false,
     };
 
-    // Set up GitHub url like this so no manual entry of user pass needed
-    const gitHubUrl = `https://${pushProjectToGithubRequest.userName}:${pushProjectToGithubRequest.password}@github.com/${pushProjectToGithubRequest.userName}/${pushProjectToGithubRequest.repositoryName}.git`;
-
     // when setting all options in a single object
     const git: SimpleGit = simpleGit(options);
 
+    // initialize git
+    await git.init().then(
+        (success: any) => {
+            console.debug("git init succeeded");
+        }, (failure: any) => {
+            console.debug('git init failed');
+            return failure
+        });
+
     // add local git config like username and email
-    git.addConfig('user.email', pushProjectToGithubRequest.email);
-    git.addConfig('user.name', pushProjectToGithubRequest.userName);
+    await git.addConfig('user.email', pushNewProjectToGithubRequest.email);
+    await git.addConfig('user.name', pushNewProjectToGithubRequest.userName);
+
+    // Set up GitHub url like this so no manual entry of user pass needed
+    const gitHubUrl = `https://${pushNewProjectToGithubRequest.userName}:${pushNewProjectToGithubRequest.password}@github.com/${pushNewProjectToGithubRequest.userName}/${pushNewProjectToGithubRequest.repositoryName}.git`;
+
     // Add remote repository url as origin to repository
-    git.addRemote('origin', gitHubUrl);
+    await git.addRemote('origin', gitHubUrl).then(
+        (success: any) => {
+            console.debug("git remote add origin succeeded");
+        }, (failure: any) => {
+            console.debug('git remote add origin failed');
+            return failure;
+        });
+
     // Add all files for commit
-    git.add('.')
+    await git.add('.')
         .then(
             (success: any) => {
                 console.debug("git add succeeded");
             }, (failure: any) => {
                 console.debug('git add failed');
-                return failure
+                return failure;
             });
+
     // Commit files as Initial Commit
-    git.commit('commit by compage : generated files through compage')
+    await git.commit('commit by compage : generated files through compage')
         .then(
             (success: any) => {
                 console.debug('git commit succeeded');
             }, (failure: any) => {
                 console.debug('git commit failed');
-                return failure
+                return failure;
             });
+
     // Finally push to online repository
-    git.push('origin', 'main')
+    await git.push('origin', 'master')
         .then((success: any) => {
             console.debug('git push succeeded');
         }, (failure: any) => {
             console.debug('git push failed');
-            return failure
+            return failure;
         });
 }

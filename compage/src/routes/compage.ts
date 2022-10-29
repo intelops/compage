@@ -2,7 +2,7 @@ import {getProjectGrpcClient} from "../grpc/project";
 import {Router} from "express";
 import * as fs from "fs";
 import * as os from "os";
-import {pushProjectToGithub, PushProjectToGithubRequest} from "../util/simple-git-operations";
+import {pushNewProjectToGithub, PushNewProjectToGithubRequest} from "../util/simple-git-operations";
 import {getUser} from "./store";
 
 const rimraf = require("rimraf");
@@ -20,9 +20,10 @@ compageRouter.post("/create_project", async (req, res) => {
             "yaml": yaml,
             "repositoryName": repositoryName
         }
-        const projectPath = `${os.tmpdir()}/${projectName}_downloaded`
+        const originalProjectPath = `${os.tmpdir()}/${projectName}`
+        const downloadedProjectPath = `${originalProjectPath}_downloaded`
         try {
-            fs.mkdirSync(projectPath, {recursive: true});
+            fs.mkdirSync(downloadedProjectPath, {recursive: true});
         } catch (err: any) {
             if (err.code !== 'EEXIST') {
                 return res.status(500).json({
@@ -34,7 +35,7 @@ compageRouter.post("/create_project", async (req, res) => {
                 });
             }
         }
-        const projectTarFilePath = `${projectPath}/${projectName}_downloaded.tar.gz`;
+        const projectTarFilePath = `${downloadedProjectPath}/${projectName}_downloaded.tar.gz`;
         let call = projectGrpcClient.CreateProject(payload);
         call.on('data', async (response: { fileChunk: any }) => {
             if (response.fileChunk) {
@@ -44,35 +45,37 @@ compageRouter.post("/create_project", async (req, res) => {
         });
         call.on('end', () => {
             // extract tar file
-            fs.createReadStream(projectTarFilePath).pipe(
-                tar.extract({
-                    strip: 1,
-                    C: projectPath
-                })
-            )
-
-            // save to github
-            const pushProjectToGithubRequest: PushProjectToGithubRequest = {
-                projectPath: `${projectPath}/` + `${os.tmpdir()}/${projectName}`,
-                userName: userName,
-                email: email,
-                password: <string>getUser(<string>userName),
-                repositoryName: repositoryName
-            }
-            pushProjectToGithub(pushProjectToGithubRequest)
-            console.log(`saved ${projectPath} to github`)
-
-            // remove directory created, delete directory recursively
-            rimraf(projectPath, () => {
-                console.debug(`${projectPath} is cleaned up`);
+            const extract = tar.extract({
+                strip: 1,
+                C: downloadedProjectPath
             });
 
-            return res.status(200).json({
-                repositoryName: repositoryName,
-                userName: userName,
-                projectName: projectName,
-                message: `created project: ${projectName} and saved in repository : ${repositoryName} successfully`,
-                error: ""
+            fs.createReadStream(projectTarFilePath).pipe(extract)
+            extract.on('finish', async () => {
+                // save to github
+                const pushProjectToGithubRequest: PushNewProjectToGithubRequest = {
+                    projectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
+                    userName: userName,
+                    email: email,
+                    password: <string>getUser(<string>userName),
+                    repositoryName: repositoryName
+                }
+                await pushNewProjectToGithub(pushProjectToGithubRequest)
+                console.log(`saved ${downloadedProjectPath} to github`)
+
+                // remove directory created, delete directory recursively
+                rimraf(downloadedProjectPath, () => {
+                    console.debug(`${downloadedProjectPath} is cleaned up`);
+                });
+
+                // send status back to ui
+                return res.status(200).json({
+                    repositoryName: repositoryName,
+                    userName: userName,
+                    projectName: projectName,
+                    message: `created project: ${projectName} and saved in repository : ${repositoryName} successfully`,
+                    error: ""
+                });
             });
         });
     } catch (err) {
