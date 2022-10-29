@@ -2,7 +2,12 @@ import {getProjectGrpcClient} from "../grpc/project";
 import {Router} from "express";
 import * as fs from "fs";
 import * as os from "os";
-import {pushNewProjectToGithub, PushNewProjectToGithubRequest} from "../util/simple-git-operations";
+import {
+    cloneExistingProjectFromGithub,
+    CloneExistingProjectFromGithubRequest,
+    pushToExistingProjectOnGithub,
+    PushToExistingProjectOnGithubRequest
+} from "../util/simple-git-operations";
 import {getUser} from "./store";
 
 const rimraf = require("rimraf");
@@ -52,15 +57,27 @@ compageRouter.post("/create_project", async (req, res) => {
 
             fs.createReadStream(projectTarFilePath).pipe(extract)
             extract.on('finish', async () => {
+                // clone existing repository
+                const cloneExistingProjectFromGithubRequest: CloneExistingProjectFromGithubRequest = {
+                    clonedProjectPath: `${downloadedProjectPath}`,
+                    userName: userName,
+                    password: <string>getUser(<string>userName),
+                    repositoryName: repositoryName
+                }
+
+                await cloneExistingProjectFromGithub(cloneExistingProjectFromGithubRequest)
+
                 // save to github
-                const pushProjectToGithubRequest: PushNewProjectToGithubRequest = {
-                    projectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
+                const pushToExistingProjectOnGithubRequest: PushToExistingProjectOnGithubRequest = {
+                    createdProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
+                    existingProject: cloneExistingProjectFromGithubRequest.clonedProjectPath + "/" + repositoryName,
                     userName: userName,
                     email: email,
                     password: <string>getUser(<string>userName),
                     repositoryName: repositoryName
                 }
-                await pushNewProjectToGithub(pushProjectToGithubRequest)
+
+                await pushToExistingProjectOnGithub(pushToExistingProjectOnGithubRequest)
                 console.log(`saved ${downloadedProjectPath} to github`)
 
                 // remove directory created, delete directory recursively
