@@ -15,25 +15,26 @@ export interface AuthenticationArrayModel {
 }
 
 // compage
-export interface GenerateProjectRequest {
+export interface CreateProjectRequest {
     userName: string,
     repositoryName: string,
     projectName: string,
-    yaml: string
+    yaml: string,
+    email: string
 }
 
-export interface GeneratedProjectModel {
+export interface CreatedProjectModel {
     "name": string,
     "fileChunk": any
 }
 
-export interface GeneratedProjectArrayModel {
+export interface CreatedProjectArrayModel {
     // In `status` we will watch
     // if todos are being loaded.
     status: "loading" | "idle";
     // `error` will contain an error message.
     error: string | null;
-    generatedProject: GeneratedProjectModel
+    createdProject: CreatedProjectModel
 }
 
 // github

@@ -2,6 +2,8 @@ import {getProjectGrpcClient} from "../grpc/project";
 import {Router} from "express";
 import * as fs from "fs";
 import * as os from "os";
+import {pushProjectToGithub, PushProjectToGithubRequest} from "../util/simple-git-operations";
+import {getUser} from "./store";
 
 const rimraf = require("rimraf");
 const tar = require('tar')
@@ -10,7 +12,7 @@ const projectGrpcClient = getProjectGrpcClient();
 
 // createProject (grpc calls to compage-core)
 compageRouter.post("/create_project", async (req, res) => {
-    const {repositoryName, yaml, projectName, userName} = req.body;
+    const {repositoryName, yaml, projectName, userName, email} = req.body;
     try {
         const payload = {
             "projectName": projectName,
@@ -18,9 +20,9 @@ compageRouter.post("/create_project", async (req, res) => {
             "yaml": yaml,
             "repositoryName": repositoryName
         }
-        const projectDir = `${os.tmpdir()}/${projectName}_downloaded`
+        const projectPath = `${os.tmpdir()}/${projectName}_downloaded`
         try {
-            fs.mkdirSync(projectDir, {recursive: true});
+            fs.mkdirSync(projectPath, {recursive: true});
         } catch (err: any) {
             if (err.code !== 'EEXIST') {
                 return res.status(500).json({
@@ -32,7 +34,7 @@ compageRouter.post("/create_project", async (req, res) => {
                 });
             }
         }
-        const projectTarFilePath = `${projectDir}/${projectName}_downloaded.tar.gz`;
+        const projectTarFilePath = `${projectPath}/${projectName}_downloaded.tar.gz`;
         let call = projectGrpcClient.CreateProject(payload);
         call.on('data', async (response: { fileChunk: any }) => {
             if (response.fileChunk) {
@@ -41,26 +43,28 @@ compageRouter.post("/create_project", async (req, res) => {
             }
         });
         call.on('end', () => {
-            // TODO need to be removed later. Its currently required for debugging.
-            // const files = fs.readdirSync(projectDir);
-            // files.forEach(file => {
-            //     console.log("file : ", file);
-            // });
-
             // extract tar file
             fs.createReadStream(projectTarFilePath).pipe(
                 tar.extract({
                     strip: 1,
-                    C: projectDir
+                    C: projectPath
                 })
             )
 
             // save to github
-            console.log(`saved ${projectDir} to gihub`)
+            const pushProjectToGithubRequest: PushProjectToGithubRequest = {
+                projectPath: `${projectPath}/` + `${os.tmpdir()}/${projectName}`,
+                userName: userName,
+                email: email,
+                password: <string>getUser(<string>userName),
+                repositoryName: repositoryName
+            }
+            pushProjectToGithub(pushProjectToGithubRequest)
+            console.log(`saved ${projectPath} to github`)
 
             // remove directory created, delete directory recursively
-            rimraf(projectDir, () => {
-                console.debug(`${projectDir} is cleaned up`);
+            rimraf(projectPath, () => {
+                console.debug(`${projectPath} is cleaned up`);
             });
 
             return res.status(200).json({

@@ -1,12 +1,12 @@
-import {GeneratedProjectArrayModel, GeneratedProjectModel} from "../models/redux-models";
+import {CreatedProjectArrayModel, CreatedProjectModel} from "../models/redux-models";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {generateProject} from "../service/compage-service";
+import {createProject} from "../service/compage-service";
 import {RootState} from "./index";
 
-const initialCompageState: GeneratedProjectArrayModel = {
+const initialCompageState: CreatedProjectArrayModel = {
     error: null,
     status: "idle",
-    generatedProject: {
+    createdProject: {
         "name": "",
         "fileChunk": undefined
     }
@@ -16,9 +16,9 @@ const compageSlice = createSlice({
     name: 'compage',
     initialState: initialCompageState,
     reducers: {
-        setGeneratedProject(state, action: PayloadAction<GeneratedProjectModel>) {
+        setGeneratedProject(state, action: PayloadAction<CreatedProjectModel>) {
             console.log("action.payload : " + action.payload)
-            state.generatedProject = action.payload;
+            state.createdProject = action.payload;
         }
     },
 
@@ -27,7 +27,7 @@ const compageSlice = createSlice({
     extraReducers: (builder) => {
         // When we send a request,
         // `generateProject.pending` is being fired:
-        builder.addCase(generateProject.pending, (state) => {
+        builder.addCase(createProject.pending, (state) => {
             // At that moment,
             // we change status to `loading`
             // and clear all the previous errors:
@@ -37,17 +37,17 @@ const compageSlice = createSlice({
 
         // When a server responses with the data,
         // `generateProject.fulfilled` is fired:
-        builder.addCase(generateProject.fulfilled,
+        builder.addCase(createProject.fulfilled,
             (state, {payload}) => {
                 // We add all the new todos into the state
                 // and change `status` back to `idle`:
                 // TODO may be problematic
-                state.generatedProject = payload[0];
+                state.createdProject = payload[0];
                 state.status = "idle";
             });
 
         // When a server responses with an error:
-        builder.addCase(generateProject.rejected,
+        builder.addCase(createProject.rejected,
             (state, {payload}) => {
                 // We show the error message
                 // and change `status` back to `idle` again.
