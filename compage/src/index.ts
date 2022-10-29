@@ -12,6 +12,7 @@ const shell = require('shelljs');
 const saveProjectToGithub = () => {
     // change current directory to repository directory in local
     shell.cd('/tmp/first-project');
+    console.log(shell.pwd())
     // repository name
     const repositoryName = 'first-project';
     // Username and password of your GitHub
@@ -19,8 +20,8 @@ const saveProjectToGithub = () => {
     const password = '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';
 
     // Set up GitHub url like this so no manual entry of user pass needed
-    const gitHubUrl = `https://${userName}:${password}@github.com/${userName}/${repositoryName}`;
-
+    const gitHubUrl = `https://${userName}:${password}@github.com/${userName}/${repositoryName}.git`;
+    console.log(gitHubUrl)
     // when setting all options in a single object
     const git: SimpleGit = simpleGit(options);
 
