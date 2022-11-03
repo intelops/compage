@@ -3,9 +3,6 @@ package generator
 import (
 	"github.com/kube-tarian/compage-core/internal/core"
 	"github.com/kube-tarian/compage-core/internal/utils"
-	log "github.com/sirupsen/logrus"
-	"os"
-	"path/filepath"
 )
 
 func Generate(project *core.Project) error {
@@ -17,21 +14,15 @@ func Generate(project *core.Project) error {
 }
 
 func runTemplates(project *core.Project, projectDirectory string) error {
-	path := filepath.Join(projectDirectory, project.Name+".txt")
-	file, err := os.Create(path)
-	if err != nil {
-		log.Error(err)
-		return err
+	config := map[string]string{
+		"Name":      "John Doe",
+		"Job":       "Software Engineer",
+		"Education": "BTech",
 	}
-	defer func(file *os.File) {
-		_ = file.Close()
-	}(file)
-
-	n, err := file.Write([]byte("mahendra intelops"))
+	err := TemplateRunner(projectDirectory, config)
 	if err != nil {
 		return err
 	}
-	log.Debug("file created successfully and written with %v bytes", n)
 
 	return utils.CreateTarFile(project.Name, projectDirectory)
 }
