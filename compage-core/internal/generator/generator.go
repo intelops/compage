@@ -14,6 +14,7 @@ func Generate(project *core.Project) error {
 }
 
 func runTemplates(project *core.Project, projectDirectory string) error {
+	// TODO project to config conversion
 	config := map[string]string{
 		"Name":      "John Doe",
 		"Job":       "Software Engineer",
