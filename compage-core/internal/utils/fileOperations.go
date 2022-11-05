@@ -24,16 +24,20 @@ func GetProjectTarFilePath(name string) string {
 
 // GetProjectDirectoryName returns tarFile parent path
 func GetProjectDirectoryName(name string) string {
-	return DownloadPath + "/" + strings.ToLower(name)
+	return TmpPath + "/" + strings.ToLower(name)
 }
 
 // CreateProjectDirectory creates a directory with project name
 func CreateProjectDirectory(name string) (string, error) {
 	dirName := GetProjectDirectoryName(name)
-	if err := os.MkdirAll(dirName, os.ModePerm); err != nil {
+	if err := CreateDirectories(dirName); err != nil {
 		return "", err
 	}
 	return dirName, nil
+}
+
+func CreateDirectories(dirName string) error {
+	return os.MkdirAll(dirName, os.ModePerm)
 }
 
 func CreateTarFile(projectName, projectDirectory string) error {

@@ -10,6 +10,7 @@ type Edge struct {
 
 // ConsumerData has detailed attributes of an edge
 type ConsumerData struct {
-	Protocol string `yaml:"protocol"`
-	Port     string `yaml:"port"`
+	Protocol    string                 `yaml:"protocol"`
+	Metadata    map[string]interface{} `yaml:"metadata"`
+	Annotations map[string]string      `yaml:"annotations"`
 }

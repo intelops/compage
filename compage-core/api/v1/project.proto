@@ -13,6 +13,7 @@ message ProjectRequest {
   string userName = 2;
   string projectName = 3;
   string repositoryName = 4;
+  string metadata = 5;
 }
 
 message ProjectResponse{

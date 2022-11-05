@@ -1,8 +1,14 @@
 package generator
 
 import (
+	"errors"
+	"fmt"
 	"github.com/kube-tarian/compage-core/internal/core"
+	"github.com/kube-tarian/compage-core/internal/core/edge"
+	"github.com/kube-tarian/compage-core/internal/core/node"
+	"github.com/kube-tarian/compage-core/internal/languages"
 	"github.com/kube-tarian/compage-core/internal/utils"
+	log "github.com/sirupsen/logrus"
 )
 
 // Generate triggers the code generation.
@@ -12,17 +18,67 @@ func Generate(coreProject *core.Project) error {
 	if err != nil {
 		return err
 	}
-	// TODO project to config conversion
-	config := map[string]string{
-		"Name":      "John Doe",
-		"Job":       "Software Engineer",
-		"Education": "BTech",
-	}
-	err = TemplateRunner(projectDirectory, config)
-	if err != nil {
-		return err
+	// decide how many components need to be created here
+	compageYaml := coreProject.CompageYaml
+	for _, nodeP := range compageYaml.Nodes {
+		log.Info("processing nodeP : ", nodeP.ID)
+		// retrieve connection details for this nodeP from edges
+		if nodeP.ConsumerData.Language == languages.Go {
+			// create node directory in projectDirectory depicting a subproject
+			if err = utils.CreateDirectories(projectDirectory + "/" + nodeP.ConsumerData.Name); err != nil {
+				return err
+			}
+			if nodeP.ConsumerData.IsServer {
+				for _, serverType := range nodeP.ConsumerData.ServerTypes {
+					s := serverType.Config["TYPE"]
+					fmt.Println(s)
+					p := serverType.Config["PROTOCOL"]
+					fmt.Println(p)
+					port := serverType.Config["PORT"]
+					fmt.Println(port)
+				}
+			}
+			if nodeP.ConsumerData.IsClient {
+				// extract server ports and source - needed this for url
+				m := getEdgeInfoForNode(compageYaml.Edges, nodeP)
+				fmt.Println(m)
+			}
+			// generate go code now
+			///////////////////Project generation////////////////////////
+			// TODO project to config conversion
+			config := map[string]string{
+				"Name":      "John Doe",
+				"Job":       "Software Engineer",
+				"Education": "BTech",
+			}
+			err = TemplateRunner(projectDirectory, config)
+			if err != nil {
+				return err
+			}
+			///////////////////////////////////////////
+
+		} else if nodeP.ConsumerData.Language == languages.NodeJs {
+			return errors.New("unsupported language : " + languages.NodeJs)
+		} else {
+			return errors.New("unsupported language : " + nodeP.ConsumerData.Language)
+		}
 	}
 
 	// create a tar file from the temporary project directory.
 	return utils.CreateTarFile(coreProject.Name, projectDirectory)
+}
+
+func getEdgeInfoForNode(edges []edge.Edge, node node.Node) map[string]string {
+	m := map[string]string{}
+	for _, e := range edges {
+		if e.Src == node.ID {
+			m["SERVER_PROTOCOL"] = e.ConsumerData.Protocol
+			m["SRC"] = e.Src
+		} else if e.Dest == node.ID {
+			m["CLIENT_PROTOCOL"] = e.ConsumerData.Protocol
+			m["DEST"] = e.Dest
+		}
+		m["NAME"] = node.ConsumerData.Name
+	}
+	return m
 }

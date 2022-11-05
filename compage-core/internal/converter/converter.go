@@ -58,3 +58,11 @@ func GetCompageYaml(yaml string) (*core.CompageYaml, error) {
 	}
 	return compageYaml, nil
 }
+
+func GetMetadata(metadataInput string) map[string]interface{} {
+	metadata := map[string]interface{}{}
+	if err := json.Unmarshal([]byte(metadataInput), &metadata); err != nil {
+		return nil
+	}
+	return metadata
+}
