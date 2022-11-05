@@ -28,6 +28,7 @@ func GetEdges(edges interface{}) interface{} {
 	return ""
 }
 
+// ConvertMap converts compageYaml structure to {edges: [], nodes:[]}
 func ConvertMap(x map[string]interface{}) map[string]interface{} {
 	// convert key-value based edges to edges Slice
 	if x["edges"] != nil {
@@ -40,6 +41,7 @@ func ConvertMap(x map[string]interface{}) map[string]interface{} {
 	return x
 }
 
+// GetCompageYaml converts yaml string to CompageYaml struct
 func GetCompageYaml(yaml string) (*core.CompageYaml, error) {
 	x := map[string]interface{}{}
 	if err := json.Unmarshal([]byte(yaml), &x); err != nil {
@@ -50,9 +52,9 @@ func GetCompageYaml(yaml string) (*core.CompageYaml, error) {
 	if err != nil {
 		return nil, err
 	}
-	compageYaml := core.CompageYaml{}
-	if err = json.Unmarshal(convertedXBytes, &compageYaml); err != nil {
+	compageYaml := &core.CompageYaml{}
+	if err = json.Unmarshal(convertedXBytes, compageYaml); err != nil {
 		return nil, err
 	}
-	return &compageYaml, nil
+	return compageYaml, nil
 }

@@ -50,7 +50,7 @@ compageRouter.post("/create_project", async (req, res) => {
                 strip: 1,
                 C: downloadedProjectPath
             });
-
+            // stream on extraction on tar file
             fs.createReadStream(projectTarFilePath).pipe(extract)
             extract.on('finish', async () => {
                 // clone existing repository

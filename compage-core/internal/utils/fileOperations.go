@@ -12,18 +12,22 @@ import (
 	"strings"
 )
 
+// GetProjectTarFileName returns tarFile name
 func GetProjectTarFileName(name string) string {
 	return strings.ToLower(name) + FileExtension
 }
 
+// GetProjectTarFilePath returns tarFile path
 func GetProjectTarFilePath(name string) string {
 	return GetProjectDirectoryName(name) + "/" + GetProjectTarFileName(name)
 }
 
+// GetProjectDirectoryName returns tarFile parent path
 func GetProjectDirectoryName(name string) string {
 	return DownloadPath + "/" + strings.ToLower(name)
 }
 
+// CreateProjectDirectory creates a directory with project name
 func CreateProjectDirectory(name string) (string, error) {
 	dirName := GetProjectDirectoryName(name)
 	if err := os.MkdirAll(dirName, os.ModePerm); err != nil {

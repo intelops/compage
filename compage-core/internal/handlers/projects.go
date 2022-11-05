@@ -11,12 +11,14 @@ import (
 	"net/http"
 )
 
+// Ping ping endpoint
 func Ping(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"message": "pong",
 	})
 }
 
+// CreateProject creates project and generates code.
 func CreateProject(context *gin.Context) {
 	// Validate input
 	var input core.ProjectInput

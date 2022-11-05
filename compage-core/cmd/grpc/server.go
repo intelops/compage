@@ -25,20 +25,20 @@ func New() project.ProjectServiceServer {
 
 // CreateProject implements api.v1.CreateProject
 func (s server) CreateProject(projectRequest *project.ProjectRequest, server project.ProjectService_CreateProjectServer) error {
-	// convert to core project
-	projectGrpc, err := grpc.GetProject(projectRequest)
+	// converts to core project
+	coreProject, err := grpc.GetProject(projectRequest)
 	if err != nil {
 		return err
 	}
 
-	// trigger project generation
-	if err := service.Generator(projectGrpc); err != nil {
+	// triggers project generation
+	if err := service.Generator(coreProject); err != nil {
 		log.Error(err)
 		return err
 	}
 
 	// CreateTarFile creates tar file for the project geneated
-	err = utils.CreateTarFile(projectGrpc.Name, utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
+	err = utils.CreateTarFile(coreProject.Name, utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
 	if err != nil {
 		return err
 	}

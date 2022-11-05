@@ -6,7 +6,7 @@ import (
 )
 
 // Generator called from rest as well as gRPC
-func Generator(project *core.Project) error {
+func Generator(coreProject *core.Project) error {
 	// trigger project generation
-	return generator.Generate(project)
+	return generator.Generate(coreProject)
 }

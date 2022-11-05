@@ -15,7 +15,7 @@ type ConsumerData struct {
 	Resources []Resource `yaml:"resources"`
 }
 
-// Resource depicts the endpoint(e.g. /user, /account)
+// Resource depicts the endpoints(e.g. /users, /accounts)
 type Resource struct {
 	// resources fields (e.g. name, age in user)
 	Fields map[string]string `yaml:"fields"`

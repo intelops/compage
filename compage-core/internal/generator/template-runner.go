@@ -63,7 +63,7 @@ func contains(filePaths []string, filePathName string) bool {
 }
 
 // TemplateRunner runs templates parser to generate a project with config passed
-func TemplateRunner(parentDirectoryName string, config map[string]string) error {
+func TemplateRunner(parentDirectoryName string, data map[string]string) error {
 	parsedTemplates, filePaths, err := ParseTemplates(templatesPath)
 	if err != nil {
 		return err
@@ -81,7 +81,7 @@ func TemplateRunner(parentDirectoryName string, config map[string]string) error 
 		if err != nil {
 			return err
 		}
-		if err = parsedTemplates.ExecuteTemplate(createdFile, fileName, config); err != nil {
+		if err = parsedTemplates.ExecuteTemplate(createdFile, fileName, data); err != nil {
 			return err
 		}
 	}
