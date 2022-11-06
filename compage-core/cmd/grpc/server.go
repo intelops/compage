@@ -42,9 +42,20 @@ func (s server) CreateProject(projectRequest *project.ProjectRequest, server pro
 	if err != nil {
 		return err
 	}
+
+	// delete tmp/project-name folder
 	defer func(name string) {
-		_ = os.Remove(name)
-	}(utils.GetProjectTarFileName(projectRequest.GetProjectName()))
+		if err = os.RemoveAll(name); err != nil {
+			log.Error(err)
+		}
+	}(utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
+
+	// delete just file
+	defer func(name string) {
+		if err = os.Remove(name); err != nil {
+			log.Error(err)
+		}
+	}(utils.GetProjectTarFilePath(projectRequest.GetProjectName()))
 
 	// stream file to grpc client
 	return sendFile(projectRequest, server)

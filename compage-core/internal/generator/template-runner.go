@@ -9,13 +9,6 @@ import (
 	"text/template"
 )
 
-const templateExtension = ".tmpl"
-const templateExtensionPattern = "/*" + templateExtension
-const substrString = "/"
-
-// Root directory of template files
-const templatesPath = "./templates"
-
 // ParseTemplates parse.go
 func ParseTemplates(templatesPath string) (*template.Template, []string, error) {
 	var directories []string
@@ -72,14 +65,15 @@ func contains(filePaths []string, filePathName string) bool {
 }
 
 // TemplateRunner runs templates parser to generate a project with config passed
-func TemplateRunner(nodeDirectoryName string, data map[string]string) error {
+func TemplateRunner(nodeDirectoryName string, templatesPath string, data map[string]string) error {
 	parsedTemplates, filePaths, err := ParseTemplates(templatesPath)
 	if err != nil {
 		return err
 	}
 	for _, filePathName := range filePaths {
 		if !utils.IgnorablePaths(filePathName) {
-			fileNameDirectoryPath := nodeDirectoryName + "/" + filePathName[:strings.LastIndex(filePathName, substrString)]
+			targetFilePath := strings.Replace(filePathName[:strings.LastIndex(filePathName, substrString)], templatesPath, "", -1)
+			fileNameDirectoryPath := nodeDirectoryName + targetFilePath
 			//fileNameDirectoryPath := nodeDirectoryName + "/" + filePathName[strings.LastIndex(filePathName, substrString)+1:]
 			if fileNameDirectoryPath != "" {
 				err = os.MkdirAll(fileNameDirectoryPath, os.ModePerm)
@@ -88,7 +82,13 @@ func TemplateRunner(nodeDirectoryName string, data map[string]string) error {
 				}
 			}
 			fileName := filePathName[strings.LastIndex(filePathName, substrString)+1:]
-			createdFile, err2 := os.Create(nodeDirectoryName + "/" + strings.TrimSuffix(filePathName, templateExtension))
+			var newFile string
+			if targetFilePath != "" {
+				newFile = nodeDirectoryName + targetFilePath + "/" + fileName
+			} else {
+				newFile = nodeDirectoryName + "/" + fileName
+			}
+			createdFile, err2 := os.Create(strings.TrimSuffix(newFile, templateExtension))
 			if err2 != nil {
 				return err2
 			}

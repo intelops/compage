@@ -44,6 +44,15 @@ compageRouter.post("/create_project", async (req, res) => {
                 console.debug(`Writing tar file chunk to: ${projectTarFilePath}`);
             }
         });
+        call.on('error', async (response: any) => {
+            return res.status(500).json({
+                repositoryName: repositoryName,
+                userName: userName,
+                projectName: projectName,
+                message: "",
+                error: `unable to create project : ${projectName}`
+            });
+        });
         call.on('end', () => {
             // extract tar file
             const extract = tar.extract({

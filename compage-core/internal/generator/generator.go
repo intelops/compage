@@ -52,7 +52,7 @@ func Generate(coreProject *core.Project) error {
 				"Job":       "Software Engineer",
 				"Education": "BTech",
 			}
-			err = TemplateRunner(nodeDirectory, config)
+			err = TemplateRunner(nodeDirectory, golangTemplatesPath, config)
 			if err != nil {
 				return err
 			}
@@ -65,8 +65,7 @@ func Generate(coreProject *core.Project) error {
 		}
 	}
 
-	// create a tar file from the temporary project directory.
-	return utils.CreateTarFile(coreProject.Name, projectDirectory)
+	return nil
 }
 
 func getEdgeInfoForNode(edges []edge.Edge, node node.Node) map[string]string {
