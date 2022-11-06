@@ -2,6 +2,7 @@ package generator
 
 import (
 	"fmt"
+	"github.com/kube-tarian/compage-core/internal/utils"
 	"os"
 	"path/filepath"
 	"strings"
@@ -42,12 +43,20 @@ func ParseTemplates(templatesPath string) (*template.Template, []string, error) 
 	}
 
 	// a template for parsing all directories
-	tmpl := template.Must(template.ParseGlob(templatesPath + templateExtensionPattern))
+	// The below line requires to have .tmpl file in every folder, so not using parseBlob because of that.
+	//tmpl := template.Must(template.ParseGlob(templatesPath + templateExtensionPattern))
+	tmpl := template.Must(template.ParseFiles(filePaths...))
 
 	// Parse all directories (minus the templatesPath directory)
 	for _, path := range directories[1:] {
-		pattern := path + templateExtensionPattern
-		template.Must(tmpl.ParseGlob(pattern))
+		gotTemplates, err2 := hasTemplates(path)
+		if err2 != nil {
+			return nil, nil, err2
+		}
+		if gotTemplates {
+			pattern := path + templateExtensionPattern
+			template.Must(tmpl.ParseGlob(pattern))
+		}
 	}
 
 	return tmpl, filePaths, nil
@@ -63,27 +72,54 @@ func contains(filePaths []string, filePathName string) bool {
 }
 
 // TemplateRunner runs templates parser to generate a project with config passed
-func TemplateRunner(parentDirectoryName string, data map[string]string) error {
+func TemplateRunner(nodeDirectoryName string, data map[string]string) error {
 	parsedTemplates, filePaths, err := ParseTemplates(templatesPath)
 	if err != nil {
 		return err
 	}
 	for _, filePathName := range filePaths {
-		fileNameDirectoryPath := parentDirectoryName + filePathName[:strings.LastIndex(filePathName, substrString)]
-		if fileNameDirectoryPath != "" {
-			err = os.MkdirAll(fileNameDirectoryPath, os.ModePerm)
-			if err != nil {
-				return err
+		if !utils.IgnorablePaths(filePathName) {
+			fileNameDirectoryPath := nodeDirectoryName + "/" + filePathName[:strings.LastIndex(filePathName, substrString)]
+			//fileNameDirectoryPath := nodeDirectoryName + "/" + filePathName[strings.LastIndex(filePathName, substrString)+1:]
+			if fileNameDirectoryPath != "" {
+				err = os.MkdirAll(fileNameDirectoryPath, os.ModePerm)
+				if err != nil {
+					return err
+				}
 			}
-		}
-		fileName := filePathName[strings.LastIndex(filePathName, substrString)+1:]
-		createdFile, err := os.Create(parentDirectoryName + strings.TrimSuffix(filePathName, templateExtension))
-		if err != nil {
-			return err
-		}
-		if err = parsedTemplates.ExecuteTemplate(createdFile, fileName, data); err != nil {
-			return err
+			fileName := filePathName[strings.LastIndex(filePathName, substrString)+1:]
+			createdFile, err2 := os.Create(nodeDirectoryName + "/" + strings.TrimSuffix(filePathName, templateExtension))
+			if err2 != nil {
+				return err2
+			}
+			if err2 = parsedTemplates.ExecuteTemplate(createdFile, fileName, data); err2 != nil {
+				return err2
+			}
 		}
 	}
 	return nil
+}
+
+func hasTemplates(directoryName string) (bool, error) {
+	d, err := os.Open(directoryName)
+	if err != nil {
+		return false, err
+	}
+	defer func(d *os.File) {
+		_ = d.Close()
+	}(d)
+
+	files, err := d.Readdir(-1)
+	if err != nil {
+		return false, err
+	}
+
+	for _, file := range files {
+		if file.Mode().IsRegular() {
+			if filepath.Ext(file.Name()) == templateExtension {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
 }

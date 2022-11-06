@@ -1,4 +1,4 @@
 package languages
 
-const Go = "Go"
+const Go = "Golang"
 const NodeJs = "NodeJs"

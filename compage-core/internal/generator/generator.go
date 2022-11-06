@@ -25,7 +25,8 @@ func Generate(coreProject *core.Project) error {
 		// retrieve connection details for this nodeP from edges
 		if nodeP.ConsumerData.Language == languages.Go {
 			// create node directory in projectDirectory depicting a subproject
-			if err = utils.CreateDirectories(projectDirectory + "/" + nodeP.ConsumerData.Name); err != nil {
+			nodeDirectory := projectDirectory + "/" + nodeP.ConsumerData.Name
+			if err = utils.CreateDirectories(nodeDirectory); err != nil {
 				return err
 			}
 			if nodeP.ConsumerData.IsServer {
@@ -51,7 +52,7 @@ func Generate(coreProject *core.Project) error {
 				"Job":       "Software Engineer",
 				"Education": "BTech",
 			}
-			err = TemplateRunner(projectDirectory, config)
+			err = TemplateRunner(nodeDirectory, config)
 			if err != nil {
 				return err
 			}

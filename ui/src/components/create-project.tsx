@@ -14,7 +14,57 @@ const CreateProject = () => {
         email: "mahendra.b@intelops.dev",
         repositoryName: "first-project",
         projectName: "first-project",
-        yaml: "{\n    \"edges\": {\n      \"edge-62\": {\n        \"dest\": \"node-dc\",\n        \"id\": \"edge-62\",\n        \"src\": \"node-1d\"\n      },\n      \"edge-40\": {\n        \"dest\": \"node-ee\",\n        \"id\": \"edge-40\",\n        \"src\": \"node-dc\"\n      },\n      \"edge-84\": {\n        \"dest\": \"node-ee\",\n        \"id\": \"edge-84\",\n        \"src\": \"node-a6\"\n      },\n      \"edge-74\": {\n        \"dest\": \"node-1d\",\n        \"id\": \"edge-74\",\n        \"src\": \"node-a6\"\n      }\n    },\n    \"nodes\": {\n      \"node-1d\": {\n        \"id\": \"node-1d\",\n        \"typeId\": \"node-type-circle\",\n        \"consumerData\": {\n          \"nodeType\": \"circle\",\n          \"type\": \"intermediate-1\",\n          \"name\": \"service-b\",\n          \"isServer\": true,\n          \"isClient\": true,\n          \"language\": \"Java\",\n          \"url\": \"\"\n        }\n      },\n      \"node-dc\": {\n        \"id\": \"node-dc\",\n        \"typeId\": \"node-type-rectangle\",\n        \"consumerData\": {\n          \"nodeType\": \"rectangle\",\n          \"type\": \"backend\",\n          \"name\": \"service-d\",\n          \"isServer\": true,\n          \"isClient\": false,\n          \"language\": \"Golang\",\n          \"url\": \"\"\n        }\n      },\n      \"node-ee\": {\n        \"id\": \"node-ee\",\n        \"typeId\": \"node-type-circle\",\n        \"consumerData\": {\n          \"nodeType\": \"circle\",\n          \"type\": \"intermediate-2\",\n          \"name\": \"service-c\",\n          \"isServer\": true,\n          \"isClient\": true,\n          \"language\": \"NodeJs\",\n          \"url\": \"\"\n        }\n      },\n      \"node-a6\": {\n        \"id\": \"node-a6\",\n        \"typeId\": \"node-type-start-top-bottom\",\n        \"consumerData\": {\n          \"type\": \"frontend\",\n          \"name\": \"service-a\",\n          \"isServer\": true,\n          \"isClient\": true,\n          \"language\": \"NodeJs\",\n          \"url\": \"\"\n        }\n      }\n    }\n  }"
+        yaml: "{\n" +
+            "  \"edges\": {\n" +
+            "    \"edge1\": {\n" +
+            "      \"id\": \"edge1\",\n" +
+            "      \"src\": \"node1\",\n" +
+            "      \"dest\": \"node2\",\n" +
+            "      \"diagramMakerData\": {\n" +
+            "        \"selected\": true\n" +
+            "      },\n" +
+            "      \"consumerData\": {\n" +
+            "        \"type\": \"sss_edge_edge\",\n" +
+            "        \"name\": \"aaa\",\n" +
+            "        \"protocol\": \"grpc\"\n" +
+            "      }\n" +
+            "    }\n" +
+            "  },\n" +
+            "  \"nodes\": {\n" +
+            "    \"node1\": {\n" +
+            "      \"id\": \"node1\",\n" +
+            "      \"typeId\": \"node-type-circle\",\n" +
+            "      \"diagramMakerData\": {\n" +
+            "        \"selected\": false,\n" +
+            "        \"dragging\": false\n" +
+            "      },\n" +
+            "      \"consumerData\": {\n" +
+            "        \"type\": \"node1Type\",\n" +
+            "        \"name\": \"node1\",\n" +
+            "        \"isServer\": true,\n" +
+            "        \"isClient\": false,\n" +
+            "        \"language\": \"Golang\",\n" +
+            "        \"url\": \"\"\n" +
+            "      }\n" +
+            "    },\n" +
+            "    \"node2\": {\n" +
+            "      \"id\": \"node2\",\n" +
+            "      \"typeId\": \"node-type-rectangle\",\n" +
+            "      \"diagramMakerData\": {\n" +
+            "        \"selected\": false,\n" +
+            "        \"dragging\": false\n" +
+            "      },\n" +
+            "      \"consumerData\": {\n" +
+            "        \"type\": \"node2Type\",\n" +
+            "        \"name\": \"node2\",\n" +
+            "        \"isServer\": false,\n" +
+            "        \"isClient\": true,\n" +
+            "        \"language\": \"Golang\",\n" +
+            "        \"url\": \"\"\n" +
+            "      }\n" +
+            "    }\n" +
+            "  }\n" +
+            "}\n"
     }
     // When clicked, dispatch `generateProject`:
     const handleClick = () => dispatch(createProject(createProjectRequest));
