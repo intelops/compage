@@ -27,15 +27,6 @@ func GetProjectDirectoryName(name string) string {
 	return TmpPath + "/" + strings.ToLower(name)
 }
 
-// CreateProjectDirectory creates a directory with project name
-func CreateProjectDirectory(name string) (string, error) {
-	dirName := GetProjectDirectoryName(name)
-	if err := CreateDirectories(dirName); err != nil {
-		return "", err
-	}
-	return dirName, nil
-}
-
 func CreateDirectories(dirName string) error {
 	return os.MkdirAll(dirName, os.ModePerm)
 }
