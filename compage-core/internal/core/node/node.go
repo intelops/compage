@@ -5,6 +5,7 @@ type ConsumerData struct {
 	IsClient bool   `yaml:"isClient"`
 	IsServer bool   `yaml:"isServer"`
 	Language string `yaml:"language"`
+	Template string `yaml:"template"`
 	// Name of component
 	Name        string `yaml:"name"`
 	NodeType    string `yaml:"nodeType"`

@@ -110,7 +110,6 @@ func listProjectFiles(projectDirectoryPath string) []string {
 	var files []string
 	err := filepath.Walk(projectDirectoryPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			log.Error(err)
 			return err
 		}
 		if !IgnorablePaths(path) && !info.IsDir() {

@@ -5,4 +5,4 @@ const templateExtensionPattern = "/*" + templateExtension
 const substrString = "/"
 
 // Root directory of template files
-const golangTemplatesPath = "templates/compage-template-go"
+const golangTemplatesPath = "/home/mahendra/DevEnv/compage-dev/compage/compage-core/templates/compage-template-go"

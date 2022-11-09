@@ -6,6 +6,7 @@ import (
 	"github.com/kube-tarian/compage-core/internal/core/edge"
 	"github.com/kube-tarian/compage-core/internal/core/node"
 	"github.com/kube-tarian/compage-core/internal/languages"
+	"github.com/kube-tarian/compage-core/internal/languages/golang"
 	"github.com/kube-tarian/compage-core/internal/utils"
 	log "github.com/sirupsen/logrus"
 )
@@ -24,9 +25,14 @@ func Generate(coreProject *core.Project) error {
 		log.Info("processing nodeP : ", nodeP.ID)
 		// retrieve connection details for this nodeP from edges
 		if nodeP.ConsumerData.Language == languages.Go {
-			err = TemplateRunner(golangTemplatesPath, coreProject, nodeP)
-			if err != nil {
-				return err
+			if golang.Compage == nodeP.ConsumerData.Template {
+				err = GoTemplateRunner(golangTemplatesPath, coreProject, golang.GetGoNode(nodeP))
+				if err != nil {
+					return err
+				}
+			} else {
+				// frameworks cli tools
+				return errors.New("unsupported template for language : " + languages.Go)
 			}
 		} else if nodeP.ConsumerData.Language == languages.NodeJs {
 			return errors.New("unsupported language : " + languages.NodeJs)

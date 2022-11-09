@@ -3,7 +3,7 @@ package generator
 import (
 	"fmt"
 	"github.com/kube-tarian/compage-core/internal/core"
-	"github.com/kube-tarian/compage-core/internal/core/node"
+	"github.com/kube-tarian/compage-core/internal/languages/golang"
 	"github.com/kube-tarian/compage-core/internal/utils"
 	"os"
 	"path/filepath"
@@ -18,6 +18,9 @@ func ParseTemplates(templatesPath string) (*template.Template, []string, error) 
 
 	// Get all directories on /templates and check if there's repeated files
 	err := filepath.Walk(templatesPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		if !info.IsDir() {
 			// Is file
 			filename := info.Name()
@@ -66,42 +69,19 @@ func contains(filePaths []string, filePathName string) bool {
 	return false
 }
 
-// TemplateRunner runs templates parser to generate a project with config passed
-func TemplateRunner(templatesPath string, coreProject *core.Project, node node.Node) error {
+// GoTemplateRunner runs templates parser to generate a project with config passed
+func GoTemplateRunner(templatesPath string, coreProject *core.Project, goNode *golang.GoNode) error {
 	projectDirectory := utils.GetProjectDirectoryName(coreProject.Name)
 	// create node directory in projectDirectory depicting a subproject
-	nodeDirectoryName := projectDirectory + "/" + node.ConsumerData.Name
+	nodeDirectoryName := projectDirectory + "/" + goNode.ConsumerData.Name
 	if err := utils.CreateDirectories(nodeDirectoryName); err != nil {
 		return err
 	}
 
-	//copy relevant files from templates based on config received
-	if node.ConsumerData.IsServer {
-		for _, serverType := range node.ConsumerData.ServerTypes {
-			s := serverType.Config["TYPE"]
-			fmt.Println(s)
-			p := serverType.Config["PROTOCOL"]
-			fmt.Println(p)
-			port := serverType.Config["PORT"]
-			fmt.Println(port)
-		}
-	}
-
-	if node.ConsumerData.IsClient {
-		// extract server ports and source - needed this for url
-		m := getEdgeInfoForNode(coreProject.CompageYaml.Edges, node)
-		fmt.Println(m)
-	}
-
-	// generate go code now
-	data := map[string]string{
-		"Name":      "John Doe",
-		"Job":       "Software Engineer",
-		"Education": "BTech",
-	}
+	// generateProject - copy relevant files from template
 
 	// parse the new file structure
-	parsedTemplates, filePaths, err := ParseTemplates(templatesPath)
+	parsedTemplates, filePaths, err := ParseTemplates(nodeDirectoryName)
 	if err != nil {
 		return err
 	}
@@ -109,8 +89,28 @@ func TemplateRunner(templatesPath string, coreProject *core.Project, node node.N
 	for _, filePathName := range filePaths {
 		// ignore paths like .git and .idea
 		if !utils.IgnorablePaths(filePathName) {
+			//copy relevant files from templates based on config received
+			//copy common files to templatesNodeDirectoryName
+			if goNode.ConsumerData.IsServer {
+				for _, serverType := range goNode.ConsumerData.ServerTypes {
+					s := serverType.Config["TYPE"]
+					fmt.Println(s)
+					p := serverType.Config["PROTOCOL"]
+					fmt.Println(p)
+					port := serverType.Config["PORT"]
+					fmt.Println(port)
+				}
+			} else if goNode.ConsumerData.IsClient {
+				// extract server ports and source - needed this for url
+				//m := getEdgeInfoForNode(coreProject.CompageYaml.Edges, node)
+				//fmt.Println(m)
+			} else {
+				//copy common files and removed from filePaths
+
+			}
+
 			// convert path from /templates/compage-template-langauge to /project-name/node structure
-			targetFilePath := strings.Replace(filePathName[:strings.LastIndex(filePathName, substrString)], templatesPath, "", -1)
+			targetFilePath := strings.Replace(filePathName[:strings.LastIndex(filePathName, substrString)], nodeDirectoryName, "", -1)
 			// nodeDirectoryName is a node directory and attach targetFilePath to node path now.
 			fileNameDirectoryPath := nodeDirectoryName + targetFilePath
 			// check for directory existence and if not, create a new one
@@ -134,6 +134,12 @@ func TemplateRunner(templatesPath string, coreProject *core.Project, node node.N
 			createdFile, err2 := os.Create(strings.TrimSuffix(newFile, templateExtension))
 			if err2 != nil {
 				return err2
+			}
+			// generate go code now
+			data := map[string]string{
+				"Name":      "John Doe",
+				"Job":       "Software Engineer",
+				"Education": "BTech",
 			}
 			if err2 = parsedTemplates.ExecuteTemplate(createdFile, fileName, data); err2 != nil {
 				return err2
