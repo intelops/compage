@@ -26,7 +26,7 @@ func Generate(coreProject *core.Project) error {
 		// retrieve connection details for this nodeP from edges
 		if nodeP.ConsumerData.Language == languages.Go {
 			if golang.Compage == nodeP.ConsumerData.Template {
-				err = GoTemplateRunner(golangTemplatesPath, coreProject, golang.GetGoNode(nodeP))
+				err = GoTemplateRunner(coreProject, golang.GetGoNode(nodeP))
 				if err != nil {
 					return err
 				}

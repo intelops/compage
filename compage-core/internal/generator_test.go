@@ -5,6 +5,7 @@ import (
 	"github.com/kube-tarian/compage-core/internal/core"
 	"github.com/kube-tarian/compage-core/internal/service"
 	log "github.com/sirupsen/logrus"
+	"os"
 	"testing"
 )
 
@@ -39,6 +40,7 @@ func TestAdd(t *testing.T) {
 			"      },\n" +
 			"      \"consumerData\": {\n" +
 			"        \"type\": \"node1Type\",\n" +
+			"        \"template\": \"compage\",\n" +
 			"        \"name\": \"node1\",\n" +
 			"        \"isServer\": true,\n" +
 			"        \"isClient\": false,\n" +
@@ -54,6 +56,7 @@ func TestAdd(t *testing.T) {
 			"        \"dragging\": false\n" +
 			"      },\n" +
 			"      \"consumerData\": {\n" +
+			"        \"template\": \"compage\",\n" +
 			"        \"type\": \"node2Type\",\n" +
 			"        \"name\": \"node2\",\n" +
 			"        \"isServer\": false,\n" +
@@ -65,6 +68,9 @@ func TestAdd(t *testing.T) {
 			"  }\n" +
 			"}\n",
 	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-project")
+	}()
 
 	// retrieve project struct
 	project, err := rest.GetProject(input)

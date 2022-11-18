@@ -19,6 +19,9 @@ func (goCY *GoNode) fillDefaults() {
 	if goCY.ConsumerData.Language == "" {
 		goCY.ConsumerData.Language = "Go"
 	}
+	if goCY.ConsumerData.Template == "" {
+		goCY.ConsumerData.Template = "compage"
+	}
 	if goCY.DBFramework == "" {
 		goCY.DBFramework = "gorm"
 	}
