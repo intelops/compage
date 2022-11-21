@@ -39,8 +39,8 @@ type GoNode struct {
 	DBFramework   string `json:"dbFramework"`
 }
 
-// GetGoNode converts node to GoNode struct
-func GetGoNode(node node.Node) *GoNode {
+// GetNode converts node to GoNode struct
+func GetNode(node node.Node) *GoNode {
 	goNode := &GoNode{
 		Node: node,
 	}
