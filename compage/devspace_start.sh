@@ -34,7 +34,7 @@ Welcome to your development container!
 This is how you can work with it:
 - Files will be synchronized between your local machine and this container
 - Some ports will be forwarded, so you can access this container via localhost
-- Run \`${COLOR_GREEN}npm start${COLOR_RESET}\` to start the application
+- Run \`${COLOR_GREEN}npm start [ts-node src/app.ts]${COLOR_RESET}\` to start the application
 "
 
 # Set terminal prompt

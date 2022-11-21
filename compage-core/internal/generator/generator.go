@@ -46,15 +46,15 @@ func Generate(coreProject *core.Project) error {
 
 func getEdgeInfoForNode(edges []edge.Edge, node node.Node) map[string]string {
 	m := map[string]string{}
-	for _, e := range edges {
-		if e.Src == node.ID {
-			m["SERVER_PROTOCOL"] = e.ConsumerData.Protocol
-			m["SRC"] = e.Src
-		} else if e.Dest == node.ID {
-			m["CLIENT_PROTOCOL"] = e.ConsumerData.Protocol
-			m["DEST"] = e.Dest
-		}
-		m["NAME"] = node.ConsumerData.Name
-	}
+	//for _, e := range edges {
+	//	if e.Src == node.ID {
+	//		m["SERVER_PROTOCOL"] = e.ConsumerData.Protocol
+	//		m["SRC"] = e.Src
+	//	} else if e.Dest == node.ID {
+	//		m["CLIENT_PROTOCOL"] = e.ConsumerData.Protocol
+	//		m["DEST"] = e.Dest
+	//	}
+	//	m["NAME"] = node.ConsumerData.Name
+	//}
 	return m
 }

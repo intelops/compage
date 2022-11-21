@@ -79,6 +79,6 @@ commands:
       echo 'Anyone using this project can invoke it via "devspace run migrate-db"'
 
 # Define dependencies to other projects with a devspace.yaml
-dependencies:
-  compage-core:
-    path: ../compage-core        # Path-based dependencies (for monorepos)
+#dependencies:
+#  compage-core:
+#    path: ../compage-core        # Path-based dependencies (for monorepos)
