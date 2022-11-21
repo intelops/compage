@@ -18,7 +18,12 @@ func Generator(coreProject *core.Project, node node.Node) error {
 		return err
 	}
 
-	goNode := GetNode(node)
+	goNode, err := GetNode(node)
+	if err != nil {
+		// return errors like certain protocols aren't yet supported
+		return err
+	}
+
 	if goNode.ConsumerData.Template == Compage {
 		// copy required files from templates, a few of them may need renaming.
 		// Iterate over all the files in template folder
@@ -40,14 +45,26 @@ func Generator(coreProject *core.Project, node node.Node) error {
 
 		// copy relevant files from templates based on config received, if the node is server
 		if goNode.ConsumerData.IsServer {
-			for _, serverType := range goNode.ConsumerData.ServerTypes {
-				s := serverType["TYPE"]
-				fmt.Println(s)
-				p := serverType["PROTOCOL"]
-				fmt.Println(p)
-				port := serverType["PORT"]
-				fmt.Println(port)
+			if goNode.RestConfig != nil {
+				//create directory /pkg/rest/controller, service, dao, models
+				// TODO
+				// copy rest folder to nodeDirectoryName, respect the names of entities
+				for _, resource := range goNode.RestConfig.Resources {
+					if err = generateFilesForResource(resource); err != nil {
+						return err
+					}
+				}
 			}
+			// The below can't be committed as it will break the flow. Once the integration is done, we can uncomment it.
+			//if goNode.GrpcConfig != nil {
+			//	return errors.New(fmt.Sprintf("unsupported serverProtocol %s for language : %s", goNode.GrpcConfig.Framework, languages.Go))
+			//}
+			//if goNode.WsConfig != nil {
+			//	return errors.New(fmt.Sprintf("unsupported serverProtocol %s for language : %s", goNode.GrpcConfig.Framework, languages.Go))
+			//}
+			//if goNode.DBConfig != nil {
+			//	return errors.New(fmt.Sprintf("unsupported serverProtocol %s for language : %s", goNode.GrpcConfig.Framework, languages.Go))
+			//}
 		}
 
 		//if the node is client, add client code
@@ -59,5 +76,10 @@ func Generator(coreProject *core.Project, node node.Node) error {
 		// frameworks cli tools
 		return errors.New("unsupported template for language : " + languages.Go)
 	}
+	return nil
+}
+
+func generateFilesForResource(resource node.Resource) error {
+
 	return nil
 }

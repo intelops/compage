@@ -10,7 +10,13 @@ type Edge struct {
 
 // ConsumerData has detailed attributes of an edge
 type ConsumerData struct {
-	ClientTypes []map[string]string    `yaml:"clientTypes"`
-	Metadata    map[string]interface{} `yaml:"metadata"`
-	Annotations map[string]string      `yaml:"annotations"`
+	ClientTypes []ClientType           `yaml:"clientTypes,omitempty"`
+	Metadata    map[string]interface{} `yaml:"metadata,omitempty"`
+	Annotations map[string]string      `yaml:"annotations,omitempty"`
+}
+
+type ClientType struct {
+	Protocol  string `json:"protocol"`
+	Port      string `json:"port"`
+	Framework string `json:"framework"`
 }
