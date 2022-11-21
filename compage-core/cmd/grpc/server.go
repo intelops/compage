@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	project "github.com/kube-tarian/compage-core/gen/api/v1"
 	"github.com/kube-tarian/compage-core/internal/converter/grpc"
-	"github.com/kube-tarian/compage-core/internal/service"
+	"github.com/kube-tarian/compage-core/internal/generator"
 	"github.com/kube-tarian/compage-core/internal/utils"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -32,12 +32,12 @@ func (s server) CreateProject(projectRequest *project.ProjectRequest, server pro
 	}
 
 	// triggers project generation
-	if err := service.Generator(coreProject); err != nil {
+	if err := generator.Generator(coreProject); err != nil {
 		log.Error(err)
 		return err
 	}
 
-	// CreateTarFile creates tar file for the project geneated
+	// CreateTarFile creates tar file for the project generated
 	err = utils.CreateTarFile(coreProject.Name, utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
 	if err != nil {
 		return err

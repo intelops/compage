@@ -18,3 +18,8 @@ grpcurl -plaintext -d '{"name":"gopher"}' localhost:8809 api.v1.ProjectService.C
 
 // generate grpc code
 buf-Linux-x86_64 generate
+
+// debug cyclic dependencies
+go install github.com/kisielk/godepgraph@latest
+sudo apt install graphviz
+godepgraph -s github.com/kube-tarian/compage-core | dot -Tpng -o godepgraph.png

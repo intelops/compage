@@ -30,7 +30,7 @@ func ParseTemplates(nodeDirectoryName string) (*template.Template, []string, err
 			return nil, nil, err2
 		}
 		if gotTemplates {
-			pattern := path + templateExtensionPattern
+			pattern := path + utils.TemplateExtensionPattern
 			template.Must(tmpl.ParseGlob(pattern))
 		}
 	}
@@ -98,8 +98,8 @@ func GoTemplateRunner(coreProject *core.Project, goNode *golang.GoNode) error {
 				"Education": "BTech",
 			}
 
-			fileName := filePathName[strings.LastIndex(filePathName, substrString)+1:]
-			createdFile, err := os.Create(nodeDirectoryName + strings.TrimSuffix(filePathName, templateExtension))
+			fileName := filePathName[strings.LastIndex(filePathName, utils.SubstrString)+1:]
+			createdFile, err := os.Create(nodeDirectoryName + strings.TrimSuffix(filePathName, utils.TemplateExtension))
 			if err != nil {
 				return err
 			}
@@ -114,7 +114,7 @@ func GoTemplateRunner(coreProject *core.Project, goNode *golang.GoNode) error {
 
 func funcName(filePathName string, nodeDirectoryName string) (string, *os.File, error) {
 	// convert path from /templates/compage-template-langauge to /project-name/node structure
-	targetFilePath := strings.Replace(filePathName[:strings.LastIndex(filePathName, substrString)], nodeDirectoryName, "", -1)
+	targetFilePath := strings.Replace(filePathName[:strings.LastIndex(filePathName, utils.SubstrString)], nodeDirectoryName, "", -1)
 	// nodeDirectoryName is a node directory and attach targetFilePath to node path now.
 	fileNameDirectoryPath := nodeDirectoryName + targetFilePath
 	// check for directory existence and if not, create a new one
@@ -126,7 +126,7 @@ func funcName(filePathName string, nodeDirectoryName string) (string, *os.File, 
 		}
 	}
 	// extract just file Name excluding the `/`
-	fileName := filePathName[strings.LastIndex(filePathName, substrString)+1:]
+	fileName := filePathName[strings.LastIndex(filePathName, utils.SubstrString)+1:]
 	var newFile string
 	if targetFilePath != "" {
 		// new structure to form new path
@@ -135,7 +135,7 @@ func funcName(filePathName string, nodeDirectoryName string) (string, *os.File, 
 		newFile = nodeDirectoryName + "/" + fileName
 	}
 	// open/create file
-	createdFile, err := os.Create(strings.TrimSuffix(newFile, templateExtension))
+	createdFile, err := os.Create(strings.TrimSuffix(newFile, utils.TemplateExtension))
 	if err != nil {
 		return "", nil, err
 	}
@@ -195,14 +195,14 @@ func copyRelevantFiles(coreProject *core.Project, goNode *golang.GoNode) (string
 		return "", err
 	}
 
-	filePaths, directories, err := getDirectoriesAndFilePaths(golangTemplatesPath)
+	filePaths, directories, err := getDirectoriesAndFilePaths(utils.GolangTemplatesPath)
 	if err != nil {
 		return nodeDirectoryName, err
 	}
 	fmt.Println(filePaths)
 	fmt.Println(directories)
 
-	err = CopyDir(golangTemplatesPath, nodeDirectoryName)
+	err = CopyDir(utils.GolangTemplatesPath, nodeDirectoryName)
 	if err != nil {
 		return nodeDirectoryName, err
 	}
@@ -246,7 +246,7 @@ func hasTemplates(directoryName string) (bool, error) {
 
 	for _, file := range files {
 		if file.Mode().IsRegular() {
-			if filepath.Ext(file.Name()) == templateExtension {
+			if filepath.Ext(file.Name()) == utils.TemplateExtension {
 				return true, nil
 			}
 		}

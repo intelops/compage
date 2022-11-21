@@ -3,7 +3,7 @@ package internal
 import (
 	"github.com/kube-tarian/compage-core/internal/converter/rest"
 	"github.com/kube-tarian/compage-core/internal/core"
-	"github.com/kube-tarian/compage-core/internal/service"
+	"github.com/kube-tarian/compage-core/internal/generator"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"testing"
@@ -79,7 +79,7 @@ func TestAdd(t *testing.T) {
 		return
 	}
 	// trigger project generation
-	if err := service.Generator(project); err != nil {
+	if err := generator.Generator(project); err != nil {
 		log.Error(err)
 	}
 }

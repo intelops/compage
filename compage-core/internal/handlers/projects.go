@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kube-tarian/compage-core/internal/converter/rest"
 	"github.com/kube-tarian/compage-core/internal/core"
-	"github.com/kube-tarian/compage-core/internal/service"
+	"github.com/kube-tarian/compage-core/internal/generator"
 	"github.com/kube-tarian/compage-core/internal/utils"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -35,7 +35,7 @@ func CreateProject(context *gin.Context) {
 		return
 	}
 	// trigger project generation
-	if err := service.Generator(project); err != nil {
+	if err := generator.Generator(project); err != nil {
 		log.Error(err)
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
