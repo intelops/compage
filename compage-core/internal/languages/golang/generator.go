@@ -38,7 +38,13 @@ func Generator(coreProject *core.Project, node node.Node) error {
 		}
 
 		// copy all files at root level
-		err = languages.CopyRootLevelFiles(utils.GolangTemplatesPath, nodeDirectoryName)
+		err = CopyRootLevelFiles(utils.GolangTemplatesPath, nodeDirectoryName)
+		if err != nil {
+			return err
+		}
+
+		// copy kubernetes yamls
+		err = CreateKubernetesDirectory(nodeDirectoryName)
 		if err != nil {
 			return err
 		}
@@ -46,11 +52,13 @@ func Generator(coreProject *core.Project, node node.Node) error {
 		// copy relevant files from templates based on config received, if the node is server
 		if goNode.ConsumerData.IsServer {
 			if goNode.RestConfig != nil {
-				//create directory /pkg/rest/controller, service, dao, models
-				// TODO
-				// copy rest folder to nodeDirectoryName, respect the names of entities
+				//create directories for controller, service, dao, models
+				if err = CreateRestServerDirectories(nodeDirectoryName); err != nil {
+					return err
+				}
+				// copy files with respect to the names of resources
 				for _, resource := range goNode.RestConfig.Resources {
-					if err = generateFilesForResource(resource); err != nil {
+					if err = CopyRestServerResourceFiles(resource, nodeDirectoryName); err != nil {
 						return err
 					}
 				}
@@ -71,15 +79,21 @@ func Generator(coreProject *core.Project, node node.Node) error {
 		if goNode.ConsumerData.IsClient {
 			// extract server ports and source - needed this for url
 			fmt.Println(otherServersInfo)
+
+			//create directories for /pkg/rest/controller, service, dao, models
+			if err = CreateRestClientDirectories(nodeDirectoryName); err != nil {
+				return err
+			}
+			// copy files with respect to the names of resources
+			//for _, resource := range goNode.RestConfig.Resources {
+			//	if err = CopyRestClientResourceFiles(resource, nodeDirectoryName); err != nil {
+			//		return err
+			//	}
+			//}
 		}
 	} else {
 		// frameworks cli tools
 		return errors.New("unsupported template for language : " + languages.Go)
 	}
-	return nil
-}
-
-func generateFilesForResource(resource node.Resource) error {
-
 	return nil
 }
