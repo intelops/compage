@@ -4,13 +4,14 @@ import (
 	"github.com/kube-tarian/compage-core/internal/core/node"
 	"github.com/kube-tarian/compage-core/internal/languages"
 	"github.com/kube-tarian/compage-core/internal/utils"
+	"strings"
 )
 
 const RestServerPath = "/pkg/rest/server"
 const RestClientPath = "/pkg/rest/client"
 
 const DaosPath = RestServerPath + "/daos"
-const ServicesPath = RestServerPath + "services"
+const ServicesPath = RestServerPath + "/services"
 const ControllersPath = RestServerPath + "/controllers"
 const ModelsPath = RestServerPath + "/models"
 
@@ -64,26 +65,27 @@ func (copier Copier) CreateRestServerDirectories() error {
 
 // CopyRestServerResourceFiles copies rest server resource files from template and renames them as per resource config.
 func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
+	resourceName := strings.ToLower(resource.Name)
 	// copy controller files to generated project
-	targetResourceControllerFileName := copier.NodeDirectoryName + ControllersPath + "/" + resource.Name + "-" + ControllerFile
+	targetResourceControllerFileName := copier.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + ControllerFile
 	_, err := utils.CopyFile(targetResourceControllerFileName, utils.GolangTemplatesPath+ControllersPath+"/"+ControllerFile)
 	if err != nil {
 		return err
 	}
 	// copy model files to generated project
-	targetResourceModelFileName := copier.NodeDirectoryName + ModelsPath + "/" + resource.Name + "-" + ModelFile
+	targetResourceModelFileName := copier.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + ModelFile
 	_, err = utils.CopyFile(targetResourceModelFileName, utils.GolangTemplatesPath+ModelsPath+"/"+ModelFile)
 	if err != nil {
 		return err
 	}
 	// copy service files to generated project
-	targetResourceServiceFileName := copier.NodeDirectoryName + ServicesPath + "/" + resource.Name + "-" + ServiceFile
+	targetResourceServiceFileName := copier.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + ServiceFile
 	_, err = utils.CopyFile(targetResourceServiceFileName, utils.GolangTemplatesPath+ServicesPath+"/"+ServiceFile)
 	if err != nil {
 		return err
 	}
 	// copy dao files to generated project
-	targetResourceDaoFileName := copier.NodeDirectoryName + DaosPath + "/" + resource.Name + "-" + DaoFile
+	targetResourceDaoFileName := copier.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + DaoFile
 	_, err = utils.CopyFile(targetResourceDaoFileName, utils.GolangTemplatesPath+DaosPath+"/"+DaoFile)
 	if err != nil {
 		return err
