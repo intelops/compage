@@ -2,7 +2,6 @@ package generator
 
 import (
 	"errors"
-	"fmt"
 	"github.com/kube-tarian/compage-core/internal/core"
 	"github.com/kube-tarian/compage-core/internal/languages"
 	"github.com/kube-tarian/compage-core/internal/languages/golang"
@@ -20,20 +19,11 @@ func Generator(coreProject *core.Project) error {
 
 	// Iterate over all nodes and generate code for all nodes.
 	compageYaml := coreProject.CompageYaml
-	for _, node := range compageYaml.Nodes {
-		log.Info("processing node ID : ", node.ID)
-
+	for _, compageNode := range compageYaml.Nodes {
+		log.Info("processing node ID : ", compageNode.ID)
 		// if language is not set, consider that the node is go project
-		if node.ConsumerData.Language == "" || node.ConsumerData.Language == languages.Go {
-			// This will be used to create clients to other servers. This is required for custom template plus the
-			// cli/frameworks plan for next release
-			otherServersInfo, err := languages.GetOtherServersInfo(coreProject.CompageYaml.Edges, node)
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(otherServersInfo)
-			goNode, err := golang.NewNode(node)
+		if compageNode.ConsumerData.Language == "" || compageNode.ConsumerData.Language == languages.Go {
+			goNode, err := golang.NewNode(compageYaml, compageNode)
 			if err != nil {
 				// return errors like certain protocols aren't yet supported
 				return err
@@ -43,10 +33,10 @@ func Generator(coreProject *core.Project) error {
 			}
 			// trigger template runner
 			// TODO
-		} else if node.ConsumerData.Language == languages.NodeJs {
+		} else if compageNode.ConsumerData.Language == languages.NodeJs {
 			return errors.New("unsupported language : " + languages.NodeJs)
 		} else {
-			return errors.New("unsupported language : " + node.ConsumerData.Language)
+			return errors.New("unsupported language : " + compageNode.ConsumerData.Language)
 		}
 	}
 

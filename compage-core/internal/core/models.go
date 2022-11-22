@@ -31,3 +31,7 @@ type CompageYaml struct {
 	// Nodes represent components and has details of the component.
 	Nodes []node.Node `yaml:"nodes"`
 }
+
+const Rest = "REST"
+const Grpc = "GRPC"
+const Ws = "WS"
