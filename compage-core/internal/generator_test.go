@@ -5,7 +5,6 @@ import (
 	"github.com/kube-tarian/compage-core/internal/core"
 	"github.com/kube-tarian/compage-core/internal/generator"
 	log "github.com/sirupsen/logrus"
-	"os"
 	"testing"
 )
 
@@ -69,7 +68,7 @@ func TestAdd(t *testing.T) {
 			"}\n",
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-project")
+		//_ = os.RemoveAll("/tmp/first-project")
 	}()
 
 	// retrieve project struct
@@ -79,7 +78,7 @@ func TestAdd(t *testing.T) {
 		return
 	}
 	// trigger project generation
-	if err := generator.Generator(project); err != nil {
+	if err = generator.Generator(project); err != nil {
 		log.Error(err)
 	}
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/kube-tarian/compage-core/internal/converter/rest"
 	"github.com/kube-tarian/compage-core/internal/core"
 	"github.com/kube-tarian/compage-core/internal/generator"
-	"github.com/kube-tarian/compage-core/internal/utils"
+	"github.com/kube-tarian/compage-core/internal/tarOperations"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 )
@@ -44,7 +44,7 @@ func CreateProject(context *gin.Context) {
 	//context.JSON(http.StatusOK, gin.H{
 	//	"message": "generateProject" + input.User,
 	//})
-	context.FileAttachment(utils.GetProjectTarFilePath(project.Name), utils.GetProjectTarFilePath(project.Name))
+	context.FileAttachment(tarOperations.GetProjectTarFilePath(project.Name), tarOperations.GetProjectTarFilePath(project.Name))
 }
 
 func UpdateProject(context *gin.Context) {

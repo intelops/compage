@@ -61,25 +61,25 @@ func (copier Copier) CreateRestServerDirectories() error {
 
 func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 	targetResourceControllerFileName := copier.NodeDirectoryName + ControllersPath + "/" + resource.Name + "-" + ControllerFile
-	_, err := languages.CopyFile(targetResourceControllerFileName, utils.GolangTemplatesPath+ControllersPath+"/"+ControllerFile)
+	_, err := utils.CopyFile(targetResourceControllerFileName, utils.GolangTemplatesPath+ControllersPath+"/"+ControllerFile)
 	if err != nil {
 		return err
 	}
 
 	targetResourceModelFileName := copier.NodeDirectoryName + ModelsPath + "/" + resource.Name + "-" + ModelFile
-	_, err = languages.CopyFile(targetResourceModelFileName, utils.GolangTemplatesPath+ModelsPath+"/"+ModelFile)
+	_, err = utils.CopyFile(targetResourceModelFileName, utils.GolangTemplatesPath+ModelsPath+"/"+ModelFile)
 	if err != nil {
 		return err
 	}
 
 	targetResourceServiceFileName := copier.NodeDirectoryName + ServicesPath + "/" + resource.Name + "-" + ServiceFile
-	_, err = languages.CopyFile(targetResourceServiceFileName, utils.GolangTemplatesPath+ServicesPath+"/"+ServiceFile)
+	_, err = utils.CopyFile(targetResourceServiceFileName, utils.GolangTemplatesPath+ServicesPath+"/"+ServiceFile)
 	if err != nil {
 		return err
 	}
 
 	targetResourceDaoFileName := copier.NodeDirectoryName + DaosPath + "/" + resource.Name + "-" + DaoFile
-	_, err = languages.CopyFile(targetResourceDaoFileName, utils.GolangTemplatesPath+DaosPath+"/"+DaoFile)
+	_, err = utils.CopyFile(targetResourceDaoFileName, utils.GolangTemplatesPath+DaosPath+"/"+DaoFile)
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 
 func (copier Copier) CopyRestClientResourceFiles(client languages.RestClient) error {
 	targetResourceClientFileName := copier.NodeDirectoryName + ClientPath + "/" + client.ExternalNode + "-" + ClientFile
-	_, err := languages.CopyFile(targetResourceClientFileName, utils.GolangTemplatesPath+ClientPath+"/"+ClientFile)
+	_, err := utils.CopyFile(targetResourceClientFileName, utils.GolangTemplatesPath+ClientPath+"/"+ClientFile)
 	if err != nil {
 		return err
 	}

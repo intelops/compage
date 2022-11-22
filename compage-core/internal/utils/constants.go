@@ -1,8 +1,6 @@
 package utils
 
 const TmpPath = "/tmp"
-const FileExtension = ".tar.gz"
-
 const TemplateExtension = ".tmpl"
 const TemplateExtensionPattern = "/*" + TemplateExtension
 const SubstrString = "/"

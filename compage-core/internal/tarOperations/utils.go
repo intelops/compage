@@ -1,16 +1,18 @@
-package utils
+package tarOperations
 
 import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
-	"github.com/kube-tarian/compage-core/internal/utils/file"
+	"github.com/kube-tarian/compage-core/internal/utils"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 )
+
+const FileExtension = ".tar.gz"
 
 // GetProjectTarFileName returns tarFile name
 func GetProjectTarFileName(name string) string {
@@ -19,16 +21,7 @@ func GetProjectTarFileName(name string) string {
 
 // GetProjectTarFilePath returns tarFile path
 func GetProjectTarFilePath(name string) string {
-	return GetProjectDirectoryName(name) + "/" + GetProjectTarFileName(name)
-}
-
-// GetProjectDirectoryName returns tarFile parent path
-func GetProjectDirectoryName(name string) string {
-	return TmpPath + "/" + strings.ToLower(name)
-}
-
-func CreateDirectories(dirName string) error {
-	return os.MkdirAll(dirName, os.ModePerm)
+	return utils.GetProjectDirectoryName(name) + "/" + GetProjectTarFileName(name)
 }
 
 func CreateTarFile(projectName, projectDirectory string) error {
@@ -125,11 +118,12 @@ func listProjectFiles(projectDirectoryPath string) []string {
 	return files
 }
 
+// IgnorablePaths ignores a few directories.
 func IgnorablePaths(path string) bool {
 	return strings.Contains(path, ".git") || strings.Contains(path, ".idea")
 }
 
-func GetFile(tarFilePath string) (*file.File, bool) {
+func GetFile(tarFilePath string) (*File, bool) {
 	if tarFilePath == "" {
 		return nil, false
 	}
@@ -137,5 +131,5 @@ func GetFile(tarFilePath string) (*file.File, bool) {
 	if err != nil {
 		return nil, false
 	}
-	return file.NewFile(tarFilePath, "tar.gz", len(data), bytes.NewReader(data)), true
+	return NewFile(tarFilePath, "tar.gz", len(data), bytes.NewReader(data)), true
 }

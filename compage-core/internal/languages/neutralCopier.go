@@ -16,9 +16,9 @@ func (nc NeutralCopier) CreateKubernetesFiles(templatePath string) error {
 	if err := utils.CreateDirectories(destKubernetesDirectory); err != nil {
 		return err
 	}
-	return CopyFilesAndDirs(destKubernetesDirectory, srcKubernetesDirectory)
+	return utils.CopyFilesAndDirs(destKubernetesDirectory, srcKubernetesDirectory)
 }
 
 func (nc NeutralCopier) CreateRootLevelFiles(templatePath string) error {
-	return CopyFiles(nc.NodeDirectoryName, templatePath)
+	return utils.CopyFiles(nc.NodeDirectoryName, templatePath)
 }

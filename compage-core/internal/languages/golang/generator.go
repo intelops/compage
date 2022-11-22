@@ -20,6 +20,7 @@ func Generator(projectName string, goNode *GoNode) error {
 			return err
 		}
 
+		// create neutralCopier
 		neutralCopier := languages.NeutralCopier{
 			NodeDirectoryName: nodeDirectoryName,
 		}
@@ -36,6 +37,7 @@ func Generator(projectName string, goNode *GoNode) error {
 			return err
 		}
 
+		// create golang specific copier
 		copier := Copier{
 			NodeDirectoryName: nodeDirectoryName,
 			GoNode:            *goNode,

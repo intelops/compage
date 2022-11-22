@@ -1,10 +1,20 @@
-package languages
+package utils
 
 import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
+
+// GetProjectDirectoryName returns tarFile parent path
+func GetProjectDirectoryName(name string) string {
+	return TmpPath + "/" + strings.ToLower(name)
+}
+
+func CreateDirectories(dirName string) error {
+	return os.MkdirAll(dirName, os.ModePerm)
+}
 
 func CopyFiles(destDirectory string, srcDirectory string) error {
 	return CopyAllFilesInSrcDirToDestDir(destDirectory, srcDirectory, false)
@@ -28,7 +38,7 @@ func CopyAllFilesInSrcDirToDestDir(dest, src string, copyNestedDir bool) error {
 		return fmt.Errorf("Source " + fileInfo.Name() + " is not a directory!")
 	}
 
-	if err = os.Mkdir(dest, 0755); err != nil && err != os.ErrExist {
+	if err = os.Mkdir(dest, 0755); err != nil && !os.IsExist(err) {
 		return err
 	}
 
