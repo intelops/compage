@@ -1,10 +1,7 @@
 package golang
 
 import (
-	"errors"
-	"fmt"
 	"github.com/kube-tarian/compage-core/internal/core"
-	"github.com/kube-tarian/compage-core/internal/core/edge"
 	"github.com/kube-tarian/compage-core/internal/core/node"
 	"github.com/kube-tarian/compage-core/internal/languages"
 )
@@ -22,73 +19,14 @@ type GoNode struct {
 	Language    string                 `yaml:"language"`
 	Template    string                 `yaml:"template"`
 
-	RestConfig *RestConfig `json:"restConfig"`
-	GrpcConfig *GrpcConfig `json:"grpcConfig"`
-	WsConfig   *WsConfig   `json:"wsConfig"`
-	DBConfig   *DBConfig   `json:"dbConfig"`
+	RestConfig *languages.RestConfig `json:"restConfig"`
+	GrpcConfig *languages.GrpcConfig `json:"grpcConfig"`
+	WsConfig   *languages.WsConfig   `json:"wsConfig"`
+	DBConfig   *languages.DBConfig   `json:"dbConfig"`
 }
-
-type DBConfig struct {
-	Framework string          `json:"framework"`
-	Port      string          `json:"port"`
-	Address   string          `json:"address"`
-	Type      string          `json:"type"`
-	Resources []node.Resource `json:"resources"`
-}
-
-// RestConfig rest configs
-type RestConfig struct {
-	Server  *RestServer  `json:"server"`
-	Clients []RestClient `json:"clients"`
-}
-
-type RestServer struct {
-	Framework string          `json:"framework"`
-	Port      string          `json:"port"`
-	Resources []node.Resource `json:"resources"`
-}
-
-type RestClient struct {
-	Protocol     string `json:"protocol"`
-	Port         string `json:"port"`
-	Framework    string `json:"framework"`
-	ExternalNode string `json:"externalNode"`
-}
-
-// GrpcConfig grpc configs
-type GrpcConfig struct {
-	Framework string          `json:"framework"`
-	Port      string          `json:"port"`
-	Resources []node.Resource `json:"resources"`
-}
-
-// WsConfig ws configs
-type WsConfig struct {
-	Framework string          `json:"framework"`
-	Port      string          `json:"port"`
-	Resources []node.Resource `json:"resources"`
-}
-
-// all clients
-type clients map[string]interface{}
-
-// all servers
-type servers map[string]interface{}
 
 // NewNode converts node to GoNode struct
-func NewNode(compageYaml *core.CompageYaml, node node.Node) (*GoNode, error) {
-	// This will be used to create clients to other servers. This is required for custom template plus the
-	// cli/frameworks plan for next release
-	clients, err := getClientsForNode(compageYaml.Edges, node)
-	if err != nil {
-		return nil, err
-	}
-
-	servers, err := getServersForNode(node)
-	if err != nil {
-		return nil, err
-	}
-
+func NewNode(node node.Node, servers *languages.Servers, clients *languages.Clients) (*GoNode, error) {
 	goNode := &GoNode{
 		ID:          node.ID,
 		Name:        node.ConsumerData.Name,
@@ -100,22 +38,26 @@ func NewNode(compageYaml *core.CompageYaml, node node.Node) (*GoNode, error) {
 	}
 
 	if restServer, ok := (*servers)[core.Rest]; ok {
-		goNode.RestConfig = &RestConfig{
-			Server: restServer.(*RestServer),
+		goNode.RestConfig = &languages.RestConfig{
+			Server: restServer.(*languages.RestServer),
 		}
 	}
 
 	if restClients, ok := (*clients)[core.Rest]; ok {
 		if goNode.RestConfig == nil {
-			goNode.RestConfig = &RestConfig{
-				Clients: restClients.([]RestClient),
+			goNode.RestConfig = &languages.RestConfig{
+				Clients: restClients.([]languages.RestClient),
 			}
 		} else {
-			goNode.RestConfig.Clients = restClients.([]RestClient)
+			goNode.RestConfig.Clients = restClients.([]languages.RestClient)
+		}
+		// set framework to clients as its there for server
+		for _, client := range goNode.RestConfig.Clients {
+			client.Framework = goNode.RestConfig.Server.Framework
 		}
 	}
 
-	err = goNode.fillDefaults()
+	err := goNode.fillDefaults()
 	if err != nil {
 		return nil, err
 	}
@@ -127,8 +69,8 @@ func NewNode(compageYaml *core.CompageYaml, node node.Node) (*GoNode, error) {
 func (goNode *GoNode) fillDefaults() error {
 	// setting default values if no values present
 	if goNode.RestConfig == nil {
-		goNode.RestConfig = &RestConfig{
-			Server: &RestServer{
+		goNode.RestConfig = &languages.RestConfig{
+			Server: &languages.RestServer{
 				Framework: "gin",
 				Port:      "8888",
 				Resources: []node.Resource{
@@ -141,7 +83,7 @@ func (goNode *GoNode) fillDefaults() error {
 		}
 	}
 	if goNode.GrpcConfig == nil {
-		goNode.GrpcConfig = &GrpcConfig{
+		goNode.GrpcConfig = &languages.GrpcConfig{
 			Framework: "grpcCore",
 			Port:      "50051",
 			Resources: []node.Resource{
@@ -153,7 +95,7 @@ func (goNode *GoNode) fillDefaults() error {
 		}
 	}
 	if goNode.WsConfig == nil {
-		goNode.WsConfig = &WsConfig{
+		goNode.WsConfig = &languages.WsConfig{
 			Framework: "Stomp",
 			Port:      "9000",
 			Resources: []node.Resource{
@@ -165,7 +107,7 @@ func (goNode *GoNode) fillDefaults() error {
 		}
 	}
 	if goNode.DBConfig == nil {
-		goNode.DBConfig = &DBConfig{
+		goNode.DBConfig = &languages.DBConfig{
 			Framework: "gorm",
 			Port:      "3306",
 			Type:      "mysql",
@@ -183,55 +125,4 @@ func (goNode *GoNode) fillDefaults() error {
 	}
 
 	return nil
-}
-
-func getServersForNode(nodeP node.Node) (*servers, error) {
-	var restServer *RestServer
-	for _, serverType := range nodeP.ConsumerData.ServerTypes {
-		serverProtocol := serverType.Protocol
-		if serverProtocol == core.Rest {
-			restServer = &RestServer{
-				Framework: serverType.Framework,
-				Port:      serverType.Port,
-				Resources: serverType.Resources,
-			}
-		} else if serverProtocol == core.Grpc {
-			return nil, errors.New(fmt.Sprintf("unsupported serverProtocol %s for language : %s", serverProtocol, languages.Go))
-		} else if serverProtocol == core.Ws {
-			return nil, errors.New(fmt.Sprintf("unsupported serverProtocol %s for language : %s", serverProtocol, languages.Go))
-		}
-	}
-	return &servers{
-		core.Rest: restServer,
-	}, nil
-}
-
-func getClientsForNode(edges []edge.Edge, node node.Node) (*clients, error) {
-	var restClients []RestClient
-
-	for _, e := range edges {
-		if e.Dest == node.ID {
-			for _, clientType := range e.ConsumerData.ClientTypes {
-				if clientType.Protocol == core.Rest {
-					restClients = append(restClients, RestClient{
-						Protocol:     clientType.Protocol,
-						Port:         clientType.Port,
-						Framework:    "",
-						ExternalNode: e.Src,
-					})
-
-					// only one rest client config for a given edge
-					break
-				} else if clientType.Protocol == core.Grpc {
-					return nil, errors.New(fmt.Sprintf("unsupported clientProtocol %s for language : %s", clientType.Protocol, languages.Go))
-				} else if clientType.Protocol == core.Ws {
-					return nil, errors.New(fmt.Sprintf("unsupported clientProtocol %s for language : %s", clientType.Protocol, languages.Go))
-				}
-			}
-		}
-	}
-
-	return &clients{
-		core.Rest: restClients,
-	}, nil
 }
