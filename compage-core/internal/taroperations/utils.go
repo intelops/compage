@@ -14,16 +14,17 @@ import (
 
 const FileExtension = ".tar.gz"
 
-// GetProjectTarFileName returns tarFile name
+// GetProjectTarFileName returns tarFile name for project.
 func GetProjectTarFileName(name string) string {
 	return strings.ToLower(name) + FileExtension
 }
 
-// GetProjectTarFilePath returns tarFile path
+// GetProjectTarFilePath returns tarFile path for project.
 func GetProjectTarFilePath(name string) string {
 	return utils.GetProjectDirectoryName(name) + "/" + GetProjectTarFileName(name)
 }
 
+// CreateTarFile creates tar file for project.
 func CreateTarFile(projectName, projectDirectory string) error {
 	projectFiles := listProjectFiles(projectDirectory)
 	projectTarFileName := GetProjectTarFilePath(projectName)
@@ -46,6 +47,7 @@ func CreateTarFile(projectName, projectDirectory string) error {
 	return nil
 }
 
+// createTarAndGz creates tar/zip of project files.
 func createTarAndGz(projectFiles []string, buffer io.Writer) error {
 	gzipWriter := gzip.NewWriter(buffer)
 	defer func(gzipWriter *gzip.Writer) {
@@ -65,6 +67,7 @@ func createTarAndGz(projectFiles []string, buffer io.Writer) error {
 	return nil
 }
 
+// addToTar adds files to tar.
 func addToTar(tarWriter *tar.Writer, filename string) error {
 	f, err := os.Open(filename)
 	if err != nil {
@@ -99,6 +102,7 @@ func addToTar(tarWriter *tar.Writer, filename string) error {
 	return nil
 }
 
+// listProjectFiles list all files on projectDirectoryPath.
 func listProjectFiles(projectDirectoryPath string) []string {
 	var files []string
 	err := filepath.Walk(projectDirectoryPath, func(path string, info os.FileInfo, err error) error {
@@ -123,6 +127,7 @@ func IgnorablePaths(path string) bool {
 	return strings.Contains(path, ".git") || strings.Contains(path, ".idea")
 }
 
+// GetFile returns file for name supplied.
 func GetFile(tarFilePath string) (*File, bool) {
 	if tarFilePath == "" {
 		return nil, false

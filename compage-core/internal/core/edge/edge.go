@@ -15,6 +15,7 @@ type ConsumerData struct {
 	Annotations map[string]string      `yaml:"annotations,omitempty"`
 }
 
+// ClientType holds information for an edge
 type ClientType struct {
 	Protocol string `json:"protocol"`
 	Port     string `json:"port"`

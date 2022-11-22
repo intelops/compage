@@ -12,20 +12,24 @@ func GetProjectDirectoryName(name string) string {
 	return TmpPath + "/" + strings.ToLower(name)
 }
 
+// CreateDirectories creates the directory specified and all other directories in the path.
 func CreateDirectories(dirName string) error {
 	return os.MkdirAll(dirName, os.ModePerm)
 }
 
+// CopyFiles copies only files in the srcDirectory to destDirectory, doesn't do it recursively.
 func CopyFiles(destDirectory string, srcDirectory string) error {
-	return CopyAllFilesInSrcDirToDestDir(destDirectory, srcDirectory, false)
+	return CopyAllInSrcDirToDestDir(destDirectory, srcDirectory, false)
 }
 
+// CopyFilesAndDirs copies files and dirs in the srcDirectory to destDirectory, does it recursively.
 func CopyFilesAndDirs(destDirectory string, srcDirectory string) error {
-	return CopyAllFilesInSrcDirToDestDir(destDirectory, srcDirectory, true)
+	return CopyAllInSrcDirToDestDir(destDirectory, srcDirectory, true)
 }
 
-func CopyAllFilesInSrcDirToDestDir(dest, src string, copyNestedDir bool) error {
-	openedDir, err := os.Open(src)
+// CopyAllInSrcDirToDestDir copies content of srcDirectory to destDirectory based on flag copyNestedDir
+func CopyAllInSrcDirToDestDir(destDirectory, srcDirectory string, copyNestedDir bool) error {
+	openedDir, err := os.Open(srcDirectory)
 	if err != nil {
 		return err
 	}
@@ -38,22 +42,22 @@ func CopyAllFilesInSrcDirToDestDir(dest, src string, copyNestedDir bool) error {
 		return fmt.Errorf("Source " + fileInfo.Name() + " is not a directory!")
 	}
 
-	if err = os.Mkdir(dest, 0755); err != nil && !os.IsExist(err) {
+	if err = os.Mkdir(destDirectory, 0755); err != nil && !os.IsExist(err) {
 		return err
 	}
 
-	files, err1 := os.ReadDir(src)
+	files, err1 := os.ReadDir(srcDirectory)
 	if err1 != nil {
 		return err1
 	}
 	for _, file := range files {
 		if !file.IsDir() {
-			_, err = CopyFile(dest+"/"+file.Name(), src+"/"+file.Name())
+			_, err = CopyFile(destDirectory+"/"+file.Name(), srcDirectory+"/"+file.Name())
 			if err != nil {
 				return err
 			}
 		} else if copyNestedDir {
-			err = CopyAllFilesInSrcDirToDestDir(dest+"/"+file.Name(), src+"/"+file.Name(), copyNestedDir)
+			err = CopyAllInSrcDirToDestDir(destDirectory+"/"+file.Name(), srcDirectory+"/"+file.Name(), copyNestedDir)
 			if err != nil {
 				return err
 			}
@@ -62,29 +66,30 @@ func CopyAllFilesInSrcDirToDestDir(dest, src string, copyNestedDir bool) error {
 	return nil
 }
 
-func CopyFile(dst, src string) (int64, error) {
-	sourceFileStat, err := os.Stat(src)
+// CopyFile copies src file to dest
+func CopyFile(destFilePath, srcFilePath string) (int64, error) {
+	srcFileStat, err := os.Stat(srcFilePath)
 	if err != nil {
 		return 0, err
 	}
-	if !sourceFileStat.Mode().IsRegular() {
-		return 0, fmt.Errorf("%s is not a regular file", src)
+	if !srcFileStat.Mode().IsRegular() {
+		return 0, fmt.Errorf("%s is not a regular file", srcFilePath)
 	}
 
-	source, err := os.Open(src)
+	sourceFile, err := os.Open(srcFilePath)
 	if err != nil {
 		return 0, err
 	}
 	defer func(source *os.File) {
 		_ = source.Close()
-	}(source)
+	}(sourceFile)
 
-	destination, err := os.Create(dst)
+	destinationFile, err := os.Create(destFilePath)
 	if err != nil {
 		return 0, err
 	}
 	defer func(destination *os.File) {
 		_ = destination.Close()
-	}(destination)
-	return io.Copy(destination, source)
+	}(destinationFile)
+	return io.Copy(destinationFile, sourceFile)
 }

@@ -32,6 +32,11 @@ type CompageYaml struct {
 	Nodes []node.Node `yaml:"nodes"`
 }
 
+// Rest Protocol
 const Rest = "REST"
+
+// Grpc Protocol
 const Grpc = "GRPC"
+
+// Ws Protocol
 const Ws = "WS"

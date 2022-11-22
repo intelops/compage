@@ -42,7 +42,6 @@ func TestAdd(t *testing.T) {
 			"        \"template\": \"compage\",\n" +
 			"        \"name\": \"node1\",\n" +
 			"        \"isServer\": true,\n" +
-			"        \"isClient\": false,\n" +
 			"        \"language\": \"Golang\",\n" +
 			"        \"url\": \"\"\n" +
 			"      }\n" +
@@ -59,7 +58,6 @@ func TestAdd(t *testing.T) {
 			"        \"type\": \"node2Type\",\n" +
 			"        \"name\": \"node2\",\n" +
 			"        \"isServer\": false,\n" +
-			"        \"isClient\": true,\n" +
 			"        \"language\": \"Golang\",\n" +
 			"        \"url\": \"\"\n" +
 			"      }\n" +

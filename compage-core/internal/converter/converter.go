@@ -6,6 +6,7 @@ import (
 	"golang.org/x/exp/maps"
 )
 
+// GetNodes converts nodes map to string.
 func GetNodes(nodes interface{}) interface{} {
 	if nodes != nil {
 		nodesBytes, err := json.Marshal(maps.Values(nodes.(map[string]interface{})))
@@ -17,6 +18,7 @@ func GetNodes(nodes interface{}) interface{} {
 	return ""
 }
 
+// GetEdges converts edges map to string.
 func GetEdges(edges interface{}) interface{} {
 	if edges != nil {
 		edgesBytes, err := json.Marshal(maps.Values(edges.(map[string]interface{})))
@@ -59,6 +61,7 @@ func GetCompageYaml(yaml string) (*core.CompageYaml, error) {
 	return compageYaml, nil
 }
 
+// GetMetadata converts string to map
 func GetMetadata(metadataInput string) map[string]interface{} {
 	metadata := map[string]interface{}{}
 	if err := json.Unmarshal([]byte(metadataInput), &metadata); err != nil {

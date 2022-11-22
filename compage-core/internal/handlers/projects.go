@@ -47,6 +47,7 @@ func CreateProject(context *gin.Context) {
 	context.FileAttachment(taroperations.GetProjectTarFilePath(project.Name), taroperations.GetProjectTarFilePath(project.Name))
 }
 
+// UpdateProject updates project and generates code.
 func UpdateProject(context *gin.Context) {
 	// Validate input
 	var input core.ProjectInput

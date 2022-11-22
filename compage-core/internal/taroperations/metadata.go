@@ -11,6 +11,7 @@ var fileNameHeader = "file-name"
 var fileTypeHeader = "file-type"
 var fileSizeHeader = "file-size"
 
+// Metadata holds metadata for file.
 func (f *File) Metadata() metadata.MD {
 	return metadata.New(map[string]string{
 		fileNameHeader: f.Name,
@@ -19,6 +20,7 @@ func (f *File) Metadata() metadata.MD {
 	})
 }
 
+// NewFromMetadata returns file with metadata.
 func NewFromMetadata(md metadata.MD, r io.Reader) *File {
 	var name, fileType string
 	var size int

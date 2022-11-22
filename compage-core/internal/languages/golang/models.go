@@ -5,6 +5,7 @@ import (
 	"github.com/kube-tarian/compage-core/internal/languages"
 )
 
+// GoNode language specific struct.
 type GoNode struct {
 	languages.LanguageNode
 }
