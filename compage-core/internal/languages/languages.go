@@ -89,6 +89,7 @@ func NewLanguageNode(compageYaml *core.CompageYaml, node node.Node) (*LanguageNo
 	if err != nil {
 		return nil, err
 	}
+
 	// This will be used to create clients to other servers. This is required for custom template plus the
 	// cli/frameworks plan for next release
 	clients, err := GetClientsForNode(compageYaml.Edges, node)
@@ -97,12 +98,14 @@ func NewLanguageNode(compageYaml *core.CompageYaml, node node.Node) (*LanguageNo
 	}
 
 	if restServer, ok := (*servers)[core.Rest]; ok {
+		// one node, one rest server
 		goNode.RestConfig = &RestConfig{
 			Server: restServer.(*RestServer),
 		}
 	}
 
 	if restClients, ok := (*clients)[core.Rest]; ok {
+		// if the component is just client and not server, goNode.RestConfig will be nil in that case.
 		if goNode.RestConfig == nil {
 			goNode.RestConfig = &RestConfig{
 				Clients: restClients.([]RestClient),
@@ -112,7 +115,12 @@ func NewLanguageNode(compageYaml *core.CompageYaml, node node.Node) (*LanguageNo
 		}
 		// set framework to clients as its there for server
 		for _, client := range goNode.RestConfig.Clients {
-			client.Framework = goNode.RestConfig.Server.Framework
+			// if server is nil, assign default framework i.e. http client
+			if goNode.RestConfig.Server != nil {
+				client.Framework = goNode.RestConfig.Server.Framework
+			} else {
+				client.Framework = "net/http"
+			}
 		}
 	}
 
@@ -121,54 +129,60 @@ func NewLanguageNode(compageYaml *core.CompageYaml, node node.Node) (*LanguageNo
 
 // GetServersForNode retrieves all servers for given node
 func GetServersForNode(nodeP node.Node) (*Servers, error) {
-	var restServer *RestServer
-	for _, serverType := range nodeP.ConsumerData.ServerTypes {
-		serverProtocol := serverType.Protocol
-		if serverProtocol == core.Rest {
-			restServer = &RestServer{
-				Framework: serverType.Framework,
-				Port:      serverType.Port,
-				Resources: serverType.Resources,
+	if nodeP.ConsumerData.IsServer {
+		var restServer *RestServer
+		for _, serverType := range nodeP.ConsumerData.ServerTypes {
+			serverProtocol := serverType.Protocol
+			if serverProtocol == core.Rest {
+				restServer = &RestServer{
+					Framework: serverType.Framework,
+					Port:      serverType.Port,
+					Resources: serverType.Resources,
+				}
+			} else if serverProtocol == core.Grpc {
+				return nil, fmt.Errorf("unsupported serverProtocol %s for language : %s", serverProtocol,
+					nodeP.ConsumerData.Language)
+			} else if serverProtocol == core.Ws {
+				return nil, fmt.Errorf("unsupported serverProtocol %s for language : %s", serverProtocol,
+					nodeP.ConsumerData.Language)
 			}
-		} else if serverProtocol == core.Grpc {
-			return nil, fmt.Errorf("unsupported serverProtocol %s for language : %s", serverProtocol,
-				nodeP.ConsumerData.Language)
-		} else if serverProtocol == core.Ws {
-			return nil, fmt.Errorf("unsupported serverProtocol %s for language : %s", serverProtocol,
-				nodeP.ConsumerData.Language)
 		}
+		return &Servers{
+			core.Rest: restServer,
+		}, nil
 	}
-	return &Servers{
-		core.Rest: restServer,
-	}, nil
+	return &Servers{}, nil
 }
 
 // GetClientsForNode retrieves all clients for given node
 func GetClientsForNode(edges []edge.Edge, nodeP node.Node) (*Clients, error) {
-	var restClients []RestClient
-	for _, e := range edges {
-		if e.Dest == nodeP.ID {
-			for _, clientType := range e.ConsumerData.ClientTypes {
-				if clientType.Protocol == core.Rest {
-					restClients = append(restClients, RestClient{
-						Protocol:     clientType.Protocol,
-						Port:         clientType.Port,
-						ExternalNode: e.Src,
-					})
-					// only one rest client config for a given edge
-					break
-				} else if clientType.Protocol == core.Grpc {
-					return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
-						clientType.Protocol, nodeP.ConsumerData.Language)
-				} else if clientType.Protocol == core.Ws {
-					return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
-						clientType.Protocol, nodeP.ConsumerData.Language)
+	if nodeP.ConsumerData.IsClient {
+		var restClients []RestClient
+		for _, e := range edges {
+			if e.Dest == nodeP.ID {
+				for _, clientType := range e.ConsumerData.ClientTypes {
+					if clientType.Protocol == core.Rest {
+						restClients = append(restClients, RestClient{
+							Protocol:     clientType.Protocol,
+							Port:         clientType.Port,
+							ExternalNode: e.Src,
+						})
+						// only one rest client config for a given edge
+						break
+					} else if clientType.Protocol == core.Grpc {
+						return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
+							clientType.Protocol, nodeP.ConsumerData.Language)
+					} else if clientType.Protocol == core.Ws {
+						return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
+							clientType.Protocol, nodeP.ConsumerData.Language)
+					}
 				}
 			}
 		}
-	}
 
-	return &Clients{
-		core.Rest: restClients,
-	}, nil
+		return &Clients{
+			core.Rest: restClients,
+		}, nil
+	}
+	return &Clients{}, nil
 }
