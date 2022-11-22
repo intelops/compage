@@ -3,7 +3,7 @@ package generator
 import (
 	"fmt"
 	"github.com/kube-tarian/compage-core/internal/core"
-	"github.com/kube-tarian/compage-core/internal/languages/golang"
+	"github.com/kube-tarian/compage-core/internal/languages"
 	"github.com/kube-tarian/compage-core/internal/utils"
 	"os"
 	"path/filepath"
@@ -75,7 +75,7 @@ func contains(filePaths []string, filePathName string) bool {
 }
 
 // GoTemplateRunner runs templates parser to generate a project with config passed
-func GoTemplateRunner(coreProject *core.Project, goNode *golang.GoNode) error {
+func GoTemplateRunner(coreProject *core.Project, goNode *languages.LanguageNode) error {
 	// generateProject - copy relevant files from template
 	nodeDirectoryName, err := copyRelevantFiles(coreProject, goNode)
 	if err != nil {
@@ -187,7 +187,7 @@ func CopyDir(src string, dest string) error {
 	return nil
 }
 
-func copyRelevantFiles(coreProject *core.Project, goNode *golang.GoNode) (string, error) {
+func copyRelevantFiles(coreProject *core.Project, goNode *languages.LanguageNode) (string, error) {
 	projectDirectory := utils.GetProjectDirectoryName(coreProject.Name)
 	// create node directory in projectDirectory depicting a subproject
 	nodeDirectoryName := projectDirectory + "/" + goNode.Name

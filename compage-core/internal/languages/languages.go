@@ -11,6 +11,21 @@ import (
 const Go = "Golang"
 const NodeJs = "NodeJs"
 
+type LanguageNode struct {
+	ID          string                 `json:"ID"`
+	Name        string                 `json:"name"`
+	NodeType    string                 `json:"nodeType"`
+	Metadata    map[string]interface{} `yaml:"metadata,omitempty"`
+	Annotations map[string]string      `yaml:"annotations,omitempty"`
+	Language    string                 `yaml:"language"`
+	Template    string                 `yaml:"template"`
+
+	RestConfig *RestConfig `json:"restConfig"`
+	GrpcConfig *GrpcConfig `json:"grpcConfig"`
+	WsConfig   *WsConfig   `json:"wsConfig"`
+	DBConfig   *DBConfig   `json:"dbConfig"`
+}
+
 type DBConfig struct {
 	Framework string          `json:"framework"`
 	Port      string          `json:"port"`
@@ -57,6 +72,52 @@ type Clients map[string]interface{}
 
 // Servers all servers
 type Servers map[string]interface{}
+
+// NewLanguageNode converts node to LanguageNode struct
+func NewLanguageNode(compageYaml *core.CompageYaml, node node.Node) (*LanguageNode, error) {
+	goNode := &LanguageNode{
+		ID:          node.ID,
+		Name:        node.ConsumerData.Name,
+		NodeType:    node.ConsumerData.NodeType,
+		Metadata:    node.ConsumerData.Metadata,
+		Annotations: node.ConsumerData.Annotations,
+		Language:    node.ConsumerData.Language,
+		Template:    node.ConsumerData.Template,
+	}
+
+	servers, err := GetServersForNode(node)
+	if err != nil {
+		return nil, err
+	}
+	// This will be used to create clients to other servers. This is required for custom template plus the
+	// cli/frameworks plan for next release
+	clients, err := GetClientsForNode(compageYaml.Edges, node)
+	if err != nil {
+		return nil, err
+	}
+
+	if restServer, ok := (*servers)[core.Rest]; ok {
+		goNode.RestConfig = &RestConfig{
+			Server: restServer.(*RestServer),
+		}
+	}
+
+	if restClients, ok := (*clients)[core.Rest]; ok {
+		if goNode.RestConfig == nil {
+			goNode.RestConfig = &RestConfig{
+				Clients: restClients.([]RestClient),
+			}
+		} else {
+			goNode.RestConfig.Clients = restClients.([]RestClient)
+		}
+		// set framework to clients as its there for server
+		for _, client := range goNode.RestConfig.Clients {
+			client.Framework = goNode.RestConfig.Server.Framework
+		}
+	}
+
+	return goNode, nil
+}
 
 // GetServersForNode retrieves all servers for given node
 func GetServersForNode(nodeP node.Node) (*Servers, error) {

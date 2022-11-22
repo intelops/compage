@@ -21,24 +21,20 @@ func Generator(coreProject *core.Project) error {
 	compageYaml := coreProject.CompageYaml
 	for _, compageNode := range compageYaml.Nodes {
 		log.Info("processing node ID : ", compageNode.ID)
-		servers, err := languages.GetServersForNode(compageNode)
-		if err != nil {
-			return err
+		// convert node to languageNode
+		languageNode, err1 := languages.NewLanguageNode(compageYaml, compageNode)
+		if err1 != nil {
+			// return errors like certain protocols aren't yet supported
+			return err1
 		}
-		// This will be used to create clients to other servers. This is required for custom template plus the
-		// cli/frameworks plan for next release
-		clients, err := languages.GetClientsForNode(compageYaml.Edges, compageNode)
-		if err != nil {
-			return err
-		}
+
 		// if language is not set, consider that the node is go project
 		if compageNode.ConsumerData.Language == "" || compageNode.ConsumerData.Language == languages.Go {
-			goNode, err1 := golang.NewNode(compageNode, servers, clients)
-			if err1 != nil {
-				// return errors like certain protocols aren't yet supported
-				return err1
+			goNode := golang.GoNode{LanguageNode: *languageNode}
+			if err2 := goNode.FillDefaults(); err2 != nil {
+				return err2
 			}
-			if err2 := golang.Generator(coreProject.Name, goNode); err2 != nil {
+			if err2 := golang.Generator(coreProject.Name, &goNode); err2 != nil {
 				return err2
 			}
 			// trigger template runner
