@@ -17,10 +17,10 @@ type ModificationDetails struct {
 // Project is top level struct depicting the monorepo and resembling to github repository.
 // It has a single compage.json and can have multiple nodes and edges (projects and connections) internally.
 type Project struct {
-	Name           string `json:"name"`
-	RepositoryName string `json:"repositoryName"`
-	CompageYaml    *CompageYaml
-	Metadata       map[string]interface{}
+	Name           string                 `json:"name"`
+	RepositoryName string                 `json:"repositoryName"`
+	CompageYaml    *CompageYaml           `json:"compageYaml"`
+	Metadata       map[string]interface{} `json:"metadata"`
 	ModificationDetails
 }
 

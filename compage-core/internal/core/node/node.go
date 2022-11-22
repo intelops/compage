@@ -1,5 +1,12 @@
 package node
 
+// Node depicts a separate repository
+type Node struct {
+	ConsumerData ConsumerData `yaml:"consumerData,omitempty"`
+	ID           string       `yaml:"id"`
+	TypeID       string       `yaml:"typeId"`
+}
+
 // ConsumerData has detailed attributes of a Node
 type ConsumerData struct {
 	IsClient bool   `yaml:"isClient"`
@@ -15,11 +22,11 @@ type ConsumerData struct {
 	Annotations map[string]string      `yaml:"annotations,omitempty"`
 }
 
-// Node depicts a separate repository
-type Node struct {
-	ConsumerData ConsumerData `yaml:"consumerData,omitempty"`
-	ID           string       `yaml:"id"`
-	TypeID       string       `yaml:"typeId"`
+type ServerType struct {
+	Protocol  string     `json:"protocol"`
+	Port      string     `json:"port"`
+	Framework string     `json:"framework"`
+	Resources []Resource `json:"resources"`
 }
 
 // Resource depicts the endpoints(e.g. /users, /accounts)
@@ -27,11 +34,4 @@ type Resource struct {
 	Name string `json:"name"`
 	// resources fields (e.g. name, age in user)
 	Fields map[string]string `yaml:"fields"`
-}
-
-type ServerType struct {
-	Protocol  string     `json:"protocol"`
-	Port      string     `json:"port"`
-	Framework string     `json:"framework"`
-	Resources []Resource `json:"resources"`
 }

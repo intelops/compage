@@ -10,9 +10,9 @@ const NodeJs = "NodeJs"
 
 func GetOtherServersInfo(edges []edge.Edge, node node.Node) (map[string]interface{}, error) {
 	m := map[string]interface{}{}
-	for _, edge := range edges {
-		if edge.Dest == node.ID {
-			m[edge.ID] = edge
+	for _, e := range edges {
+		if e.Dest == node.ID {
+			m[e.ID] = e
 		}
 	}
 	return m, nil

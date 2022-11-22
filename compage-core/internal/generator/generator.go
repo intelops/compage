@@ -2,6 +2,7 @@ package generator
 
 import (
 	"errors"
+	"fmt"
 	"github.com/kube-tarian/compage-core/internal/core"
 	"github.com/kube-tarian/compage-core/internal/languages"
 	"github.com/kube-tarian/compage-core/internal/languages/golang"
@@ -24,7 +25,20 @@ func Generator(coreProject *core.Project) error {
 
 		// if language is not set, consider that the node is go project
 		if node.ConsumerData.Language == "" || node.ConsumerData.Language == languages.Go {
-			if err := golang.Generator(coreProject, node); err != nil {
+			// This will be used to create clients to other servers. This is required for custom template plus the
+			// cli/frameworks plan for next release
+			otherServersInfo, err := languages.GetOtherServersInfo(coreProject.CompageYaml.Edges, node)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(otherServersInfo)
+			goNode, err := golang.NewNode(node)
+			if err != nil {
+				// return errors like certain protocols aren't yet supported
+				return err
+			}
+			if err := golang.Generator(coreProject.Name, goNode); err != nil {
 				return err
 			}
 			// trigger template runner

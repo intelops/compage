@@ -190,7 +190,7 @@ func CopyDir(src string, dest string) error {
 func copyRelevantFiles(coreProject *core.Project, goNode *golang.GoNode) (string, error) {
 	projectDirectory := utils.GetProjectDirectoryName(coreProject.Name)
 	// create node directory in projectDirectory depicting a subproject
-	nodeDirectoryName := projectDirectory + "/" + goNode.ConsumerData.Name
+	nodeDirectoryName := projectDirectory + "/" + goNode.Name
 	if err := utils.CreateDirectories(nodeDirectoryName); err != nil {
 		return "", err
 	}
