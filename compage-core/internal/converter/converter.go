@@ -2,7 +2,9 @@ package converter
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/kube-tarian/compage-core/internal/core"
+	"github.com/kube-tarian/compage-core/internal/languages"
 	"golang.org/x/exp/maps"
 )
 
@@ -58,7 +60,39 @@ func GetCompageYaml(yaml string) (*core.CompageYaml, error) {
 	if err = json.Unmarshal(convertedXBytes, compageYaml); err != nil {
 		return nil, err
 	}
+
+	// Validate compageYaml
+	if err := validate(compageYaml); err != nil {
+		return nil, err
+	}
+
 	return compageYaml, nil
+}
+
+// validate validates edges and nodes in compage yaml.
+func validate(compageYaml *core.CompageYaml) error {
+	// validations on node fields and setting default values.
+	for _, node := range compageYaml.Nodes {
+		// name can't be empty for node
+		if node.ConsumerData.Name == "" {
+			return fmt.Errorf("name should not be empty")
+		}
+		// set default language as go
+		if node.ConsumerData.Language == "" {
+			node.ConsumerData.Language = languages.Go
+		}
+		// set default template as compage
+		if node.ConsumerData.Template == "" {
+			node.ConsumerData.Template = languages.Compage
+		}
+
+	}
+
+	// no need to populate port in individual edge as we need to have that validation on ui itself.
+	// Reasons 1. user may use grpc protocol when the src node doesn't have one. We need to show the protocols in
+	// edge dropdown based on the server configs on src node :D
+
+	return nil
 }
 
 // GetMetadata converts string to map

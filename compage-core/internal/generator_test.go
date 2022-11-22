@@ -9,61 +9,12 @@ import (
 )
 
 func TestAdd(t *testing.T) {
+	jsonString := "{\n\t\"edges\": {\n\t\t\"edge1\": {\n\t\t\t\"id\": \"edge1\",\n\t\t\t\"src\": \"node1\",\n\t\t\t\"dest\": \"node2\",\n\t\t\t\"consumerData\": {\n\t\t\t\t\"clientTypes\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"protocol\": \"REST\"\n\t\t\t\t\t}\n\t\t\t\t],\n\t\t\t\t\"metadata\": {},\n\t\t\t\t\"annotations\": {}\n\t\t\t}\n\t\t}\n\t},\n\t\"nodes\": {\n\t\t\"node1\": {\n\t\t\t\"id\": \"node1\",\n\t\t\t\"typeId\": \"node-type-circle\",\n\t\t\t\"consumerData\": {\n\t\t\t\t\"name\": \"ServiceA\",\n\t\t\t\t\"template\": \"compage\",\n\t\t\t\t\"serverTypes\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"protocol\": \"REST\",\n\t\t\t\t\t\t\"port\": \"9999\",\n\t\t\t\t\t\t\"framework\": \"net/http\",\n\t\t\t\t\t\t\"resources\": [\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\"Name\": \"User\",\n\t\t\t\t\t\t\t\t\"Fields\": {\n\t\t\t\t\t\t\t\t\t\"name\": \"string\",\n\t\t\t\t\t\t\t\t\t\"city\": \"string\",\n\t\t\t\t\t\t\t\t\t\"mobileNumber\": \"string\"\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t]\n\t\t\t\t\t}\n\t\t\t\t],\n\t\t\t\t\"language\": \"Golang\",\n\t\t\t\t\"metadata\": {},\n\t\t\t\t\"annotations\": {}\n\t\t\t}\n\t\t},\n\t\t\"node2\": {\n\t\t\t\"id\": \"node2\",\n\t\t\t\"typeId\": \"node-type-rectangle\",\n\t\t\t\"consumerData\": {\n\t\t\t\t\"template\": \"compage\",\n\t\t\t\t\"name\": \"ServiceB\",\n\t\t\t\t\"language\": \"Golang\",\n\t\t\t\t\"metadata\": {},\n\t\t\t\t\"annotations\": {}\n\t\t\t}\n\t\t}\n\t}\n}"
 	input := core.ProjectInput{
 		UserName:       "mahendraintelops",
 		RepositoryName: "first-project",
 		ProjectName:    "first-project",
-		Yaml: "{\n" +
-			"  \"edges\": {\n" +
-			"    \"edge1\": {\n" +
-			"      \"id\": \"edge1\",\n" +
-			"      \"src\": \"node1\",\n" +
-			"      \"dest\": \"node2\",\n" +
-			"      \"diagramMakerData\": {\n" +
-			"        \"selected\": true\n" +
-			"      },\n" +
-			"      \"consumerData\": {\n" +
-			"        \"type\": \"sss_edge_edge\",\n" +
-			"        \"name\": \"aaa\",\n" +
-			"        \"protocol\": \"grpc\"\n" +
-			"      }\n" +
-			"    }\n" +
-			"  },\n" +
-			"  \"nodes\": {\n" +
-			"    \"node1\": {\n" +
-			"      \"id\": \"node1\",\n" +
-			"      \"typeId\": \"node-type-circle\",\n" +
-			"      \"diagramMakerData\": {\n" +
-			"        \"selected\": false,\n" +
-			"        \"dragging\": false\n" +
-			"      },\n" +
-			"      \"consumerData\": {\n" +
-			"        \"type\": \"node1Type\",\n" +
-			"        \"template\": \"compage\",\n" +
-			"        \"name\": \"node1\",\n" +
-			"        \"isServer\": true,\n" +
-			"        \"language\": \"Golang\",\n" +
-			"        \"url\": \"\"\n" +
-			"      }\n" +
-			"    },\n" +
-			"    \"node2\": {\n" +
-			"      \"id\": \"node2\",\n" +
-			"      \"typeId\": \"node-type-rectangle\",\n" +
-			"      \"diagramMakerData\": {\n" +
-			"        \"selected\": false,\n" +
-			"        \"dragging\": false\n" +
-			"      },\n" +
-			"      \"consumerData\": {\n" +
-			"        \"template\": \"compage\",\n" +
-			"        \"type\": \"node2Type\",\n" +
-			"        \"name\": \"node2\",\n" +
-			"        \"isServer\": false,\n" +
-			"        \"language\": \"Golang\",\n" +
-			"        \"url\": \"\"\n" +
-			"      }\n" +
-			"    }\n" +
-			"  }\n" +
-			"}\n",
+		Yaml:           jsonString,
 	}
 	defer func() {
 		//_ = os.RemoveAll("/tmp/first-project")

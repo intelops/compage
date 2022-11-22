@@ -31,6 +31,7 @@ func Generator(coreProject *core.Project) error {
 		// if language is not set, consider that the node is go project
 		if compageNode.ConsumerData.Language == "" || compageNode.ConsumerData.Language == languages.Go {
 			goNode := golang.GoNode{LanguageNode: *languageNode}
+			// currently below func does nothing.
 			if err2 := goNode.FillDefaults(); err2 != nil {
 				return err2
 			}

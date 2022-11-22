@@ -81,7 +81,6 @@ func NewLanguageNode(compageYaml *core.CompageYaml, node node.Node) (*LanguageNo
 	goNode := &LanguageNode{
 		ID:          node.ID,
 		Name:        node.ConsumerData.Name,
-		NodeType:    node.ConsumerData.NodeType,
 		Metadata:    node.ConsumerData.Metadata,
 		Annotations: node.ConsumerData.Annotations,
 		Language:    node.ConsumerData.Language,
@@ -134,7 +133,7 @@ func NewLanguageNode(compageYaml *core.CompageYaml, node node.Node) (*LanguageNo
 func GetServersForNode(nodeP node.Node) (*Servers, error) {
 	servers := &Servers{}
 	// check if the node is server
-	if nodeP.ConsumerData.IsServer {
+	if nodeP.ConsumerData.ServerTypes != nil {
 		// retrieve Rest server config and store in below variable
 		var restServer *RestServer
 		// iterate over the serverTypes. Protocol in serverType decides server's type.
