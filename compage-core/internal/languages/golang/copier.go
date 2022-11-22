@@ -1,11 +1,9 @@
 package golang
 
 import (
-	"fmt"
 	"github.com/kube-tarian/compage-core/internal/core/node"
+	"github.com/kube-tarian/compage-core/internal/languages"
 	"github.com/kube-tarian/compage-core/internal/utils"
-	"io"
-	"os"
 )
 
 const RestServerPath = "/pkg/rest/server"
@@ -25,71 +23,13 @@ const ModelFile = "model.go.tmpl"
 
 const ClientFile = "client.go.tmpl"
 
-func CreateKubernetesDirectory(nodeDirectoryName string) error {
-	kubernetesDirectory := nodeDirectoryName + "/kubernetes"
-
-	if err := utils.CreateDirectories(kubernetesDirectory); err != nil {
-		return err
-	}
-
-	//targetServerDeploymentYaml := ""
-	//targetServerServiceYaml := ""
-	//targetClientDeploymentYaml := ""
-	//TODO create files with above names
-
-	return nil
+type Copier struct {
+	NodeDirectoryName string `json:"nodeDirectoryName"`
+	GoNode            GoNode `json:"goNode"`
 }
 
-func CopyKubernetesFiles(nodeDirectoryName string) error {
-	//kubernetesDirectory := nodeDirectoryName + "/kubernetes"
-	//
-	//targetServerDeploymentYaml := kubernetesDirectory + ""
-	//targetServerServiceYaml := kubernetesDirectory + ""
-	//targetClientDeploymentYaml := kubernetesDirectory + ""
-
-	//TODO create files with above names
-
-	return nil
-}
-
-func CopyRootLevelFiles(src, dest string) error {
-	openedFile, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-
-	if fileInfo, err0 := openedFile.Stat(); err0 != nil {
-		return err0
-	} else if !fileInfo.IsDir() {
-		return fmt.Errorf("Source " + fileInfo.Name() + " is not a directory!")
-	}
-
-	if err = os.Mkdir(dest, 0755); err != nil && err != os.ErrExist {
-		return err
-	}
-
-	if files, err1 := os.ReadDir(src); err1 != nil {
-		return err1
-	} else {
-		for _, file := range files {
-			if !file.IsDir() {
-				content, err2 := os.ReadFile(src + "/" + file.Name())
-				if err2 != nil {
-					return err2
-				}
-				err2 = os.WriteFile(dest+"/"+file.Name(), content, 0755)
-				if err2 != nil {
-					return err2
-				}
-			}
-		}
-	}
-	return nil
-}
-
-func CreateRestClientDirectories(nodeDirectoryName string) error {
-	clientDirectory := nodeDirectoryName + RestClientPath
-
+func (copier Copier) CreateRestClientDirectories() error {
+	clientDirectory := copier.NodeDirectoryName + RestClientPath
 	if err := utils.CreateDirectories(clientDirectory); err != nil {
 		return err
 	}
@@ -97,11 +37,11 @@ func CreateRestClientDirectories(nodeDirectoryName string) error {
 	return nil
 }
 
-func CreateRestServerDirectories(nodeDirectoryName string) error {
-	controllersDirectory := nodeDirectoryName + ControllersPath
-	modelsDirectory := nodeDirectoryName + ModelsPath
-	servicesDirectory := nodeDirectoryName + ServicesPath
-	daosDirectory := nodeDirectoryName + DaosPath
+func (copier Copier) CreateRestServerDirectories() error {
+	controllersDirectory := copier.NodeDirectoryName + ControllersPath
+	modelsDirectory := copier.NodeDirectoryName + ModelsPath
+	servicesDirectory := copier.NodeDirectoryName + ServicesPath
+	daosDirectory := copier.NodeDirectoryName + DaosPath
 
 	if err := utils.CreateDirectories(controllersDirectory); err != nil {
 		return err
@@ -119,37 +59,27 @@ func CreateRestServerDirectories(nodeDirectoryName string) error {
 	return nil
 }
 
-func CopyRestServerResourceFiles(resource node.Resource, nodeDirectoryName string) error {
-	targetResourceControllerFileName := nodeDirectoryName + ControllersPath + "/" + resource.Name + "-" + ControllerFile
-	_, err := CopyFile(utils.GolangTemplatesPath+ControllersPath+"/"+ControllerFile, targetResourceControllerFileName)
+func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
+	targetResourceControllerFileName := copier.NodeDirectoryName + ControllersPath + "/" + resource.Name + "-" + ControllerFile
+	_, err := languages.CopyFile(targetResourceControllerFileName, utils.GolangTemplatesPath+ControllersPath+"/"+ControllerFile)
 	if err != nil {
 		return err
 	}
 
-	targetResourceModelFileName := nodeDirectoryName + ModelsPath + "/" + resource.Name + "-" + ModelFile
-	_, err = CopyFile(utils.GolangTemplatesPath+ModelsPath+"/"+ModelFile, targetResourceModelFileName)
+	targetResourceModelFileName := copier.NodeDirectoryName + ModelsPath + "/" + resource.Name + "-" + ModelFile
+	_, err = languages.CopyFile(targetResourceModelFileName, utils.GolangTemplatesPath+ModelsPath+"/"+ModelFile)
 	if err != nil {
 		return err
 	}
 
-	targetResourceServiceFileName := nodeDirectoryName + ServicesPath + "/" + resource.Name + "-" + ServiceFile
-	_, err = CopyFile(utils.GolangTemplatesPath+ServicesPath+"/"+ServiceFile, targetResourceServiceFileName)
+	targetResourceServiceFileName := copier.NodeDirectoryName + ServicesPath + "/" + resource.Name + "-" + ServiceFile
+	_, err = languages.CopyFile(targetResourceServiceFileName, utils.GolangTemplatesPath+ServicesPath+"/"+ServiceFile)
 	if err != nil {
 		return err
 	}
 
-	targetResourceDaoFileName := nodeDirectoryName + DaosPath + "/" + resource.Name + "-" + DaoFile
-	_, err = CopyFile(utils.GolangTemplatesPath+DaosPath+"/"+DaoFile, targetResourceDaoFileName)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func CopyRestClientResourceFiles(resource node.Resource, nodeDirectoryName string) error {
-	targetResourceClientFileName := nodeDirectoryName + ClientPath + "/" + resource.Name + "-" + ClientFile
-	_, err := CopyFile(utils.GolangTemplatesPath+ClientPath+"/"+ClientFile, targetResourceClientFileName)
+	targetResourceDaoFileName := copier.NodeDirectoryName + DaosPath + "/" + resource.Name + "-" + DaoFile
+	_, err = languages.CopyFile(targetResourceDaoFileName, utils.GolangTemplatesPath+DaosPath+"/"+DaoFile)
 	if err != nil {
 		return err
 	}
@@ -157,30 +87,44 @@ func CopyRestClientResourceFiles(resource node.Resource, nodeDirectoryName strin
 	return nil
 }
 
-func CopyFile(src, dst string) (int64, error) {
-	sourceFileStat, err := os.Stat(src)
+func (copier Copier) CopyRestClientResourceFiles(client languages.RestClient) error {
+	targetResourceClientFileName := copier.NodeDirectoryName + ClientPath + "/" + client.ExternalNode + "-" + ClientFile
+	_, err := languages.CopyFile(targetResourceClientFileName, utils.GolangTemplatesPath+ClientPath+"/"+ClientFile)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	if !sourceFileStat.Mode().IsRegular() {
-		return 0, fmt.Errorf("%s is not a regular file", src)
-	}
+	return nil
+}
 
-	source, err := os.Open(src)
-	if err != nil {
-		return 0, err
+// CreateRestConfigs creates/copies relevant files to generated project
+func (copier Copier) CreateRestConfigs() error {
+	//if the node is server, add server code
+	if copier.GoNode.RestConfig.Server != nil {
+		//create directories for controller, service, dao, models
+		if err := copier.CreateRestServerDirectories(); err != nil {
+			return err
+		}
+		// copy files with respect to the names of resources
+		for _, resource := range copier.GoNode.RestConfig.Server.Resources {
+			if err := copier.CopyRestServerResourceFiles(resource); err != nil {
+				return err
+			}
+		}
 	}
-	defer func(source *os.File) {
-		_ = source.Close()
-	}(source)
+	//if the node is client, add client code
+	if copier.GoNode.RestConfig.Clients != nil {
+		//create directories for client
+		if err := copier.CreateRestClientDirectories(); err != nil {
+			return err
+		}
 
-	destination, err := os.Create(dst)
-	if err != nil {
-		return 0, err
+		//copy files with respect to the names of resources
+		for _, client := range copier.GoNode.RestConfig.Clients {
+			if err := copier.CopyRestClientResourceFiles(client); err != nil {
+				return err
+			}
+		}
 	}
-	defer func(destination *os.File) {
-		_ = destination.Close()
-	}(destination)
-	return io.Copy(destination, source)
+	return nil
 }

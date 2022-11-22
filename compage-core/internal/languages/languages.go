@@ -10,6 +10,7 @@ import (
 
 const Go = "Golang"
 const NodeJs = "NodeJs"
+const Compage string = "compage"
 
 type LanguageNode struct {
 	ID          string                 `json:"ID"`

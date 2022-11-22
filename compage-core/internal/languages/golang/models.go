@@ -5,10 +5,6 @@ import (
 	"github.com/kube-tarian/compage-core/internal/languages"
 )
 
-const (
-	Compage string = "compage"
-)
-
 type GoNode struct {
 	languages.LanguageNode
 }
@@ -69,7 +65,7 @@ func (goNode *GoNode) FillDefaults() error {
 		goNode.Language = languages.Go
 	}
 	if goNode.Template == "" {
-		goNode.Template = Compage
+		goNode.Template = languages.Compage
 	}
 
 	return nil
