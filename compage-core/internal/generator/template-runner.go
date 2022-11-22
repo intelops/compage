@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/kube-tarian/compage-core/internal/core"
 	"github.com/kube-tarian/compage-core/internal/languages"
-	tarOperations "github.com/kube-tarian/compage-core/internal/tarOperations"
+	"github.com/kube-tarian/compage-core/internal/taroperations"
 	"github.com/kube-tarian/compage-core/internal/utils"
 	"os"
 	"path/filepath"
@@ -91,7 +91,7 @@ func GoTemplateRunner(coreProject *core.Project, goNode *languages.LanguageNode)
 
 	for _, filePathName := range filePaths {
 		// ignore paths like .git and .idea
-		if !tarOperations.IgnorablePaths(filePathName) {
+		if !taroperations.IgnorablePaths(filePathName) {
 			// generate go code now
 			data := map[string]string{
 				"Name":      "John Doe",

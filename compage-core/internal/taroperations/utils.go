@@ -1,4 +1,4 @@
-package tarOperations
+package taroperations
 
 import (
 	"archive/tar"

@@ -1,7 +1,6 @@
 package languages
 
 import (
-	"errors"
 	"fmt"
 	"github.com/kube-tarian/compage-core/internal/core"
 	"github.com/kube-tarian/compage-core/internal/core/edge"
@@ -132,11 +131,11 @@ func GetServersForNode(nodeP node.Node) (*Servers, error) {
 				Resources: serverType.Resources,
 			}
 		} else if serverProtocol == core.Grpc {
-			return nil, errors.New(fmt.Sprintf("unsupported serverProtocol %s for language : %s", serverProtocol,
-				nodeP.ConsumerData.Language))
+			return nil, fmt.Errorf("unsupported serverProtocol %s for language : %s", serverProtocol,
+				nodeP.ConsumerData.Language)
 		} else if serverProtocol == core.Ws {
-			return nil, errors.New(fmt.Sprintf("unsupported serverProtocol %s for language : %s", serverProtocol,
-				nodeP.ConsumerData.Language))
+			return nil, fmt.Errorf("unsupported serverProtocol %s for language : %s", serverProtocol,
+				nodeP.ConsumerData.Language)
 		}
 	}
 	return &Servers{
@@ -159,11 +158,11 @@ func GetClientsForNode(edges []edge.Edge, nodeP node.Node) (*Clients, error) {
 					// only one rest client config for a given edge
 					break
 				} else if clientType.Protocol == core.Grpc {
-					return nil, errors.New(fmt.Sprintf("unsupported clientProtocol %s for language : %s",
-						clientType.Protocol, nodeP.ConsumerData.Language))
+					return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
+						clientType.Protocol, nodeP.ConsumerData.Language)
 				} else if clientType.Protocol == core.Ws {
-					return nil, errors.New(fmt.Sprintf("unsupported clientProtocol %s for language : %s",
-						clientType.Protocol, nodeP.ConsumerData.Language))
+					return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
+						clientType.Protocol, nodeP.ConsumerData.Language)
 				}
 			}
 		}

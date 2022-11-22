@@ -5,7 +5,7 @@ import (
 	project "github.com/kube-tarian/compage-core/gen/api/v1"
 	"github.com/kube-tarian/compage-core/internal/converter/grpc"
 	"github.com/kube-tarian/compage-core/internal/generator"
-	"github.com/kube-tarian/compage-core/internal/tarOperations"
+	"github.com/kube-tarian/compage-core/internal/taroperations"
 	"github.com/kube-tarian/compage-core/internal/utils"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -39,7 +39,7 @@ func (s server) CreateProject(projectRequest *project.ProjectRequest, server pro
 	}
 
 	// CreateTarFile creates tar file for the project generated
-	err = tarOperations.CreateTarFile(coreProject.Name, utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
+	err = taroperations.CreateTarFile(coreProject.Name, utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (s server) CreateProject(projectRequest *project.ProjectRequest, server pro
 		if err = os.Remove(name); err != nil {
 			log.Error(err)
 		}
-	}(tarOperations.GetProjectTarFilePath(projectRequest.GetProjectName()))
+	}(taroperations.GetProjectTarFilePath(projectRequest.GetProjectName()))
 
 	// stream file to grpc client
 	return sendFile(projectRequest, server)
@@ -70,7 +70,7 @@ func (s server) UpdateProject(projectRequest *project.ProjectRequest, server pro
 	//}
 	//fmt.Println(projectGrpc.CompageYaml)
 	// createProject
-	err := tarOperations.CreateTarFile(projectRequest.ProjectName, utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
+	err := taroperations.CreateTarFile(projectRequest.ProjectName, utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (s server) UpdateProject(projectRequest *project.ProjectRequest, server pro
 }
 
 func sendFile(projectRequest *project.ProjectRequest, server project.ProjectService_CreateProjectServer) error {
-	f, ok := tarOperations.GetFile(tarOperations.GetProjectTarFilePath(projectRequest.ProjectName))
+	f, ok := taroperations.GetFile(taroperations.GetProjectTarFilePath(projectRequest.ProjectName))
 	if !ok {
 		return status.Error(codes.NotFound, "file is not found")
 	}
