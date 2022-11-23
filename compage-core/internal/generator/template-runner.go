@@ -114,7 +114,7 @@ func GoTemplateRunner(coreProject *core.Project, goNode *languages.LanguageNode)
 }
 
 func funcName(filePathName string, nodeDirectoryName string) (string, *os.File, error) {
-	// convert path from /templates/compage-template-langauge to /project-name/node structure
+	// convert path from /templates/compage-template-language to /project-name/node structure
 	targetFilePath := strings.Replace(filePathName[:strings.LastIndex(filePathName, utils.SubstrString)], nodeDirectoryName, "", -1)
 	// nodeDirectoryName is a node directory and attach targetFilePath to node path now.
 	fileNameDirectoryPath := nodeDirectoryName + targetFilePath

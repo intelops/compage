@@ -169,8 +169,9 @@ func GetClientsForNode(edges []edge.Edge, nodeP node.Node) (*Clients, error) {
 			for _, clientType := range e.ConsumerData.ClientTypes {
 				if clientType.Protocol == core.Rest {
 					restClients = append(restClients, RestClient{
-						Protocol:     clientType.Protocol,
-						Port:         clientType.Port,
+						Protocol: clientType.Protocol,
+						Port:     clientType.Port,
+						// TODO refer node's name here instead of id.
 						ExternalNode: e.Src,
 					})
 					// only one rest client config for a given edge.
