@@ -15,10 +15,10 @@ type LanguageNode struct {
 	ID          string                 `json:"ID"`
 	Name        string                 `json:"name"`
 	NodeType    string                 `json:"nodeType"`
-	Metadata    map[string]interface{} `yaml:"metadata,omitempty"`
-	Annotations map[string]string      `yaml:"annotations,omitempty"`
-	Language    string                 `yaml:"language"`
-	Template    string                 `yaml:"template"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Annotations map[string]string      `json:"annotations,omitempty"`
+	Language    string                 `json:"language"`
+	Template    string                 `json:"template"`
 
 	RestConfig *RestConfig `json:"restConfig"`
 	GrpcConfig *GrpcConfig `json:"grpcConfig"`

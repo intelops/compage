@@ -2,25 +2,25 @@ package node
 
 // Node depicts a separate repository
 type Node struct {
-	ConsumerData ConsumerData `yaml:"consumerData,omitempty"`
-	ID           string       `yaml:"id"`
-	TypeID       string       `yaml:"typeId"`
+	ConsumerData ConsumerData `json:"consumerData,omitempty"`
+	ID           string       `json:"id"`
+	TypeID       string       `json:"typeId"`
 }
 
 // ConsumerData has detailed attributes of a Node
 type ConsumerData struct {
 	// Language node's(component) language.
-	Language string `yaml:"language"`
+	Language string `json:"language"`
 	// Template its template to be used to generate project.
-	Template string `yaml:"template"`
+	Template string `json:"template"`
 	// Name of component (required, this will be service and deployment name).
-	Name string `yaml:"name"`
+	Name string `json:"name"`
 	// ServerTypes holds all config related to server. If nil, it means that the node is just client and not server.
-	ServerTypes []ServerType `yaml:"serverTypes,omitempty"`
+	ServerTypes []ServerType `json:"serverTypes,omitempty"`
 	// Metadata holds misc information about the node.
-	Metadata map[string]interface{} `yaml:"metadata,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Annotations holds annotations for the node.
-	Annotations map[string]string `yaml:"annotations,omitempty"`
+	Annotations map[string]string `json:"annotations,omitempty"`
 }
 
 type ServerType struct {
@@ -34,5 +34,5 @@ type ServerType struct {
 type Resource struct {
 	Name string `json:"name"`
 	// resources fields (e.g. name, age in user)
-	Fields map[string]string `yaml:"fields"`
+	Fields map[string]string `json:"fields"`
 }

@@ -2,17 +2,17 @@ package edge
 
 // Edge can have connection details such as port (Assumption is that the port mentioned is of SRC in edge)
 type Edge struct {
-	Dest         string       `yaml:"dest"`
-	ID           string       `yaml:"id"`
-	Src          string       `yaml:"src"`
-	ConsumerData ConsumerData `yaml:"consumerData,omitempty"`
+	Dest         string       `json:"dest"`
+	ID           string       `json:"id"`
+	Src          string       `json:"src"`
+	ConsumerData ConsumerData `json:"consumerData,omitempty"`
 }
 
 // ConsumerData has detailed attributes of an edge
 type ConsumerData struct {
-	ClientTypes []ClientType           `yaml:"clientTypes,omitempty"`
-	Metadata    map[string]interface{} `yaml:"metadata,omitempty"`
-	Annotations map[string]string      `yaml:"annotations,omitempty"`
+	ClientTypes []ClientType           `json:"clientTypes,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Annotations map[string]string      `json:"annotations,omitempty"`
 }
 
 // ClientType holds information for an edge

@@ -39,6 +39,8 @@ func Generator(coreProject *core.Project) error {
 				return err2
 			}
 			// trigger template runner
+			// create data map with values from GoNode and project to replace placeholders  - this is required as the
+			// names may be conflicting in nature
 			// TODO
 		} else if compageNode.ConsumerData.Language == languages.NodeJs {
 			return errors.New("unsupported language : " + languages.NodeJs)

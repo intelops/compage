@@ -27,9 +27,9 @@ type Project struct {
 // CompageYaml has all edges and nodes
 type CompageYaml struct {
 	// Linkages (connection details) between Nodes
-	Edges []edge.Edge `yaml:"edges"`
+	Edges []edge.Edge `json:"edges"`
 	// Nodes represent components and has details of the component.
-	Nodes []node.Node `yaml:"nodes"`
+	Nodes []node.Node `json:"nodes"`
 }
 
 // Rest Protocol
