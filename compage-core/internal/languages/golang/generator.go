@@ -24,24 +24,25 @@ func Generator(ctx context.Context) error {
 		// create golang specific copier
 		copier := NewCopier(ctx)
 
-		// copy all files at root level
-		err := copier.CreateRootLevelFiles(utils.GolangTemplatesPath)
-		if err != nil {
-			return err
-		}
-
-		// copy kubernetes yaml's
-		err = copier.CreateKubernetesFiles(utils.GolangTemplatesPath)
-		if err != nil {
-			return err
-		}
-
 		// copy relevant files from templates based on config received, if the node is server
 		if goNode.RestConfig != nil {
-			if err = copier.CreateRestConfigs(); err != nil {
+			if err := copier.CreateRestConfigs(); err != nil {
 				return err
 			}
 		}
+
+		// copy kubernetes yaml's
+		err := copier.CreateKubernetesFiles(utils.GolangTemplatesPath)
+		if err != nil {
+			return err
+		}
+
+		// copy all files at root level
+		err = copier.CreateRootLevelFiles(utils.GolangTemplatesPath)
+		if err != nil {
+			return err
+		}
+
 	} else {
 		// frameworks cli tools
 		return errors.New("unsupported template for language : " + languages.Go)

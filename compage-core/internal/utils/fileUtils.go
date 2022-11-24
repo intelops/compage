@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -97,4 +98,41 @@ func CopyFile(destFilePath, srcFilePath string) (int64, error) {
 // IgnorablePaths ignores a few directories.
 func IgnorablePaths(path string) bool {
 	return strings.Contains(path, ".git") || strings.Contains(path, ".idea")
+}
+
+// GetDirectoriesAndFilePaths returns files and directories in given path or error.
+func GetDirectoriesAndFilePaths(templatesPath string) ([]string, []string, error) {
+	var directories []string
+	var filePaths []string
+
+	// Get all directories on /templates and check if there's repeated files
+	err := filepath.Walk(templatesPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			// Is file
+			filename := info.Name()
+			hasRepeatedFilePaths := contains(filePaths, path)
+			if hasRepeatedFilePaths {
+				return fmt.Errorf("you can't have repeated template files: %s", filename)
+			}
+			filePaths = append(filePaths, path)
+		} else {
+			// Is directory
+			directories = append(directories, path)
+		}
+
+		return nil
+	})
+	return directories, filePaths, err
+}
+
+func contains(filePaths []string, filePathName string) bool {
+	for _, f := range filePaths {
+		if f == filePathName {
+			return true
+		}
+	}
+	return false
 }

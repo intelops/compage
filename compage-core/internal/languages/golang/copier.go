@@ -59,7 +59,7 @@ func NewCopier(ctx context.Context) *Copier {
 		var resourcesData []resourceData
 		resources := values.GoNode.RestConfig.Server.Resources
 		for _, r := range resources {
-			resourcesData = append(resourcesData, resourceData{ResourceName: r.Name, ResourceNamePlural: r.Name + "s"})
+			resourcesData = append(resourcesData, resourceData{ResourceName: r.Name, ResourceNamePlural: strings.ToLower(r.Name) + "s"})
 		}
 		data["Resources"] = resourcesData
 		data["ServerPort"] = values.GoNode.LanguageNode.RestConfig.Server.Port
@@ -202,18 +202,45 @@ func (copier Copier) CreateKubernetesFiles(templatePath string) error {
 	if err := utils.CreateDirectories(destKubernetesDirectory); err != nil {
 		return err
 	}
-	return utils.CopyFilesAndDirs(destKubernetesDirectory, srcKubernetesDirectory)
+
+	err := utils.CopyFilesAndDirs(destKubernetesDirectory, srcKubernetesDirectory)
+	if err != nil {
+		return err
+	}
+
+	return copier.apply()
 }
 
 // CreateRootLevelFiles copies all root level files at language template.
 func (copier Copier) CreateRootLevelFiles(templatePath string) error {
-	return utils.CopyFiles(copier.NodeDirectoryName, templatePath)
+	err := utils.CopyFiles(copier.NodeDirectoryName, templatePath)
+	if err != nil {
+		return err
+	}
+
+	return copier.apply()
+}
+
+func (copier Copier) apply() error {
+	_, files, err := utils.GetDirectoriesAndFilePaths(copier.NodeDirectoryName)
+	if err != nil {
+		return err
+	}
+
+	return copier.applyTemplate(files)
 }
 
 func (copier Copier) addResourceSpecificTemplateData(resource node.Resource) {
 	// set resource specific key/value for data.
 	copier.Data["ResourceName"] = resource.Name
-	copier.Data["Fields"] = resource.Fields
+	//make every field public by making its first character capital.
+	fields := map[string]string{}
+	for key, value := range resource.Fields {
+		// TODO change this approach
+		key = strings.Title(key)
+		fields[key] = value
+	}
+	copier.Data["Fields"] = fields
 	copier.Data["ResourceNameSingular"] = strings.ToLower(resource.Name)
 	copier.Data["ResourceNamePlural"] = strings.ToLower(resource.Name) + "s"
 }
@@ -235,8 +262,10 @@ func (copier Copier) applyTemplate(filePaths []string) error {
 
 	// delete the template files
 	for _, filePathName := range filePaths {
-		if err2 := os.Remove(filePathName); err2 != nil {
-			return err2
+		if strings.HasSuffix(filePathName, ".tmpl") {
+			if err2 := os.Remove(filePathName); err2 != nil {
+				return err2
+			}
 		}
 	}
 	return nil
