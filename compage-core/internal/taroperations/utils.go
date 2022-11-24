@@ -109,7 +109,7 @@ func listProjectFiles(projectDirectoryPath string) []string {
 		if err != nil {
 			return err
 		}
-		if !IgnorablePaths(path) && !info.IsDir() {
+		if !utils.IgnorablePaths(path) && !info.IsDir() {
 			//TODO Needs to fix problem with below impl as it searches in current dir
 			//files = append(files, strings.Replace(path, projectDirectoryPath, "", -1))
 			files = append(files, path)
@@ -120,11 +120,6 @@ func listProjectFiles(projectDirectoryPath string) []string {
 		log.Error(err)
 	}
 	return files
-}
-
-// IgnorablePaths ignores a few directories.
-func IgnorablePaths(path string) bool {
-	return strings.Contains(path, ".git") || strings.Contains(path, ".idea")
 }
 
 // GetFile returns file for name supplied.

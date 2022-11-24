@@ -1,46 +1,39 @@
 package golang
 
 import (
+	"context"
 	"errors"
 	"github.com/kube-tarian/compage-core/internal/languages"
 	"github.com/kube-tarian/compage-core/internal/utils"
 )
 
 // Generator generates golang specific code according to config passed
-func Generator(projectName string, goNode *GoNode) error {
+func Generator(ctx context.Context) error {
+	values := ctx.Value(ContextVars).(Values)
+	goNode := values.GoNode
+	nodeDirectoryName := values.NodeDirectoryName
+
 	// Copy required files from templates, a few of them may need renaming.
 	// Iterate over all the files in template folder
 	if goNode.Template == languages.Compage {
-		// retrieve project named directory
-		projectDirectory := utils.GetProjectDirectoryName(projectName)
-
 		// create node directory in projectDirectory depicting a subproject
-		nodeDirectoryName := projectDirectory + "/" + goNode.Name
 		if err := utils.CreateDirectories(nodeDirectoryName); err != nil {
 			return err
 		}
 
-		// create neutralCopier
-		neutralCopier := languages.NeutralCopier{
-			NodeDirectoryName: nodeDirectoryName,
-		}
+		// create golang specific copier
+		copier := NewCopier(ctx)
 
 		// copy all files at root level
-		err := neutralCopier.CreateRootLevelFiles(utils.GolangTemplatesPath)
+		err := copier.CreateRootLevelFiles(utils.GolangTemplatesPath)
 		if err != nil {
 			return err
 		}
 
-		// copy kubernetes yamls
-		err = neutralCopier.CreateKubernetesFiles(utils.GolangTemplatesPath)
+		// copy kubernetes yaml's
+		err = copier.CreateKubernetesFiles(utils.GolangTemplatesPath)
 		if err != nil {
 			return err
-		}
-
-		// create golang specific copier
-		copier := Copier{
-			NodeDirectoryName: nodeDirectoryName,
-			GoNode:            *goNode,
 		}
 
 		// copy relevant files from templates based on config received, if the node is server

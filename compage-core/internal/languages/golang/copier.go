@@ -1,10 +1,13 @@
 package golang
 
 import (
+	"context"
 	"github.com/kube-tarian/compage-core/internal/core/node"
 	"github.com/kube-tarian/compage-core/internal/languages"
 	"github.com/kube-tarian/compage-core/internal/utils"
+	"os"
 	"strings"
+	"text/template"
 )
 
 const RestServerPath = "/pkg/rest/server"
@@ -14,6 +17,8 @@ const DaosPath = RestServerPath + "/daos"
 const ServicesPath = RestServerPath + "/services"
 const ControllersPath = RestServerPath + "/controllers"
 const ModelsPath = RestServerPath + "/models"
+
+const KubernetesPath = "/kubernetes"
 
 const ClientPath = "/pkg/rest/client"
 
@@ -26,8 +31,20 @@ const ClientFile = "client.go.tmpl"
 
 // Copier Language specific copier
 type Copier struct {
-	NodeDirectoryName string `json:"nodeDirectoryName"`
-	GoNode            GoNode `json:"goNode"`
+	Ctx               context.Context
+	NodeDirectoryName string
+	GoNode            *GoNode
+	ProjectName       string
+}
+
+func NewCopier(ctx context.Context) *Copier {
+	values := ctx.Value(ContextVars).(Values)
+
+	return &Copier{
+		Ctx:               ctx,
+		NodeDirectoryName: values.NodeDirectoryName,
+		GoNode:            values.GoNode,
+	}
 }
 
 // CreateRestClientDirectories creates rest client directories.
@@ -65,6 +82,7 @@ func (copier Copier) CreateRestServerDirectories() error {
 
 // CopyRestServerResourceFiles copies rest server resource files from template and renames them as per resource config.
 func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
+	var filePaths []string
 	resourceName := strings.ToLower(resource.Name)
 	// copy controller files to generated project
 	targetResourceControllerFileName := copier.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + ControllerFile
@@ -72,23 +90,62 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 	if err != nil {
 		return err
 	}
+	filePaths = append(filePaths, targetResourceControllerFileName)
 	// copy model files to generated project
 	targetResourceModelFileName := copier.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + ModelFile
 	_, err = utils.CopyFile(targetResourceModelFileName, utils.GolangTemplatesPath+ModelsPath+"/"+ModelFile)
 	if err != nil {
 		return err
 	}
+	filePaths = append(filePaths, targetResourceControllerFileName)
 	// copy service files to generated project
 	targetResourceServiceFileName := copier.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + ServiceFile
 	_, err = utils.CopyFile(targetResourceServiceFileName, utils.GolangTemplatesPath+ServicesPath+"/"+ServiceFile)
 	if err != nil {
 		return err
 	}
+	filePaths = append(filePaths, targetResourceServiceFileName)
 	// copy dao files to generated project
 	targetResourceDaoFileName := copier.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + DaoFile
 	_, err = utils.CopyFile(targetResourceDaoFileName, utils.GolangTemplatesPath+DaosPath+"/"+DaoFile)
 	if err != nil {
 		return err
+	}
+	filePaths = append(filePaths, targetResourceDaoFileName)
+
+	values := copier.Ctx.Value(ContextVars).(Values)
+
+	repositoryName := values.Get(RepositoryName)
+	nodeName := values.Get(NodeName)
+
+	data := map[string]interface{}{
+		"ResourceName":         resource.Name,
+		"Fields":               resource.Fields,
+		"ResourceNameSingular": strings.ToLower(resource.Name),
+		"ResourceNamePlural":   strings.ToLower(resource.Name) + "s",
+		"RepositoryName":       repositoryName,
+		"NodeName":             nodeName,
+	}
+
+	for _, filePathName := range filePaths {
+		// template code
+		parsedTemplates := template.Must(template.New("").Option("missingkey=zero").ParseFiles(filePathName))
+		// generate go code now
+		fileName := filePathName[strings.LastIndex(filePathName, utils.SubstrString)+1:]
+		createdFile, err2 := os.Create(strings.TrimSuffix(filePathName, utils.TemplateExtension))
+		if err2 != nil {
+			return err2
+		}
+		if err2 = parsedTemplates.ExecuteTemplate(createdFile, fileName, data); err2 != nil {
+			return err2
+		}
+
+		//If file is deleted, it fails in next iteration. I think the template parsing
+		// should happen on current file.
+		//TODO
+		//if err2 = os.Remove(filePathName); err2 != nil {
+		//	return err2
+		//}
 	}
 
 	return nil
@@ -136,4 +193,19 @@ func (copier Copier) CreateRestConfigs() error {
 		}
 	}
 	return nil
+}
+
+// CreateKubernetesFiles creates required directory and copies files from language template.
+func (copier Copier) CreateKubernetesFiles(templatePath string) error {
+	srcKubernetesDirectory := templatePath + KubernetesPath
+	destKubernetesDirectory := copier.NodeDirectoryName + KubernetesPath
+	if err := utils.CreateDirectories(destKubernetesDirectory); err != nil {
+		return err
+	}
+	return utils.CopyFilesAndDirs(destKubernetesDirectory, srcKubernetesDirectory)
+}
+
+// CreateRootLevelFiles copies all root level files at language template.
+func (copier Copier) CreateRootLevelFiles(templatePath string) error {
+	return utils.CopyFiles(copier.NodeDirectoryName, templatePath)
 }

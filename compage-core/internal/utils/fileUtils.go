@@ -93,3 +93,8 @@ func CopyFile(destFilePath, srcFilePath string) (int64, error) {
 	}(destinationFile)
 	return io.Copy(destinationFile, sourceFile)
 }
+
+// IgnorablePaths ignores a few directories.
+func IgnorablePaths(path string) bool {
+	return strings.Contains(path, ".git") || strings.Contains(path, ".idea")
+}

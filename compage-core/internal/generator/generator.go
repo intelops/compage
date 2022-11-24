@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"context"
 	"errors"
 	"github.com/kube-tarian/compage-core/internal/core"
 	"github.com/kube-tarian/compage-core/internal/languages"
@@ -35,7 +36,10 @@ func Generator(coreProject *core.Project) error {
 			if err2 := goNode.FillDefaults(); err2 != nil {
 				return err2
 			}
-			if err2 := golang.Generator(coreProject.Name, &goNode); err2 != nil {
+
+			ctx := golang.AddValuesToContext(context.Background(), coreProject, &goNode)
+
+			if err2 := golang.Generator(ctx); err2 != nil {
 				return err2
 			}
 			// trigger template runner
