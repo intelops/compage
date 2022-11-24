@@ -172,7 +172,7 @@ func GetClientsForNode(edges []edge.Edge, nodeP node.Node) (*Clients, error) {
 						Protocol: clientType.Protocol,
 						Port:     clientType.Port,
 						// TODO refer node's name here instead of id.
-						ExternalNode: e.Src,
+						ExternalNode: e.ConsumerData.ExternalNodeName,
 					})
 					// only one rest client config for a given edge.
 					break

@@ -10,9 +10,10 @@ type Edge struct {
 
 // ConsumerData has detailed attributes of an edge
 type ConsumerData struct {
-	ClientTypes []ClientType           `json:"clientTypes,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Annotations map[string]string      `json:"annotations,omitempty"`
+	ClientTypes      []ClientType           `json:"clientTypes,omitempty"`
+	Metadata         map[string]interface{} `json:"metadata,omitempty"`
+	Annotations      map[string]string      `json:"annotations,omitempty"`
+	ExternalNodeName string                 `json:"externalNodeName,omitempty"`
 }
 
 // ClientType holds information for an edge

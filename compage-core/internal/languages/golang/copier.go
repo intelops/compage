@@ -19,6 +19,8 @@ const ControllersPath = RestServerPath + "/controllers"
 const ModelsPath = RestServerPath + "/models"
 
 const KubernetesPath = "/kubernetes"
+const KubernetesDeploymentFile = "deployment.yaml.tmpl"
+const KubernetesServiceFile = "service.yaml.tmpl"
 
 const ClientPath = "/pkg/rest/client"
 
@@ -46,7 +48,7 @@ func NewCopier(ctx context.Context) *Copier {
 	//populate map to replace templates
 	data := map[string]interface{}{
 		"RepositoryName": repositoryName,
-		"NodeName":       nodeName,
+		"NodeName":       strings.ToLower(nodeName),
 	}
 
 	//set all resources for main.go.tmpl
@@ -153,11 +155,21 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 
 // CopyRestClientResourceFiles copies rest client files from template and renames them as per client config.
 func (copier Copier) CopyRestClientResourceFiles(client languages.RestClient) error {
+	/// add resource specific data to map in copier needed for templates.
+	copier.Data["ClientPort"] = client.Port
+	copier.Data["ClientServiceName"] = client.ExternalNode
+
 	// copy client files to generated project.
 	targetResourceClientFileName := copier.NodeDirectoryName + ClientPath + "/" + client.ExternalNode + "-" + ClientFile
 	_, err := utils.CopyFile(targetResourceClientFileName, utils.GolangTemplatesPath+ClientPath+"/"+ClientFile)
 	if err != nil {
 		return err
+	}
+	var filePaths []string
+	filePaths = append(filePaths, targetResourceClientFileName)
+	// apply template
+	if err2 := copier.applyTemplate(filePaths); err2 != nil {
+		return err2
 	}
 
 	return nil
@@ -197,18 +209,33 @@ func (copier Copier) CreateRestConfigs() error {
 
 // CreateKubernetesFiles creates required directory and copies files from language template.
 func (copier Copier) CreateKubernetesFiles(templatePath string) error {
-	srcKubernetesDirectory := templatePath + KubernetesPath
 	destKubernetesDirectory := copier.NodeDirectoryName + KubernetesPath
 	if err := utils.CreateDirectories(destKubernetesDirectory); err != nil {
 		return err
 	}
 
-	err := utils.CopyFilesAndDirs(destKubernetesDirectory, srcKubernetesDirectory)
+	var filePaths []string
+	if copier.GoNode.RestConfig.Server != nil {
+		// copy service files to generated kubernetes manifests
+		targetKubernetesServiceFileName := copier.NodeDirectoryName + KubernetesPath + "/" + KubernetesServiceFile
+		_, err := utils.CopyFile(targetKubernetesServiceFileName, utils.GolangTemplatesPath+KubernetesPath+"/"+KubernetesServiceFile)
+		if err != nil {
+			return err
+		}
+		filePaths = append(filePaths, targetKubernetesServiceFileName)
+	}
+	// copy deployment files to generated kubernetes manifests
+	targetKubernetesDeploymentFileName := copier.NodeDirectoryName + KubernetesPath + "/" + KubernetesDeploymentFile
+	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, utils.GolangTemplatesPath+KubernetesPath+"/"+KubernetesDeploymentFile)
 	if err != nil {
 		return err
 	}
+	filePaths = append(filePaths, targetKubernetesDeploymentFileName)
+	if err = copier.applyTemplate(filePaths); err != nil {
+		return err
+	}
 
-	return copier.apply()
+	return nil
 }
 
 // CreateRootLevelFiles copies all root level files at language template.
