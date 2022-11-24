@@ -97,7 +97,7 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetResourceControllerFileName)
+	filePaths = append(filePaths, targetResourceModelFileName)
 	// copy service files to generated project
 	targetResourceServiceFileName := copier.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + ServiceFile
 	_, err = utils.CopyFile(targetResourceServiceFileName, utils.GolangTemplatesPath+ServicesPath+"/"+ServiceFile)
@@ -113,6 +113,17 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 	}
 	filePaths = append(filePaths, targetResourceDaoFileName)
 
+	type ResourceData struct {
+		ResourceNamePlural string `json:"resourceNamePlural"`
+		ResourceName       string `json:"resourceName"`
+	}
+
+	var resourcesData []ResourceData
+	resources := copier.GoNode.RestConfig.Server.Resources
+	for _, r := range resources {
+		resourcesData = append(resourcesData, ResourceData{ResourceName: r.Name, ResourceNamePlural: r.Name + "s"})
+	}
+
 	values := copier.Ctx.Value(ContextVars).(Values)
 
 	repositoryName := values.Get(RepositoryName)
@@ -125,6 +136,8 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 		"ResourceNamePlural":   strings.ToLower(resource.Name) + "s",
 		"RepositoryName":       repositoryName,
 		"NodeName":             nodeName,
+		"Resources":            resourcesData,
+		"ServerPort":           copier.GoNode.LanguageNode.RestConfig.Server.Port,
 	}
 
 	for _, filePathName := range filePaths {
@@ -139,13 +152,13 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 		if err2 = parsedTemplates.ExecuteTemplate(createdFile, fileName, data); err2 != nil {
 			return err2
 		}
+	}
 
-		//If file is deleted, it fails in next iteration. I think the template parsing
-		// should happen on current file.
-		//TODO
-		//if err2 = os.Remove(filePathName); err2 != nil {
-		//	return err2
-		//}
+	// delete the template files
+	for _, filePathName := range filePaths {
+		if err2 := os.Remove(filePathName); err2 != nil {
+			return err2
+		}
 	}
 
 	return nil
