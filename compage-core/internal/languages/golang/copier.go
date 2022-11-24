@@ -35,15 +35,42 @@ type Copier struct {
 	NodeDirectoryName string
 	GoNode            *GoNode
 	ProjectName       string
+	Data              map[string]interface{}
 }
 
 func NewCopier(ctx context.Context) *Copier {
 	values := ctx.Value(ContextVars).(Values)
+	repositoryName := values.Get(RepositoryName)
+	nodeName := values.Get(NodeName)
+
+	//populate map to replace templates
+	data := map[string]interface{}{
+		"RepositoryName": repositoryName,
+		"NodeName":       nodeName,
+	}
+
+	//set all resources for main.go.tmpl
+	if values.GoNode.RestConfig.Server != nil {
+		type resourceData struct {
+			ResourceNamePlural string
+			ResourceName       string
+		}
+
+		var resourcesData []resourceData
+		resources := values.GoNode.RestConfig.Server.Resources
+		for _, r := range resources {
+			resourcesData = append(resourcesData, resourceData{ResourceName: r.Name, ResourceNamePlural: r.Name + "s"})
+		}
+		data["Resources"] = resourcesData
+		data["ServerPort"] = values.GoNode.LanguageNode.RestConfig.Server.Port
+		data["IsServer"] = true
+	}
 
 	return &Copier{
 		Ctx:               ctx,
 		NodeDirectoryName: values.NodeDirectoryName,
 		GoNode:            values.GoNode,
+		Data:              data,
 	}
 }
 
@@ -113,52 +140,12 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 	}
 	filePaths = append(filePaths, targetResourceDaoFileName)
 
-	type ResourceData struct {
-		ResourceNamePlural string `json:"resourceNamePlural"`
-		ResourceName       string `json:"resourceName"`
-	}
+	/// add resource specific data to map in copier needed for templates.
+	copier.addResourceSpecificTemplateData(resource)
 
-	var resourcesData []ResourceData
-	resources := copier.GoNode.RestConfig.Server.Resources
-	for _, r := range resources {
-		resourcesData = append(resourcesData, ResourceData{ResourceName: r.Name, ResourceNamePlural: r.Name + "s"})
-	}
-
-	values := copier.Ctx.Value(ContextVars).(Values)
-
-	repositoryName := values.Get(RepositoryName)
-	nodeName := values.Get(NodeName)
-
-	data := map[string]interface{}{
-		"ResourceName":         resource.Name,
-		"Fields":               resource.Fields,
-		"ResourceNameSingular": strings.ToLower(resource.Name),
-		"ResourceNamePlural":   strings.ToLower(resource.Name) + "s",
-		"RepositoryName":       repositoryName,
-		"NodeName":             nodeName,
-		"Resources":            resourcesData,
-		"ServerPort":           copier.GoNode.LanguageNode.RestConfig.Server.Port,
-	}
-
-	for _, filePathName := range filePaths {
-		// template code
-		parsedTemplates := template.Must(template.New("").Option("missingkey=zero").ParseFiles(filePathName))
-		// generate go code now
-		fileName := filePathName[strings.LastIndex(filePathName, utils.SubstrString)+1:]
-		createdFile, err2 := os.Create(strings.TrimSuffix(filePathName, utils.TemplateExtension))
-		if err2 != nil {
-			return err2
-		}
-		if err2 = parsedTemplates.ExecuteTemplate(createdFile, fileName, data); err2 != nil {
-			return err2
-		}
-	}
-
-	// delete the template files
-	for _, filePathName := range filePaths {
-		if err2 := os.Remove(filePathName); err2 != nil {
-			return err2
-		}
+	// apply template
+	if err2 := copier.applyTemplate(filePaths); err2 != nil {
+		return err2
 	}
 
 	return nil
@@ -221,4 +208,36 @@ func (copier Copier) CreateKubernetesFiles(templatePath string) error {
 // CreateRootLevelFiles copies all root level files at language template.
 func (copier Copier) CreateRootLevelFiles(templatePath string) error {
 	return utils.CopyFiles(copier.NodeDirectoryName, templatePath)
+}
+
+func (copier Copier) addResourceSpecificTemplateData(resource node.Resource) {
+	// set resource specific key/value for data.
+	copier.Data["ResourceName"] = resource.Name
+	copier.Data["Fields"] = resource.Fields
+	copier.Data["ResourceNameSingular"] = strings.ToLower(resource.Name)
+	copier.Data["ResourceNamePlural"] = strings.ToLower(resource.Name) + "s"
+}
+
+func (copier Copier) applyTemplate(filePaths []string) error {
+	for _, filePathName := range filePaths {
+		// template code
+		parsedTemplates := template.Must(template.New("").Option("missingkey=zero").ParseFiles(filePathName))
+		// generate go code now
+		fileName := filePathName[strings.LastIndex(filePathName, utils.SubstrString)+1:]
+		createdFile, err2 := os.Create(strings.TrimSuffix(filePathName, utils.TemplateExtension))
+		if err2 != nil {
+			return err2
+		}
+		if err2 = parsedTemplates.ExecuteTemplate(createdFile, fileName, copier.Data); err2 != nil {
+			return err2
+		}
+	}
+
+	// delete the template files
+	for _, filePathName := range filePaths {
+		if err2 := os.Remove(filePathName); err2 != nil {
+			return err2
+		}
+	}
+	return nil
 }
