@@ -14,6 +14,13 @@ const projectGrpcClient = getProjectGrpcClient();
 // createProject (grpc calls to compage-core)
 compageRouter.post("/create_project", async (req, res) => {
     const {repositoryName, yaml, projectName, userName, email} = req.body;
+    const cleanup = (downloadedProjectPath: string) => {
+        // remove directory created, delete directory recursively
+        rimraf(downloadedProjectPath, () => {
+            console.debug(`${downloadedProjectPath} is cleaned up`);
+        });
+    }
+
     try {
         const payload = {
             "projectName": projectName,
@@ -31,17 +38,27 @@ compageRouter.post("/create_project", async (req, res) => {
                     repositoryName: repositoryName,
                     userName: userName,
                     projectName: projectName,
-                    message: "",
+                    message: err,
                     error: `unable to create project : ${projectName} directory with error : ${err}`
                 });
             }
         }
         const projectTarFilePath = `${downloadedProjectPath}/${projectName}_downloaded.tar.gz`;
         let call = projectGrpcClient.CreateProject(payload);
-        call.on('data', async (response: { fileChunk: any }) => {
+        call.on('data', async (err: any, response: { fileChunk: any }) => {
+            if (err) {
+                cleanup(downloadedProjectPath)
+                return res.status(500).json({
+                    repositoryName: repositoryName,
+                    userName: userName,
+                    projectName: projectName,
+                    message: `unable to create project : ${projectName}`,
+                    error: err
+                });
+            }
             if (response.fileChunk) {
                 fs.appendFileSync(projectTarFilePath, response.fileChunk);
-                console.debug(`Writing tar file chunk to: ${projectTarFilePath}`);
+                console.debug(`writing tar file chunk to: ${projectTarFilePath}`);
             }
         });
         call.on('error', async (response: any) => {
@@ -49,8 +66,8 @@ compageRouter.post("/create_project", async (req, res) => {
                 repositoryName: repositoryName,
                 userName: userName,
                 projectName: projectName,
-                message: "",
-                error: `unable to create project : ${projectName}`
+                message: `unable to create project : ${projectName}`,
+                error: response.details
             });
         });
         call.on('end', () => {
@@ -60,7 +77,11 @@ compageRouter.post("/create_project", async (req, res) => {
                 C: downloadedProjectPath
             });
             // stream on extraction on tar file
-            fs.createReadStream(projectTarFilePath).pipe(extract)
+            let fscrs = fs.createReadStream(projectTarFilePath)
+            fscrs.on('error', function (err: any) {
+                console.log(JSON.stringify(err))
+            });
+            fscrs.pipe(extract)
             extract.on('finish', async () => {
                 // clone existing repository
                 const cloneExistingProjectFromGithubRequest: CloneExistingProjectFromGithubRequest = {
@@ -84,11 +105,7 @@ compageRouter.post("/create_project", async (req, res) => {
 
                 await pushToExistingProjectOnGithub(pushToExistingProjectOnGithubRequest)
                 console.log(`saved ${downloadedProjectPath} to github`)
-
-                // remove directory created, delete directory recursively
-                rimraf(downloadedProjectPath, () => {
-                    console.debug(`${downloadedProjectPath} is cleaned up`);
-                });
+                cleanup(downloadedProjectPath);
 
                 // send status back to ui
                 return res.status(200).json({
@@ -106,8 +123,8 @@ compageRouter.post("/create_project", async (req, res) => {
             repositoryName: repositoryName,
             userName: userName,
             projectName: projectName,
-            message: "",
-            error: `unable to create project : ${projectName}`
+            message: `unable to create project : ${projectName}`,
+            error: err
         });
     }
 });

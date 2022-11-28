@@ -21,40 +21,45 @@ type server struct {
 }
 
 func New() project.ProjectServiceServer {
-	return server{}
+	return &server{}
 }
 
 // CreateProject implements api.v1.CreateProject
-func (s server) CreateProject(projectRequest *project.ProjectRequest, server project.ProjectService_CreateProjectServer) error {
+func (s *server) CreateProject(projectRequest *project.ProjectRequest, server project.ProjectService_CreateProjectServer) error {
 	// converts to core project
 	coreProject, err := grpc.GetProject(projectRequest)
 	if err != nil {
-		return err
+		log.Debug(err)
+		return status.Errorf(codes.InvalidArgument,
+			"wrong project message body :  error while converting request to project ["+err.Error()+"]")
 	}
 
 	// triggers project generation
 	if err := generator.Generator(coreProject); err != nil {
-		log.Error(err)
-		return err
+		log.Debug(err)
+		return status.Errorf(codes.InvalidArgument,
+			"couldn't generate the project :  error while generating the project ["+err.Error()+"]")
 	}
 
 	// CreateTarFile creates tar file for the project generated
 	err = taroperations.CreateTarFile(coreProject.Name, utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
 	if err != nil {
-		return err
+		log.Debug(err)
+		return status.Errorf(codes.InvalidArgument,
+			"wrong project message body :  error while converting request to project ["+err.Error()+"]")
 	}
 
 	// delete tmp/project-name folder
 	defer func(name string) {
 		if err = os.RemoveAll(name); err != nil {
-			log.Error(err)
+			log.Debug(err)
 		}
 	}(utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
 
 	// delete just file
 	defer func(name string) {
 		if err = os.Remove(name); err != nil {
-			log.Error(err)
+			log.Debug(err)
 		}
 	}(taroperations.GetProjectTarFilePath(projectRequest.GetProjectName()))
 
@@ -63,7 +68,7 @@ func (s server) CreateProject(projectRequest *project.ProjectRequest, server pro
 }
 
 // UpdateProject implements api.v1.UpdateProject
-func (s server) UpdateProject(projectRequest *project.ProjectRequest, server project.ProjectService_UpdateProjectServer) error {
+func (s *server) UpdateProject(projectRequest *project.ProjectRequest, server project.ProjectService_UpdateProjectServer) error {
 	//projectGrpc, err := grpc.GetProject(projectRequest)
 	//if err != nil {
 	//	return err
@@ -72,7 +77,9 @@ func (s server) UpdateProject(projectRequest *project.ProjectRequest, server pro
 	// createProject
 	err := taroperations.CreateTarFile(projectRequest.ProjectName, utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
 	if err != nil {
-		return err
+		log.Debug(err)
+		return status.Errorf(codes.InvalidArgument,
+			"couldn't create a tar file :  error while creating a tar file ["+err.Error()+"]")
 	}
 	return sendFile(projectRequest, server)
 }
