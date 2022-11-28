@@ -14,7 +14,7 @@ const projectGrpcClient = getProjectGrpcClient();
 
 // createProject (grpc calls to compage-core)
 compageRouter.post("/create_project", async (req, res) => {
-    const {repositoryName, yaml, projectName, userName, email} = req.body;
+    const {repositoryName, yaml, projectName, userName, email, metadata} = req.body;
     const cleanup = (downloadedProjectPath: string) => {
         // remove directory created, delete directory recursively
         rimraf(downloadedProjectPath, () => {
@@ -27,7 +27,8 @@ compageRouter.post("/create_project", async (req, res) => {
             "projectName": projectName,
             "userName": userName,
             "yaml": yaml,
-            "repositoryName": repositoryName
+            "repositoryName": repositoryName,
+            "metadata": metadata
         }
         const originalProjectPath = `${os.tmpdir()}/${projectName}`
         const downloadedProjectPath = `${originalProjectPath}_downloaded`
@@ -45,6 +46,11 @@ compageRouter.post("/create_project", async (req, res) => {
             }
         }
         const projectTarFilePath = `${downloadedProjectPath}/${projectName}_downloaded.tar.gz`;
+
+        // call to grpc server to generate the project
+        // save project metadata (in compage db or somewhere)
+        // need to save projectname, compage-yaml version, github repo and latest commit to the db
+
         let call = projectGrpcClient.CreateProject(payload);
         call.on('data', async (err: any, response: { fileChunk: any }) => {
             if (err) {
