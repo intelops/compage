@@ -62,13 +62,12 @@ compageRouter.post("/create_project", async (req, res) => {
     const projectTarFilePath = `${downloadedProjectPath}/${createProjectRequest.projectName}_downloaded.tar.gz`;
 
     // save project metadata (in compage db or somewhere)
-    // need to save projectname, compage-yaml version, github repo and latest commit to the db
+    // need to save project-name, compage-yaml version, github repo and latest commit to the db
     const payload: Project = {
         projectName: createProjectRequest.projectName,
         userName: createProjectRequest.userName,
-        //this is needed as the data in object format becomes [object, object]
         yaml: JSON.stringify(createProjectRequest.yaml),
-        repository: JSON.stringify(createProjectRequest.repository),
+        repositoryName: createProjectRequest.repository.name,
         metadata: JSON.stringify(createProjectRequest.metadata)
     }
 

@@ -58,11 +58,12 @@ interface Repository {
 }
 
 // all keys are of string format
+// grpc client request
 export interface Project {
     projectName: string,
     userName: string,
     yaml: string,
-    repository: string,
+    repositoryName: string,
     metadata: string
 }
 
