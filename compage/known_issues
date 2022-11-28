@@ -1,0 +1,11 @@
+Issue : The below error occurs when grpc server is unreachable.
+// error response on ui
+{
+    "repositoryName": "first-project",
+    "userName": "mahendraintelops",
+    "projectName": "first-project",
+    "message": "unable to create project : first-project",
+    "error": "No connection established"
+}
+Possible Solution : Need to add some code in node server to let ui know about the unavailability.
+--------------------------------------------------------

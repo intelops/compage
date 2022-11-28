@@ -66,9 +66,10 @@ compageRouter.post("/create_project", async (req, res) => {
     const payload: Project = {
         projectName: createProjectRequest.projectName,
         userName: createProjectRequest.userName,
-        yaml: createProjectRequest.yaml,
-        repository: createProjectRequest.repository,
-        metadata: createProjectRequest.metadata
+        //this is needed as the data in object format becomes [object, object]
+        yaml: JSON.stringify(createProjectRequest.yaml),
+        repository: JSON.stringify(createProjectRequest.repository),
+        metadata: JSON.stringify(createProjectRequest.metadata)
     }
 
     //save to redisClient

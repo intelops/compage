@@ -57,18 +57,19 @@ interface Repository {
     branch: string
 }
 
+// all keys are of string format
 export interface Project {
-    projectName?: string,
-    userName?: string,
-    yaml?: CompageYaml,
-    repository: Repository,
-    metadata?: Map<string, string>
+    projectName: string,
+    userName: string,
+    yaml: string,
+    repository: string,
+    metadata: string
 }
 
 export interface CreateProjectRequest {
-    projectName?: string,
-    userName?: string,
-    yaml?: CompageYaml,
+    projectName: string,
+    userName: string,
+    yaml: CompageYaml,
     repository: Repository,
     metadata?: Map<string, string>,
     email: string

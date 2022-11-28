@@ -43,7 +43,7 @@ export const createRepository = (userName: string, repositoryName: string, repoD
 export const createProject = (createProjectRequest: CreateProjectRequest):
     Promise<Response> => {
     const requestBody = {
-        repositoryName: createProjectRequest.repositoryName,
+        repository: createProjectRequest.repository,
         projectName: createProjectRequest.projectName,
         userName: createProjectRequest.userName,
         yaml: createProjectRequest.yaml,
