@@ -6,12 +6,17 @@ import {pushToExistingProjectOnGithub, PushToExistingProjectOnGithubRequest} fro
 import {getUser} from "./store";
 import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
 import {CreateProjectRequest, CreateProjectResponse, Project} from "./models";
+import {client as redisClient} from "../db/redis";
 
-const grpc = require('grpc');
+const grpc = require('@grpc/grpc-js');
 const rimraf = require("rimraf");
 const tar = require('tar')
 const compageRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
+
+// redis connect call
+redisClient.connect().then();
+redisClient.on("error", (error) => console.error(`Error : ${error}`));
 
 const getCreateProjectResponse = (createProjectRequest: CreateProjectRequest, message: string, error: string) => {
     let createProjectResponse: CreateProjectResponse = {
@@ -65,6 +70,18 @@ compageRouter.post("/create_project", async (req, res) => {
         repository: createProjectRequest.repository,
         metadata: createProjectRequest.metadata
     }
+
+    //save to redisClient
+    const getKey = (userName: string | undefined, projectName: string | undefined) => {
+        return userName + "$" + projectName;
+    }
+
+    // retrieve project from store - this is just till ui gets its changes done.
+    const payloadRetrieved = await redisClient.get(getKey(createProjectRequest.userName, createProjectRequest.projectName));
+    if (!payloadRetrieved) {
+        await redisClient.set(getKey(createProjectRequest.userName, createProjectRequest.projectName), JSON.stringify(payload));
+    }
+
     // call to grpc server to generate the project
     let call = projectGrpcClient.CreateProject(payload);
     // receive the data(tar file) in chunks.
