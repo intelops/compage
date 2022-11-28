@@ -86,18 +86,7 @@ compageRouter.post("/create_project", async (req, res) => {
     // call to grpc server to generate the project
     let call = projectGrpcClient.CreateProject(payload);
     // receive the data(tar file) in chunks.
-    call.on('data', async (err: any, response: { fileChunk: any }) => {
-        if (err) {
-            // need to clean up the created file structure before returning to ui.
-            cleanup(downloadedProjectPath)
-            if (err.code === grpc.status.INVALID_ARGUMENT) {
-                // your code here
-            }
-            let message = `unable to create project : ${createProjectRequest.projectName}`
-            let error = err.Message
-
-            return res.status(500).json(getCreateProjectResponse(createProjectRequest, message, error));
-        }
+    call.on('data', async (response: { fileChunk: any }) => {
         // chunk is available, append it to the given path.
         if (response.fileChunk) {
             fs.appendFileSync(projectTarFilePath, response.fileChunk);
