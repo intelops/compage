@@ -18,6 +18,7 @@ func GetProject(input *project.ProjectRequest) (*core.Project, error) {
 		CompageYaml:    compageYaml,
 		Name:           input.ProjectName,
 		RepositoryName: input.RepositoryName,
+		UserName:       input.UserName,
 		Metadata:       converter.GetMetadata(input.Metadata),
 		ModificationDetails: core.ModificationDetails{
 			CreatedBy: input.UserName,

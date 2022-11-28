@@ -19,6 +19,7 @@ type ModificationDetails struct {
 type Project struct {
 	Name           string                 `json:"name"`
 	RepositoryName string                 `json:"repositoryName"`
+	UserName       string                 `json:"userName"`
 	CompageYaml    *CompageYaml           `json:"compageYaml"`
 	Metadata       map[string]interface{} `json:"metadata"`
 	ModificationDetails

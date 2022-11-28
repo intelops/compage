@@ -13,6 +13,7 @@ type TemplateVarKey string
 const (
 	RepositoryName TemplateVarKey = "RepositoryName"
 	NodeName       TemplateVarKey = "NodeName"
+	UserName       TemplateVarKey = "UserName"
 )
 
 type Values struct {
@@ -38,6 +39,7 @@ func AddValuesToContext(ctx context.Context, project *core.Project, goNode *GoNo
 		TemplateVars: map[TemplateVarKey]string{
 			RepositoryName: project.RepositoryName,
 			NodeName:       goNode.Name,
+			UserName:       project.UserName,
 		},
 		NodeDirectoryName: nodeDirectoryName,
 		ProjectName:       project.Name,

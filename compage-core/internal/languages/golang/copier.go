@@ -44,11 +44,13 @@ func NewCopier(ctx context.Context) *Copier {
 	values := ctx.Value(ContextVars).(Values)
 	repositoryName := values.Get(RepositoryName)
 	nodeName := values.Get(NodeName)
+	userName := values.Get(UserName)
 
 	//populate map to replace templates
 	data := map[string]interface{}{
 		"RepositoryName": repositoryName,
 		"NodeName":       strings.ToLower(nodeName),
+		"UserName":       userName,
 	}
 
 	//set all resources for main.go.tmpl
