@@ -85,7 +85,6 @@ func validate(compageYaml *core.CompageYaml) error {
 		if node.ConsumerData.Template == "" {
 			node.ConsumerData.Template = languages.Compage
 		}
-
 	}
 
 	// no need to populate port in individual edge as we need to have that validation on ui itself.

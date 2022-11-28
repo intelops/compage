@@ -77,7 +77,7 @@ type Clients map[string]interface{}
 type Servers map[string]interface{}
 
 // NewLanguageNode converts node to LanguageNode struct
-func NewLanguageNode(compageYaml *core.CompageYaml, node node.Node) (*LanguageNode, error) {
+func NewLanguageNode(compageYaml *core.CompageYaml, node *node.Node) (*LanguageNode, error) {
 	goNode := &LanguageNode{
 		ID:          node.ID,
 		Name:        node.ConsumerData.Name,
@@ -130,7 +130,7 @@ func NewLanguageNode(compageYaml *core.CompageYaml, node node.Node) (*LanguageNo
 }
 
 // GetServersForNode retrieves all servers for given node
-func GetServersForNode(nodeP node.Node) (*Servers, error) {
+func GetServersForNode(nodeP *node.Node) (*Servers, error) {
 	servers := &Servers{}
 	// check if the node is server
 	if nodeP.ConsumerData.ServerTypes != nil {
@@ -161,7 +161,7 @@ func GetServersForNode(nodeP node.Node) (*Servers, error) {
 }
 
 // GetClientsForNode retrieves all clients for given node
-func GetClientsForNode(edges []edge.Edge, nodeP node.Node) (*Clients, error) {
+func GetClientsForNode(edges []*edge.Edge, nodeP *node.Node) (*Clients, error) {
 	var restClients []RestClient
 	for _, e := range edges {
 		// if the current node is in dest field of edge, it means it's a client to node in src field of edge.

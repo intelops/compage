@@ -6,6 +6,7 @@ import {pushToExistingProjectOnGithub, PushToExistingProjectOnGithubRequest} fro
 import {getUser} from "./store";
 import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
 
+const grpc = require('grpc');
 const rimraf = require("rimraf");
 const tar = require('tar')
 const compageRouter = Router();
@@ -48,12 +49,15 @@ compageRouter.post("/create_project", async (req, res) => {
         call.on('data', async (err: any, response: { fileChunk: any }) => {
             if (err) {
                 cleanup(downloadedProjectPath)
+                if (err.code === grpc.status.INVALID_ARGUMENT) {
+                    // your code here
+                }
                 return res.status(500).json({
                     repositoryName: repositoryName,
                     userName: userName,
                     projectName: projectName,
                     message: `unable to create project : ${projectName}`,
-                    error: err
+                    error: err.Message
                 });
             }
             if (response.fileChunk) {

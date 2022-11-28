@@ -31,22 +31,22 @@ func (s *server) CreateProject(projectRequest *project.ProjectRequest, server pr
 	if err != nil {
 		log.Debug(err)
 		return status.Errorf(codes.InvalidArgument,
-			"wrong project message body :  error while converting request to project ["+err.Error()+"]")
+			"error while converting request to project ["+err.Error()+"]")
 	}
 
 	// triggers project generation
 	if err := generator.Generator(coreProject); err != nil {
 		log.Debug(err)
 		return status.Errorf(codes.InvalidArgument,
-			"couldn't generate the project :  error while generating the project ["+err.Error()+"]")
+			"error while generating the project ["+err.Error()+"]")
 	}
 
 	// CreateTarFile creates tar file for the project generated
 	err = taroperations.CreateTarFile(coreProject.Name, utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
 	if err != nil {
 		log.Debug(err)
-		return status.Errorf(codes.InvalidArgument,
-			"wrong project message body :  error while converting request to project ["+err.Error()+"]")
+		return status.Errorf(codes.Internal,
+			"error while converting request to project ["+err.Error()+"]")
 	}
 
 	// delete tmp/project-name folder
@@ -79,7 +79,7 @@ func (s *server) UpdateProject(projectRequest *project.ProjectRequest, server pr
 	if err != nil {
 		log.Debug(err)
 		return status.Errorf(codes.InvalidArgument,
-			"couldn't create a tar file :  error while creating a tar file ["+err.Error()+"]")
+			"error while creating a tar file ["+err.Error()+"]")
 	}
 	return sendFile(projectRequest, server)
 }
