@@ -1,5 +1,5 @@
 version: v2beta1
-name: compage
+name: compage-app
 
 # This is a list of `pipelines` that DevSpace can execute (you can define your own)
 pipelines:
@@ -7,25 +7,25 @@ pipelines:
   dev:
     run: |-
       run_dependencies --all       # 1. Deploy any projects this project needs (see "dependencies")
-      create_deployments --all     # 2. Deploy Helm charts and manifests specfied as "deployments"
-      start_dev compageapp                # 3. Start dev mode "compageapp" (see "dev" section)
+      create_deployments --all     # 2. Deploy Helm charts and manifests specified as "deployments"
+      start_dev compage-app                # 3. Start dev mode "compage-app" (see "dev" section)
   # You can run this pipeline via `devspace deploy` (or `devspace run-pipeline deploy`)
   deploy:
     run: |-
       run_dependencies --all --sequential               # 1. Deploy any projects this project needs (see "dependencies")
       build_images --all -t $(git describe --always)    # 2. Build, tag (git commit hash) and push all images (see "images")
-      create_deployments --all                          # 3. Deploy Helm charts and manifests specfied as "deployments"
+      create_deployments --all                          # 3. Deploy Helm charts and manifests specified as "deployments"
 
 # This is a list of `images` that DevSpace can build for this project
 # We recommend to skip image building during development (devspace dev) as much as possible
 images:
-  compageapp:
-    image: ghcr.io/mahendraintelops/compageapp
+  compage-app:
+    image: ghcr.io/mahendraintelops/compage/compage-app
     dockerfile: ./Dockerfile
 
 # This is a list of `deployments` that DevSpace can create for this project
 deployments:
-  compageapp:
+  compage-app:
     # This deployment uses `helm` but you can also define `kubectl` deployments or kustomizations
     helm:
       # We are deploying this project with the Helm chart you provided
@@ -36,16 +36,16 @@ deployments:
       # You may also use `valuesFiles` to load values from files, e.g. valuesFiles: ["values.yaml"]
       values:
         containers:
-          - image: ghcr.io/mahendraintelops/compageapp
+          - image: ghcr.io/mahendraintelops/compage/compage-app
         service:
           ports:
             - port: 5000
 
 # This is a list of `dev` containers that are based on the containers created by your deployments
 dev:
-  compageapp:
+  compage-app:
     # Search for the container that runs this image
-    imageSelector: ghcr.io/mahendraintelops/compageapp
+    imageSelector: ghcr.io/mahendraintelops/compage/compage-app
     # Replace the container image with this dev-optimized image (allows to skip image building during development)
     devImage: ghcr.io/loft-sh/devspace-containers/javascript:17-alpine
     # Sync files between the local filesystem and the development container
