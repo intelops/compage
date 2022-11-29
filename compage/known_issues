@@ -9,3 +9,30 @@ Issue : The below error occurs when grpc server is unreachable.
 }
 Possible Solution : Need to add some code in node server to let ui know about the unavailability.
 --------------------------------------------------------
+Issue : When the git repo is missing
+git clone failed
+/home/mahendra/DevEnv/compage-dev/compage/compage/node_modules/simple-git/src/lib/git-factory.ts:48
+      throw new api.GitConstructError(
+            ^
+GitConstructError: Cannot use simple-git on a directory that does not exist
+    at gitInstanceFactory (/home/mahendra/DevEnv/compage-dev/compage/compage/node_modules/simple-git/src/lib/git-factory.ts:48:13)
+    at /home/mahendra/DevEnv/compage-dev/compage/compage/src/util/simple-git/existing-project.ts:23:37
+    at Generator.next (<anonymous>)
+    at /home/mahendra/DevEnv/compage-dev/compage/compage/src/util/simple-git/existing-project.ts:31:71
+    at new Promise (<anonymous>)
+    at __awaiter (/home/mahendra/DevEnv/compage-dev/compage/compage/src/util/simple-git/existing-project.ts:27:12)
+    at pushToExistingProjectOnGithub (/home/mahendra/DevEnv/compage-dev/compage/compage/src/util/simple-git/existing-project.ts:14:131)
+    at /home/mahendra/DevEnv/compage-dev/compage/compage/src/routes/compage.ts:137:48
+    at Generator.next (<anonymous>)
+    at fulfilled (/home/mahendra/DevEnv/compage-dev/compage/compage/src/routes/compage.ts:28:58) {
+  task: undefined,
+  config: {
+    baseDir: '/tmp/first-project_downloaded/first-project',
+    binary: 'git',
+    maxConcurrentProcesses: 6,
+    config: [],
+    trimmed: false
+  }
+}
+Solution :  create the github repo when the project is getting created. git clone will never fail.
+ We shouldn't really create repo here as it doesn't fit it the usecase
