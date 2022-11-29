@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "nodemon src/app.ts",
     "start": "node dist/app.js",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "server": "ts-node src/app.ts"
   },
   "keywords": [],
   "license": "MIT",
@@ -34,6 +35,6 @@
     "simple-git": "^3.14.1",
     "tar": "^6.1.11",
     "ts-node": "^10.9.1",
-    "typescript": "^4.8.4"
+    "typescript": "^4.9.3"
   }
 }

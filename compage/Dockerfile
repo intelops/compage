@@ -1,22 +1,20 @@
-FROM node:16.18-alpine
-
-# Set working directory
+FROM node:18.12-alpine
 WORKDIR /app
+COPY package.json ./
+COPY tsconfig.json ./
+COPY src ./src
+COPY protobufs protobufs
+COPY .env .
+RUN yarn install
+RUN yarn run build
 
-# Add package.json to WORKDIR and install dependencies
-COPY package*.json ./
-COPY yarn*.lock ./
-
-RUN npm install
-RUN npm install pm2 -g
-RUN npm run build
-
-# Copy build files
-COPY ./dist .
-COPY protobufs .
-
-# Application port (optional)
+## this is stage two , where the app actually runs
+FROM node:18.12-alpine
+WORKDIR /app
+COPY package.json ./
+RUN yarn install --production=true
+COPY --from=0 /app/dist .
+RUN yarn global add pm2@5.2.2
 EXPOSE 5000
 
-# Container start command (DO NOT CHANGE and see note below)
 CMD ["pm2-runtime","app.js"]
