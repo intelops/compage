@@ -20,7 +20,7 @@ pipelines:
 # We recommend to skip image building during development (devspace dev) as much as possible
 images:
   compagecoreapp:
-    image: my-image-registry.tld/username/compagecoreapp
+    image: ghcr.io/mahendraintelops/compagecoreapp
     dockerfile: ./Dockerfile
 
 # This is a list of `deployments` that DevSpace can create for this project
@@ -36,7 +36,7 @@ deployments:
       # You may also use `valuesFiles` to load values from files, e.g. valuesFiles: ["values.yaml"]
       values:
         containers:
-          - image: my-image-registry.tld/username/compagecoreapp
+          - image: ghcr.io/mahendraintelops/compagecoreapp
         service:
           ports:
             - port: 8080
@@ -46,7 +46,7 @@ deployments:
 dev:
   compagecoreapp:
     # Search for the container that runs this image
-    imageSelector: my-image-registry.tld/username/compagecoreapp
+    imageSelector: ghcr.io/mahendraintelops/compagecoreapp
     # Replace the container image with this dev-optimized image (allows to skip image building during development)
     devImage: ghcr.io/loft-sh/devspace-containers/go:1.18-alpine
     # Sync files between the local filesystem and the development container
