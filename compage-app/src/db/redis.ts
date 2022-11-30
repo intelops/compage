@@ -1,5 +1,5 @@
 import * as redis from 'redis'
-import {config} from "./constants";
+import {config} from "../util/constants";
 
 // create redis client
 export const client = redis.createClient({
