@@ -1,0 +1,152 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CICD
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches:
+      - master
+      - staging
+      - develop
+  pull_request:
+    branches:
+      - master
+      - staging
+      - develop
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # The "lint" workflow
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - uses: actions/checkout@v3
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v3.2.0
+        with:
+          args:
+            -v
+            --config=.golangci.yml
+            --max-same-issues=50
+
+  # The "build" workflow
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Setup Go
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.19' # The Go version to download (if necessary) and use.
+
+      # Run build of the application
+      - name: Run build
+        run: go build .
+
+      # Run vet & lint on the code
+      - name: Run vet
+        run: |
+          go vet .
+
+      # Run testing on the code
+      - name: Run testing
+        run: cd test && go test -v
+
+  # The "deploy" workflow
+  deploy:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+#    permissions:
+#      id-token: write   # This is the key for OIDC!
+    needs: [ build, golangci ] # Only run this workflow when "build" workflow succeeds
+    if: ${{ github.ref == 'refs/heads/master' && github.event_name == 'push' }} # Only run this workflow if it is master branch on push event
+    steps:
+      - uses: actions/checkout@v3
+      - uses: sigstore/cosign-installer@main
+        with:
+          cosign-release: 'v1.13.1'
+      - id: get_version
+        run: |
+          RELEASE_VERSION=$(echo $GITHUB_REF | sed -nE 's!refs/tags/!!p')
+          echo "::set-output name=release_version::$RELEASE_VERSION"
+      - name: Get Docker tags
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v2
+        with:
+          images: |
+            ghcr.io/mahendraintelops/compage/core
+          tags: |
+            type=semver,pattern={{version}}
+            type=raw,value=latest
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and push the image
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          file: Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/arm
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
+      - name: Images digests
+        run: echo ${{ steps.docker_build.outputs.digest }}
+#      - name: Sign Container Image
+#        run: |
+#          COSIGN_EXPERIMENTAL=1 cosign sign --force mahendraintelops/core@${{ steps.docker_build.outputs.digest }}
+      - name: Sign the published Docker image
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        # This step uses the identity token to provision an ephemeral certificate
+        # against the sigstore community Fulcio instance.
+        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
+  publish-release:
+    if: startsWith(github.ref, 'refs/tags/v') == true
+    needs: [ deploy ] # Only run this workflow when "build" workflow succeeds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 300
+      - id: get_version
+        run: |
+          RELEASE_VERSION=$(echo $GITHUB_REF | sed -nE 's!refs/tags/!!p')
+          echo "::set-output name=release_version::$RELEASE_VERSION"
+      - uses: geertvdc/setup-hub@v1.0.0
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+      - run: |
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - run: |
+          STATE=$(hub release show "$RELEASE_VERSION" --format="%S" | sed -En "s/-//p")
+          EXTRA_ARGS=""
+          if [ "$STATE" != "" ]; then
+            EXTRA_ARGS="$EXTRA_ARGS --$STATE"
+          else
+            EXTRA_ARGS="$EXTRA_ARGS --prerelease=false --draft=false"
+          fi
+          hub release create -m "$RELEASE_VERSION" -m "" $EXTRA_ARGS "$RELEASE_VERSION" 2>/dev/null || hub release edit -m "$RELEASE_VERSION" -m "" $EXTRA_ARGS "$RELEASE_VERSION"
+        env:
+          RELEASE_VERSION: ${{ steps.get_version.outputs.release_version }}
+          GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}

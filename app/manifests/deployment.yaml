@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: compage
+  name: app
+  labels:
+    app: app
+spec:
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+        name: app
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/mahendraintelops/compage/app
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+              name: http
+          env:
+            - name: COMPAGE_CORE_URL
+              value: "localhost:50051"
+            - name: GITHUB_APP_REDIRECT_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: github-config
+                  key: GITHUB_APP_REDIRECT_URI
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-config
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-config
+                  key: REDIS_PORT
+          volumeMounts:
+            - name: github-credentials
+              mountPath: "/etc/github-credentials"
+              readOnly: true
+            - name: redis-credentials
+              mountPath: "/etc/redis-credentials"
+              readOnly: true
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 30
+      volumes:
+        - name: github-credentials
+          secret:
+            secretName: github-credentials
+            defaultMode: 0400
+        - name: redis-credentials
+          secret:
+            secretName: redis-credentials
+            defaultMode: 0400

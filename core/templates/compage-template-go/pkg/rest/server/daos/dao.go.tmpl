@@ -1,0 +1,52 @@
+package daos
+
+import (
+	"errors"
+	"github.com/{{.UserName}}/{{.RepositoryName}}/{{.NodeName}}/pkg/rest/server/models"
+)
+
+var {{.ResourceNamePlural}} = make(map[string]models.{{.ResourceName}})
+
+type {{.ResourceName}}Dao struct {
+}
+
+func ({{.ResourceNameSingular}}Dao *{{.ResourceName}}Dao) Create{{.ResourceName}}({{.ResourceNameSingular}} models.{{.ResourceName}}) error {
+	{{.ResourceNamePlural}}[{{.ResourceNameSingular}}.Id] = {{.ResourceNameSingular}}
+
+	return nil
+}
+
+func ({{.ResourceNameSingular}}Dao *{{.ResourceName}}Dao) Update{{.ResourceName}}(id string, {{.ResourceNameSingular}} models.{{.ResourceName}}) error {
+	if id != {{.ResourceNameSingular}}.Id {
+		return errors.New("id and payload don't match")
+	}
+	{{.ResourceNamePlural}}[{{.ResourceNameSingular}}.Id] = {{.ResourceNameSingular}}
+
+	return nil
+}
+
+func ({{.ResourceNameSingular}}Dao *{{.ResourceName}}Dao) Delete{{.ResourceName}}(id string) error {
+	if _, ok := {{.ResourceNamePlural}}[id]; ok {
+		delete({{.ResourceNamePlural}}, id)
+		return nil
+	}
+
+	return errors.New("{{.ResourceNameSingular}} not found")
+}
+
+func ({{.ResourceNameSingular}}Dao *{{.ResourceName}}Dao) List{{.ResourceName}}s() ([]models.{{.ResourceName}}, error) {
+	v := make([]models.{{.ResourceName}}, len({{.ResourceNamePlural}}))
+	for _, value := range {{.ResourceNamePlural}} {
+		v = append(v, value)
+	}
+
+	return v, nil
+}
+
+func ({{.ResourceNameSingular}}Dao *{{.ResourceName}}Dao) Get{{.ResourceName}}(id string) (models.{{.ResourceName}}, error) {
+	if {{.ResourceNameSingular}}, ok := {{.ResourceNamePlural}}[id]; ok {
+		return {{.ResourceNameSingular}}, nil
+	}
+
+	return models.{{.ResourceName}}{}, errors.New("{{.ResourceNameSingular}} not found")
+}

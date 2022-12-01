@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{.NodeName}}
+  labels:
+    app: {{.NodeName}}
+  name: {{.NodeName}}
+spec:
+  ports:
+    - protocol: TCP
+      port: {{.ServerPort}}
+      targetPort: {{.ServerPort}}
+  selector:
+    app: {{.NodeName}}
+  type: ClusterIP

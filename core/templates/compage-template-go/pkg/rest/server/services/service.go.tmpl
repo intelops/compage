@@ -1,0 +1,31 @@
+package services
+
+import (
+	"github.com/{{.UserName}}/{{.RepositoryName}}/{{.NodeName}}/pkg/rest/server/daos"
+	"github.com/{{.UserName}}/{{.RepositoryName}}/{{.NodeName}}/pkg/rest/server/models"
+)
+
+type {{.ResourceName}}Service struct {
+}
+
+var {{.ResourceNameSingular}}Dao = daos.{{.ResourceName}}Dao{}
+
+func ({{.ResourceNameSingular}}Service *{{.ResourceName}}Service) Create{{.ResourceName}}({{.ResourceNameSingular}} models.{{.ResourceName}}) error {
+	return {{.ResourceNameSingular}}Dao.Create{{.ResourceName}}({{.ResourceNameSingular}})
+}
+
+func ({{.ResourceNameSingular}}Service *{{.ResourceName}}Service) Update{{.ResourceName}}(id string, {{.ResourceNameSingular}} models.{{.ResourceName}}) error {
+	return {{.ResourceNameSingular}}Dao.Update{{.ResourceName}}(id, {{.ResourceNameSingular}})
+}
+
+func ({{.ResourceNameSingular}}Service *{{.ResourceName}}Service) Delete{{.ResourceName}}(id string) error {
+	return {{.ResourceNameSingular}}Dao.Delete{{.ResourceName}}(id)
+}
+
+func ({{.ResourceNameSingular}}Service *{{.ResourceName}}Service) List{{.ResourceName}}s() ([]models.{{.ResourceName}}, error) {
+	return {{.ResourceNameSingular}}Dao.List{{.ResourceName}}s()
+}
+
+func ({{.ResourceNameSingular}}Service *{{.ResourceName}}Service) Get{{.ResourceName}}(id string) (models.{{.ResourceName}}, error) {
+	return {{.ResourceNameSingular}}Dao.Get{{.ResourceName}}(id)
+}

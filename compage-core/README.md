@@ -1,2 +1,0 @@
-# compage-core
-compage-core

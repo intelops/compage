@@ -1,9 +1,9 @@
 /node_modules/
-/compage-app/build/
-/compage-app/node_modules/
-/compage-core/.devspace/
-/compage-core/.idea/
+/app/build/
+/app/node_modules/
+/core/.devspace/
+/core/.idea/
 /.devspace/logs/default.log
-/compage-app/scratch/
-/compage-core/compage-core
+/app/scratch/
+/core/core
 /.idea
