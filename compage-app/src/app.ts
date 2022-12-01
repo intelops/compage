@@ -5,6 +5,7 @@ import helmet from "helmet";
 import compageRouter from "./routes/compage";
 import githubRouter from "./routes/github";
 import authRouter from "./routes/auth";
+import {config} from "./util/constants";
 
 const app: Application = express();
 
@@ -36,7 +37,6 @@ app.get("*", (req, res) => {
     return res.status(200).json("you have reached default route");
 });
 
-const PORT = 5000
-app.listen(PORT, () => {
-    console.log(`server is running on PORT ${PORT}`)
+app.listen(config.server_port, () => {
+    console.log(`server is running on PORT ${config.server_port}`)
 })

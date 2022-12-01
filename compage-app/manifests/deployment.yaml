@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: compage-app
-          image: mahendraintelops/compage-app
+          image: ghcr.io/mahendraintelops/compage/compage-app
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
@@ -25,12 +25,27 @@ spec:
           env:
             - name: COMPAGE_CORE_URL
               value: "localhost:50051"
+            - name: GITHUB_APP_REDIRECT_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: github-config
+                  key: GITHUB_APP_REDIRECT_URI
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-config
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-config
+                  key: REDIS_PORT
           volumeMounts:
-            - name: github
-              mountPath: "/etc/github"
+            - name: github-credentials
+              mountPath: "/etc/github-credentials"
               readOnly: true
-            - name: redis
-              mountPath: "/etc/redis"
+            - name: redis-credentials
+              mountPath: "/etc/redis-credentials"
               readOnly: true
           readinessProbe:
             tcpSocket:
@@ -43,11 +58,11 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 30
       volumes:
-        - name: github
+        - name: github-credentials
           secret:
-            secretName: github-config
+            secretName: github-credentials
             defaultMode: 0400
-        - name: redis
+        - name: redis-credentials
           secret:
-            secretName: redis-config
+            secretName: redis-credentials
             defaultMode: 0400

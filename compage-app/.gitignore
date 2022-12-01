@@ -2,3 +2,7 @@ node_modules/
 # Ignore DevSpace cache and log folder
 .devspace/
 /dist/
+
+
+# Ignore DevSpace cache and log folder
+.devspace/

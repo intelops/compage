@@ -26,20 +26,10 @@ images:
 # This is a list of `deployments` that DevSpace can create for this project
 deployments:
   compage-app:
-    # This deployment uses `helm` but you can also define `kubectl` deployments or kustomizations
-    helm:
-      # We are deploying this project with the Helm chart you provided
-      chart:
-        name: component-chart
-        repo: https://charts.devspace.sh
-      # Under `values` we can define the values for this Helm chart used during `helm install/upgrade`
-      # You may also use `valuesFiles` to load values from files, e.g. valuesFiles: ["values.yaml"]
-      values:
-        containers:
-          - image: ghcr.io/mahendraintelops/compage/compage-app
-        service:
-          ports:
-            - port: 5000
+    # This deployment uses `kubectl` but you can also define `helm` deployments
+    kubectl:
+      manifests:
+        - manifests/**
 
 # This is a list of `dev` containers that are based on the containers created by your deployments
 dev:
@@ -47,10 +37,11 @@ dev:
     # Search for the container that runs this image
     imageSelector: ghcr.io/mahendraintelops/compage/compage-app
     # Replace the container image with this dev-optimized image (allows to skip image building during development)
-    devImage: ghcr.io/loft-sh/devspace-containers/javascript:17-alpine
+    devImage: ghcr.io/loft-sh/devspace-containers/typescript:18-alpine
     # Sync files between the local filesystem and the development container
     sync:
       - path: ./
+        uploadExcludeFile: .dockerignore
     # Open a terminal and use the following command to start it
     terminal:
       command: ./devspace_start.sh
