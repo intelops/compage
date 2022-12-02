@@ -12,6 +12,11 @@ const readSecretFile = async (secretPath: string) => {
     }
     return keyValuePairs
 }
+
+if (!process.env.NODE_ENV) {
+    process.env.NODE_ENV = "development"
+}
+
 console.log("process.env.NODE_ENV: ", process.env.NODE_ENV)
 const isDevelopment = (process.env.NODE_ENV === 'development')
 if (isDevelopment) {
@@ -20,7 +25,6 @@ if (isDevelopment) {
     const homedir = require('os').homedir();
     require("dotenv").config({path: `${homedir}/.compage/.env`});
 } else {
-    console.log("Mahendra")
     readSecretFile('/etc/github-credentials').then(console.log).catch(console.log)
     readSecretFile('/etc/redis-credentials').then(console.log).catch(console.log)
 }
