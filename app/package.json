@@ -1,6 +1,6 @@
 {
-  "name": "compage",
-  "version": "1.0.0",
+  "name": "app",
+  "version": "0.0.1",
   "main": "index.js",
   "repository": "https://github.com/kube-tarian/compage.git",
   "author": "Mahendra <mahendra.b@intelops.dev>",
