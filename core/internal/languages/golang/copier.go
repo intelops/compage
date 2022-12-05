@@ -117,28 +117,28 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 	resourceName := strings.ToLower(resource.Name)
 	// copy controller files to generated project
 	targetResourceControllerFileName := copier.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + ControllerFile
-	_, err := utils.CopyFile(targetResourceControllerFileName, utils.GolangTemplatesPath+ControllersPath+"/"+ControllerFile)
+	_, err := utils.CopyFile(targetResourceControllerFileName, utils.GetProjectRootPath()+ControllersPath+"/"+ControllerFile)
 	if err != nil {
 		return err
 	}
 	filePaths = append(filePaths, targetResourceControllerFileName)
 	// copy model files to generated project
 	targetResourceModelFileName := copier.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + ModelFile
-	_, err = utils.CopyFile(targetResourceModelFileName, utils.GolangTemplatesPath+ModelsPath+"/"+ModelFile)
+	_, err = utils.CopyFile(targetResourceModelFileName, utils.GetProjectRootPath()+ModelsPath+"/"+ModelFile)
 	if err != nil {
 		return err
 	}
 	filePaths = append(filePaths, targetResourceModelFileName)
 	// copy service files to generated project
 	targetResourceServiceFileName := copier.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + ServiceFile
-	_, err = utils.CopyFile(targetResourceServiceFileName, utils.GolangTemplatesPath+ServicesPath+"/"+ServiceFile)
+	_, err = utils.CopyFile(targetResourceServiceFileName, utils.GetProjectRootPath()+ServicesPath+"/"+ServiceFile)
 	if err != nil {
 		return err
 	}
 	filePaths = append(filePaths, targetResourceServiceFileName)
 	// copy dao files to generated project
 	targetResourceDaoFileName := copier.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + DaoFile
-	_, err = utils.CopyFile(targetResourceDaoFileName, utils.GolangTemplatesPath+DaosPath+"/"+DaoFile)
+	_, err = utils.CopyFile(targetResourceDaoFileName, utils.GetProjectRootPath()+DaosPath+"/"+DaoFile)
 	if err != nil {
 		return err
 	}
@@ -163,7 +163,7 @@ func (copier Copier) CopyRestClientResourceFiles(client languages.RestClient) er
 
 	// copy client files to generated project.
 	targetResourceClientFileName := copier.NodeDirectoryName + ClientPath + "/" + client.ExternalNode + "-" + ClientFile
-	_, err := utils.CopyFile(targetResourceClientFileName, utils.GolangTemplatesPath+ClientPath+"/"+ClientFile)
+	_, err := utils.CopyFile(targetResourceClientFileName, utils.GetProjectRootPath()+ClientPath+"/"+ClientFile)
 	if err != nil {
 		return err
 	}
@@ -220,7 +220,7 @@ func (copier Copier) CreateKubernetesFiles(templatePath string) error {
 	if copier.GoNode.RestConfig.Server != nil {
 		// copy service files to generated kubernetes manifests
 		targetKubernetesServiceFileName := copier.NodeDirectoryName + KubernetesPath + "/" + KubernetesServiceFile
-		_, err := utils.CopyFile(targetKubernetesServiceFileName, utils.GolangTemplatesPath+KubernetesPath+"/"+KubernetesServiceFile)
+		_, err := utils.CopyFile(targetKubernetesServiceFileName, utils.GetProjectRootPath()+KubernetesPath+"/"+KubernetesServiceFile)
 		if err != nil {
 			return err
 		}
@@ -228,7 +228,7 @@ func (copier Copier) CreateKubernetesFiles(templatePath string) error {
 	}
 	// copy deployment files to generated kubernetes manifests
 	targetKubernetesDeploymentFileName := copier.NodeDirectoryName + KubernetesPath + "/" + KubernetesDeploymentFile
-	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, utils.GolangTemplatesPath+KubernetesPath+"/"+KubernetesDeploymentFile)
+	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, utils.GetProjectRootPath()+KubernetesPath+"/"+KubernetesDeploymentFile)
 	if err != nil {
 		return err
 	}

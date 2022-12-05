@@ -31,13 +31,13 @@ func Generator(ctx context.Context) error {
 			}
 
 			// copy kubernetes yaml's
-			err := copier.CreateKubernetesFiles(utils.GolangTemplatesPath)
+			err := copier.CreateKubernetesFiles(utils.GetProjectRootPath())
 			if err != nil {
 				return err
 			}
 
 			// copy all files at root level
-			err = copier.CreateRootLevelFiles(utils.GolangTemplatesPath)
+			err = copier.CreateRootLevelFiles(utils.GetProjectRootPath())
 			if err != nil {
 				return err
 			}

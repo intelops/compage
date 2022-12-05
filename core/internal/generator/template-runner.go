@@ -195,14 +195,14 @@ func copyRelevantFiles(coreProject *core.Project, goNode *languages.LanguageNode
 		return "", err
 	}
 
-	filePaths, directories, err := getDirectoriesAndFilePaths(utils.GolangTemplatesPath)
+	filePaths, directories, err := getDirectoriesAndFilePaths(utils.GetProjectRootPath())
 	if err != nil {
 		return nodeDirectoryName, err
 	}
 	fmt.Println(filePaths)
 	fmt.Println(directories)
 
-	err = CopyDir(utils.GolangTemplatesPath, nodeDirectoryName)
+	err = CopyDir(utils.GetProjectRootPath(), nodeDirectoryName)
 	if err != nil {
 		return nodeDirectoryName, err
 	}
