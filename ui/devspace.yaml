@@ -2,8 +2,8 @@ version: v2beta1
 name: ui
 
 vars:
-  # load .env file from local computer.
-  DEVSPACE_ENV_FILE: ".env"
+  # load .env.development file from local computer.
+  DEVSPACE_ENV_FILE: ".env.development"
 
 # This is a list of `pipelines` that DevSpace can execute (you can define your own)
 pipelines:
