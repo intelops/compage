@@ -3,7 +3,7 @@ name: ui
 
 vars:
   # load .env file from local computer.
-  DEVSPACE_ENV_FILE: "/home/mahendra/.compage/.env"
+  DEVSPACE_ENV_FILE: ".env"
 
 # This is a list of `pipelines` that DevSpace can execute (you can define your own)
 pipelines:
@@ -44,12 +44,12 @@ deployments:
         containers:
           - image: ghcr.io/mahendraintelops/compage/ui
             env:
-            - name: GITHUB_APP_CLIENT_ID
-              value: ${GITHUB_APP_CLIENT_ID}
-            - name: GITHUB_APP_REDIRECT_URI
-              value: ${GITHUB_APP_REDIRECT_URI}
-            - name: COMPAGE_APP_SERVER_URL
-              value: ${COMPAGE_APP_SERVER_URL}
+            - name: REACT_APP_GITHUB_APP_CLIENT_ID
+              value: ${REACT_APP_GITHUB_APP_CLIENT_ID}
+            - name: REACT_APP_GITHUB_APP_REDIRECT_URI
+              value: ${REACT_APP_GITHUB_APP_REDIRECT_URI}
+            - name: REACT_APP_COMPAGE_APP_SERVER_URL
+              value: ${REACT_APP_COMPAGE_APP_SERVER_URL}
         service:
           ports:
             - port: 3000

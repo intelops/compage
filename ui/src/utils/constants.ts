@@ -5,13 +5,13 @@ const assert = require('assert').strict
 console.log("process.env.NODE_ENV: ", process.env.NODE_ENV)
 
 // github config
-const GITHUB_APP_CLIENT_ID = process.env.GITHUB_APP_CLIENT_ID
-assert.ok(GITHUB_APP_CLIENT_ID, 'The "GITHUB_APP_CLIENT_ID" environment variable is required')
-const GITHUB_APP_REDIRECT_URI = process.env.GITHUB_APP_REDIRECT_URI
-assert.ok(GITHUB_APP_REDIRECT_URI, 'The "GITHUB_APP_REDIRECT_URI" environment variable is required')
+const REACT_APP_GITHUB_APP_CLIENT_ID = process.env.REACT_APP_GITHUB_APP_CLIENT_ID
+assert.ok(REACT_APP_GITHUB_APP_CLIENT_ID, 'The "REACT_APP_GITHUB_APP_CLIENT_ID" environment variable is required')
+const REACT_APP_GITHUB_APP_REDIRECT_URI = process.env.REACT_APP_GITHUB_APP_REDIRECT_URI
+assert.ok(REACT_APP_GITHUB_APP_REDIRECT_URI, 'The "REACT_APP_GITHUB_APP_REDIRECT_URI" environment variable is required')
 // app server config
-const COMPAGE_APP_SERVER_URL = process.env.COMPAGE_APP_SERVER_URL
-assert.ok(COMPAGE_APP_SERVER_URL, 'The "COMPAGE_APP_SERVER_URL" environment variable is required')
+const REACT_APP_COMPAGE_APP_SERVER_URL = process.env.REACT_APP_COMPAGE_APP_SERVER_URL
+assert.ok(REACT_APP_COMPAGE_APP_SERVER_URL, 'The "REACT_APP_COMPAGE_APP_SERVER_URL" environment variable is required')
 
 let BackendBaseURL
 if (process.env.NODE_ENV === 'development') {
@@ -19,13 +19,13 @@ if (process.env.NODE_ENV === 'development') {
     BackendBaseURL = 'http://localhost:5000'
 } else {
     // for container
-    BackendBaseURL = COMPAGE_APP_SERVER_URL
+    BackendBaseURL = REACT_APP_COMPAGE_APP_SERVER_URL
 }
 
 export const config = {
     // github config
-    client_id: GITHUB_APP_CLIENT_ID,
-    redirect_uri: GITHUB_APP_REDIRECT_URI,
+    client_id: REACT_APP_GITHUB_APP_CLIENT_ID,
+    redirect_uri: REACT_APP_GITHUB_APP_REDIRECT_URI,
     backend_base_url: BackendBaseURL,
 
     // authRoutes
