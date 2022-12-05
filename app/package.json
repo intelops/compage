@@ -9,7 +9,7 @@
     "dev": "NODE_ENV=development nodemon src/app.ts",
     "server": "NODE_ENV=development ts-node src/app.ts",
     "indevspace": "ts-node src/app.ts",
-    "start": "yarn run build && node dist/app.js",
+    "build-start": "yarn run build && node dist/app.js",
     "build": "tsc -p ."
   },
   "keywords": [],

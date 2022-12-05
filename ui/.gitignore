@@ -28,3 +28,4 @@ yarn-error.log*
 .devspace/
 .env.development
 .env.production
+.env.staging

@@ -44,11 +44,11 @@
   "scripts": {
     "build:css": "node-sass src/ -o src/",
     "watch:css": "npm run build:css && node-sass src/ -o src/ -w -r",
-    "start": "react-app-env --env-file=.env.development start",
-    "build": "react-app-env build",
-    "build:development": "react-app-env --env-file=.env.development build",
+    "start": "react-scripts start",
+    "build": "react-app-env --env-file=.env.development build",
+    "build:staging": "react-app-env --env-file=.env.staging build",
     "build:production": "react-app-env --env-file=.env.production build",
-    "test": "react-app-env test",
+    "test": "react-app-env --env-file=.env.development test",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public"

@@ -3,6 +3,9 @@ const assert = require('assert').strict
 // const configValue : string = process.env.REACT_APP_SOME_CONFIGURATION
 
 console.log("process.env.NODE_ENV: ", process.env.NODE_ENV)
+console.log("process.env.REACT_APP_GITHUB_APP_CLIENT_ID: ", process.env.REACT_APP_GITHUB_APP_CLIENT_ID)
+console.log("process.env.REACT_APP_GITHUB_APP_REDIRECT_URI: ", process.env.REACT_APP_GITHUB_APP_REDIRECT_URI)
+console.log("process.env.REACT_APP_COMPAGE_APP_SERVER_URL: ", process.env.REACT_APP_COMPAGE_APP_SERVER_URL)
 
 // github config
 const REACT_APP_GITHUB_APP_CLIENT_ID = process.env.REACT_APP_GITHUB_APP_CLIENT_ID

@@ -31,7 +31,6 @@ if (isDevelopment) {
 
 // app server config
 const SERVER_PORT = process.env.PORT
-console.log("isDevelopment : ", isDevelopment)
 // github config
 const GITHUB_APP_CLIENT_ID = process.env.GITHUB_APP_CLIENT_ID
 assert.ok(GITHUB_APP_CLIENT_ID, 'The "GITHUB_APP_CLIENT_ID" environment variable is required')
