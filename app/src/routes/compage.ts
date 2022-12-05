@@ -8,7 +8,6 @@ import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} f
 import {CreateProjectRequest, CreateProjectResponse, Project} from "./models";
 import {client as redisClient} from "../db/redis";
 
-const grpc = require('@grpc/grpc-js');
 const rimraf = require("rimraf");
 const tar = require('tar')
 const compageRouter = Router();
