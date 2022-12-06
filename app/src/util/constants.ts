@@ -54,22 +54,16 @@ if (isDevelopment) {
     let REDIS_PASSWORD
     let REDIS_USERNAME
     // read github-credentials
-    let githubMap = readSecretFile('/etc/github-credentials')
-
+    const githubMap = readSecretFile('/etc/github-credentials/compage')
     GITHUB_APP_CLIENT_ID = githubMap.get("GITHUB_APP_CLIENT_ID");
     GITHUB_APP_CLIENT_SECRET = githubMap.get("GITHUB_APP_CLIENT_SECRET");
-    console.log("GITHUB_APP_CLIENT_ID : ", GITHUB_APP_CLIENT_ID)
-    console.log("GITHUB_APP_CLIENT_SECRET : ", GITHUB_APP_CLIENT_SECRET)
     assert.ok(GITHUB_APP_CLIENT_ID, 'The "GITHUB_APP_CLIENT_ID" environment variable is required')
     assert.ok(GITHUB_APP_CLIENT_SECRET, 'The "GITHUB_APP_CLIENT_SECRET" environment variable is required')
 
     // read redis-credentials
-    let redisMap = readSecretFile('/etc/redis-credentials')
+    let redisMap = readSecretFile('/etc/redis-credentials/compage')
     REDIS_PASSWORD = redisMap.get("REDIS_PASSWORD");
     REDIS_USERNAME = redisMap.get("REDIS_USERNAME");
-    console.log("REDIS_PASSWORD : ", REDIS_PASSWORD)
-    console.log("REDIS_USERNAME : ", REDIS_USERNAME)
-
     assert.ok(REDIS_PASSWORD, 'The "REDIS_PASSWORD" environment variable is required')
     assert.ok(REDIS_USERNAME, 'The "REDIS_USERNAME" environment variable is required')
 

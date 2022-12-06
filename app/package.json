@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "dev": "NODE_ENV=development nodemon src/app.ts",
-    "start": "NODE_ENV=development ts-node src/app.ts",
+    "start": "NODE_ENV=production ts-node src/app.ts",
     "indevspace": "ts-node src/app.ts",
     "build-start": "yarn run build && node dist/app.js",
     "build": "tsc -p ."

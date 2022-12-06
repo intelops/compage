@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: ghcr.io/mahendraintelops/compage/app:ggIkfgg
+          image: ghcr.io/mahendraintelops/compage/app:qmRVGqY
           imagePullPolicy: Never
           ports:
             - containerPort: 5000
@@ -65,7 +65,17 @@ spec:
           secret:
             secretName: app-github-credentials
             defaultMode: 0400
+            items:
+              - key: GITHUB_APP_CLIENT_ID
+                path: compage/GITHUB_APP_CLIENT_ID
+              - key: GITHUB_APP_CLIENT_SECRET
+                path: compage/GITHUB_APP_CLIENT_SECRET
         - name: redis-credentials
           secret:
             secretName: app-redis-credentials
             defaultMode: 0400
+            items:
+              - key: REDIS_PASSWORD
+                path: compage/REDIS_PASSWORD
+              - key: REDIS_USERNAME
+                path: compage/REDIS_USERNAME
