@@ -7,7 +7,7 @@ export const gitOperations = async (git: SimpleGit) => {
             (success: any) => {
                 console.debug("git add succeeded");
             }, (failure: any) => {
-                console.debug('git add failed');
+                console.debug('git add failed : ', failure);
                 return failure;
             });
 
@@ -17,7 +17,7 @@ export const gitOperations = async (git: SimpleGit) => {
             (success: any) => {
                 console.debug('git commit succeeded');
             }, (failure: any) => {
-                console.debug('git commit failed');
+                console.debug('git commit failed : ', failure);
                 return failure;
             });
 
@@ -26,7 +26,7 @@ export const gitOperations = async (git: SimpleGit) => {
         .then((success: any) => {
             console.debug('git push succeeded');
         }, (failure: any) => {
-            console.debug('git push failed');
+            console.debug('git push failed : ', failure);
             return failure;
         });
 }

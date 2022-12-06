@@ -1,5 +1,7 @@
 FROM node:18.12-alpine
 WORKDIR /app
+RUN apk update
+RUN apk add git
 COPY package.json ./
 COPY tsconfig.json ./
 COPY src ./src

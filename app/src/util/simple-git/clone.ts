@@ -26,7 +26,7 @@ export const cloneExistingProjectFromGithub = async (cloneExistingProjectFromGit
         (success: any) => {
             console.debug("git clone succeeded");
         }, (failure: any) => {
-            console.debug('git clone failed');
+            console.debug('git clone failed : ', failure);
             return failure
         });
 }

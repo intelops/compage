@@ -25,7 +25,7 @@ export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: Push
         (success: any) => {
             console.debug("git init succeeded");
         }, (failure: any) => {
-            console.debug('git init failed');
+            console.debug('git init failed : ', failure);
             return failure
         });
 
@@ -41,7 +41,7 @@ export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: Push
         (success: any) => {
             console.debug("git remote add origin succeeded");
         }, (failure: any) => {
-            console.debug('git remote add origin failed');
+            console.debug('git remote add origin failed : ', failure);
             return failure;
         });
 
