@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: ghcr.io/mahendraintelops/compage/app:qmRVGqY
+          image: ghcr.io/mahendraintelops/compage/app:RjoWSOd
           imagePullPolicy: Never
           ports:
             - containerPort: 5000
@@ -50,6 +50,8 @@ spec:
             - name: redis-credentials
               mountPath: "/etc/redis-credentials"
               readOnly: true
+            - name: tmp-volume
+              mountPath: /tmp
           readinessProbe:
             tcpSocket:
               port: http
@@ -61,6 +63,8 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 30
       volumes:
+        - name: tmp-volume
+          emptyDir: {}
         - name: github-credentials
           secret:
             secretName: app-github-credentials

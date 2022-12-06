@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: ui
-          image: ghcr.io/mahendraintelops/compage/ui:iFLobku
+          image: ghcr.io/mahendraintelops/compage/ui:xUcnGNJ
           imagePullPolicy: Never
           ports:
             - containerPort: 3000

@@ -8,7 +8,7 @@ metadata:
 spec:
   ports:
     - port: 3000
-      nodePort: 33333
+      nodePort: 32222
       name: http
   selector:
     app: ui

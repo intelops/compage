@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: core
-          image: ghcr.io/mahendraintelops/compage/core:yQJmeVm
+          image: ghcr.io/mahendraintelops/compage/core:aPwbBij
           imagePullPolicy: Never
           ports:
             - containerPort: 50051

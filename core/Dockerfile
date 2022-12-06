@@ -26,7 +26,7 @@ FROM gcr.io/distroless/base-debian10 as production
 
 # Copy application binary from build/dev stage to the distroless container
 COPY --from=build /app/main /
-
+ADD templates /app/templates
 # Application port (optional)
 EXPOSE 8080
 EXPOSE 50051
