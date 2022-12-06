@@ -1,8 +1,8 @@
-import {config} from "../util/constants";
 import axios from "axios";
 import {btoa} from "buffer";
 import {Router} from "express";
 import {getUser, setUser} from "./store";
+import config from "../util/constants";
 
 const authRouter = Router();
 

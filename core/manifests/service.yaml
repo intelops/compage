@@ -10,7 +10,5 @@ spec:
   - port: 50051
     targetPort: grpc
     protocol: TCP
-    nodePort: 30101
   selector:
     app: core
-  type: NodePort

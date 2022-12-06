@@ -42,6 +42,8 @@ deployments:
         containers:
           - image: ghcr.io/mahendraintelops/compage/app
             env:
+              - name: NODE_ENV
+                value: production
               - name: GITHUB_APP_CLIENT_ID
                 value: ${GITHUB_APP_CLIENT_ID}
               - name: GITHUB_APP_CLIENT_SECRET

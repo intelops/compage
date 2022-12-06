@@ -17,28 +17,31 @@ spec:
     spec:
       containers:
         - name: app
-          image: ghcr.io/mahendraintelops/compage/app
-          imagePullPolicy: Always
+          image: ghcr.io/mahendraintelops/compage/app:ggIkfgg
+          imagePullPolicy: Never
           ports:
             - containerPort: 5000
               name: http
           env:
             - name: COMPAGE_CORE_URL
-              value: "localhost:50051"
+              valueFrom:
+                configMapKeyRef:
+                  name: app-data
+                  key: COMPAGE_CORE_URL
             - name: GITHUB_APP_REDIRECT_URI
               valueFrom:
                 configMapKeyRef:
-                  name: github-config
+                  name: app-github
                   key: GITHUB_APP_REDIRECT_URI
             - name: REDIS_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: redis-config
+                  name: app-redis
                   key: REDIS_HOST
             - name: REDIS_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: redis-config
+                  name: app-redis
                   key: REDIS_PORT
           volumeMounts:
             - name: github-credentials
@@ -60,9 +63,9 @@ spec:
       volumes:
         - name: github-credentials
           secret:
-            secretName: github-credentials
+            secretName: app-github-credentials
             defaultMode: 0400
         - name: redis-credentials
           secret:
-            secretName: redis-credentials
+            secretName: app-redis-credentials
             defaultMode: 0400

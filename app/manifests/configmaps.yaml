@@ -1,16 +1,27 @@
+# github config
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: github-config
+  name: app-github
   namespace: compage
 data:
-  GITHUB_APP_REDIRECT_URI: "http://localhost:3000/login"
+  GITHUB_APP_REDIRECT_URI: "http://192.168.1.29:3000/login"
 ---
+# redis connection details
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redis-config
+  name: app-redis
   namespace: compage
 data:
-  REDIS_HOST: "192.168.1.29"
+  REDIS_HOST: "redis.redis.svc"
   REDIS_PORT: "6379"
+---
+# app-data config | core connection details
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-data
+  namespace: compage
+data:
+  COMPAGE_CORE_URL: "core:50051"

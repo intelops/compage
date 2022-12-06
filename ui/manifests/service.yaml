@@ -3,12 +3,14 @@ kind: Service
 metadata:
   namespace: compage
   labels:
-    app: app
-  name: app
+    app: ui
+  name: ui
 spec:
   ports:
-    - port: 5000
+    - port: 3000
       targetPort: http
       protocol: TCP
+      nodePort: 30102
   selector:
-    app: app
+    app: ui
+  type: NodePort

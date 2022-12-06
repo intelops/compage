@@ -1,6 +1,6 @@
 'use strict';
 
-import {config} from "../util/constants";
+import config from "../util/constants";
 
 export const getProjectGrpcClient = () => {
     const PROTO_PATH = './protobufs/project.proto';

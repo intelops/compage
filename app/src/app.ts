@@ -5,7 +5,7 @@ import helmet from "helmet";
 import compageRouter from "./routes/compage";
 import githubRouter from "./routes/github";
 import authRouter from "./routes/auth";
-import {config} from "./util/constants";
+import config from "./util/constants";
 
 const app: Application = express();
 

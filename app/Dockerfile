@@ -16,4 +16,5 @@ RUN yarn install --production=true
 COPY --from=0 /app/dist .
 RUN yarn global add pm2@5.2.2
 EXPOSE 5000
+ENV NODE_ENV=production
 CMD ["pm2-runtime","app.js"]

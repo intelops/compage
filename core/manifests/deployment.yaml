@@ -17,8 +17,8 @@ spec:
     spec:
       containers:
         - name: core
-          image: ghcr.io/mahendraintelops/compage/core
-          imagePullPolicy: Always
+          image: ghcr.io/mahendraintelops/compage/core:wEfCcBW
+          imagePullPolicy: Never
           ports:
             - containerPort: 50051
               name: grpc

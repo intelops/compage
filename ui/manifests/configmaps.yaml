@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ui-data
+  namespace: compage
+data:
+  REACT_APP_GITHUB_APP_REDIRECT_URI: "http://192.168.1.29:3000/login"
+  REACT_APP_GITHUB_APP_CLIENT_ID: 5f8b8208ffa000316d2d
+  REACT_APP_COMPAGE_APP_SERVER_URL: http://ui:5000
