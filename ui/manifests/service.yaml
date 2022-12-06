@@ -8,9 +8,8 @@ metadata:
 spec:
   ports:
     - port: 3000
-      targetPort: http
-      protocol: TCP
-      nodePort: 30102
+      nodePort: 33333
+      name: http
   selector:
     app: ui
   type: NodePort

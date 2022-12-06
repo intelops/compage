@@ -17,10 +17,10 @@ spec:
     spec:
       containers:
         - name: ui
-          image: ghcr.io/mahendraintelops/compage/ui:qYbaUtG
+          image: ghcr.io/mahendraintelops/compage/ui:iFLobku
           imagePullPolicy: Never
           ports:
-            - containerPort: 5000
+            - containerPort: 3000
               name: http
           env:
             - name: REACT_APP_GITHUB_APP_REDIRECT_URI
