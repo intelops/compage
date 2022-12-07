@@ -1,10 +1,13 @@
-import {LocalStorage} from 'node-localstorage'
-const localStorage = new LocalStorage("./scratch");
+import {get, set} from "../db/redis";
+
 
 export const setUser = (username: string, token: string) => {
-    localStorage.setItem(username, token)
+    set(username, token).then(r => console.log(r))
 }
 
 export const getUser = (username: string) => {
-    return localStorage.getItem(username)
+    get(username).then(value => {
+        return value
+    })
+    return ""
 }

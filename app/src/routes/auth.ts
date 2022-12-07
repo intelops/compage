@@ -30,8 +30,6 @@ authRouter.post("/authenticate", async (req, res) => {
                 Authorization: `token ${access_token}`,
             },
         }).then((response) => {
-            //save token to temporary_map
-            //TODO if server restarted, the map becomes empty and have to reauthorize the user
             setUser(response.data.login, <string>access_token)
             return res.status(200).json(response.data);
         }).catch((error) => {

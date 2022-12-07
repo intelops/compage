@@ -5,7 +5,7 @@ metadata:
   name: app-github
   namespace: compage
 data:
-  GITHUB_APP_REDIRECT_URI: "http://172.20.0.3:32222/login"
+  GITHUB_APP_REDIRECT_URI: "http://172.20.0.2:32222/login"
 ---
 # redis connection details
 apiVersion: v1
