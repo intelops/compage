@@ -109,11 +109,14 @@ compageRouter.post("/create_project", async (req, res) => {
         fscrs.pipe(extract)
 
         extract.on('finish', async () => {
+            console.log("userName :", createProjectRequest.userName)
+            let password = <string>getUser(<string>createProjectRequest.userName);
+            console.log("password :", password)
             // clone existing repository
             const cloneExistingProjectFromGithubRequest: CloneExistingProjectFromGithubRequest = {
                 clonedProjectPath: `${downloadedProjectPath}`,
                 userName: <string>createProjectRequest.userName,
-                password: <string>getUser(<string>createProjectRequest.userName),
+                password: password,
                 repositoryName: createProjectRequest.repository.name
             }
 
@@ -125,7 +128,7 @@ compageRouter.post("/create_project", async (req, res) => {
                 existingProject: cloneExistingProjectFromGithubRequest.clonedProjectPath + "/" + createProjectRequest.repository.name,
                 userName: <string>createProjectRequest.userName,
                 email: createProjectRequest.email,
-                password: <string>getUser(<string>createProjectRequest.userName),
+                password: password,
                 repositoryName: createProjectRequest.repository.name
             }
 
