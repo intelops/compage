@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: ghcr.io/mahendraintelops/compage/app:UpCvczc
+          image: {{APP_IMAGE}}
           imagePullPolicy: Never
           ports:
             - containerPort: 5000
@@ -64,7 +64,7 @@ spec:
             periodSeconds: 30
       volumes:
         - name: tmp-volume
-          emptyDir: {}
+          emptyDir: { }
         - name: github-credentials
           secret:
             secretName: app-github-credentials
