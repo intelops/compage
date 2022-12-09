@@ -3,6 +3,7 @@ import {btoa} from "buffer";
 import {Router} from "express";
 import {getUser, setUser} from "../util/store";
 import config from "../util/constants";
+import {requireUserNameMiddleware} from "../middlewares/auth";
 
 const authRouter = Router();
 
@@ -23,7 +24,6 @@ authRouter.post("/authenticate", async (req, res) => {
     }).then(response => {
         let params = new URLSearchParams(response.data);
         const access_token = params.get("access_token");
-        console.log("access_token : ", access_token)
         // Request to return data of a user that has been authenticated
         return axios(`https://api.github.com/user`, {
             headers: {
@@ -40,7 +40,7 @@ authRouter.post("/authenticate", async (req, res) => {
     });
 });
 
-authRouter.get("/protected/logout", async (req, res) => {
+authRouter.get("/logout", requireUserNameMiddleware, async (req, res) => {
     const {userName} = req.query
     const bearerToken = `${getBasicAuthenticationPair()}`
     console.log("bearerToken : ", bearerToken)
@@ -67,7 +67,7 @@ authRouter.get("/protected/logout", async (req, res) => {
     });
 });
 
-authRouter.get("/protected/check_token", async (req, res) => {
+authRouter.get("/check_token", requireUserNameMiddleware, async (req, res) => {
     const {userName} = req.query;
     axios({
         headers: {

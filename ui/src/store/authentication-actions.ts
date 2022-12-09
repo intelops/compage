@@ -9,6 +9,8 @@ export const authenticationActions = authenticationSlice.actions
 export const fetchUser = (code: string): ThunkAction<void, RootState, unknown, AnyAction> => {
     return async (dispatch, getState) => {
         const response: AuthenticationModel = await AuthenticationService.authenticate(code);
+        //TODO This is temporary, need to replace with code extracting from localstorage.
+        localStorage.setItem("CURRENT_USER_NAME", response.login)
         dispatch(authenticationActions.setUser(response))
     }
 }

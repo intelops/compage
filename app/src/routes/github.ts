@@ -1,10 +1,11 @@
 import axios from "axios";
 import {Router} from "express";
 import {getUser} from "../util/store";
+import {requireUserNameMiddleware} from "../middlewares/auth";
 
 const githubRouter = Router();
 
-githubRouter.post("/protected/create_repository", async (req, res) => {
+githubRouter.post("/create_repository", requireUserNameMiddleware, async (req, res) => {
     const {repositoryName, description, userName} = req.body;
     axios({
         headers: {
@@ -26,7 +27,7 @@ githubRouter.post("/protected/create_repository", async (req, res) => {
     });
 });
 
-githubRouter.get("/protected/list_repositories", async (req, res) => {
+githubRouter.get("/list_repositories", requireUserNameMiddleware, async (req, res) => {
     const {userName} = req.query;
     axios({
         headers: {
@@ -45,7 +46,7 @@ githubRouter.get("/protected/list_repositories", async (req, res) => {
     });
 });
 
-githubRouter.put("/protected/commit_compage_yaml", async (req, res) => {
+githubRouter.put("/commit_compage_yaml", requireUserNameMiddleware, async (req, res) => {
     const {message, committer, content, repositoryName, sha} = req.body;
     axios({
         headers: {
@@ -73,7 +74,7 @@ githubRouter.put("/protected/commit_compage_yaml", async (req, res) => {
     });
 });
 
-githubRouter.get("/protected/pull_compage_yaml", async (req, res) => {
+githubRouter.get("/pull_compage_yaml", requireUserNameMiddleware, async (req, res) => {
     const {userName, repositoryName} = req.query;
     axios({
         headers: {

@@ -7,6 +7,7 @@ import {getUser} from "../util/store";
 import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
 import {CreateProjectRequest, CreateProjectResponse, Project} from "./models";
 import {get, set} from "../db/redis";
+import {requireUserNameMiddleware} from "../middlewares/auth";
 
 const rimraf = require("rimraf");
 const tar = require('tar')
@@ -25,7 +26,7 @@ const getCreateProjectResponse = (createProjectRequest: CreateProjectRequest, me
 }
 
 // createProject (grpc calls to core)
-compageRouter.post("/protected/create_project", async (req, res) => {
+compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res) => {
     const createProjectRequest: CreateProjectRequest = req.body;
     const cleanup = (downloadedProjectPath: string) => {
         // remove directory created, delete directory recursively
@@ -143,7 +144,7 @@ compageRouter.post("/protected/create_project", async (req, res) => {
 });
 
 // updateProject (grpc calls to core)
-compageRouter.post("/protected/update_project", async (req, res) => {
+compageRouter.post("/update_project", requireUserNameMiddleware, async (req, res) => {
     const {repositoryName, yaml, projectName, userName} = req.body;
     try {
         const payload = {

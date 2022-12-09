@@ -6,7 +6,6 @@ import compageRouter from "./routes/compage";
 import githubRouter from "./routes/github";
 import authRouter from "./routes/auth";
 import config from "./util/constants";
-import {requireUserNameMiddleware} from "./middlewares/auth";
 
 const app: Application = express();
 
@@ -18,7 +17,7 @@ app.use(helmet())
 app.use((req: Request, res: Response, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     //Needed for PUT requests
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, X-User-Name");
     res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
     next();
 });
@@ -27,8 +26,6 @@ app.use((req: Request, res: Response, next) => {
 app.get('/', (req: Request, res: Response) => {
     res.send('TS App is Running')
 })
-
-app.use("/protected", requireUserNameMiddleware);
 
 const routes = Router();
 routes.use('/compage', compageRouter);

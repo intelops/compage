@@ -2,7 +2,7 @@ import {get, set} from "../db/redis";
 
 
 export const setUser = async (username: string, token: string) => {
-    await set(username, token).then(r => console.log(r))
+    await set(username, token)
 }
 
 export const getUser = async (username: string) => {
