@@ -1,6 +1,7 @@
 import {SimpleGit} from "simple-git";
+import {Repository} from "../../routes/models";
 
-export const gitOperations = async (git: SimpleGit) => {
+export const gitOperations = async (git: SimpleGit, repository: Repository) => {
     // Add all files for commit
     await git.add('.')
         .then(
@@ -22,7 +23,7 @@ export const gitOperations = async (git: SimpleGit) => {
             });
 
     // Finally push to online repository
-    await git.push('origin', 'master')
+    await git.push('origin', repository.branch)
         .then((success: any) => {
             console.debug('git push succeeded');
         }, (failure: any) => {

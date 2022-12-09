@@ -1,9 +1,10 @@
 import {simpleGit, SimpleGit, SimpleGitOptions} from "simple-git";
 import {gitOperations} from "./common";
+import {Repository} from "../../routes/models";
 
 export interface PushNewProjectToGithubRequest {
     createdProjectPath: string,
-    repositoryName: string,
+    repository: Repository,
     userName: string,
     password: string,
     email: string
@@ -34,7 +35,7 @@ export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: Push
     await git.addConfig('user.name', pushNewProjectToGithubRequest.userName);
 
     // Set up GitHub url like this so no manual entry of user pass needed
-    const gitHubUrl = `https://${pushNewProjectToGithubRequest.userName}:${pushNewProjectToGithubRequest.password}@github.com/${pushNewProjectToGithubRequest.userName}/${pushNewProjectToGithubRequest.repositoryName}.git`;
+    const gitHubUrl = `https://${pushNewProjectToGithubRequest.userName}:${pushNewProjectToGithubRequest.password}@github.com/${pushNewProjectToGithubRequest.userName}/${pushNewProjectToGithubRequest.repository.name}.git`;
 
     // Add remote repository url as origin to repository
     await git.addRemote('origin', gitHubUrl).then(
@@ -46,5 +47,5 @@ export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: Push
         });
 
     // add, commit and push
-    await gitOperations(git)
+    await gitOperations(git, pushNewProjectToGithubRequest.repository)
 }

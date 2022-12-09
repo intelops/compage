@@ -6,7 +6,6 @@ import {pushToExistingProjectOnGithub, PushToExistingProjectOnGithubRequest} fro
 import {getUser} from "../util/store";
 import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
 import {CreateProjectRequest, CreateProjectResponse, Project} from "./models";
-import {get, set} from "../db/redis";
 import {requireUserNameMiddleware} from "../middlewares/auth";
 
 const rimraf = require("rimraf");
@@ -42,13 +41,9 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
         fs.mkdirSync(downloadedProjectPath, {recursive: true});
     } catch (err: any) {
         if (err.code !== 'EEXIST') {
-            return res.status(500).json({
-                repositoryName: createProjectRequest.repository.name,
-                userName: createProjectRequest.userName,
-                projectName: createProjectRequest.projectName,
-                message: err,
-                error: `unable to create project : ${createProjectRequest.projectName} directory with error : ${err}`
-            });
+            let message = `unable to create project : ${createProjectRequest.projectName}`
+            let error = `unable to create project : ${createProjectRequest.projectName} directory with error : ${err}`
+            return res.status(500).json(getCreateProjectResponse(createProjectRequest, message, error));
         } else {
             // first clean up and then recreate (it might be a residue of previous run)
             cleanup(downloadedProjectPath)
@@ -72,12 +67,6 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
         return userName + "$" + projectName;
     }
 
-    // retrieve project from store - this is just till ui gets its changes done.
-    const payloadRetrieved = await get(getKey(createProjectRequest.userName, createProjectRequest.projectName))
-    if (!payloadRetrieved) {
-        await set(getKey(createProjectRequest.userName, createProjectRequest.projectName), JSON.stringify(payload));
-    }
-
     // call to grpc server to generate the project
     let call = projectGrpcClient.CreateProject(payload);
     // receive the data(tar file) in chunks.
@@ -89,6 +78,7 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
         }
     });
 
+    // error while receiving the file from core component
     call.on('error', async (response: any) => {
         let message = `unable to create project : ${createProjectRequest.projectName}`
         let error = response.details
@@ -116,7 +106,7 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
                 clonedProjectPath: `${downloadedProjectPath}`,
                 userName: <string>createProjectRequest.userName,
                 password: password,
-                repositoryName: createProjectRequest.repository.name
+                repository: createProjectRequest.repository
             }
 
             await cloneExistingProjectFromGithub(cloneExistingProjectFromGithubRequest)
@@ -128,7 +118,7 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
                 userName: <string>createProjectRequest.userName,
                 email: createProjectRequest.email,
                 password: password,
-                repositoryName: createProjectRequest.repository.name
+                repository: createProjectRequest.repository
             }
 
             await pushToExistingProjectOnGithub(pushToExistingProjectOnGithubRequest)

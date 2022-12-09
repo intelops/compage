@@ -85,7 +85,7 @@ const CreateProject = () => {
         userName: "mahendraintelops",
         email: "mahendra.b@intelops.dev",
         //TODO need to set the remaining fields here once available
-        repository: {name: "first-project"},
+        repository: {name: "first-project", branch: "main"},
         projectName: "first-project",
         yaml: compageYaml
     }

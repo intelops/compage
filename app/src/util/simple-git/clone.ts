@@ -1,8 +1,9 @@
 import {simpleGit, SimpleGit, SimpleGitOptions} from "simple-git";
+import {Repository} from "../../routes/models";
 
 export interface CloneExistingProjectFromGithubRequest {
     clonedProjectPath: string,
-    repositoryName: string,
+    repository: Repository,
     userName: string,
     password: string,
 }
@@ -19,7 +20,7 @@ export const cloneExistingProjectFromGithub = async (cloneExistingProjectFromGit
     const git: SimpleGit = simpleGit(options);
 
     // Set up GitHub url like this so no manual entry of user pass needed
-    const gitHubUrl = `https://${cloneExistingProjectFromGithubRequest.userName}:${cloneExistingProjectFromGithubRequest.password}@github.com/${cloneExistingProjectFromGithubRequest.userName}/${cloneExistingProjectFromGithubRequest.repositoryName}.git`;
+    const gitHubUrl = `https://${cloneExistingProjectFromGithubRequest.userName}:${cloneExistingProjectFromGithubRequest.password}@github.com/${cloneExistingProjectFromGithubRequest.userName}/${cloneExistingProjectFromGithubRequest.repository.name}.git`;
 
     // clone git repository
     await git.clone(gitHubUrl).then(

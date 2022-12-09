@@ -13,6 +13,10 @@ const getBasicAuthenticationPair = () => {
 
 authRouter.post("/authenticate", async (req, res) => {
     const {code} = req.body;
+    console.log("Code :", code)
+    console.log("config.client_id :", config.client_id)
+    console.log("config.client_secret :", config.client_secret)
+    console.log("Code :", config.redirect_uri)
     // Request to exchange code for an access token
     axios({
         url: `https://github.com/login/oauth/access_token`, method: "POST", data: {
@@ -24,6 +28,7 @@ authRouter.post("/authenticate", async (req, res) => {
     }).then(response => {
         let params = new URLSearchParams(response.data);
         const access_token = params.get("access_token");
+        console.log("Access token retrieved")
         // Request to return data of a user that has been authenticated
         return axios(`https://api.github.com/user`, {
             headers: {
@@ -31,6 +36,7 @@ authRouter.post("/authenticate", async (req, res) => {
             },
         }).then((response) => {
             setUser(response.data.login, <string>access_token)
+            console.log("User token retrieved")
             return res.status(200).json(response.data);
         }).catch((error) => {
             return res.status(400).json(error);

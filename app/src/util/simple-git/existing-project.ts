@@ -1,10 +1,11 @@
 import {simpleGit, SimpleGit, SimpleGitOptions} from 'simple-git';
 import * as fs from "fs";
 import {gitOperations} from "./common";
+import {Repository} from "../../routes/models";
 
 export interface PushToExistingProjectOnGithubRequest {
     createdProjectPath: string,
-    repositoryName: string,
+    repository: Repository,
     existingProject: string,
     userName: string,
     password: string,
@@ -31,5 +32,5 @@ export const pushToExistingProjectOnGithub = async (pushToExistingProjectOnGithu
     console.log(`${pushToExistingProjectOnGithubRequest.createdProjectPath} files copied to ${pushToExistingProjectOnGithubRequest.existingProject}`)
 
     // add, commit and push
-    await gitOperations(git);
+    await gitOperations(git, pushToExistingProjectOnGithubRequest.repository);
 }
