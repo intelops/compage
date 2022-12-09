@@ -42,13 +42,12 @@ authRouter.post("/authenticate", async (req, res) => {
 
 authRouter.get("/logout", async (req, res) => {
     const {userName} = req.query
-    if (getUser(<string>userName) === undefined) {
-        // TODO change message and may impl later
-        return res.status(401).json("server restarted and lost the local cache of tokens")
+    if (await getUser(<string>userName) === undefined) {
+        return res.status(401).json("token lost from server, needs to re-login to github")
     }
     const bearerToken = `${getBasicAuthenticationPair()}`
     console.log("bearerToken : ", bearerToken)
-    const accessToken = getUser(<string>userName)
+    const accessToken = await getUser(<string>userName)
     console.log("accessToken : ", accessToken)
     console.log("config.client_id: ", config.client_id)
     axios({
@@ -73,9 +72,8 @@ authRouter.get("/logout", async (req, res) => {
 
 authRouter.get("/check_token", async (req, res) => {
     const {userName} = req.query;
-    if (getUser(<string>userName) === undefined) {
-        // TODO change message and may impl later
-        return res.status(401).json("server restarted and lost the local cache of tokens")
+    if (await getUser(<string>userName) === undefined) {
+        return res.status(401).json("token lost from server, needs to re-login to github")
     }
     axios({
         headers: {
@@ -85,7 +83,7 @@ authRouter.get("/check_token", async (req, res) => {
         url: `https://api.github.com/applications/${config.client_id}/token`,
         method: "POST",
         data: {
-            access_token: getUser(<string>userName)
+            access_token: await getUser(<string>userName)
         }
     }).then((response) => {
         if (response.status !== 200) {

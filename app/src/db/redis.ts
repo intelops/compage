@@ -11,10 +11,10 @@ client.connect().then();
 client.on("error", (error) => console.error(`Error : ${error}`));
 
 export const get = async (key: string) => {
-    return client.get(key);
+    return await client.get(key);
 }
 
 
 export const set = async (key: string, value: string) => {
-    return client.set(key, value);
+    return await client.set(key, value);
 }

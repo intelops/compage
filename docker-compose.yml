@@ -14,53 +14,53 @@ services:
     command: redis-server --save 20 1 --loglevel warning --requirepass compage123
     volumes:
       - cache:/data
-  core:
-    build:
-      dockerfile: Dockerfile
-      context: "./core"
-    volumes:
-      - "./vendor:/vendor"
-    ports:
-      - "9906:3306"
-    environment:
-      <<: *common-variables
-      MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
-      MYSQL_HOST: localhost
-
-  app:
-    build:
-      dockerfile: Dockerfile
-      context: "./app"
-    depends_on:
-      - core
-    volumes:
-      - /app/node_modules
-      - ./app:/app
-    environment:
-      <<: *common-variables
-      MYSQL_HOST_IP: mysql_db
-
-  ui:
-    stdin_open: true
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    build:
-      dockerfile: Dockerfile
-      context: ./ui
-    volumes:
-      - /app/node_modules
-      - ./ui:/app
-
-  nginx:
-    depends_on:
-      - app
-      - ui
-    restart: always
-    build:
-      dockerfile: Dockerfile
-      context: ./nginx
-    ports:
-      - "3050:80"
+#  core:
+#    build:
+#      dockerfile: Dockerfile
+#      context: "./core"
+#    volumes:
+#      - "./vendor:/vendor"
+#    ports:
+#      - "9906:3306"
+#    environment:
+#      <<: *common-variables
+#      MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
+#      MYSQL_HOST: localhost
+#
+#  app:
+#    build:
+#      dockerfile: Dockerfile
+#      context: "./app"
+#    depends_on:
+#      - core
+#    volumes:
+#      - /app/node_modules
+#      - ./app:/app
+#    environment:
+#      <<: *common-variables
+#      MYSQL_HOST_IP: mysql_db
+#
+#  ui:
+#    stdin_open: true
+#    environment:
+#      - CHOKIDAR_USEPOLLING=true
+#    build:
+#      dockerfile: Dockerfile
+#      context: ./ui
+#    volumes:
+#      - /app/node_modules
+#      - ./ui:/app
+#
+#  nginx:
+#    depends_on:
+#      - app
+#      - ui
+#    restart: always
+#    build:
+#      dockerfile: Dockerfile
+#      context: ./nginx
+#    ports:
+#      - "3050:80"
 
 volumes:
   cache:
