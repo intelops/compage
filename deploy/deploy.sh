@@ -26,14 +26,14 @@ APP_IMAGE="ghcr.io/mahendraintelops/compage/app:$TAG_NAME"
 UI_IMAGE="ghcr.io/mahendraintelops/compage/ui:$TAG_NAME"
 
 # create docker images for core, app and ui
-#docker build -t $CORE_IMAGE ../core/
+docker build -t $CORE_IMAGE ../core/
 docker build -t $APP_IMAGE ../app/
-#docker build -t $UI_IMAGE ../ui/
+docker build -t $UI_IMAGE ../ui/
 
 # load docker images for core, app and ui
-#kind load docker-image --name $CLUSTER_NAME $CORE_IMAGE
+kind load docker-image --name $CLUSTER_NAME $CORE_IMAGE
 kind load docker-image --name $CLUSTER_NAME $APP_IMAGE
-#kind load docker-image --name $CLUSTER_NAME $UI_IMAGE
+kind load docker-image --name $CLUSTER_NAME $UI_IMAGE
 
 # update image tags for core, app and ui
 sed -i "s#{{CORE_IMAGE}}#$CORE_IMAGE#" ../core/manifests/deployment.yaml
@@ -56,3 +56,7 @@ echo "Your KinD cluster has $KIND_NODE_IP as node ip, please check your github a
 
 echo "Your compage images have been loaded to cluster : $CLUSTER_NAME"
 docker exec -it ${CLUSTER_NAME}-control-plane crictl images | grep compage
+
+kubectl config set-context --current --namespace=compage
+
+echo "Access your app at http://"$KIND_NODE_IP":32222 ."

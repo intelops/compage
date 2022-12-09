@@ -1,7 +1,7 @@
 import axios from "axios";
 import {btoa} from "buffer";
 import {Router} from "express";
-import {getUser, setUser} from "./store";
+import {getUser, setUser} from "../util/store";
 import config from "../util/constants";
 
 const authRouter = Router();
@@ -40,11 +40,8 @@ authRouter.post("/authenticate", async (req, res) => {
     });
 });
 
-authRouter.get("/logout", async (req, res) => {
+authRouter.get("/protected/logout", async (req, res) => {
     const {userName} = req.query
-    if (await getUser(<string>userName) === undefined) {
-        return res.status(401).json("token lost from server, needs to re-login to github")
-    }
     const bearerToken = `${getBasicAuthenticationPair()}`
     console.log("bearerToken : ", bearerToken)
     const accessToken = await getUser(<string>userName)
@@ -70,11 +67,8 @@ authRouter.get("/logout", async (req, res) => {
     });
 });
 
-authRouter.get("/check_token", async (req, res) => {
+authRouter.get("/protected/check_token", async (req, res) => {
     const {userName} = req.query;
-    if (await getUser(<string>userName) === undefined) {
-        return res.status(401).json("token lost from server, needs to re-login to github")
-    }
     axios({
         headers: {
             Accept: "application/vnd.github+json",

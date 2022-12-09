@@ -1,14 +1,11 @@
 import axios from "axios";
 import {Router} from "express";
-import {getUser} from "./store";
+import {getUser} from "../util/store";
 
 const githubRouter = Router();
 
-githubRouter.post("/create_repository", async (req, res) => {
+githubRouter.post("/protected/create_repository", async (req, res) => {
     const {repositoryName, description, userName} = req.body;
-    if (await getUser(userName) === undefined) {
-        return res.status(401).json("token lost from server, needs to re-login to github")
-    }
     axios({
         headers: {
             Accept: "application/vnd.github+json",
@@ -29,11 +26,8 @@ githubRouter.post("/create_repository", async (req, res) => {
     });
 });
 
-githubRouter.get("/list_repositories", async (req, res) => {
+githubRouter.get("/protected/list_repositories", async (req, res) => {
     const {userName} = req.query;
-    if (await getUser(<string>userName) === undefined) {
-        return res.status(401).json("token lost from server, needs to re-login to github")
-    }
     axios({
         headers: {
             Accept: "application/vnd.github+json",
@@ -51,12 +45,8 @@ githubRouter.get("/list_repositories", async (req, res) => {
     });
 });
 
-githubRouter.put("/commit_compage_yaml", async (req, res) => {
+githubRouter.put("/protected/commit_compage_yaml", async (req, res) => {
     const {message, committer, content, repositoryName, sha} = req.body;
-    if (await getUser(committer.userName) === undefined) {
-        // TODO change message and may be impl too later
-        return res.status(401).json("server restarted and lost the local cache of tokens")
-    }
     axios({
         headers: {
             Accept: "application/vnd.github+json",
@@ -83,11 +73,8 @@ githubRouter.put("/commit_compage_yaml", async (req, res) => {
     });
 });
 
-githubRouter.get("/pull_compage_yaml", async (req, res) => {
+githubRouter.get("/protected/pull_compage_yaml", async (req, res) => {
     const {userName, repositoryName} = req.query;
-    if (await getUser(<string>userName) === undefined) {
-        return res.status(401).json("token lost from server, needs to re-login to github")
-    }
     axios({
         headers: {
             Accept: "application/vnd.github+json",

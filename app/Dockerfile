@@ -8,7 +8,7 @@ COPY src ./src
 COPY protobufs protobufs
 RUN yarn install
 ENV NODE_ENV=production
-CMD ["yarn", "run", "start"]
+CMD ["yarn", "run", "start-prod"]
 
 
 ### this is stage two , where the app actually runs
