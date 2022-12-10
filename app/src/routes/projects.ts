@@ -17,7 +17,8 @@ projectsRouter.post("/", requireUserNameMiddleware, async (request: Request, res
     const requestHeader = "X-User-Name";
     const userName = request.header(requestHeader);
     const createProjectRequest: CreateProjectRequest = request.body;
-    return response.status(200).json(await addProject(<string>userName, createProjectRequest));
+    await addProject(<string>userName, createProjectRequest)
+    return response.status(201).json("project created successfully");
 });
 
 export default projectsRouter;

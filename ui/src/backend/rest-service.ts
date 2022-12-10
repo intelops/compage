@@ -1,7 +1,7 @@
 import {getCurrentRepositoryDetails} from "../utils/service";
 import {getBase64EncodedStringForConfig} from "../components/diagram-maker/helper/helper";
 import {config} from "../utils/constants";
-import {CreateProjectRequest} from "../models/redux-models";
+import {GenerateProjectRequest} from "../models/redux-models";
 
 export const pullCompageYaml = (userName: string, repositoryName: string): Promise<Response> => {
     const proxy_url_pull_compage_yaml = config.proxy_url_pull_compage_yaml + "?userName=" + userName + "&repositoryName=" + (repositoryName || getCurrentRepositoryDetails().repositoryName);
@@ -40,14 +40,14 @@ export const createRepository = (userName: string, repositoryName: string, repoD
         body: JSON.stringify(requestBody)
     }).then(data => data.json());
 }
-export const createProject = (createProjectRequest: CreateProjectRequest):
+export const generateProject = (generateProjectRequest: GenerateProjectRequest):
     Promise<Response> => {
     const requestBody = {
-        repository: createProjectRequest.repository,
-        projectName: createProjectRequest.projectName,
-        userName: createProjectRequest.userName,
-        yaml: createProjectRequest.yaml,
-        email: createProjectRequest.email
+        repository: generateProjectRequest.repository,
+        projectName: generateProjectRequest.project.name,
+        userName: generateProjectRequest.user.name,
+        yaml: generateProjectRequest.yaml,
+        email: generateProjectRequest.user.email
     };
     // Use code parameter and other parameters to make POST request to proxy_server
     return fetch(config.proxy_url_create_project, {

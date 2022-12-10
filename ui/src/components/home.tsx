@@ -12,7 +12,7 @@ import {
 import {useAppSelector} from "../hooks/redux-hooks";
 import {DiagramMakerContainer} from "./diagram-maker/diagram-maker-container";
 import Button from "@mui/material/Button";
-import CreateProject from "./create-project";
+import GenerateProject from "./generate-project";
 
 export const Home = () => {
     const authentication = useAppSelector(state => state.authentication);
@@ -47,7 +47,7 @@ export const Home = () => {
                 // after resetting, needs to manually reload so, avoiding manual step here.
                 window.location.reload();
             }}>Reset state</Button>
-            <CreateProject></CreateProject>
+            <GenerateProject></GenerateProject>
         </React.Fragment>
     );
 }

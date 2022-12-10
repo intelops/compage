@@ -73,27 +73,41 @@ export interface Repository {
     branch?: string
 }
 
-export interface CreateProjectRequest {
-    projectName?: string,
-    userName?: string,
+export interface User {
+    name: string,
+    email?: string
+}
+
+export interface ProjectEntity {
+    id?: string,
+    name: string,
+    user?: User,
+    yaml?: CompageYaml,
+    repository?: Repository,
+    metadata?: Map<string, string>,
+    version?: string
+}
+
+export interface GenerateProjectRequest {
+    project: ProjectEntity,
+    user: User,
     yaml: CompageYaml,
     repository: Repository,
     metadata?: Map<string, string>,
-    email: string
 }
 
-export interface CreatedProjectModel {
+export interface GeneratedProjectModel {
     "name": string,
     "fileChunk": any
 }
 
-export interface CreatedProjectArrayModel {
+export interface GeneratedProjectArrayModel {
     // In `status` we will watch
     // if todos are being loaded.
     status: "loading" | "idle";
     // `error` will contain an error message.
     error: string | null;
-    createdProject: CreatedProjectModel
+    generatedProject: GeneratedProjectModel
 }
 
 // github

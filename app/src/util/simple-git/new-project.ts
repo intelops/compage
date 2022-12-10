@@ -3,7 +3,7 @@ import {gitOperations} from "./common";
 import {Repository} from "../../routes/models";
 
 export interface PushNewProjectToGithubRequest {
-    createdProjectPath: string,
+    generatedProjectPath: string,
     repository: Repository,
     userName: string,
     password: string,
@@ -12,7 +12,7 @@ export interface PushNewProjectToGithubRequest {
 
 export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: PushNewProjectToGithubRequest) => {
     const options: Partial<SimpleGitOptions> = {
-        baseDir: pushNewProjectToGithubRequest.createdProjectPath,
+        baseDir: pushNewProjectToGithubRequest.generatedProjectPath,
         binary: 'git',
         maxConcurrentProcesses: 6,
         trimmed: false,

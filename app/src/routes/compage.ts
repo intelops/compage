@@ -5,7 +5,7 @@ import * as os from "os";
 import {pushToExistingProjectOnGithub, PushToExistingProjectOnGithubRequest} from "../util/simple-git/existing-project";
 import {getToken} from "../util/token-store";
 import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
-import {CreateProjectRequest, CreateProjectResponse, Project} from "./models";
+import {CreateProjectRequest, GenerateProjectResponse, Project} from "./models";
 import {requireUserNameMiddleware} from "../middlewares/auth";
 
 const rimraf = require("rimraf");
@@ -13,20 +13,20 @@ const tar = require('tar')
 const compageRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
 
-const getCreateProjectResponse = (createProjectRequest: CreateProjectRequest, message: string, error: string) => {
-    let createProjectResponse: CreateProjectResponse = {
-        repositoryName: createProjectRequest.repository.name,
-        userName: createProjectRequest.user.name,
-        projectName: createProjectRequest.projectName,
+const getGenerateProjectResponse = (generateProjectRequest: CreateProjectRequest, message: string, error: string) => {
+    let generateProjectResponse: GenerateProjectResponse = {
+        repositoryName: generateProjectRequest.repository.name,
+        userName: generateProjectRequest.user.name,
+        projectName: generateProjectRequest.project.name,
         message: message,
         error: error
     }
-    return createProjectResponse;
+    return generateProjectResponse;
 }
 
-// createProject (grpc calls to core)
+// generateProject (grpc calls to core)
 compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res) => {
-    const createProjectRequest: CreateProjectRequest = req.body;
+    const generateProjectRequest: CreateProjectRequest = req.body;
     const cleanup = (downloadedProjectPath: string) => {
         // remove directory created, delete directory recursively
         rimraf(downloadedProjectPath, () => {
@@ -35,31 +35,31 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
     }
 
     // create directory hierarchy here itself as creating it after receiving data will not be proper.
-    const originalProjectPath = `${os.tmpdir()}/${createProjectRequest.projectName}`
+    const originalProjectPath = `${os.tmpdir()}/${generateProjectRequest.project.name}`
     const downloadedProjectPath = `${originalProjectPath}_downloaded`
     try {
         fs.mkdirSync(downloadedProjectPath, {recursive: true});
     } catch (err: any) {
         if (err.code !== 'EEXIST') {
-            let message = `unable to create project : ${createProjectRequest.projectName}`
-            let error = `unable to create project : ${createProjectRequest.projectName} directory with error : ${err}`
-            return res.status(500).json(getCreateProjectResponse(createProjectRequest, message, error));
+            let message = `unable to generate project : ${generateProjectRequest.project.name}`
+            let error = `unable to generate project : ${generateProjectRequest.project.name} directory with error : ${err}`
+            return res.status(500).json(getGenerateProjectResponse(generateProjectRequest, message, error));
         } else {
             // first clean up and then recreate (it might be a residue of previous run)
             cleanup(downloadedProjectPath)
             fs.mkdirSync(downloadedProjectPath, {recursive: true});
         }
     }
-    const projectTarFilePath = `${downloadedProjectPath}/${createProjectRequest.projectName}_downloaded.tar.gz`;
+    const projectTarFilePath = `${downloadedProjectPath}/${generateProjectRequest.project.name}_downloaded.tar.gz`;
 
     // save project metadata (in compage db or somewhere)
     // need to save project-name, compage-yaml version, github repo and latest commit to the db
     const payload: Project = {
-        projectName: createProjectRequest.projectName,
-        userName: createProjectRequest.user.name,
-        yaml: JSON.stringify(createProjectRequest.yaml),
-        repositoryName: createProjectRequest.repository.name,
-        metadata: JSON.stringify(createProjectRequest.metadata)
+        projectName: generateProjectRequest.project.name,
+        userName: generateProjectRequest.user.name,
+        yaml: JSON.stringify(generateProjectRequest.yaml),
+        repositoryName: generateProjectRequest.repository.name,
+        metadata: JSON.stringify(generateProjectRequest.metadata)
     }
 
     //save to redis
@@ -68,7 +68,7 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
     }
 
     // call to grpc server to generate the project
-    let call = projectGrpcClient.CreateProject(payload);
+    let call = projectGrpcClient.GenerateProject(payload);
     // receive the data(tar file) in chunks.
     call.on('data', async (response: { fileChunk: any }) => {
         // chunk is available, append it to the given path.
@@ -80,9 +80,9 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
 
     // error while receiving the file from core component
     call.on('error', async (response: any) => {
-        let message = `unable to create project : ${createProjectRequest.projectName}`
+        let message = `unable to generate project : ${generateProjectRequest.project.name}`
         let error = response.details
-        return res.status(500).json(getCreateProjectResponse(createProjectRequest, message, error));
+        return res.status(500).json(getGenerateProjectResponse(generateProjectRequest, message, error));
     });
 
     // file has been transferred, lets save it to github.
@@ -100,25 +100,25 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
         fscrs.pipe(extract)
 
         extract.on('finish', async () => {
-            let password = <string>await getToken(<string>createProjectRequest.user.name);
+            let password = <string>await getToken(<string>generateProjectRequest.user.name);
             // clone existing repository
             const cloneExistingProjectFromGithubRequest: CloneExistingProjectFromGithubRequest = {
                 clonedProjectPath: `${downloadedProjectPath}`,
-                userName: <string>createProjectRequest.user.name,
+                userName: <string>generateProjectRequest.user.name,
                 password: password,
-                repository: createProjectRequest.repository
+                repository: generateProjectRequest.repository
             }
 
             await cloneExistingProjectFromGithub(cloneExistingProjectFromGithubRequest)
 
             // save to GitHub
             const pushToExistingProjectOnGithubRequest: PushToExistingProjectOnGithubRequest = {
-                createdProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
-                existingProject: cloneExistingProjectFromGithubRequest.clonedProjectPath + "/" + createProjectRequest.repository.name,
-                userName: <string>createProjectRequest.user.name,
-                email: createProjectRequest.user.email,
+                generatedProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
+                existingProject: cloneExistingProjectFromGithubRequest.clonedProjectPath + "/" + generateProjectRequest.repository.name,
+                userName: <string>generateProjectRequest.user.name,
+                email: generateProjectRequest.user.email,
                 password: password,
-                repository: createProjectRequest.repository
+                repository: generateProjectRequest.repository
             }
 
             await pushToExistingProjectOnGithub(pushToExistingProjectOnGithubRequest)
@@ -126,9 +126,9 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
             cleanup(downloadedProjectPath);
 
             // send status back to ui
-            let message = `created project: ${createProjectRequest.projectName} and saved in repository : ${createProjectRequest.repository.name} successfully`
+            let message = `created project: ${generateProjectRequest.project.name} and saved in repository : ${generateProjectRequest.repository.name} successfully`
             let error = ""
-            return res.status(200).json(getCreateProjectResponse(createProjectRequest, message, error));
+            return res.status(200).json(getGenerateProjectResponse(generateProjectRequest, message, error));
         });
     });
 });

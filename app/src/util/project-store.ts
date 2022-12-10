@@ -1,5 +1,6 @@
 import {client} from "../db/redis";
 import {CreateProjectRequest, ProjectEntity} from "../routes/models";
+import {uuid} from "uuidv4";
 
 
 export const getProjects = async (username: string) => {
@@ -13,7 +14,8 @@ export const getProjects = async (username: string) => {
 
 export const addProject = async (userName: string, createProjectRequest: CreateProjectRequest) => {
     const projectEntity: ProjectEntity = {
-        name: createProjectRequest.projectName,
+        id: uuid(),
+        name: createProjectRequest.project.name,
         metadata: createProjectRequest.metadata,
         user: createProjectRequest.user,
         yaml: createProjectRequest.yaml,

@@ -4,7 +4,7 @@ import {gitOperations} from "./common";
 import {Repository} from "../../routes/models";
 
 export interface PushToExistingProjectOnGithubRequest {
-    createdProjectPath: string,
+    generatedProjectPath: string,
     repository: Repository,
     existingProject: string,
     userName: string,
@@ -28,8 +28,8 @@ export const pushToExistingProjectOnGithub = async (pushToExistingProjectOnGithu
     await git.addConfig('user.name', pushToExistingProjectOnGithubRequest.userName);
 
     // copy over the new files to this cloned files.
-    fs.cpSync(pushToExistingProjectOnGithubRequest.createdProjectPath, pushToExistingProjectOnGithubRequest.existingProject, {recursive: true})
-    console.log(`${pushToExistingProjectOnGithubRequest.createdProjectPath} files copied to ${pushToExistingProjectOnGithubRequest.existingProject}`)
+    fs.cpSync(pushToExistingProjectOnGithubRequest.generatedProjectPath, pushToExistingProjectOnGithubRequest.existingProject, {recursive: true})
+    console.log(`${pushToExistingProjectOnGithubRequest.generatedProjectPath} files copied to ${pushToExistingProjectOnGithubRequest.existingProject}`)
 
     // add, commit and push
     await gitOperations(git, pushToExistingProjectOnGithubRequest.repository);

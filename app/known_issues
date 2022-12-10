@@ -4,7 +4,7 @@ Issue : The below error occurs when grpc server is unreachable.
     "repositoryName": "first-project",
     "userName": "mahendraintelops",
     "projectName": "first-project",
-    "message": "unable to create project : first-project",
+    "message": "unable to generate project : first-project",
     "error": "No connection established"
 }
 Possible Solution : Need to add some code in node server to let ui know about the unavailability.

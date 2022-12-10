@@ -1,13 +1,13 @@
 import {useAppDispatch, useAppSelector} from "../hooks/redux-hooks";
-import './create-project.css'
+import './generate-project.css'
 import {selectStatus} from "../store/compage-slice";
-import {createProject} from "../service/compage-service";
+import {generateProject} from "../service/compage-service";
 import Button from "@mui/material/Button";
-import {CompageYaml, CreateProjectRequest} from "../models/redux-models";
+import {CompageYaml, GenerateProjectRequest} from "../models/redux-models";
 
-const CreateProject = () => {
+const GenerateProject = () => {
     const dispatch = useAppDispatch();
-    const generatedProject = useAppSelector(state => state.compage.createdProject);
+    const generatedProject = useAppSelector(state => state.compage.generatedProject);
     const status = useAppSelector(selectStatus);
     const compageYaml: CompageYaml = JSON.parse("{\n" +
         "\t\"edges\": {\n" +
@@ -81,22 +81,21 @@ const CreateProject = () => {
         "}")
     compageYaml.version = "v1";
 
-    const createProjectRequest: CreateProjectRequest = {
-        userName: "mahendraintelops",
-        email: "mahendra.b@intelops.dev",
+    const generateProjectRequest: GenerateProjectRequest = {
+        user: {name: "mahendraintelops", email: "mahendra.b@intelops.dev"},
         //TODO need to set the remaining fields here once available
         repository: {name: "first-project", branch: "main"},
-        projectName: "first-project",
+        project: {id: "first-project", name: "first-project"},
         yaml: compageYaml
     }
     // When clicked, dispatch `generateProject`:
-    const handleClick = () => dispatch(createProject(createProjectRequest));
+    const handleClick = () => dispatch(generateProject(generateProjectRequest));
     return (
         <>
             <Button variant="contained" onClick={handleClick}>
                 {status === "loading"
-                    ? "Creating Project"
-                    : "Create Project"}
+                    ? "Generating Project"
+                    : "Generate Project"}
             </Button>
             <div>
                 {JSON.stringify(generatedProject)}
@@ -105,4 +104,4 @@ const CreateProject = () => {
         </>
     );
 }
-export default CreateProject;
+export default GenerateProject;
