@@ -3,7 +3,7 @@ import {Router} from "express";
 import * as fs from "fs";
 import * as os from "os";
 import {pushToExistingProjectOnGithub, PushToExistingProjectOnGithubRequest} from "../util/simple-git/existing-project";
-import {getUser} from "../util/store";
+import {getToken} from "../util/token-store";
 import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
 import {CreateProjectRequest, CreateProjectResponse, Project} from "./models";
 import {requireUserNameMiddleware} from "../middlewares/auth";
@@ -16,7 +16,7 @@ const projectGrpcClient = getProjectGrpcClient();
 const getCreateProjectResponse = (createProjectRequest: CreateProjectRequest, message: string, error: string) => {
     let createProjectResponse: CreateProjectResponse = {
         repositoryName: createProjectRequest.repository.name,
-        userName: createProjectRequest.userName,
+        userName: createProjectRequest.user.name,
         projectName: createProjectRequest.projectName,
         message: message,
         error: error
@@ -56,7 +56,7 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
     // need to save project-name, compage-yaml version, github repo and latest commit to the db
     const payload: Project = {
         projectName: createProjectRequest.projectName,
-        userName: createProjectRequest.userName,
+        userName: createProjectRequest.user.name,
         yaml: JSON.stringify(createProjectRequest.yaml),
         repositoryName: createProjectRequest.repository.name,
         metadata: JSON.stringify(createProjectRequest.metadata)
@@ -100,11 +100,11 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
         fscrs.pipe(extract)
 
         extract.on('finish', async () => {
-            let password = <string>await getUser(<string>createProjectRequest.userName);
+            let password = <string>await getToken(<string>createProjectRequest.user.name);
             // clone existing repository
             const cloneExistingProjectFromGithubRequest: CloneExistingProjectFromGithubRequest = {
                 clonedProjectPath: `${downloadedProjectPath}`,
-                userName: <string>createProjectRequest.userName,
+                userName: <string>createProjectRequest.user.name,
                 password: password,
                 repository: createProjectRequest.repository
             }
@@ -115,8 +115,8 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
             const pushToExistingProjectOnGithubRequest: PushToExistingProjectOnGithubRequest = {
                 createdProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
                 existingProject: cloneExistingProjectFromGithubRequest.clonedProjectPath + "/" + createProjectRequest.repository.name,
-                userName: <string>createProjectRequest.userName,
-                email: createProjectRequest.email,
+                userName: <string>createProjectRequest.user.name,
+                email: createProjectRequest.user.email,
                 password: password,
                 repository: createProjectRequest.repository
             }

@@ -6,6 +6,7 @@ import compageRouter from "./routes/compage";
 import githubRouter from "./routes/github";
 import authRouter from "./routes/auth";
 import config from "./util/constants";
+import projectsRouter from "./routes/projects";
 
 const app: Application = express();
 
@@ -28,6 +29,7 @@ app.get('/', (req: Request, res: Response) => {
 })
 
 const routes = Router();
+routes.use('/projects', projectsRouter)
 routes.use('/compage', compageRouter);
 routes.use('/github', githubRouter);
 routes.use('/auth', authRouter);

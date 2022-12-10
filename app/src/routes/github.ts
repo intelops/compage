@@ -1,6 +1,6 @@
 import axios from "axios";
 import {Router} from "express";
-import {getUser} from "../util/store";
+import {getToken} from "../util/token-store";
 import {requireUserNameMiddleware} from "../middlewares/auth";
 
 const githubRouter = Router();
@@ -10,7 +10,7 @@ githubRouter.post("/create_repository", requireUserNameMiddleware, async (req, r
     axios({
         headers: {
             Accept: "application/vnd.github+json",
-            Authorization: `Bearer ${await getUser(userName)}`,
+            Authorization: `Bearer ${await getToken(userName)}`,
         },
         url: `https://api.github.com/user/repos`, method: "POST", data: {
             name: repositoryName,
@@ -32,7 +32,7 @@ githubRouter.get("/list_repositories", requireUserNameMiddleware, async (req, re
     axios({
         headers: {
             Accept: "application/vnd.github+json",
-            Authorization: `Bearer ${await getUser(<string>userName)}`,
+            Authorization: `Bearer ${await getToken(<string>userName)}`,
         },
         url: `https://api.github.com/user/repos`,
         method: "GET"
@@ -51,7 +51,7 @@ githubRouter.put("/commit_compage_yaml", requireUserNameMiddleware, async (req, 
     axios({
         headers: {
             Accept: "application/vnd.github+json",
-            Authorization: `Bearer ${await getUser(committer.userName)}`,
+            Authorization: `Bearer ${await getToken(committer.userName)}`,
         },
         url: `https://api.github.com/repos/${committer.userName}/${repositoryName}/contents/.compage/config.json`,
         method: "PUT",
@@ -79,7 +79,7 @@ githubRouter.get("/pull_compage_yaml", requireUserNameMiddleware, async (req, re
     axios({
         headers: {
             Accept: "application/vnd.github+json",
-            Authorization: `Bearer ${await getUser(<string>userName)}`,
+            Authorization: `Bearer ${await getToken(<string>userName)}`,
         },
         url: `https://api.github.com/repos/${userName}/${repositoryName}/contents/.compage/config.json`,
         method: "GET",

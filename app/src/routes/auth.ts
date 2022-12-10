@@ -1,7 +1,7 @@
 import axios from "axios";
 import {btoa} from "buffer";
 import {Router} from "express";
-import {getUser, setUser} from "../util/store";
+import {getToken, setToken} from "../util/token-store";
 import config from "../util/constants";
 import {requireUserNameMiddleware} from "../middlewares/auth";
 
@@ -35,7 +35,7 @@ authRouter.post("/authenticate", async (req, res) => {
                 Authorization: `token ${access_token}`,
             },
         }).then((response) => {
-            setUser(response.data.login, <string>access_token)
+            setToken(response.data.login, <string>access_token)
             console.log("User token retrieved")
             return res.status(200).json(response.data);
         }).catch((error) => {
@@ -50,7 +50,7 @@ authRouter.get("/logout", requireUserNameMiddleware, async (req, res) => {
     const {userName} = req.query
     const bearerToken = `${getBasicAuthenticationPair()}`
     console.log("bearerToken : ", bearerToken)
-    const accessToken = await getUser(<string>userName)
+    const accessToken = await getToken(<string>userName)
     console.log("accessToken : ", accessToken)
     console.log("config.client_id: ", config.client_id)
     axios({
@@ -83,7 +83,7 @@ authRouter.get("/check_token", requireUserNameMiddleware, async (req, res) => {
         url: `https://api.github.com/applications/${config.client_id}/token`,
         method: "POST",
         data: {
-            access_token: await getUser(<string>userName)
+            access_token: await getToken(<string>userName)
         }
     }).then((response) => {
         if (response.status !== 200) {

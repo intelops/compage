@@ -1,4 +1,4 @@
-import {getUser} from "../util/store";
+import {getToken} from "../util/token-store";
 import {NextFunction, Request, Response} from "express";
 
 export const requireUserNameMiddleware = async (request: Request, response: Response, next: NextFunction) => {
@@ -14,7 +14,7 @@ export const requireUserNameMiddleware = async (request: Request, response: Resp
         return;
     }
 
-    let token = await getUser(<string>userName);
+    let token = await getToken(<string>userName);
     if (token === undefined || token === "" || token === null) {
         unauthorized(`token lost from server, needs to re-login to github`);
         return

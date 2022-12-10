@@ -67,13 +67,25 @@ export interface Project {
     metadata: string
 }
 
-export interface CreateProjectRequest {
-    projectName: string,
-    userName: string,
+export interface ProjectEntity {
+    name: string,
+    user: User,
     yaml: CompageYaml,
     repository: Repository,
     metadata?: Map<string, string>,
+}
+
+export interface User {
+    name: string,
     email: string
+}
+
+export interface CreateProjectRequest {
+    projectName: string,
+    user: User,
+    yaml: CompageYaml,
+    repository: Repository,
+    metadata?: Map<string, string>,
 }
 
 export interface CreateProjectResponse {
