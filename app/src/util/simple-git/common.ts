@@ -22,6 +22,16 @@ export const gitOperations = async (git: SimpleGit, repository: Repository) => {
                 return failure;
             });
 
+    //  checkoutLocalBranch checks out local branch with name supplied
+    await git.checkoutLocalBranch(repository.branch)
+        .then(
+            (success: any) => {
+                console.debug('git checkoutLocalBranch succeeded');
+            }, (failure: any) => {
+                console.debug('git checkoutLocalBranch failed : ', failure);
+                return failure;
+            });
+
     // Finally push to online repository
     await git.push('origin', repository.branch)
         .then((success: any) => {

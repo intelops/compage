@@ -5,7 +5,7 @@ import * as os from "os";
 import {pushToExistingProjectOnGithub, PushToExistingProjectOnGithubRequest} from "../util/simple-git/existing-project";
 import {getToken} from "../util/token-store";
 import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
-import {CreateProjectRequest, GenerateProjectResponse, Project} from "./models";
+import {GenerateProjectRequest, GenerateProjectResponse, Project} from "./models";
 import {requireUserNameMiddleware} from "../middlewares/auth";
 
 const rimraf = require("rimraf");
@@ -13,7 +13,7 @@ const tar = require('tar')
 const compageRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
 
-const getGenerateProjectResponse = (generateProjectRequest: CreateProjectRequest, message: string, error: string) => {
+const getGenerateProjectResponse = (generateProjectRequest: GenerateProjectRequest, message: string, error: string) => {
     let generateProjectResponse: GenerateProjectResponse = {
         repositoryName: generateProjectRequest.repository.name,
         userName: generateProjectRequest.user.name,
@@ -26,7 +26,7 @@ const getGenerateProjectResponse = (generateProjectRequest: CreateProjectRequest
 
 // generateProject (grpc calls to core)
 compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res) => {
-    const generateProjectRequest: CreateProjectRequest = req.body;
+    const generateProjectRequest: GenerateProjectRequest = req.body;
     const cleanup = (downloadedProjectPath: string) => {
         // remove directory created, delete directory recursively
         rimraf(downloadedProjectPath, () => {
@@ -60,11 +60,6 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
         yaml: JSON.stringify(generateProjectRequest.yaml),
         repositoryName: generateProjectRequest.repository.name,
         metadata: JSON.stringify(generateProjectRequest.metadata)
-    }
-
-    //save to redis
-    const getKey = (userName: string | undefined, projectName: string | undefined) => {
-        return userName + "$" + projectName;
     }
 
     // call to grpc server to generate the project

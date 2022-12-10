@@ -90,7 +90,7 @@ export interface CreateProjectRequest {
     metadata?: Map<string, string>,
 }
 
-export interface CreateProjectRequest {
+export interface GenerateProjectRequest {
     project: ProjectEntity,
     user: User,
     yaml: CompageYaml,
