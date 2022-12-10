@@ -8,7 +8,7 @@ export interface CloneExistingProjectFromGithubRequest {
     password: string,
 }
 
-export const cloneExistingProjectFromGithub = async (cloneExistingProjectFromGithubRequest: CloneExistingProjectFromGithubRequest) => {
+export const cloneExistingProjectFromGithub = async (cloneExistingProjectFromGithubRequest: CloneExistingProjectFromGithubRequest): Promise<string> => {
     const options: Partial<SimpleGitOptions> = {
         baseDir: cloneExistingProjectFromGithubRequest.clonedProjectPath,
         binary: 'git',
@@ -21,13 +21,14 @@ export const cloneExistingProjectFromGithub = async (cloneExistingProjectFromGit
 
     // Set up GitHub url like this so no manual entry of user pass needed
     const gitHubUrl = `https://${cloneExistingProjectFromGithubRequest.userName}:${cloneExistingProjectFromGithubRequest.password}@github.com/${cloneExistingProjectFromGithubRequest.userName}/${cloneExistingProjectFromGithubRequest.repository.name}.git`;
-
+    let error: string = ""
     // clone git repository
     await git.clone(gitHubUrl).then(
         (success: any) => {
             console.debug("git clone succeeded");
         }, (failure: any) => {
             console.debug('git clone failed : ', failure);
-            return failure
+            error = "git clone failed" + failure
         });
+    return error
 }

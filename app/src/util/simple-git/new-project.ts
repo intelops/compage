@@ -10,7 +10,7 @@ export interface PushNewProjectToGithubRequest {
     email: string
 }
 
-export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: PushNewProjectToGithubRequest) => {
+export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: PushNewProjectToGithubRequest): Promise<string> => {
     const options: Partial<SimpleGitOptions> = {
         baseDir: pushNewProjectToGithubRequest.generatedProjectPath,
         binary: 'git',
@@ -21,15 +21,19 @@ export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: Push
     // when setting all options in a single object
     const git: SimpleGit = simpleGit(options);
 
+    let error: string = ""
+
     // initialize git
     await git.init().then(
         (success: any) => {
             console.debug("git init succeeded");
         }, (failure: any) => {
             console.debug('git init failed : ', failure);
-            return failure
+            error = "git init failed" + failure
         });
-
+    if (error.length > 0) {
+        return error
+    }
     // add local git config like username and email
     await git.addConfig('user.email', pushNewProjectToGithubRequest.email);
     await git.addConfig('user.name', pushNewProjectToGithubRequest.userName);
@@ -43,9 +47,12 @@ export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: Push
             console.debug("git remote add origin succeeded");
         }, (failure: any) => {
             console.debug('git remote add origin failed : ', failure);
-            return failure;
+            error = "git remote add origin failed" + failure
         });
+    if (error.length > 0) {
+        return error
+    }
 
     // add, commit and push
-    await gitOperations(git, pushNewProjectToGithubRequest.repository)
+    return await gitOperations(git, pushNewProjectToGithubRequest.repository)
 }

@@ -104,7 +104,13 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
                 repository: generateProjectRequest.repository
             }
 
-            await cloneExistingProjectFromGithub(cloneExistingProjectFromGithubRequest)
+            let error: string = await cloneExistingProjectFromGithub(cloneExistingProjectFromGithubRequest)
+            if (error.length > 0) {
+                // send status back to ui
+                let message = `couldn't generate project: ${generateProjectRequest.project.name} due to : ${error}.`
+                // error = ""
+                return res.status(500).json(getGenerateProjectResponse(generateProjectRequest, message, error));
+            }
 
             // save to GitHub
             const pushToExistingProjectOnGithubRequest: PushToExistingProjectOnGithubRequest = {
@@ -116,13 +122,19 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
                 repository: generateProjectRequest.repository
             }
 
-            await pushToExistingProjectOnGithub(pushToExistingProjectOnGithubRequest)
+            error = await pushToExistingProjectOnGithub(pushToExistingProjectOnGithubRequest)
+            if (error.length > 0) {
+                // send status back to ui
+                let message = `couldn't generate project: ${generateProjectRequest.project.name} due to : ${error}.`
+                // error = ""
+                return res.status(500).json(getGenerateProjectResponse(generateProjectRequest, message, error));
+            }
+
             console.log(`saved ${downloadedProjectPath} to github`)
             cleanup(downloadedProjectPath);
 
             // send status back to ui
-            let message = `created project: ${generateProjectRequest.project.name} and saved in repository : ${generateProjectRequest.repository.name} successfully`
-            let error = ""
+            let message = `generated project: ${generateProjectRequest.project.name} and saved in repository : ${generateProjectRequest.repository.name} successfully`
             return res.status(200).json(getGenerateProjectResponse(generateProjectRequest, message, error));
         });
     });

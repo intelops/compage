@@ -12,7 +12,7 @@ export interface PushToExistingProjectOnGithubRequest {
     email: string
 }
 
-export const pushToExistingProjectOnGithub = async (pushToExistingProjectOnGithubRequest: PushToExistingProjectOnGithubRequest) => {
+export const pushToExistingProjectOnGithub = async (pushToExistingProjectOnGithubRequest: PushToExistingProjectOnGithubRequest): Promise<string> => {
     const options: Partial<SimpleGitOptions> = {
         baseDir: pushToExistingProjectOnGithubRequest.existingProject,
         binary: 'git',
@@ -32,5 +32,5 @@ export const pushToExistingProjectOnGithub = async (pushToExistingProjectOnGithu
     console.log(`${pushToExistingProjectOnGithubRequest.generatedProjectPath} files copied to ${pushToExistingProjectOnGithubRequest.existingProject}`)
 
     // add, commit and push
-    await gitOperations(git, pushToExistingProjectOnGithubRequest.repository);
+    return await gitOperations(git, pushToExistingProjectOnGithubRequest.repository)
 }
