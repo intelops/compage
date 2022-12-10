@@ -24,8 +24,8 @@ func New() project.ProjectServiceServer {
 	return &server{}
 }
 
-// CreateProject implements api.v1.CreateProject
-func (s *server) CreateProject(projectRequest *project.ProjectRequest, server project.ProjectService_CreateProjectServer) error {
+// GenerateProject implements api.v1.GenerateProject
+func (s *server) GenerateProject(projectRequest *project.GenerateProjectRequest, server project.ProjectService_GenerateProjectServer) error {
 	// converts to core project
 	coreProject, err := grpc.GetProject(projectRequest)
 	if err != nil {
@@ -67,25 +67,25 @@ func (s *server) CreateProject(projectRequest *project.ProjectRequest, server pr
 	return sendFile(projectRequest, server)
 }
 
-// UpdateProject implements api.v1.UpdateProject
-func (s *server) UpdateProject(projectRequest *project.ProjectRequest, server project.ProjectService_UpdateProjectServer) error {
-	//projectGrpc, err := grpc.GetProject(projectRequest)
+// RegenerateProject implements api.v1.RegenerateProject
+func (s *server) RegenerateProject(generateProjectRequest *project.GenerateProjectRequest, server project.ProjectService_RegenerateProjectServer) error {
+	//projectGrpc, err := grpc.GetProject(generateProjectRequest)
 	//if err != nil {
 	//	return err
 	//}
 	//fmt.Println(projectGrpc.CompageYaml)
-	// createProject
-	err := taroperations.CreateTarFile(projectRequest.ProjectName, utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
+	// GenerateProject
+	err := taroperations.CreateTarFile(generateProjectRequest.ProjectName, utils.GetProjectDirectoryName(generateProjectRequest.GetProjectName()))
 	if err != nil {
 		log.Debug(err)
 		return status.Errorf(codes.InvalidArgument,
 			"error while creating a tar file ["+err.Error()+"]")
 	}
-	return sendFile(projectRequest, server)
+	return sendFile(generateProjectRequest, server)
 }
 
-func sendFile(projectRequest *project.ProjectRequest, server project.ProjectService_CreateProjectServer) error {
-	f, ok := taroperations.GetFile(taroperations.GetProjectTarFilePath(projectRequest.ProjectName))
+func sendFile(generateProjectRequest *project.GenerateProjectRequest, server project.ProjectService_GenerateProjectServer) error {
+	f, ok := taroperations.GetFile(taroperations.GetProjectTarFilePath(generateProjectRequest.ProjectName))
 	if !ok {
 		return status.Error(codes.NotFound, "file is not found")
 	}
@@ -93,7 +93,7 @@ func sendFile(projectRequest *project.ProjectRequest, server project.ProjectServ
 	if err != nil {
 		return status.Error(codes.Internal, "error during sending header")
 	}
-	fileChunk := &project.ProjectResponse{FileChunk: make([]byte, chunkSize)}
+	fileChunk := &project.GenerateProjectResponse{FileChunk: make([]byte, chunkSize)}
 	var n int
 Loop:
 	for {

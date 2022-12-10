@@ -18,8 +18,8 @@ func Ping(context *gin.Context) {
 	})
 }
 
-// CreateProject creates project and generates code.
-func CreateProject(context *gin.Context) {
+// GenerateProject creates project and generates code.
+func GenerateProject(context *gin.Context) {
 	// Validate input
 	var input core.ProjectInput
 	if err := context.ShouldBindJSON(&input); err != nil {
@@ -47,8 +47,8 @@ func CreateProject(context *gin.Context) {
 	context.FileAttachment(taroperations.GetProjectTarFilePath(project.Name), taroperations.GetProjectTarFilePath(project.Name))
 }
 
-// UpdateProject updates project and generates code.
-func UpdateProject(context *gin.Context) {
+// RegenerateProject updates project and generates code.
+func RegenerateProject(context *gin.Context) {
 	// Validate input
 	var input core.ProjectInput
 	if err := context.ShouldBindJSON(&input); err != nil {
@@ -59,6 +59,6 @@ func UpdateProject(context *gin.Context) {
 	// Start regenerate-project flow
 	fmt.Println("input.User : ", input.UserName)
 	context.JSON(http.StatusOK, gin.H{
-		"message": "UpdateProject" + input.UserName,
+		"message": "RegenerateProject" + input.UserName,
 	})
 }

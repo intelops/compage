@@ -4,11 +4,11 @@ package api.v1;
 option go_package = "github.com/kube-tarian/compage/core/gen/api/v1;project";
 
 service ProjectService {
-  rpc CreateProject (ProjectRequest) returns (stream ProjectResponse) {}
-  rpc UpdateProject (ProjectRequest) returns (stream ProjectResponse) {}
+  rpc GenerateProject (GenerateProjectRequest) returns (stream GenerateProjectResponse) {}
+  rpc RegenerateProject (GenerateProjectRequest) returns (stream GenerateProjectResponse) {}
 }
 
-message ProjectRequest {
+message GenerateProjectRequest {
   string yaml = 1;
   string userName = 2;
   string projectName = 3;
@@ -16,6 +16,6 @@ message ProjectRequest {
   string metadata = 5;
 }
 
-message ProjectResponse{
+message GenerateProjectResponse{
   bytes fileChunk = 1;
 }
