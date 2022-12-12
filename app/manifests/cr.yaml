@@ -1,0 +1,20 @@
+apiVersion: compage.kube-tarian.github.com/v1alpha1
+kind: Project
+metadata:
+  name: project-1
+  namespace: compage
+spec:
+  id: first-project-id
+  name: project-1
+  user:
+    name: mahendraintelops
+    email: mahendra.b@intelops.dev
+  yaml: |
+    this is sample yaml string
+  repository:
+    name: first-project
+    tag: v1
+    branch: main
+  metadata: |
+    sampleKey: sampleValue
+  version: v1

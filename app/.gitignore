@@ -6,3 +6,4 @@ node_modules/
 
 # Ignore DevSpace cache and log folder
 .devspace/
+yarn-error.log
