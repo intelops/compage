@@ -4,30 +4,22 @@ const group = "compage.kube-tarian.github.com";
 const version = "v1alpha1";
 const plural = "users";
 
-// createUser creates user resource
-export const createUser = async (namespace: string, payload: string) => {
-    const result = await createObject({group, version, plural}, namespace, payload);
-    console.log(JSON.stringify(result))
-    console.log("--------------------------------")
+// createUserResource creates user resource
+export const createUserResource = async (namespace: string, payload: string) => {
+    return await createObject({group, version, plural}, namespace, payload);
 }
 
-// getUser gets user resource
-export const getUser = async (namespace: string, name: string) => {
-    const result = await getObject({group, version, plural}, namespace, name);
-    console.log(JSON.stringify(result))
-    console.log("--------------------------------")
+// getUserResource gets user resource
+export const getUserResource = async (namespace: string, name: string) => {
+    return await getObject({group, version, plural}, namespace, name);
 }
 
-// patchUser patches user resource
-export const patchUser = async (namespace: string, name: string, payload: string) => {
-    const result = await patchObject({group, version, plural}, namespace, name, payload);
-    console.log(JSON.stringify(result))
-    console.log("--------------------------------")
+// patchUserResource patches user resource
+export const patchUserResource = async (namespace: string, name: string, payload: string) => {
+    return await patchObject({group, version, plural}, namespace, name, payload);
 }
 
 // listUsers lists user resource
-export const listUsers = async (namespace: string) => {
-    const result = await listObjects({group, version, plural}, namespace);
-    console.log(JSON.stringify(result))
-    console.log("--------------------------------")
+export const listUserResources = async (namespace: string) => {
+    return await listObjects({group, version, plural}, namespace);
 }

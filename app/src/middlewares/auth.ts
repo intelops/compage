@@ -1,4 +1,4 @@
-import {getToken} from "../util/token-store";
+import {getToken} from "../util/user-store";
 import {NextFunction, Request, Response} from "express";
 
 export const requireUserNameMiddleware = async (request: Request, response: Response, next: NextFunction) => {

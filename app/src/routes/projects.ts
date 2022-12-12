@@ -1,6 +1,6 @@
 import {requireUserNameMiddleware} from "../middlewares/auth";
 import {Request, Response, Router} from "express";
-import {addProject, getProjects} from "../util/project-store";
+import {createProject, getProjects} from "../util/project-store";
 import {CreateProjectRequest} from "./models";
 
 const projectsRouter = Router();
@@ -17,7 +17,7 @@ projectsRouter.post("/", requireUserNameMiddleware, async (request: Request, res
     const requestHeader = "X-User-Name";
     const userName = request.header(requestHeader);
     const createProjectRequest: CreateProjectRequest = request.body;
-    await addProject(<string>userName, createProjectRequest)
+    await createProject(<string>userName, createProjectRequest)
     return response.status(201).json("project created successfully");
 });
 

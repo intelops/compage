@@ -1,10 +1,15 @@
 import {CreateProjectRequest, ProjectEntity} from "../routes/models";
 import {uuid} from "uuidv4";
-import {createProject, listProjects} from "../store/project-client";
 import {ProjectResource} from "../store/models";
+import {NAMESPACE} from "./constants";
+import {createProjectResource, getProjectResource, listProjectResources} from "../store/project-client";
 
-const NAMESPACE = "compage";
-const createProjectResource = (userName: string, createProjectRequest: CreateProjectRequest) => {
+const group = "compage.kube-tarian.github.com";
+const version = "v1alpha1";
+const plural = "projects";
+
+// createProjectResource creates projectResource on k8s cluster.
+const convertCreateProjectRequestToProjectResource = (userName: string, createProjectRequest: CreateProjectRequest) => {
     const projectResource: ProjectResource = {
         id: uuid(),
         name: createProjectRequest.project.name,
@@ -18,6 +23,7 @@ const createProjectResource = (userName: string, createProjectRequest: CreatePro
     return JSON.stringify(projectResource)
 }
 
+// convertListOfProjectResourceToListOfProjectEntity converts projectResourceList to ProjectEntityList
 const convertListOfProjectResourceToListOfProjectEntity = (projectResources: ProjectResource[]) => {
     let projectEntities: ProjectEntity[] = []
     for (let i = 0; i < projectResources.length; i++) {
@@ -35,16 +41,28 @@ const convertListOfProjectResourceToListOfProjectEntity = (projectResources: Pro
     return projectEntities
 }
 
+// getProjects returns all projects for userName supplied
 export const getProjects = async (userName: string) => {
-    let listOfProjectResource = await listProjects(NAMESPACE, userName);
+    let listOfProjectResource = await listProjectResources(NAMESPACE, userName);
     if (listOfProjectResource) {
-        const entities = convertListOfProjectResourceToListOfProjectEntity(JSON.parse(JSON.stringify(listOfProjectResource)));
-        return JSON.stringify(entities)
+        const projectEntities = convertListOfProjectResourceToListOfProjectEntity(JSON.parse(JSON.stringify(listOfProjectResource.body)));
+        return JSON.stringify(projectEntities)
     }
     return [];
 }
 
-export const addProject = async (userName: string, createProjectRequest: CreateProjectRequest) => {
-    const projectResource = createProjectResource(userName, createProjectRequest);
-    await createProject(NAMESPACE, projectResource);
+// getProject returns specific project for userName and projectName supplied
+export const getProject = async (userName: string, name: string) => {
+    // TODO I may need to apply labelSelector here
+    const projectResource = await getProjectResource(NAMESPACE, name);
+    if (projectResource) {
+        return JSON.stringify(projectResource)
+    }
+    return [];
+}
+
+// createProject creates projectResource on k8s cluster.
+export const createProject = async (userName: string, createProjectRequest: CreateProjectRequest) => {
+    const projectResource = convertCreateProjectRequestToProjectResource(userName, createProjectRequest);
+    await createProjectResource(NAMESPACE, projectResource);
 }

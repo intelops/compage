@@ -1,6 +1,6 @@
 import axios from "axios";
 import {Router} from "express";
-import {getToken} from "../util/token-store";
+import {getToken} from "../util/user-store";
 import {requireUserNameMiddleware} from "../middlewares/auth";
 
 const githubRouter = Router();

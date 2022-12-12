@@ -1,6 +1,7 @@
 const assert = require('assert').strict
 const fs = require('fs')
 const path = require('path')
+export const NAMESPACE = "compage";
 
 const readSecretFile = (secretPath: string) => {
     const keyValuePairs: Map<string, string> = new Map();

@@ -3,7 +3,7 @@ import {Router} from "express";
 import * as fs from "fs";
 import * as os from "os";
 import {pushToExistingProjectOnGithub, PushToExistingProjectOnGithubRequest} from "../util/simple-git/existing-project";
-import {getToken} from "../util/token-store";
+import {getToken} from "../util/user-store";
 import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
 import {GenerateProjectRequest, GenerateProjectResponse, Project} from "./models";
 import {requireUserNameMiddleware} from "../middlewares/auth";
