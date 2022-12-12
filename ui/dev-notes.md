@@ -17,7 +17,7 @@ How to run on UI local computer?
 ```
 REACT_APP_GITHUB_APP_CLIENT_ID=5f16d808ffab8200032d
 REACT_APP_GITHUB_APP_REDIRECT_URI=http://localhost:3000/login
-REACT_APP_COMPAGE_APP_SERVER_URL=192.168.1.24:5000
+REACT_APP_COMPAGE_APP_SERVER_URL=localhost:5000
 ```
 
 4. Fire `yarn` and then `yarn install`.
