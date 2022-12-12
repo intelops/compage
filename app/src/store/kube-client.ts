@@ -26,6 +26,22 @@ export const getObject = async ({
     );
 }
 
+export const patchObject = async ({
+                                      group,
+                                      version,
+                                      plural
+                                  }: { group: string, version: string, plural: string }
+    , namespace: string, name: string, payload: string) => {
+    return await client.patchNamespacedCustomObject(
+        group,
+        version,
+        namespace,
+        plural,
+        name,
+        JSON.parse(payload)
+    );
+}
+
 export const createObject = async ({
                                        group,
                                        version,
@@ -46,11 +62,12 @@ export const listObjects = async ({
                                       version,
                                       plural
                                   }: { group: string, version: string, plural: string }
-    , namespace: string) => {
+    , namespace: string, userName?: string) => {
     return await client.listNamespacedCustomObject(
         group,
         version,
         namespace,
         plural,
+        // labelSelector
     );
 }

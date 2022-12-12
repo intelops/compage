@@ -1,4 +1,4 @@
-import {createObject, getObject, listObjects} from "./kube-client";
+import {createObject, getObject, listObjects, patchObject} from "./kube-client";
 
 const group = "compage.kube-tarian.github.com";
 const version = "v1alpha1";
@@ -12,8 +12,15 @@ export const createUser = async (namespace: string, payload: string) => {
 }
 
 // getUser gets user resource
-export const getUser = async (name: string, namespace: string) => {
+export const getUser = async (namespace: string, name: string) => {
     const result = await getObject({group, version, plural}, namespace, name);
+    console.log(JSON.stringify(result))
+    console.log("--------------------------------")
+}
+
+// patchUser patches user resource
+export const patchUser = async (namespace: string, name: string, payload: string) => {
+    const result = await patchObject({group, version, plural}, namespace, name, payload);
     console.log(JSON.stringify(result))
     console.log("--------------------------------")
 }

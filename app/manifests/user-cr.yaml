@@ -4,8 +4,5 @@ metadata:
   name: mahendraintelops
   namespace: compage
 spec:
-  name: mahendraintelops
-  user:
-    login: mahendraintelops
-    email: mahendra.b@intelops.dev
-    token: ddaddadaadada
+  email: mahendra.b@intelops.dev
+  token: ddaddadaadada

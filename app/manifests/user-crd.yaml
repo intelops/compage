@@ -31,17 +31,11 @@ spec:
             spec:
               type: object
               properties:
-                name:
+                token:
                   type: string
-                user:
-                  type: object
-                  properties:
-                    login:
-                      type: string
-                    email:
-                      type: string
+                email:
+                  type: string
                 replicas:
                   type: integer
                   minimum: 1
-              required: [ "name" ]
-          required: [ "spec" ]
+          required: ["spec"]

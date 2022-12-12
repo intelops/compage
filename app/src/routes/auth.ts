@@ -35,7 +35,7 @@ authRouter.post("/authenticate", async (req, res) => {
                 Authorization: `token ${access_token}`,
             },
         }).then((response) => {
-            setToken(response.data.login, <string>access_token)
+            setToken(response.data.login, response.data.email, <string>access_token)
             console.log("User token retrieved")
             return res.status(200).json(response.data);
         }).catch((error) => {
