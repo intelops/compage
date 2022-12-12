@@ -7,6 +7,9 @@ import githubRouter from "./routes/github";
 import authRouter from "./routes/auth";
 import config from "./util/constants";
 import projectsRouter from "./routes/projects";
+import {initializeKubeClient} from "./store/kube-client";
+
+export const client = initializeKubeClient()
 
 const app: Application = express();
 
