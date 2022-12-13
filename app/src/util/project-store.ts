@@ -1,16 +1,12 @@
 import {CreateProjectRequest, ProjectEntity} from "../routes/models";
 import {uuid} from "uuidv4";
-import {ProjectResource} from "../store/models";
+import {ProjectResourceSpec} from "../store/models";
 import {NAMESPACE} from "./constants";
 import {createProjectResource, getProjectResource, listProjectResources} from "../store/project-client";
 
-const group = "compage.kube-tarian.github.com";
-const version = "v1alpha1";
-const plural = "projects";
-
 // createProjectResource creates projectResource on k8s cluster.
 const convertCreateProjectRequestToProjectResource = (userName: string, createProjectRequest: CreateProjectRequest) => {
-    const projectResource: ProjectResource = {
+    const projectResource: ProjectResourceSpec = {
         id: uuid(),
         name: createProjectRequest.project.name,
         metadata: JSON.stringify(createProjectRequest.metadata),
@@ -24,7 +20,7 @@ const convertCreateProjectRequestToProjectResource = (userName: string, createPr
 }
 
 // convertListOfProjectResourceToListOfProjectEntity converts projectResourceList to ProjectEntityList
-const convertListOfProjectResourceToListOfProjectEntity = (projectResources: ProjectResource[]) => {
+const convertListOfProjectResourceToListOfProjectEntity = (projectResources: ProjectResourceSpec[]) => {
     let projectEntities: ProjectEntity[] = []
     for (let i = 0; i < projectResources.length; i++) {
         let projectEntity: ProjectEntity = {
@@ -44,8 +40,9 @@ const convertListOfProjectResourceToListOfProjectEntity = (projectResources: Pro
 // getProjects returns all projects for userName supplied
 export const getProjects = async (userName: string) => {
     let listOfProjectResource = await listProjectResources(NAMESPACE, userName);
+    console.log("listOfProjectResource: ", listOfProjectResource)
     if (listOfProjectResource) {
-        const projectEntities = convertListOfProjectResourceToListOfProjectEntity(JSON.parse(JSON.stringify(listOfProjectResource.body)));
+        const projectEntities = convertListOfProjectResourceToListOfProjectEntity(JSON.parse(JSON.stringify(listOfProjectResource)));
         return JSON.stringify(projectEntities)
     }
     return [];

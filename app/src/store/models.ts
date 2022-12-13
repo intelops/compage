@@ -1,12 +1,33 @@
 import {Repository, User} from "../routes/models";
 
+export interface Resource {
+    apiVersion: string,
+    kind: string,
+    metadata: string,
+    spec: any
+}
+
+export interface ProjectResource {
+    apiVersion: string,
+    kind: string,
+    metadata: string,
+    spec: ProjectResourceSpec
+}
+
 export interface UserResource {
+    apiVersion: string,
+    kind: string,
+    metadata: string,
+    spec: UserResourceSpec
+}
+
+export interface UserResourceSpec {
     email: string,
     token: string,
     name: string
 }
 
-export interface ProjectResource {
+export interface ProjectResourceSpec {
     id: string,
     name: string,
     user: User,
@@ -15,3 +36,15 @@ export interface ProjectResource {
     metadata: string,
     version: string,
 }
+
+// user
+export const user_group = "compage.kube-tarian.github.com";
+export const user_version = "v1alpha1";
+export const user_plural = "users";
+export const user_kind = "User"
+
+// project
+export const project_group = "compage.kube-tarian.github.com";
+export const project_version = "v1alpha1";
+export const project_plural = "projects";
+export const project_kind = "Project"

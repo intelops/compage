@@ -2,6 +2,7 @@ const assert = require('assert').strict
 const fs = require('fs')
 const path = require('path')
 export const NAMESPACE = "compage";
+export const X_USER_NAME_HEADER = "X-User-Name";
 
 const readSecretFile = (secretPath: string) => {
     const keyValuePairs: Map<string, string> = new Map();

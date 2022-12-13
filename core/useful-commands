@@ -1,6 +1,9 @@
 // form-data curl commands
 curl -X POST -F 'name=compage' -F 'email=compage@example.com' http://localhost:8080/create_project
 curl -X PUT -F 'name=compage' -F 'email=compage@example.com' http://localhost:8080/update_project
+curl http://localhost:5000/projects
+   -H "X-User-Name: mahendraintelops"
+   -H "Content-Type: application/json"
 
 // request-body curl commands
 curl -X PUT http://localhost:8080/update_project  -H 'Content-Type: application/json' -d '{"user":"myuser","yaml":"my_yaml"}'

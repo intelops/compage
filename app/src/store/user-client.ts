@@ -1,25 +1,55 @@
 import {createObject, getObject, listObjects, patchObject} from "./kube-client";
+import {user_group, user_plural, user_version, UserResource} from "./models";
 
-const group = "compage.kube-tarian.github.com";
-const version = "v1alpha1";
-const plural = "users";
 
 // createUserResource creates user resource
 export const createUserResource = async (namespace: string, payload: string) => {
-    return await createObject({group, version, plural}, namespace, payload);
+    const object = await createObject({group: user_group, version: user_version, plural: user_plural}, namespace, payload);
+    const userResource: UserResource = {
+        kind: object.kind,
+        apiVersion: object.apiVersion,
+        spec: object.spec,
+        metadata: object.metadata
+    };
+    return userResource;
 }
 
 // getUserResource gets user resource
 export const getUserResource = async (namespace: string, name: string) => {
-    return await getObject({group, version, plural}, namespace, name);
+    const object = await getObject({group: user_group, version: user_version, plural: user_plural}, namespace, name);
+    const userResource: UserResource = {
+        kind: object.kind,
+        apiVersion: object.apiVersion,
+        spec: object.spec,
+        metadata: object.metadata
+    };
+    return userResource;
 }
 
 // patchUserResource patches user resource
 export const patchUserResource = async (namespace: string, name: string, payload: string) => {
-    return await patchObject({group, version, plural}, namespace, name, payload);
+    const object = await patchObject({group: user_group, version: user_version, plural: user_plural}, namespace, name, payload);
+    const userResource: UserResource = {
+        kind: object.kind,
+        apiVersion: object.apiVersion,
+        spec: object.spec,
+        metadata: object.metadata
+    };
+    return userResource;
 }
 
 // listUsers lists user resource
 export const listUserResources = async (namespace: string) => {
-    return await listObjects({group, version, plural}, namespace);
+    const objects = await listObjects({group: user_group, version: user_version, plural: user_plural}, namespace);
+    const userResources: UserResource[] = [];
+    objects.forEach(uR => {
+        const userResource: UserResource = {
+            kind: uR.kind,
+            apiVersion: uR.apiVersion,
+            spec: uR.spec,
+            metadata: uR.metadata
+        };
+        userResources.push(userResource);
+    })
+    return userResources;
 }

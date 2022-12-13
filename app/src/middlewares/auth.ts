@@ -1,5 +1,6 @@
 import {getToken} from "../util/user-store";
 import {NextFunction, Request, Response} from "express";
+import {X_USER_NAME_HEADER} from "../util/constants";
 
 export const requireUserNameMiddleware = async (request: Request, response: Response, next: NextFunction) => {
     const unauthorized = (message: string) => response.status(401).json({
@@ -7,10 +8,9 @@ export const requireUserNameMiddleware = async (request: Request, response: Resp
         message: message
     });
 
-    const requestHeader = "X-User-Name";
-    const userName = request.header(requestHeader);
+    const userName = request.header(X_USER_NAME_HEADER);
     if (!userName) {
-        unauthorized(`Required ${requestHeader} header not found.`);
+        unauthorized(`Required ${X_USER_NAME_HEADER} header not found.`);
         return;
     }
 

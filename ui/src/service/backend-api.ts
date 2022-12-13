@@ -1,6 +1,8 @@
 import axios from 'axios';
 import {config} from "../utils/constants";
 
+export const X_USER_NAME_HEADER = "X-User-Name";
+
 const BackendApi = () => {
     return axios.create({
         baseURL: config.backend_base_url,
@@ -35,10 +37,10 @@ export const CompageBackendApi = () => {
 const getHeaders = () => {
     return {
         post: {
-            "X-User-Name": retrieveCurrentUserName()
+            [X_USER_NAME_HEADER]: retrieveCurrentUserName()
         },
         get: {
-            "X-User-Name": retrieveCurrentUserName()
+            [X_USER_NAME_HEADER]: retrieveCurrentUserName()
         }
     };
 }

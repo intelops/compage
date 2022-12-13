@@ -1,25 +1,70 @@
 import {createObject, getObject, listObjects, patchObject} from "./kube-client";
-
-const group = "compage.kube-tarian.github.com";
-const version = "v1alpha1";
-const plural = "projects";
+import {project_group, project_plural, project_version, ProjectResource, Resource, UserResource} from "./models";
 
 // createProjectResource creates project resource
 export const createProjectResource = async (namespace: string, payload: string) => {
-    return await createObject({group, version, plural}, namespace, payload);
+    const object = await createObject({
+        group: project_group,
+        version: project_version,
+        plural: project_plural
+    }, namespace, payload);
+    const projectResource: ProjectResource = {
+        kind: object.kind,
+        apiVersion: object.apiVersion,
+        spec: object.spec,
+        metadata: object.metadata
+    };
+    return projectResource;
 }
 
 // patchProjectResource patches project resource
 export const patchProjectResource = async (namespace: string, name: string, payload: string) => {
-    return await patchObject({group, version, plural}, namespace, name, payload)
+    const object = await patchObject({
+        group: project_group,
+        version: project_version,
+        plural: project_plural
+    }, namespace, name, payload);
+    const projectResource: ProjectResource = {
+        kind: object.kind,
+        apiVersion: object.apiVersion,
+        spec: object.spec,
+        metadata: object.metadata
+    };
+    return projectResource;
 }
 
 // getProjectResource gets user resource
 export const getProjectResource = async (namespace: string, name: string) => {
-    return await getObject({group, version, plural}, namespace, name);
+    const object: Resource = await getObject({
+        group: project_group,
+        version: project_version,
+        plural: project_plural
+    }, namespace, name);
+    const projectResource: ProjectResource = {
+        kind: object.kind,
+        apiVersion: object.apiVersion,
+        spec: object.spec,
+        metadata: object.metadata
+    };
+    return projectResource;
 }
 
 // listProjectResources lists project resources
 export const listProjectResources = async (namespace: string, userName: string) => {
-    return await listObjects({group, version, plural}, namespace, userName);
+    const objects = await listObjects({
+        group: project_group,
+        version: project_version,
+        plural: project_plural
+    }, namespace, "username=" + userName);
+    const userResources: UserResource[] = [];
+    objects.forEach(uR => {
+        const userResource: UserResource = {
+            kind: uR.kind,
+            apiVersion: uR.apiVersion,
+            spec: uR.spec,
+            metadata: uR.metadata
+        };
+        userResources.push(userResource);
+    })
+    return userResources;
 }
