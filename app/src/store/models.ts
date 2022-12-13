@@ -37,6 +37,27 @@ export interface ProjectResourceSpec {
     version: string,
 }
 
+export interface ProjectResourceList {
+    apiVersion: string,
+    kind: string,
+    metadata: string,
+    items: ProjectResource[]
+}
+
+export interface UserResourceList {
+    apiVersion: string,
+    kind: string,
+    metadata: string,
+    items: UserResource[]
+}
+
+export interface ResourceList {
+    apiVersion: string,
+    kind: string,
+    metadata: string,
+    items: Resource[]
+}
+
 // user
 export const user_group = "compage.kube-tarian.github.com";
 export const user_version = "v1alpha1";

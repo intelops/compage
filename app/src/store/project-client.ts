@@ -56,15 +56,16 @@ export const listProjectResources = async (namespace: string, userName: string) 
         version: project_version,
         plural: project_plural
     }, namespace, "username=" + userName);
-    const userResources: UserResource[] = [];
-    objects.forEach(uR => {
-        const userResource: UserResource = {
+    const projectResources: ProjectResource[] = [];
+    for (let i = 0; i < objects.items.length; i++) {
+        let uR = objects.items[i];
+        const projectResource: ProjectResource = {
             kind: uR.kind,
             apiVersion: uR.apiVersion,
             spec: uR.spec,
             metadata: uR.metadata
         };
-        userResources.push(userResource);
-    })
-    return userResources;
+        projectResources.push(projectResource);
+    }
+    return projectResources;
 }

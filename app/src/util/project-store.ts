@@ -1,6 +1,6 @@
 import {CreateProjectRequest, ProjectEntity} from "../routes/models";
 import {uuid} from "uuidv4";
-import {ProjectResourceSpec} from "../store/models";
+import {ProjectResource, ProjectResourceSpec} from "../store/models";
 import {NAMESPACE} from "./constants";
 import {createProjectResource, getProjectResource, listProjectResources} from "../store/project-client";
 
@@ -20,17 +20,17 @@ const convertCreateProjectRequestToProjectResource = (userName: string, createPr
 }
 
 // convertListOfProjectResourceToListOfProjectEntity converts projectResourceList to ProjectEntityList
-const convertListOfProjectResourceToListOfProjectEntity = (projectResources: ProjectResourceSpec[]) => {
+const convertListOfProjectResourceToListOfProjectEntity = (projectResources: ProjectResource[]) => {
     let projectEntities: ProjectEntity[] = []
     for (let i = 0; i < projectResources.length; i++) {
         let projectEntity: ProjectEntity = {
-            id: projectResources[i].id,
-            metadata: JSON.parse(projectResources[i].metadata),
-            name: projectResources[i].name,
-            repository: projectResources[i].repository,
-            user: projectResources[i].user,
-            version: projectResources[i].version,
-            yaml: JSON.parse(projectResources[i].yaml)
+            id: projectResources[i].spec.id,
+            // metadata: projectResources[i].spec.metadata,
+            name: projectResources[i].spec.name,
+            repository: projectResources[i].spec.repository,
+            user: projectResources[i].spec.user,
+            version: projectResources[i].spec.version,
+            yaml: JSON.parse(JSON.stringify(projectResources[i].spec.yaml))
         }
         projectEntities.push(projectEntity)
     }
@@ -38,9 +38,8 @@ const convertListOfProjectResourceToListOfProjectEntity = (projectResources: Pro
 }
 
 // getProjects returns all projects for userName supplied
-export const getProjects = async (userName: string) => {
+export const listProjects = async (userName: string) => {
     let listOfProjectResource = await listProjectResources(NAMESPACE, userName);
-    console.log("listOfProjectResource: ", listOfProjectResource)
     if (listOfProjectResource) {
         const projectEntities = convertListOfProjectResourceToListOfProjectEntity(JSON.parse(JSON.stringify(listOfProjectResource)));
         return JSON.stringify(projectEntities)

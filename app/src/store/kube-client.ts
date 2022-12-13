@@ -1,6 +1,6 @@
 import {CustomObjectsApi, KubeConfig} from "@kubernetes/client-node";
 import {client} from "../app";
-import {Resource} from "./models";
+import {Resource, ResourceList} from "./models";
 
 export const initializeKubeClient = () => {
     const kubeConfig = new KubeConfig();
@@ -82,7 +82,8 @@ export const listObjects = async ({
             "",
             labelSelector
         );
-        const resources: Resource[] = JSON.parse(JSON.stringify(object.body))
+
+        const resources: ResourceList = JSON.parse(JSON.stringify(object.body))
         return resources
     } else {
         const object = await client.listNamespacedCustomObject(
@@ -91,7 +92,7 @@ export const listObjects = async ({
             namespace,
             plural,
         );
-        const resources: Resource[] = JSON.parse(JSON.stringify(object.body))
+        const resources: ResourceList = JSON.parse(JSON.stringify(object.body))
         return resources
     }
 }

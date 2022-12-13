@@ -1,6 +1,6 @@
 import {requireUserNameMiddleware} from "../middlewares/auth";
 import {Request, Response, Router} from "express";
-import {createProject, getProjects} from "../util/project-store";
+import {createProject, listProjects} from "../util/project-store";
 import {CreateProjectRequest} from "./models";
 import {X_USER_NAME_HEADER} from "../util/constants";
 
@@ -9,7 +9,7 @@ const projectsRouter = Router();
 // list all projects for given user
 projectsRouter.get("/", requireUserNameMiddleware, async (request: Request, response: Response) => {
     const userName = request.header(X_USER_NAME_HEADER);
-    return response.status(200).json(await getProjects(<string>userName));
+    return response.status(200).json(await listProjects(<string>userName));
 });
 
 // create project with details given in request

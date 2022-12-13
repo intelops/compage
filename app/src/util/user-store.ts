@@ -32,8 +32,6 @@ export const setToken = async (name: string, email: string, token: string) => {
 // getToken returns tokens
 export const getToken = async (userName: string) => {
     const userResource = await getUserResource(NAMESPACE, userName);
-    console.log("userResource: ", userResource);
     const userResourceSpec: UserResourceSpec = userResource.spec;
-    console.log("userResourceSpec: ", userResourceSpec);
     return userResourceSpec.token;
 }

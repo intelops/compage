@@ -4,7 +4,11 @@ import {user_group, user_plural, user_version, UserResource} from "./models";
 
 // createUserResource creates user resource
 export const createUserResource = async (namespace: string, payload: string) => {
-    const object = await createObject({group: user_group, version: user_version, plural: user_plural}, namespace, payload);
+    const object = await createObject({
+        group: user_group,
+        version: user_version,
+        plural: user_plural
+    }, namespace, payload);
     const userResource: UserResource = {
         kind: object.kind,
         apiVersion: object.apiVersion,
@@ -28,7 +32,11 @@ export const getUserResource = async (namespace: string, name: string) => {
 
 // patchUserResource patches user resource
 export const patchUserResource = async (namespace: string, name: string, payload: string) => {
-    const object = await patchObject({group: user_group, version: user_version, plural: user_plural}, namespace, name, payload);
+    const object = await patchObject({
+        group: user_group,
+        version: user_version,
+        plural: user_plural
+    }, namespace, name, payload);
     const userResource: UserResource = {
         kind: object.kind,
         apiVersion: object.apiVersion,
@@ -42,7 +50,8 @@ export const patchUserResource = async (namespace: string, name: string, payload
 export const listUserResources = async (namespace: string) => {
     const objects = await listObjects({group: user_group, version: user_version, plural: user_plural}, namespace);
     const userResources: UserResource[] = [];
-    objects.forEach(uR => {
+    for (let i = 0; i < objects.items.length; i++) {
+        let uR = objects.items[i];
         const userResource: UserResource = {
             kind: uR.kind,
             apiVersion: uR.apiVersion,
@@ -50,6 +59,6 @@ export const listUserResources = async (namespace: string) => {
             metadata: uR.metadata
         };
         userResources.push(userResource);
-    })
+    }
     return userResources;
 }
