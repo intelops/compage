@@ -14,9 +14,13 @@ export const requireUserNameMiddleware = async (request: Request, response: Resp
         return;
     }
 
-    let token = await getToken(<string>userName);
-    console.log("token : ", token)
-    if (token === undefined || token === "" || token === null) {
+    try {
+        let token = await getToken(<string>userName);
+        if (token === undefined || token === "" || token === null) {
+            unauthorized(`token lost from server, needs to re-login to github`);
+            return
+        }
+    } catch (e: any) {
         unauthorized(`token lost from server, needs to re-login to github`);
         return
     }

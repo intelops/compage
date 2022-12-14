@@ -41,8 +41,7 @@ const convertListOfProjectResourceToListOfProjectEntity = (projectResources: Pro
 export const listProjects = async (userName: string) => {
     let listOfProjectResource = await listProjectResources(NAMESPACE, userName);
     if (listOfProjectResource) {
-        const projectEntities = convertListOfProjectResourceToListOfProjectEntity(JSON.parse(JSON.stringify(listOfProjectResource)));
-        return JSON.stringify(projectEntities)
+        return convertListOfProjectResourceToListOfProjectEntity(JSON.parse(JSON.stringify(listOfProjectResource)));
     }
     return [];
 }
