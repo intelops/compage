@@ -5,14 +5,15 @@ metadata:
   labels:
     {{- include "compage.app.labels" . | nindent 4 }}
 data:
-  GITHUB_APP_REDIRECT_URI: {{.Values.app.githubAppRedirectURI}}
+  GITHUB_APP_REDIRECT_URI: {{.Values.githubApp.redirectURI}}
 
 ---
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "compage.app.fullname" . }}
+  name: app-data
   labels:
     {{- include "compage.app.labels" . | nindent 4 }}
 data:
-  GITHUB_APP_REDIRECT_URI: {{.Values.app.githubAppRedirectURI}}
+  COMPAGE_CORE_URL: {{.Values.app.compageCoreURL}}
