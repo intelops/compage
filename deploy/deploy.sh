@@ -6,8 +6,6 @@ CLUSTER_NAME=compage
 kind create cluster --name $CLUSTER_NAME --config kind-config.yaml
 # creates compage namespace
 kubectl create namespace compage
-# creates redis namespace
-kubectl create namespace redis
 
 # retrieves nodes ip [tested on single node cluster]
 KIND_NODE_IP=$(kubectl get nodes -o wide --no-headers | awk -v OFS='\t' '{print $6}')

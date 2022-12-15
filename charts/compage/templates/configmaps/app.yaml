@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-github
+  labels:
+    {{- include "compage.app.labels" . | nindent 4 }}
+data:
+  GITHUB_APP_REDIRECT_URI: {{.Values.app.githubAppRedirectURI}}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "compage.app.fullname" . }}
+  labels:
+    {{- include "compage.app.labels" . | nindent 4 }}
+data:
+  GITHUB_APP_REDIRECT_URI: {{.Values.app.githubAppRedirectURI}}

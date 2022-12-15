@@ -15,7 +15,7 @@ app:
   imagePullSecrets: []
   nameOverride: "app"
   fullnameOverride: ""
-
+  githubAppRedirectURI: "http://{{KIND_NODE_IP}}:32222/login"
   podAnnotations: {}
 
   podSecurityContext: {}

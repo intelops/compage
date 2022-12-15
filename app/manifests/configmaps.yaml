@@ -7,16 +7,6 @@ metadata:
 data:
   GITHUB_APP_REDIRECT_URI: "http://{{KIND_NODE_IP}}:32222/login"
 ---
-# redis connection details
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: app-redis
-  namespace: compage
-data:
-  REDIS_HOST: "redis.redis.svc"
-  REDIS_PORT: "6379"
----
 # app-data config | core connection details
 apiVersion: v1
 kind: ConfigMap

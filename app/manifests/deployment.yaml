@@ -33,22 +33,9 @@ spec:
                 configMapKeyRef:
                   name: app-github
                   key: GITHUB_APP_REDIRECT_URI
-            - name: REDIS_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: app-redis
-                  key: REDIS_HOST
-            - name: REDIS_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: app-redis
-                  key: REDIS_PORT
           volumeMounts:
             - name: github-credentials
               mountPath: "/etc/github-credentials"
-              readOnly: true
-            - name: redis-credentials
-              mountPath: "/etc/redis-credentials"
               readOnly: true
             - name: tmp-volume
               mountPath: /tmp
@@ -64,7 +51,7 @@ spec:
             periodSeconds: 30
       volumes:
         - name: tmp-volume
-          emptyDir: { }
+          emptyDir: {}
         - name: github-credentials
           secret:
             secretName: app-github-credentials
@@ -74,12 +61,3 @@ spec:
                 path: compage/GITHUB_APP_CLIENT_ID
               - key: GITHUB_APP_CLIENT_SECRET
                 path: compage/GITHUB_APP_CLIENT_SECRET
-        - name: redis-credentials
-          secret:
-            secretName: app-redis-credentials
-            defaultMode: 0400
-            items:
-              - key: REDIS_PASSWORD
-                path: compage/REDIS_PASSWORD
-              - key: REDIS_USERNAME
-                path: compage/REDIS_USERNAME

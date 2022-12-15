@@ -1,9 +1,0 @@
-### check into redis while debugging.
-# exec into redis pod
-kubectl exec -n redis -it redis-7f48f89c99-f6hgg -- redis-cli
-# login to redis
-auth compage123
-# list down all keys
-keys *
-# retrieve key
-get mahendraintelops

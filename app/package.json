@@ -29,7 +29,6 @@
     "localStorage": "^1.0.4",
     "node-localstorage": "^2.2.1",
     "nodemon": "^2.0.20",
-    "redis": "^4.5.1",
     "rimraf": "^3.0.2",
     "shelljs": "^0.8.5",
     "simple-git": "^3.14.1",

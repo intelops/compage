@@ -52,14 +52,6 @@ deployments:
                 value: ${GITHUB_APP_REDIRECT_URI}
               - name: COMPAGE_CORE_URL
                 value: ${COMPAGE_CORE_URL}
-              - name: REDIS_HOST
-                value: ${REDIS_HOST}
-              - name: REDIS_PORT
-                value: ${REDIS_PORT}
-              - name: REDIS_USERNAME
-                value: ${REDIS_USERNAME}
-              - name: REDIS_PASSWORD
-                value: ${REDIS_PASSWORD}
         service:
           ports:
             - port: 5000
