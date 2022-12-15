@@ -2,7 +2,7 @@
 # Build stage will be used:
 # - for building the application for production
 # - as target for development (see devspace.yaml)
-FROM golang:1.19.2-alpine as build
+FROM golang:1.19.4-alpine3.17 as build
 
 # Create project directory (workdir)
 WORKDIR /app

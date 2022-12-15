@@ -1,0 +1,64 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: projects.compage.kube-tarian.github.com
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: compage.kube-tarian.github.com
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: projects
+    # singular name to be used as an alias on the CLI and for display
+    singular: project
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: Project
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+      - prj
+  # either Namespaced or Cluster
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      # Each version can be enabled/disabled by Served flag.
+      served: true
+      # One and only one version must be marked as the storage version.
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+                user:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    email:
+                      type: string
+                yaml:
+                  type: string
+                repository:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    tag:
+                      type: string
+                    branch:
+                      type: string
+                metadata:
+                  type: string
+                version:
+                  type: string
+                replicas:
+                  type: integer
+                  minimum: 1
+              required: [ "id", "name", "version" ]
+          required: [ "spec" ]

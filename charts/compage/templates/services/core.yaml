@@ -8,8 +8,7 @@ spec:
   type: {{ .Values.core.service.type }}
   ports:
     - port: {{ .Values.core.service.port }}
-      targetPort: http
+      targetPort: grpc
       protocol: TCP
-      name: http
   selector:
     {{- include "compage.core.selectorLabels" . | nindent 4 }}

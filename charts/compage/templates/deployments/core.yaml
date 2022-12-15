@@ -34,17 +34,18 @@ spec:
           image: "{{ .Values.core.image.repository }}:{{ .Values.core.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.core.image.pullPolicy }}
           ports:
-            - name: http
+            - name: grpc
               containerPort: {{ .Values.core.service.port }}
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
           readinessProbe:
-            httpGet:
-              path: /
-              port: http
+            tcpSocket:
+              port: grpc
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: grpc
+            initialDelaySeconds: 15
+            periodSeconds: 30
           resources:
             {{- toYaml .Values.core.resources | nindent 12 }}
       {{- with .Values.core.nodeSelector }}

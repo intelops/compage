@@ -37,14 +37,35 @@ spec:
             - name: http
               containerPort: {{ .Values.app.service.port }}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
+          env:
+            - name: COMPAGE_CORE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-data
+                  key: COMPAGE_CORE_URL
+            - name: GITHUB_APP_REDIRECT_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: app-github
+                  key: GITHUB_APP_REDIRECT_URI
+          volumeMounts:
+            - name: github-credentials
+              mountPath: "/etc/github-credentials"
+              readOnly: true
+            - name: tmp-volume
+              mountPath: /tmp
+            - name: yarn-cache-volume
+              mountPath: /.cache/yarn
           readinessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 30
           resources:
             {{- toYaml .Values.app.resources | nindent 12 }}
       {{- with .Values.app.nodeSelector }}
@@ -59,3 +80,17 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+        - name: yarn-cache-volume
+          emptyDir: {}
+        - name: tmp-volume
+          emptyDir: {}
+        - name: github-credentials
+          secret:
+            secretName: app-github-credentials
+            defaultMode: 0400
+            items:
+              - key: GITHUB_APP_CLIENT_ID
+                path: compage/GITHUB_APP_CLIENT_ID
+              - key: GITHUB_APP_CLIENT_SECRET
+                path: compage/GITHUB_APP_CLIENT_SECRET

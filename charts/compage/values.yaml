@@ -1,6 +1,6 @@
 ## Define serviceAccount names for components. Defaults to component's fully qualified name.
 githubApp:
-  redirectURI: "http://{{KIND_NODE_IP}}:32222/login"
+  redirectURI: "http://172.18.0.2:32222/login"
   clientId: "NWY4YjgyMDhmZmEwMDAzMTZkMmQ="
   clientSecret: "ZTk2NDNhMmI3MjI0MmUzYjE5YzQyYTM4N2ZhM2Y1YTAyMDVmMzY4YQ=="
 
@@ -24,17 +24,16 @@ app:
   podAnnotations: {}
 
   podSecurityContext: {}
-  # fsGroup: 2000
 
   securityContext:
     runAsUser: 65534
     runAsNonRoot: true
     runAsGroup: 65534
-    fsGroup: 65534
-  
+
   service:
     type: NodePort
-    port: 80
+    nodePort: 31111
+    port: 5000
 
   resources:
     limits:
@@ -76,17 +75,15 @@ core:
   podAnnotations: {}
 
   podSecurityContext: {}
-  # fsGroup: 2000
 
   securityContext:
     runAsUser: 65534
     runAsNonRoot: true
     runAsGroup: 65534
-    fsGroup: 65534
 
   service:
-    type: NodePort
-    port: 80
+    type: ClusterIP
+    port: 50051
 
   resources:
     limits:
@@ -140,21 +137,20 @@ ui:
     #    hosts:
     #      - chart-example.local
   compageApp:
-    serverUrl: http://{{KIND_NODE_IP}}:31111
+    serverUrl: http://172.18.0.2:31111
   podAnnotations: {}
 
   podSecurityContext: {}
-  # fsGroup: 2000
 
   securityContext:
     runAsUser: 65534
     runAsNonRoot: true
     runAsGroup: 65534
-    fsGroup: 65534
 
   service:
     type: NodePort
-    port: 80
+    nodePort: 32222
+    port: 3000
 
   resources:
     limits:

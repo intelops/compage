@@ -8,8 +8,7 @@ spec:
   type: {{ .Values.ui.service.type }}
   ports:
     - port: {{ .Values.ui.service.port }}
+      nodePort: {{ .Values.ui.service.nodePort }}
       targetPort: http
-      protocol: TCP
-      name: http
   selector:
     {{- include "compage.ui.selectorLabels" . | nindent 4 }}
