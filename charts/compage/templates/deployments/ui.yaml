@@ -36,6 +36,16 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.ui.service.port }}
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 30
           env:
             - name: REACT_APP_GITHUB_APP_REDIRECT_URI
               valueFrom:
@@ -52,21 +62,6 @@ spec:
                 configMapKeyRef:
                   name: ui-data
                   key: REACT_APP_COMPAGE_APP_SERVER_URL
-          readinessProbe:
-            tcpSocket:
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 15
-          livenessProbe:
-            tcpSocket:
-              port: http
-            initialDelaySeconds: 15
-            periodSeconds: 30
-          volumeMounts:
-          - name: yarn-cache-volume
-            mountPath: /.cache
-          - name: yarn-cache-volume
-            mountPath: /.yarn
           resources:
             {{- toYaml .Values.ui.resources | nindent 12 }}
       {{- with .Values.ui.nodeSelector }}
@@ -81,6 +76,3 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      volumes:
-        - name: yarn-cache-volume
-          emptyDir: {}

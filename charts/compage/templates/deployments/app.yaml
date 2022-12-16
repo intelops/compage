@@ -36,7 +36,16 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.app.service.port }}
-              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 30
           env:
             - name: COMPAGE_CORE_URL
               valueFrom:
@@ -54,18 +63,6 @@ spec:
               readOnly: true
             - name: tmp-volume
               mountPath: /tmp
-            - name: yarn-cache-volume
-              mountPath: /.cache/yarn
-          readinessProbe:
-            tcpSocket:
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 15
-          livenessProbe:
-            tcpSocket:
-              port: http
-            initialDelaySeconds: 15
-            periodSeconds: 30
           resources:
             {{- toYaml .Values.app.resources | nindent 12 }}
       {{- with .Values.app.nodeSelector }}
@@ -81,8 +78,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        - name: yarn-cache-volume
-          emptyDir: {}
         - name: tmp-volume
           emptyDir: {}
         - name: github-credentials

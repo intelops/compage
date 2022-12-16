@@ -6,11 +6,11 @@ COPY package.json ./
 COPY tsconfig.json ./
 COPY src ./src
 COPY protobufs protobufs
-RUN yarn config set prefix /usr/local/
-RUN yarn install
 ENV NODE_ENV=production
 EXPOSE 5000
-CMD ["yarn", "run", "start-prod"]
+RUN npm install ts-node -g
+RUN ["npm", "i", "npm@8.12", "-g"]
+CMD ["npm", "run", "start-prod"]
 
 
 ### this is stage two , where the app actually runs
