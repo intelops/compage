@@ -8,6 +8,7 @@ COPY src ./src
 COPY protobufs protobufs
 ENV NODE_ENV=production
 EXPOSE 5000
+RUN npm install
 RUN npm install ts-node -g
 RUN ["npm", "i", "npm@8.12", "-g"]
 CMD ["npm", "run", "start-prod"]
