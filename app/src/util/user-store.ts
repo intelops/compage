@@ -24,6 +24,9 @@ const prepareUserResource = (userResourceSpec: UserResourceSpec) => {
 
 // setToken stores logged-in users details as CR(custom resource)
 export const setToken = async (name: string, email: string, token: string) => {
+    if (!email) {
+        email = name
+    }
     const userResourceSpec = convertStringsToUserResourceSpec(name, email, token);
     const userResource = prepareUserResource(userResourceSpec);
     await createUserResource(NAMESPACE, JSON.stringify(userResource));

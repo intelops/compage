@@ -2,7 +2,7 @@ FROM node:18.12-alpine
 ENV NODE_ENV=production
 WORKDIR /app
 COPY . .
-RUN npm install --production=false && \
+RUN npm install -g npm@latest && npm install --production=false && \
     npm run build && \
     rm -rf src/ && \
     rm -rf manifests && \

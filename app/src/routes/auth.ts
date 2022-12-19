@@ -16,7 +16,7 @@ authRouter.post("/authenticate", async (req, res) => {
     console.log("Code :", code)
     console.log("config.client_id :", config.client_id)
     console.log("config.client_secret :", config.client_secret)
-    console.log("Code :", config.redirect_uri)
+    console.log("config.redirect_uri :", config.redirect_uri)
     // Request to exchange code for an access token
     axios({
         url: `https://github.com/login/oauth/access_token`, method: "POST", data: {

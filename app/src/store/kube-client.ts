@@ -53,15 +53,21 @@ export const createObject = async ({
                                        plural
                                    }: { group: string, version: string, plural: string }
     , namespace: string, payload: string) => {
-    const object = await client.createNamespacedCustomObject(
-        group,
-        version,
-        namespace,
-        plural,
-        JSON.parse(payload)
-    );
-    const resource: Resource = JSON.parse(JSON.stringify(object.body))
-    return resource
+    try {
+        const object = await client.createNamespacedCustomObject(
+            group,
+            version,
+            namespace,
+            plural,
+            JSON.parse(payload)
+        );
+        const resource: Resource = JSON.parse(JSON.stringify(object.body))
+        return resource
+    } catch (e: any) {
+        console.log("error while creating custom object : ", e)
+        const resource: Resource = {apiVersion: "", kind: "", metadata: "", spec: undefined}
+        return resource
+    }
 }
 
 export const listObjects = async ({

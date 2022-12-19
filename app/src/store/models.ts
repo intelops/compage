@@ -17,7 +17,7 @@ export interface ProjectResource {
 export interface UserResource {
     apiVersion: string,
     kind: string,
-    metadata: string,
+    metadata?: string,
     spec: UserResourceSpec
 }
 
