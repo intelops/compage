@@ -36,3 +36,30 @@ GitConstructError: Cannot use simple-git on a directory that does not exist
 }
 Solution :  create the github repo when the project is getting created. git clone will never fail.
  We shouldn't really create repo here as it doesn't fit it the usecase
+
+ Issue : when project is not present in the cluster(may happen if the projects are cleared from backend)
+
+Solution :  add check in the backend and return error message telling no project exists for the id/name received in request.
+/app/node_modules/@kubernetes/client-node/dist/gen/api/customObjectsApi.js:268
+                            reject(new apis_1.HttpError(response, body, response.statusCode));
+                                   ^
+
+HttpError: HTTP request failed
+    at Request._callback (/app/node_modules/@kubernetes/client-node/dist/gen/api/customObjectsApi.js:268:36)
+    at self.callback (/app/node_modules/request/request.js:185:22)
+    at Request.emit (node:events:513:28)
+    at Request.<anonymous> (/app/node_modules/request/request.js:1154:10)
+    at Request.emit (node:events:513:28)
+    at IncomingMessage.<anonymous> (/app/node_modules/request/request.js:1076:12)
+    at Object.onceWrapper (node:events:627:28)
+    at IncomingMessage.emit (node:events:525:35)
+    at endReadableNT (node:internal/streams/readable:1359:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  response: <ref *2> IncomingMessage {
+    _readableState: ReadableState {
+      objectMode: false,
+      highWaterMark: 16384,
+      buffer: BufferList { head: null, tail: null, length: 0 },
+      length: 0,
+      pipes: [],
+      flowing: true,

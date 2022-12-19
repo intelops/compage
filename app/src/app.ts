@@ -8,6 +8,7 @@ import authRouter from "./routes/auth";
 import config from "./util/constants";
 import projectsRouter from "./routes/projects";
 import {initializeKubeClient} from "./store/kube-client";
+import "@kubernetes/client-node"
 
 export const client = initializeKubeClient()
 
