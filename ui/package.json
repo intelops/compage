@@ -45,6 +45,7 @@
     "build:css": "node-sass src/ -o src/",
     "watch:css": "npm run build:css && node-sass src/ -o src/ -w -r",
     "start": "HOST=0.0.0.0 PORT=3000 react-scripts start",
+    "k8s-start": "PORT=3000 react-scripts start",
     "build": "react-app-env --env-file=.env.development build",
     "build:staging": "react-app-env --env-file=.env.staging build",
     "build:production": "react-app-env --env-file=.env.production build",

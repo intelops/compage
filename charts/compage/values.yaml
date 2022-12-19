@@ -1,6 +1,7 @@
 ## Define serviceAccount names for components. Defaults to component's fully qualified name.
 githubApp:
-  redirectURI: "http://172.18.0.2:32222/login"
+  # update below value cluster's node ip and with port specified here (.Values.ui.service.nodePort)
+  redirectURI: "http://172.20.0.2:32222/login"
   clientId: "NWY4YjgyMDhmZmEwMDAzMTZkMmQ="
   clientSecret: "ZTk2NDNhMmI3MjI0MmUzYjE5YzQyYTM4N2ZhM2Y1YTAyMDVmMzY4YQ=="
 
@@ -20,15 +21,14 @@ app:
   imagePullSecrets: []
   nameOverride: "app"
   fullnameOverride: ""
-  compageCoreURL: "core:50051"
   podAnnotations: {}
 
   podSecurityContext: {}
 
-  securityContext:
-    runAsUser: 65534
-    runAsNonRoot: true
-    runAsGroup: 65534
+#  securityContext:
+#    runAsUser: 65534
+#    runAsNonRoot: true
+#    runAsGroup: 65534
 
   service:
     type: NodePort
@@ -137,15 +137,16 @@ ui:
     #    hosts:
     #      - chart-example.local
   compageApp:
-    serverUrl: http://172.18.0.2:31111
+#   update below value cluster's node ip and with port specified here (.Values.app.service.nodePort)
+    serverUrl: http://172.20.0.2:31111
   podAnnotations: {}
 
   podSecurityContext: {}
 
-  securityContext:
-    runAsUser: 65534
-    runAsNonRoot: true
-    runAsGroup: 65534
+#  securityContext:
+#    runAsUser: 65534
+#    runAsNonRoot: true
+#    runAsGroup: 65534
 
   service:
     type: NodePort

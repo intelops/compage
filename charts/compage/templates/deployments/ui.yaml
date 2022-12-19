@@ -39,12 +39,12 @@ spec:
           readinessProbe:
             tcpSocket:
               port: {{ .Values.ui.service.port }}
-            initialDelaySeconds: 300
+            initialDelaySeconds: 120
             periodSeconds: 30
           livenessProbe:
             tcpSocket:
               port: {{ .Values.ui.service.port }}
-            initialDelaySeconds: 300
+            initialDelaySeconds: 120
             periodSeconds: 30
           env:
             - name: REACT_APP_GITHUB_APP_REDIRECT_URI

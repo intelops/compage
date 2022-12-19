@@ -16,4 +16,4 @@ metadata:
   labels:
     {{- include "compage.app.labels" . | nindent 4 }}
 data:
-  COMPAGE_CORE_URL: {{.Values.app.compageCoreURL}}
+  COMPAGE_CORE_URL: core.compage:{{.Values.core.service.port}}
