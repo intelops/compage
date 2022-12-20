@@ -5,6 +5,8 @@ githubApp:
   clientId: "NWY4YjgyMDhmZmEwMDAzMTZkMmQ="
   clientSecret: "ZTk2NDNhMmI3MjI0MmUzYjE5YzQyYTM4N2ZhM2Y1YTAyMDVmMzY4YQ=="
 
+systemNamespace: compage
+
 app:
   enabled: true
   name: app
