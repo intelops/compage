@@ -1,7 +1,7 @@
 ## Define serviceAccount names for components. Defaults to component's fully qualified name.
 githubApp:
   # update below value cluster's node ip and with port specified here (.Values.ui.service.nodePort)
-  redirectURI: "http://localhost:3000/login"
+  redirectURI: "http://172.20.0.2:32222/login"
   clientId: "NWY4YjgyMDhmZmEwMDAzMTZkMmQ="
   clientSecret: "ZTk2NDNhMmI3MjI0MmUzYjE5YzQyYTM4N2ZhM2Y1YTAyMDVmMzY4YQ=="
 

@@ -19,7 +19,7 @@ fi
 #sed -i "s/{{KIND_NODE_IP}}/$KIND_NODE_IP/" ../app/manifests/configmaps.yaml
 #sed -i "s/{{KIND_NODE_IP}}/$KIND_NODE_IP/" ../ui/manifests/configmaps.yaml
 
-TAG_NAME="0.0.4"
+TAG_NAME="0.0.1"
 CORE_IMAGE="ghcr.io/mahendraintelops/compage/core:$TAG_NAME"
 APP_IMAGE="ghcr.io/mahendraintelops/compage/app:$TAG_NAME"
 UI_IMAGE="ghcr.io/mahendraintelops/compage/ui:$TAG_NAME"

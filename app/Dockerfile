@@ -1,8 +1,7 @@
-FROM node:18.12-alpine
-ENV NODE_ENV=production
+# build environment
+FROM node:18.12-alpine as builder
 WORKDIR /app
 COPY . .
-RUN apk update && apk add git
 RUN npm install -g npm@latest && npm install --production=false && \
     npm run build && \
     rm -rf src/ && \
@@ -10,4 +9,14 @@ RUN npm install -g npm@latest && npm install --production=false && \
     rm -rf node_modules && \
     npm install
 
-CMD [ "node", "./dist/app.js" ]
+# production environment
+FROM node:18.12-alpine
+WORKDIR /server
+RUN apk update && apk add git
+COPY --from=builder /app/dist /server/dist
+COPY --from=builder /app/node_modules /server/node_modules
+COPY --from=builder /app/protobufs /server/protobufs
+
+ENV NODE_ENV=production
+EXPOSE 5000
+CMD [ "node", "dist/app.js" ]
