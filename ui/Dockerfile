@@ -1,9 +1,13 @@
-FROM node:18.12-alpine as build
+# build environment
+FROM node:18.12-alpine as builder
 WORKDIR /app
 COPY . .
-RUN apk add --update python3 make g++\
-   && rm -rf /var/cache/apk/*
-RUN npm install
-ENV WDS_SOCKET_PORT=32222
-EXPOSE 3000
-CMD ["npm","run", "k8s-start"]
+RUN npm install -g npm@latest && npm install --production=false
+RUN npm run build:production
+
+# production environment
+FROM nginx:1.23.3-alpine
+COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/conf /etc/nginx
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
