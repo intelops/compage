@@ -4,20 +4,23 @@ import {user_group, user_kind, user_version, UserResource, UserResourceSpec} fro
 const NAMESPACE = "compage";
 
 // convertStringsToUserResourceSpec converts strings to userResource
-const convertStringsToUserResourceSpec = (userName: string, email: string, token: string) => {
+const convertStringsToUserResourceSpec = (email: string, token: string) => {
     const userResourceSpec: UserResourceSpec = {
-        email: email, name: userName, token: token
+        email: email, token: token
     }
     return userResourceSpec
 }
 
-const prepareUserResource = (userResourceSpec: UserResourceSpec) => {
+const prepareUserResource = (name: string, userResourceSpec: UserResourceSpec) => {
+    const metadata = {
+        name: name,
+        namespace: NAMESPACE
+    }
     const userResource: UserResource = {
         apiVersion: user_group + "/" + user_version,
         kind: user_kind,
         spec: userResourceSpec,
-        //TODO how below var will get populated.
-        metadata: ""
+        metadata: metadata
     }
     return userResource
 }
@@ -27,8 +30,9 @@ export const setToken = async (name: string, email: string, token: string) => {
     if (!email) {
         email = name
     }
-    const userResourceSpec = convertStringsToUserResourceSpec(name, email, token);
-    const userResource = prepareUserResource(userResourceSpec);
+    const userResourceSpec = convertStringsToUserResourceSpec(email, token);
+    const userResource = prepareUserResource(name, userResourceSpec);
+    console.log("JSON.stringify(userResource) : ", JSON.stringify(userResource))
     await createUserResource(NAMESPACE, JSON.stringify(userResource));
 }
 

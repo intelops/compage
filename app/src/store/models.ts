@@ -3,28 +3,33 @@ import {Repository, User} from "../routes/models";
 export interface Resource {
     apiVersion: string,
     kind: string,
-    metadata: string,
+    metadata: any,
     spec: any
 }
 
 export interface ProjectResource {
     apiVersion: string,
     kind: string,
-    metadata: string,
+    metadata: Metadata,
     spec: ProjectResourceSpec
 }
 
 export interface UserResource {
     apiVersion: string,
     kind: string,
-    metadata?: string,
+    metadata: Metadata,
     spec: UserResourceSpec
+}
+
+export interface Metadata {
+    name: string,
+    namespace: string,
+    labels?: Map<string, string>
 }
 
 export interface UserResourceSpec {
     email: string,
     token: string,
-    name: string
 }
 
 export interface ProjectResourceSpec {

@@ -9,7 +9,7 @@ const convertCreateProjectRequestToProjectResource = (userName: string, createPr
     const projectResource: ProjectResourceSpec = {
         id: uuid(),
         name: createProjectRequest.project.name,
-        metadata: JSON.stringify(createProjectRequest.metadata),
+        metadata: JSON.stringify(createProjectRequest.metadata) || "{}",
         user: createProjectRequest.user,
         yaml: JSON.stringify(createProjectRequest.yaml),
         repository: createProjectRequest.repository,

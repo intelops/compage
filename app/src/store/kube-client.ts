@@ -65,7 +65,7 @@ export const createObject = async ({
         return resource
     } catch (e: any) {
         console.log("error while creating custom object : ", e)
-        const resource: Resource = {apiVersion: "", kind: "", metadata: "", spec: undefined}
+        const resource: Resource = {apiVersion: "", kind: "", metadata: undefined, spec: undefined}
         return resource
     }
 }
