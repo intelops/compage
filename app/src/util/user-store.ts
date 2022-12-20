@@ -1,4 +1,4 @@
-import {createUserResource, getUserResource} from "../store/user-client";
+import {createUserResource, getUserResource, patchUserResource} from "../store/user-client";
 import {user_group, user_kind, user_version, UserResource, UserResourceSpec} from "../store/models";
 
 const NAMESPACE = "compage";
@@ -11,9 +11,9 @@ const convertStringsToUserResourceSpec = (email: string, token: string) => {
     return userResourceSpec
 }
 
-const prepareUserResource = (name: string, userResourceSpec: UserResourceSpec) => {
+const prepareUserResource = (userName: string, userResourceSpec: UserResourceSpec) => {
     const metadata = {
-        name: name,
+        name: userName,
         namespace: NAMESPACE
     }
     const userResource: UserResource = {
@@ -26,19 +26,36 @@ const prepareUserResource = (name: string, userResourceSpec: UserResourceSpec) =
 }
 
 // setToken stores logged-in users details as CR(custom resource)
-export const setToken = async (name: string, email: string, token: string) => {
-    if (!email) {
-        email = name
+export const setToken = async (login: string, email: string, token: string) => {
+    const existingUserResource = await getUserResource(NAMESPACE, login);
+    if (existingUserResource) {
+        // if next time email is added to github, add it to existing resource.
+        if (existingUserResource.spec.email === existingUserResource.metadata.name
+            && email
+            && login !== email) {
+            existingUserResource.spec.email = email
+        }
+        existingUserResource.spec.token = token
+        // we shouldn't change name as it will result in new user resource.
+
+        // send spec only as the called method considers updating specs only.
+        const createdUserResource = await patchUserResource(NAMESPACE, existingUserResource.metadata.name, JSON.stringify(existingUserResource.spec));
+        console.log(createdUserResource.metadata.name + " user updated")
+        return
     }
-    const userResourceSpec = convertStringsToUserResourceSpec(email, token);
-    const userResource = prepareUserResource(name, userResourceSpec);
-    console.log("JSON.stringify(userResource) : ", JSON.stringify(userResource))
-    await createUserResource(NAMESPACE, JSON.stringify(userResource));
+
+    if (!email) {
+        email = login
+    }
+    const newUserResourceSpec = convertStringsToUserResourceSpec(email, token);
+    const newUserResource = prepareUserResource(login, newUserResourceSpec);
+    const createdUserResource = await createUserResource(NAMESPACE, JSON.stringify(newUserResource));
+    console.log(createdUserResource.metadata.name + " user added")
 }
 
 // getToken returns tokens
-export const getToken = async (userName: string) => {
-    const userResource = await getUserResource(NAMESPACE, userName);
+export const getToken = async (login: string) => {
+    const userResource = await getUserResource(NAMESPACE, login);
     const userResourceSpec: UserResourceSpec = userResource.spec;
     return userResourceSpec.token;
 }

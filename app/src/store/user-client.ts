@@ -32,11 +32,17 @@ export const getUserResource = async (namespace: string, name: string) => {
 
 // patchUserResource patches user resource
 export const patchUserResource = async (namespace: string, name: string, payload: string) => {
+    const patch = [{
+        "op": "replace",
+        "path":"/spec",
+        "value": JSON.parse(payload)
+    }];
+
     const object = await patchObject({
         group: user_group,
         version: user_version,
         plural: user_plural
-    }, namespace, name, payload);
+    }, namespace, name, JSON.stringify(patch));
     const userResource: UserResource = {
         kind: object.kind,
         apiVersion: object.apiVersion,

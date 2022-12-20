@@ -1,15 +1,16 @@
-import {CustomObjectsApi, KubeConfig} from "@kubernetes/client-node";
+import * as k8s from "@kubernetes/client-node";
+
 import {client} from "../app";
 import {Resource, ResourceList} from "./models";
 
 export const initializeKubeClient = () => {
-    const kubeConfig = new KubeConfig();
+    const kubeConfig = new k8s.KubeConfig();
     if (process.env.NODE_ENV === 'development') {
         kubeConfig.loadFromDefault();
     } else {
         kubeConfig.loadFromCluster();
     }
-    return kubeConfig.makeApiClient(CustomObjectsApi);
+    return kubeConfig.makeApiClient(k8s.CustomObjectsApi);
 }
 
 export const getObject = async ({
@@ -34,14 +35,16 @@ export const patchObject = async ({
                                       version,
                                       plural
                                   }: { group: string, version: string, plural: string }
-    , namespace: string, name: string, payload: string) => {
+    , namespace: string, name: string, patch: string) => {
+    console.log("patch : ", patch)
+    const options = {"headers": {"Content-type": k8s.PatchUtils.PATCH_FORMAT_JSON_PATCH}};
     const object = await client.patchNamespacedCustomObject(
         group,
         version,
         namespace,
         plural,
         name,
-        JSON.parse(payload)
+        JSON.parse(patch), undefined, undefined, undefined, options
     );
     const resource: Resource = JSON.parse(JSON.stringify(object.body))
     return resource
