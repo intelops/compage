@@ -116,7 +116,7 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
             const pushToExistingProjectOnGithubRequest: PushToExistingProjectOnGithubRequest = {
                 generatedProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
                 existingProject: cloneExistingProjectFromGithubRequest.clonedProjectPath + "/" + generateProjectRequest.repository.name,
-                userName: <string>generateProjectRequest.user.name,
+                userName: generateProjectRequest.user.name,
                 email: generateProjectRequest.user.email,
                 password: password,
                 repository: generateProjectRequest.repository
@@ -126,7 +126,6 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
             if (error.length > 0) {
                 // send status back to ui
                 let message = `couldn't generate project: ${generateProjectRequest.project.name} due to : ${error}.`
-                // error = ""
                 return res.status(500).json(getGenerateProjectResponse(generateProjectRequest, message, error));
             }
 
