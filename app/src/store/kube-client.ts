@@ -30,7 +30,8 @@ export const getObject = async ({
         const resource: Resource = JSON.parse(JSON.stringify(object.body))
         return resource
     } catch (e: any) {
-        console.log("error while getting custom object : ", e.message)
+        console.debug("error while getting custom object : ", e?.body)
+        // console.log("error while getting custom object : ", e?.body?.reason)
         const resource: Resource = {apiVersion: "", kind: "", metadata: undefined, spec: undefined}
         return resource
     }
@@ -55,7 +56,8 @@ export const patchObject = async ({
         const resource: Resource = JSON.parse(JSON.stringify(object.body))
         return resource
     } catch (e: any) {
-        console.log("error while patching custom object : ", e.message)
+        console.debug("error while patching custom object : ", e?.body)
+        // console.log("error while patching custom object : ", e?.body?.reason)
         const resource: Resource = {apiVersion: "", kind: "", metadata: undefined, spec: undefined}
         return resource
     }
@@ -78,7 +80,8 @@ export const createObject = async ({
         const resource: Resource = JSON.parse(JSON.stringify(object.body))
         return resource
     } catch (e: any) {
-        console.log("error while creating custom object : ", e.message)
+        console.debug("error while creating custom object : ", e?.body)
+        // console.log("error while creating custom object : ", e?.body?.reason)
         const resource: Resource = {apiVersion: "", kind: "", metadata: undefined, spec: undefined}
         return resource
     }
@@ -107,7 +110,8 @@ export const listObjects = async ({
             const resources: ResourceList = JSON.parse(JSON.stringify(object.body))
             return resources
         } catch (e: any) {
-            console.log("error while listing custom objects : ", e.message)
+            console.debug("error while listing custom object : ", e?.body)
+            // console.log("error while listing custom object : ", e?.body?.reason)
             const resources: ResourceList = {apiVersion: "", items: [], kind: "", metadata: undefined}
             return resources
         }
@@ -122,7 +126,8 @@ export const listObjects = async ({
             const resources: ResourceList = JSON.parse(JSON.stringify(object.body))
             return resources
         } catch (e: any) {
-            console.log("error while listing custom objects : ", e.message)
+            console.debug("error while listing custom object : ", e?.body)
+            // console.log("error while listing custom object : ", e?.body?.reason)
             const resources: ResourceList = {apiVersion: "", items: [], kind: "", metadata: undefined}
             return resources
         }
