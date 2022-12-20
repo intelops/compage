@@ -5,10 +5,16 @@ import {project_group, project_kind, project_version, ProjectResource, ProjectRe
 import {NAMESPACE} from "./constants";
 import {createProjectResource, getProjectResource, listProjectResources} from "../store/project-client";
 
+const generateId = () => {
+    let uuid = uuidv4();
+    uuid = uuid.replace(/-/g, "");
+    return Buffer.from(uuid, 'hex').toString('base64');
+}
+
 // convertProjectEntityToProjectResourceSpec creates projectResourceSpec on k8s cluster.
 const convertProjectEntityToProjectResourceSpec = (userName: string, projectEntity: ProjectEntity) => {
     const projectResourceSpec: ProjectResourceSpec = {
-        id: uuidv4(),
+        id: generateId(),
         name: projectEntity.name,
         metadata: JSON.stringify(projectEntity.metadata),
         user: projectEntity.user,
@@ -59,10 +65,6 @@ export const getProject = async (userName: string, name: string) => {
 
 // prepareProjectResource prepares ProjectResource containing the project details.
 const prepareProjectResource = (userName: string, projectResourceSpec: ProjectResourceSpec) => {
-    // create metadata
-    const labels: Map<string, string> = new Map<string, string>()
-    labels.set("userName", userName)
-
     // create projectResource
     const projectResource: ProjectResource = {
         apiVersion: project_group + "/" + project_version,
@@ -71,7 +73,9 @@ const prepareProjectResource = (userName: string, projectResourceSpec: ProjectRe
         metadata: {
             name: projectResourceSpec.name,
             namespace: NAMESPACE,
-            labels: labels
+            labels: {
+                userName: userName
+            }
         }
     }
     console.log("projectResource : ", projectResource)

@@ -18,11 +18,11 @@ projectsRouter.post("/", requireUserNameMiddleware, async (request: Request, res
     const projectEntity: ProjectEntity = request.body;
     const createdProjectResource = await createProject(<string>userName, projectEntity);
     if (createdProjectResource.apiVersion) {
-        console.log(createdProjectResource.metadata.name + " project created")
-    } else {
-        console.log(projectEntity.name + " project couldn't be created")
+        console.log(`'${createdProjectResource.metadata.name}' project created successfully`)
+        return response.status(201).json({message: `'${createdProjectResource.metadata.name}' project created successfully`});
     }
-    return response.status(201).json("project created successfully");
+    console.log(`'${projectEntity.name}' project couldn't be created`)
+    return response.status(201).json({message: `'${projectEntity.name}' project couldn't be created`});
 });
 
 export default projectsRouter;

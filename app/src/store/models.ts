@@ -17,21 +17,28 @@ export interface ResourceList {
 export interface ProjectResource {
     apiVersion: string,
     kind: string,
-    metadata: Metadata,
+    metadata: ProjectMetadata,
     spec: ProjectResourceSpec
 }
 
 export interface UserResource {
     apiVersion: string,
     kind: string,
-    metadata: Metadata,
+    metadata: UserMetadata,
     spec: UserResourceSpec
 }
 
-export interface Metadata {
+export interface UserMetadata {
     name: string,
     namespace: string,
-    labels?: Map<string, string>
+}
+
+export interface ProjectMetadata {
+    name: string,
+    namespace: string,
+    labels: {
+        userName: string
+    }
 }
 
 export interface UserResourceSpec {
