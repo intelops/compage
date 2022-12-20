@@ -19,19 +19,29 @@ export const generateProject = createAsyncThunk<GeneratedProjectModel[],
     // work with device API,
     // or any other async APIs we need to.
     async (generateProjectRequest: GenerateProjectRequest, thunkApi) => {
-        // Fetch the backend endpoint:
-        const response = await CompageBackendApi().post('/create_project', generateProjectRequest);
-        // Check if status is not okay:
-        if (response.status !== 200) {
-            // Return the error message:
-            return thunkApi.rejectWithValue({
-                message: "Failed to generate project."
-            });
+        try {
+            // Fetch the backend endpoint:
+            const response = await CompageBackendApi().post('/create_project', generateProjectRequest);
+            // Get the JSON from the response:
+            const data: GeneratedProjectModel[] = await response.data;
+            return data;
+        } catch (e: any) {
+            if (e.response.data.status === 401) {
+                sessionStorage.clear()
+                // Return the error message:
+                return thunkApi.rejectWithValue({
+                    message: "Failed to generate project."
+                });
+            }
+            // Check if status is not okay:
+            if (e.response.status !== 200) {
+                // Return the error message:
+                return thunkApi.rejectWithValue({
+                    message: "Failed to generate project."
+                });
+            }
+            const data: GeneratedProjectModel[] = []
+            return data
         }
-        // Get the JSON from the response:
-        const data: GeneratedProjectModel[] = await response.data;
-        console.log(data)
-
-        return data;
     }
 );
