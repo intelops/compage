@@ -28,7 +28,8 @@ const prepareUserResource = (userName: string, userResourceSpec: UserResourceSpe
 // setToken stores logged-in users details as CR(custom resource)
 export const setToken = async (login: string, email: string, token: string) => {
     const existingUserResource = await getUserResource(NAMESPACE, login);
-    if (existingUserResource) {
+    // for non-existent resources apiVersion is empty.
+    if (existingUserResource.apiVersion) {
         // if next time email is added to github, add it to existing resource.
         if (existingUserResource.spec.email === existingUserResource.metadata.name
             && email

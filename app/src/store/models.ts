@@ -7,6 +7,13 @@ export interface Resource {
     spec: any
 }
 
+export interface ResourceList {
+    apiVersion: string,
+    kind: string,
+    metadata: any,
+    items: Resource[]
+}
+
 export interface ProjectResource {
     apiVersion: string,
     kind: string,
@@ -54,13 +61,6 @@ export interface UserResourceList {
     kind: string,
     metadata: string,
     items: UserResource[]
-}
-
-export interface ResourceList {
-    apiVersion: string,
-    kind: string,
-    metadata: string,
-    items: Resource[]
 }
 
 // user

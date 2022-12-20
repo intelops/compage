@@ -39,12 +39,12 @@ spec:
           readinessProbe:
             tcpSocket:
               port: http
-            initialDelaySeconds: 120
+            initialDelaySeconds: 45
             periodSeconds: 30
           livenessProbe:
             tcpSocket:
               port: http
-            initialDelaySeconds: 120
+            initialDelaySeconds: 45
             periodSeconds: 30
           env:
             - name: COMPAGE_CORE_URL

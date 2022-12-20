@@ -19,15 +19,21 @@ export const getObject = async ({
                                     plural
                                 }: { group: string, version: string, plural: string }
     , namespace: string, name: string) => {
-    const object = await client.getNamespacedCustomObject(
-        group,
-        version,
-        namespace,
-        plural,
-        name
-    );
-    const resource: Resource = JSON.parse(JSON.stringify(object.body))
-    return resource
+    try {
+        const object = await client.getNamespacedCustomObject(
+            group,
+            version,
+            namespace,
+            plural,
+            name
+        );
+        const resource: Resource = JSON.parse(JSON.stringify(object.body))
+        return resource
+    } catch (e: any) {
+        console.log("error while getting custom object : ", e.message)
+        const resource: Resource = {apiVersion: "", kind: "", metadata: undefined, spec: undefined}
+        return resource
+    }
 }
 
 export const patchObject = async ({
@@ -36,18 +42,23 @@ export const patchObject = async ({
                                       plural
                                   }: { group: string, version: string, plural: string }
     , namespace: string, name: string, patch: string) => {
-    console.log("patch : ", patch)
     const options = {"headers": {"Content-type": k8s.PatchUtils.PATCH_FORMAT_JSON_PATCH}};
-    const object = await client.patchNamespacedCustomObject(
-        group,
-        version,
-        namespace,
-        plural,
-        name,
-        JSON.parse(patch), undefined, undefined, undefined, options
-    );
-    const resource: Resource = JSON.parse(JSON.stringify(object.body))
-    return resource
+    try {
+        const object = await client.patchNamespacedCustomObject(
+            group,
+            version,
+            namespace,
+            plural,
+            name,
+            JSON.parse(patch), undefined, undefined, undefined, options
+        );
+        const resource: Resource = JSON.parse(JSON.stringify(object.body))
+        return resource
+    } catch (e: any) {
+        console.log("error while patching custom object : ", e.message)
+        const resource: Resource = {apiVersion: "", kind: "", metadata: undefined, spec: undefined}
+        return resource
+    }
 }
 
 export const createObject = async ({
@@ -67,7 +78,7 @@ export const createObject = async ({
         const resource: Resource = JSON.parse(JSON.stringify(object.body))
         return resource
     } catch (e: any) {
-        console.log("error while creating custom object : ", e)
+        console.log("error while creating custom object : ", e.message)
         const resource: Resource = {apiVersion: "", kind: "", metadata: undefined, spec: undefined}
         return resource
     }
@@ -80,28 +91,40 @@ export const listObjects = async ({
                                   }: { group: string, version: string, plural: string }
     , namespace: string, labelSelector?: string) => {
     if (labelSelector) {
-        const object = await client.listNamespacedCustomObject(
-            group,
-            version,
-            namespace,
-            plural,
-            "true",
-            false,
-            "",
-            "",
-            labelSelector
-        );
+        try {
+            const object = await client.listNamespacedCustomObject(
+                group,
+                version,
+                namespace,
+                plural,
+                "true",
+                false,
+                "",
+                "",
+                labelSelector
+            );
 
-        const resources: ResourceList = JSON.parse(JSON.stringify(object.body))
-        return resources
+            const resources: ResourceList = JSON.parse(JSON.stringify(object.body))
+            return resources
+        } catch (e: any) {
+            console.log("error while listing custom objects : ", e.message)
+            const resources: ResourceList = {apiVersion: "", items: [], kind: "", metadata: undefined}
+            return resources
+        }
     } else {
-        const object = await client.listNamespacedCustomObject(
-            group,
-            version,
-            namespace,
-            plural,
-        );
-        const resources: ResourceList = JSON.parse(JSON.stringify(object.body))
-        return resources
+        try {
+            const object = await client.listNamespacedCustomObject(
+                group,
+                version,
+                namespace,
+                plural,
+            );
+            const resources: ResourceList = JSON.parse(JSON.stringify(object.body))
+            return resources
+        } catch (e: any) {
+            console.log("error while listing custom objects : ", e.message)
+            const resources: ResourceList = {apiVersion: "", items: [], kind: "", metadata: undefined}
+            return resources
+        }
     }
 }
