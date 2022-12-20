@@ -20,6 +20,8 @@ export const requireUserNameMiddleware = async (request: Request, response: Resp
             unauthorized(`token lost from server, needs to re-login to github`);
             return
         }
+        // TODO
+        // check with github api
     } catch (e: any) {
         unauthorized(`token lost from server, needs to re-login to github`);
         return

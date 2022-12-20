@@ -41,7 +41,11 @@ export const setToken = async (login: string, email: string, token: string) => {
 
         // send spec only as the called method considers updating specs only.
         const createdUserResource = await patchUserResource(NAMESPACE, existingUserResource.metadata.name, JSON.stringify(existingUserResource.spec));
-        console.log(createdUserResource.metadata.name + " user updated")
+        if (createdUserResource.apiVersion) {
+            console.log(createdUserResource.metadata.name + " user updated")
+        } else {
+            console.log(existingUserResource.metadata.name + " user couldn't be updated")
+        }
         return
     }
 
@@ -51,12 +55,16 @@ export const setToken = async (login: string, email: string, token: string) => {
     const newUserResourceSpec = convertStringsToUserResourceSpec(email, token);
     const newUserResource = prepareUserResource(login, newUserResourceSpec);
     const createdUserResource = await createUserResource(NAMESPACE, JSON.stringify(newUserResource));
-    console.log(createdUserResource.metadata.name + " user added")
+    if (createdUserResource.apiVersion) {
+        console.log(createdUserResource.metadata.name + " user added")
+    } else {
+        console.log(newUserResource.metadata.name + " user couldn't be added")
+    }
 }
 
 // getToken returns tokens
 export const getToken = async (login: string) => {
     const userResource = await getUserResource(NAMESPACE, login);
-    const userResourceSpec: UserResourceSpec = userResource.spec;
-    return userResourceSpec.token;
+    const userResourceSpec: UserResourceSpec = userResource?.spec;
+    return userResourceSpec?.token;
 }

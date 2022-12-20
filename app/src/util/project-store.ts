@@ -1,22 +1,22 @@
-import {CreateProjectRequest, ProjectEntity} from "../routes/models";
-import {uuid} from "uuidv4";
-import {ProjectResource, ProjectResourceSpec} from "../store/models";
+import {ProjectEntity} from "../routes/models";
+import {v4 as uuidv4} from 'uuid';
+
+import {project_group, project_kind, project_version, ProjectResource, ProjectResourceSpec} from "../store/models";
 import {NAMESPACE} from "./constants";
 import {createProjectResource, getProjectResource, listProjectResources} from "../store/project-client";
 
-// createProjectResource creates projectResource on k8s cluster.
-const convertCreateProjectRequestToProjectResource = (userName: string, createProjectRequest: CreateProjectRequest) => {
-    const projectResource: ProjectResourceSpec = {
-        id: uuid(),
-        name: createProjectRequest.project.name,
-        metadata: JSON.stringify(createProjectRequest.metadata) || "{}",
-        user: createProjectRequest.user,
-        yaml: JSON.stringify(createProjectRequest.yaml),
-        repository: createProjectRequest.repository,
-        //TODO needs to be parameterized
-        version: "v1",
+// convertProjectEntityToProjectResourceSpec creates projectResourceSpec on k8s cluster.
+const convertProjectEntityToProjectResourceSpec = (userName: string, projectEntity: ProjectEntity) => {
+    const projectResourceSpec: ProjectResourceSpec = {
+        id: uuidv4(),
+        name: projectEntity.name,
+        metadata: JSON.stringify(projectEntity.metadata),
+        user: projectEntity.user,
+        yaml: JSON.stringify(projectEntity.yaml),
+        repository: projectEntity.repository,
+        version: projectEntity.version,
     }
-    return JSON.stringify(projectResource)
+    return projectResourceSpec
 }
 
 // convertListOfProjectResourceToListOfProjectEntity converts projectResourceList to ProjectEntityList
@@ -24,6 +24,7 @@ const convertListOfProjectResourceToListOfProjectEntity = (projectResources: Pro
     let projectEntities: ProjectEntity[] = []
     for (let i = 0; i < projectResources.length; i++) {
         let projectEntity: ProjectEntity = {
+            metadata: JSON.parse(projectResources[i].spec.metadata),
             id: projectResources[i].spec.id,
             // metadata: projectResources[i].spec.metadata,
             name: projectResources[i].spec.name,
@@ -56,8 +57,42 @@ export const getProject = async (userName: string, name: string) => {
     return [];
 }
 
-// createProject creates projectResource on k8s cluster.
-export const createProject = async (userName: string, createProjectRequest: CreateProjectRequest) => {
-    const projectResource = convertCreateProjectRequestToProjectResource(userName, createProjectRequest);
-    await createProjectResource(NAMESPACE, projectResource);
+// prepareProjectResource prepares ProjectResource containing the project details.
+const prepareProjectResource = (userName: string, projectResourceSpec: ProjectResourceSpec) => {
+    // create metadata
+    const labels: Map<string, string> = new Map<string, string>()
+    labels.set("userName", userName)
+
+    // create projectResource
+    const projectResource: ProjectResource = {
+        apiVersion: project_group + "/" + project_version,
+        kind: project_kind,
+        spec: projectResourceSpec,
+        metadata: {
+            name: projectResourceSpec.name,
+            namespace: NAMESPACE,
+            labels: labels
+        }
+    }
+    console.log("projectResource : ", projectResource)
+    return projectResource
 }
+
+// createProject creates projectResource on k8s cluster.
+export const createProject = async (userName: string, projectEntity: ProjectEntity) => {
+    const projectResourceSpec = convertProjectEntityToProjectResourceSpec(userName, projectEntity);
+    const projectResource = prepareProjectResource(userName, projectResourceSpec);
+    return await createProjectResource(NAMESPACE, JSON.stringify(projectResource));
+}
+
+// updateProject updates projectResource on k8s cluster.
+// export const updateProject = async (projectName: string, userName: string, projectEntity: ProjectEntity) => {
+//     const projectResourceSpec = convertProjectEntityToProjectResourceSpec(userName, projectEntity);
+//     const projectResource = prepareProjectResource(userName, projectResourceSpec);
+//     let createdProjectResource = await patchProjectResource(NAMESPACE, projectName, JSON.stringify(projectResource));
+//     if (createdProjectResource.apiVersion) {
+//         console.log(createdProjectResource.metadata.name + " project created")
+//     } else {
+//         console.log(projectResource.metadata.name + " project couldn't be created")
+//     }
+// }

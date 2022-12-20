@@ -70,24 +70,16 @@ export interface Project {
 export interface ProjectEntity {
     id?: string,
     name: string,
-    user?: User,
-    yaml?: CompageYaml,
-    repository?: Repository,
-    metadata?: Map<string, string>,
-    version?: string
+    version: string,
+    user: User,
+    yaml: CompageYaml,
+    repository: Repository,
+    metadata: Map<string, string>
 }
 
 export interface User {
     name: string,
     email: string
-}
-
-export interface CreateProjectRequest {
-    project: ProjectEntity,
-    user: User,
-    yaml: CompageYaml,
-    repository: Repository,
-    metadata?: Map<string, string>,
 }
 
 export interface GenerateProjectRequest {

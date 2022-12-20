@@ -5,6 +5,7 @@ githubApp:
   clientId: "NWY4YjgyMDhmZmEwMDAzMTZkMmQ="
   clientSecret: "ZTk2NDNhMmI3MjI0MmUzYjE5YzQyYTM4N2ZhM2Y1YTAyMDVmMzY4YQ=="
 
+# TODO the below is not yet configurable. Code has direct references so, any change in below value will break the application.
 systemNamespace: compage
 
 app:

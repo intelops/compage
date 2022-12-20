@@ -41,11 +41,12 @@ export interface UserResourceSpec {
 
 export interface ProjectResourceSpec {
     id: string,
+    //TODO this can be removed and just have the name at root level metadata.
     name: string,
     user: User,
     yaml: string,
     repository: Repository,
-    metadata: string,
+    metadata: string
     version: string,
 }
 
