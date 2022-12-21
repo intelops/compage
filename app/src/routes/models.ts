@@ -69,7 +69,7 @@ export interface Project {
 
 export interface ProjectEntity {
     id?: string,
-    name: string,
+    displayName: string,
     version: string,
     user: User,
     yaml: CompageYaml,

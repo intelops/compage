@@ -17,7 +17,7 @@ const getGenerateProjectResponse = (generateProjectRequest: GenerateProjectReque
     let generateProjectResponse: GenerateProjectResponse = {
         repositoryName: generateProjectRequest.repository.name,
         userName: generateProjectRequest.user.name,
-        projectName: generateProjectRequest.project.name,
+        projectName: generateProjectRequest.project.displayName,
         message: message,
         error: error
     }
@@ -35,14 +35,14 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
     }
 
     // create directory hierarchy here itself as creating it after receiving data will not be proper.
-    const originalProjectPath = `${os.tmpdir()}/${generateProjectRequest.project.name}`
+    const originalProjectPath = `${os.tmpdir()}/${generateProjectRequest.project.displayName}`
     const downloadedProjectPath = `${originalProjectPath}_downloaded`
     try {
         fs.mkdirSync(downloadedProjectPath, {recursive: true});
     } catch (err: any) {
         if (err.code !== 'EEXIST') {
-            let message = `unable to generate project : ${generateProjectRequest.project.name}`
-            let error = `unable to generate project : ${generateProjectRequest.project.name} directory with error : ${err}`
+            let message = `unable to generate project : ${generateProjectRequest.project.displayName}`
+            let error = `unable to generate project : ${generateProjectRequest.project.displayName} directory with error : ${err}`
             return res.status(500).json(getGenerateProjectResponse(generateProjectRequest, message, error));
         } else {
             // first clean up and then recreate (it might be a residue of previous run)
@@ -50,12 +50,12 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
             fs.mkdirSync(downloadedProjectPath, {recursive: true});
         }
     }
-    const projectTarFilePath = `${downloadedProjectPath}/${generateProjectRequest.project.name}_downloaded.tar.gz`;
+    const projectTarFilePath = `${downloadedProjectPath}/${generateProjectRequest.project.displayName}_downloaded.tar.gz`;
 
     // save project metadata (in compage db or somewhere)
     // need to save project-name, compage-yaml version, github repo and latest commit to the db
     const payload: Project = {
-        projectName: generateProjectRequest.project.name,
+        projectName: generateProjectRequest.project.displayName,
         userName: generateProjectRequest.user.name,
         yaml: JSON.stringify(generateProjectRequest.yaml),
         repositoryName: generateProjectRequest.repository.name,
@@ -75,7 +75,7 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
 
     // error while receiving the file from core component
     call.on('error', async (response: any) => {
-        let message = `unable to generate project : ${generateProjectRequest.project.name}`
+        let message = `unable to generate project : ${generateProjectRequest.project.displayName}`
         let error = response.details
         return res.status(500).json(getGenerateProjectResponse(generateProjectRequest, message, error));
     });
@@ -107,7 +107,7 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
             let error: string = await cloneExistingProjectFromGithub(cloneExistingProjectFromGithubRequest)
             if (error.length > 0) {
                 // send status back to ui
-                let message = `couldn't generate project: ${generateProjectRequest.project.name} due to : ${error}.`
+                let message = `couldn't generate project: ${generateProjectRequest.project.displayName} due to : ${error}.`
                 // error = ""
                 return res.status(500).json(getGenerateProjectResponse(generateProjectRequest, message, error));
             }
@@ -125,7 +125,7 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
             error = await pushToExistingProjectOnGithub(pushToExistingProjectOnGithubRequest)
             if (error.length > 0) {
                 // send status back to ui
-                let message = `couldn't generate project: ${generateProjectRequest.project.name} due to : ${error}.`
+                let message = `couldn't generate project: ${generateProjectRequest.project.displayName} due to : ${error}.`
                 return res.status(500).json(getGenerateProjectResponse(generateProjectRequest, message, error));
             }
 
@@ -133,7 +133,7 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
             cleanup(downloadedProjectPath);
 
             // send status back to ui
-            let message = `generated project: ${generateProjectRequest.project.name} and saved in repository : ${generateProjectRequest.repository.name} successfully`
+            let message = `generated project: ${generateProjectRequest.project.displayName} and saved in repository : ${generateProjectRequest.repository.name} successfully`
             return res.status(200).json(getGenerateProjectResponse(generateProjectRequest, message, error));
         });
     });

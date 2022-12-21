@@ -7,7 +7,7 @@ metadata:
     username: mahendraintelops
 spec:
   id: first-project-id
-  name: project-1
+  displayName: project-1
   user:
     name: mahendraintelops
     email: mahendra.b@intelops.dev

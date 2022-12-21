@@ -1,21 +1,14 @@
 import {ProjectEntity} from "../routes/models";
-import {v4 as uuidv4} from 'uuid';
 
 import {project_group, project_kind, project_version, ProjectResource, ProjectResourceSpec} from "../store/models";
 import {NAMESPACE} from "./constants";
 import {createProjectResource, getProjectResource, listProjectResources} from "../store/project-client";
 
-const generateId = () => {
-    let uuid = uuidv4();
-    uuid = uuid.replace(/-/g, "");
-    return Buffer.from(uuid, 'hex').toString('base64');
-}
-
 // convertProjectEntityToProjectResourceSpec creates projectResourceSpec on k8s cluster.
-const convertProjectEntityToProjectResourceSpec = (userName: string, projectEntity: ProjectEntity) => {
+const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: string, projectEntity: ProjectEntity) => {
     const projectResourceSpec: ProjectResourceSpec = {
-        id: generateId(),
-        name: projectEntity.name,
+        id: projectId,
+        displayName: projectEntity.displayName,
         metadata: JSON.stringify(projectEntity.metadata),
         user: projectEntity.user,
         yaml: JSON.stringify(projectEntity.yaml),
@@ -33,7 +26,7 @@ const convertListOfProjectResourceToListOfProjectEntity = (projectResources: Pro
             metadata: JSON.parse(projectResources[i].spec.metadata),
             id: projectResources[i].spec.id,
             // metadata: projectResources[i].spec.metadata,
-            name: projectResources[i].spec.name,
+            displayName: projectResources[i].spec.displayName,
             repository: projectResources[i].spec.repository,
             user: projectResources[i].spec.user,
             version: projectResources[i].spec.version,
@@ -54,24 +47,25 @@ export const listProjects = async (userName: string) => {
 }
 
 // getProject returns specific project for userName and projectName supplied
-export const getProject = async (userName: string, name: string) => {
-    // TODO I may need to apply labelSelector here
-    const projectResource = await getProjectResource(NAMESPACE, name);
-    if (projectResource) {
+export const getProject = async (userName: string, projectId: string) => {
+    // TODO I may need to apply labelSelector here - below impl is done temporarily.
+    // currently added filter post projects retrieval(which can be slower if there are too many projects with same name.
+    const projectResource = await getProjectResource(NAMESPACE, projectId);
+    if (projectResource && projectResource.metadata.labels.userName === userName) {
         return JSON.stringify(projectResource)
     }
-    return [];
+    return {};
 }
 
 // prepareProjectResource prepares ProjectResource containing the project details.
-const prepareProjectResource = (userName: string, projectResourceSpec: ProjectResourceSpec) => {
+const prepareProjectResource = (projectId: string, userName: string, projectResourceSpec: ProjectResourceSpec) => {
     // create projectResource
     const projectResource: ProjectResource = {
         apiVersion: project_group + "/" + project_version,
         kind: project_kind,
         spec: projectResourceSpec,
         metadata: {
-            name: projectResourceSpec.name,
+            name: projectId,
             namespace: NAMESPACE,
             labels: {
                 userName: userName
@@ -82,10 +76,28 @@ const prepareProjectResource = (userName: string, projectResourceSpec: ProjectRe
     return projectResource
 }
 
+// generateProjectId generates unique id for project.
+const generateProjectId = (userName: string, projectName: string) => {
+    // truncate userName if its length is greater than 5
+    let sanitizedUserName = userName
+    if (userName.length > 5) {
+        sanitizedUserName = userName.substring(0, 5)
+    }
+
+    // truncate projectResourceSpec.name if its length is greater than 5
+    let sanitizedProjectName = ""
+    if (projectName.length > 5) {
+        sanitizedProjectName = projectName.substring(0, 5)
+    }
+
+    return sanitizedUserName.toLowerCase() + "-" + sanitizedProjectName.toLowerCase() + "-" + (Math.floor(Math.random() * 90000) + 10000);
+}
+
 // createProject creates projectResource on k8s cluster.
 export const createProject = async (userName: string, projectEntity: ProjectEntity) => {
-    const projectResourceSpec = convertProjectEntityToProjectResourceSpec(userName, projectEntity);
-    const projectResource = prepareProjectResource(userName, projectResourceSpec);
+    const projectId = generateProjectId(userName, projectEntity.displayName);
+    const projectResourceSpec = convertProjectEntityToProjectResourceSpec(projectId, userName, projectEntity);
+    const projectResource = prepareProjectResource(projectId, userName, projectResourceSpec);
     return await createProjectResource(NAMESPACE, JSON.stringify(projectResource));
 }
 

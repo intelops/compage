@@ -34,12 +34,12 @@ export const patchProjectResource = async (namespace: string, name: string, payl
 }
 
 // getProjectResource gets user resource
-export const getProjectResource = async (namespace: string, name: string) => {
+export const getProjectResource = async (namespace: string, projectId: string) => {
     const object: Resource = await getObject({
         group: project_group,
         version: project_version,
         plural: project_plural
-    }, namespace, name);
+    }, namespace, projectId);
     const projectResource: ProjectResource = {
         kind: object.kind,
         apiVersion: object.apiVersion,
@@ -55,7 +55,7 @@ export const listProjectResources = async (namespace: string, userName: string) 
         group: project_group,
         version: project_version,
         plural: project_plural
-    }, namespace, "username=" + userName);
+    }, namespace, "userName=" + userName);
     const projectResources: ProjectResource[] = [];
     for (let i = 0; i < objects.items.length; i++) {
         let uR = objects.items[i];
