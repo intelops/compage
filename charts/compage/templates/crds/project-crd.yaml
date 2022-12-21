@@ -35,7 +35,7 @@ spec:
               properties:
                 id:
                   type: string
-                name:
+                displayName:
                   type: string
                 user:
                   type: object
@@ -62,5 +62,5 @@ spec:
                 replicas:
                   type: integer
                   minimum: 1
-              required: [ "id", "name", "version" ]
+              required: [ "id", "displayName", "version" ]
           required: [ "spec" ]
