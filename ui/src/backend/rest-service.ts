@@ -43,11 +43,7 @@ export const createRepository = (userName: string, repositoryName: string, repoD
 export const generateProject = (generateProjectRequest: GenerateProjectRequest):
     Promise<Response> => {
     const requestBody = {
-        repository: generateProjectRequest.repository,
-        projectName: generateProjectRequest.project.name,
-        userName: generateProjectRequest.user.name,
-        yaml: generateProjectRequest.yaml,
-        email: generateProjectRequest.user.email
+        projectId: generateProjectRequest.projectId,
     };
     // Use code parameter and other parameters to make POST request to proxy_server
     return fetch(config.proxy_url_create_project, {

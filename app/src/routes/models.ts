@@ -83,6 +83,10 @@ export interface User {
     email: string
 }
 
+export interface GenerateProjectRequest {
+    projectId: string,
+}
+
 export interface GenerateProjectResponse {
     projectId: string,
     userName: string,

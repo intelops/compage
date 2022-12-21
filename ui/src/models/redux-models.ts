@@ -89,11 +89,7 @@ export interface ProjectEntity {
 }
 
 export interface GenerateProjectRequest {
-    project: ProjectEntity,
-    user: User,
-    yaml: CompageYaml,
-    repository: Repository,
-    metadata?: Map<string, string>,
+    projectId: string,
 }
 
 export interface GeneratedProjectModel {

@@ -5,7 +5,7 @@ import * as os from "os";
 import {pushToExistingProjectOnGithub, PushToExistingProjectOnGithubRequest} from "../util/simple-git/existing-project";
 import {getToken} from "../util/user-store";
 import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
-import {GenerateProjectResponse, Project} from "./models";
+import {GenerateProjectRequest, GenerateProjectResponse, Project} from "./models";
 import {requireUserNameMiddleware} from "../middlewares/auth";
 import {getProjectResource, patchProjectResource} from "../store/project-client";
 import {NAMESPACE, X_USER_NAME_HEADER} from "../util/constants";
@@ -29,7 +29,8 @@ const getGenerateProjectResponse = (userName: string, projectId: string, message
 compageRouter.post("/generate_project", requireUserNameMiddleware, async (request, resource) => {
     // TODO the below || op is not required, as the check is already done in middleware.
     const userName = request.header(X_USER_NAME_HEADER) || "";
-    const {projectId} = request.body;
+    const generateProjectRequest: GenerateProjectRequest = request.body;
+    const projectId = generateProjectRequest.projectId
     const cleanup = (downloadedProjectPath: string) => {
         // remove directory created, delete directory recursively
         rimraf(downloadedProjectPath, () => {
