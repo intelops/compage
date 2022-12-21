@@ -147,7 +147,7 @@ compageRouter.post("/generate_project", requireUserNameMiddleware, async (reques
             metadata.isGenerated = true;
             metadata.version = projectResource.spec.version;
             // add metadata back to projectResource.spec
-            projectResource.spec.metadata = metadata
+            projectResource.spec.metadata = JSON.stringify(metadata)
             const patchedProjectResource = await patchProjectResource(NAMESPACE, projectId, JSON.stringify(projectResource.spec))
             if (patchedProjectResource.apiVersion) {
                 // send status back to ui
