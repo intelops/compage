@@ -13,6 +13,26 @@ export const initializeKubeClient = () => {
     return kubeConfig.makeApiClient(k8s.CustomObjectsApi);
 }
 
+export const deleteObject = async ({
+                                       group,
+                                       version,
+                                       plural
+                                   }: { group: string, version: string, plural: string }
+    , namespace: string, name: string) => {
+    try {
+        await client.deleteNamespacedCustomObject(
+            group,
+            version,
+            namespace,
+            plural,
+            name
+        );
+    } catch (e: any) {
+        console.debug("error while deleting custom object : ", e?.body)
+        // console.log("error while getting custom object : ", e?.body?.reason)
+    }
+}
+
 export const getObject = async ({
                                     group,
                                     version,

@@ -2,7 +2,12 @@ import {ProjectEntity} from "../routes/models";
 
 import {project_group, project_kind, project_version, ProjectResource, ProjectResourceSpec} from "../store/models";
 import {NAMESPACE} from "./constants";
-import {createProjectResource, getProjectResource, listProjectResources} from "../store/project-client";
+import {
+    createProjectResource,
+    deleteProjectResource,
+    getProjectResource,
+    listProjectResources
+} from "../store/project-client";
 
 // convertProjectEntityToProjectResourceSpec creates projectResourceSpec on k8s cluster.
 const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: string, projectEntity: ProjectEntity) => {
@@ -46,13 +51,23 @@ export const listProjects = async (userName: string) => {
     return [];
 }
 
-// getProject returns specific project for userName and projectName supplied
+// deleteProject deletes project for userName and projectId supplied
+export const deleteProject = async (userName: string, projectId: string) => {
+    const projectResource = await getProjectResource(NAMESPACE, projectId);
+    if (projectResource?.metadata?.labels?.userName === userName) {
+        await deleteProjectResource(NAMESPACE, projectId);
+        return true
+    }
+    return false;
+}
+
+// getProject returns project for userName and projectId supplied
 export const getProject = async (userName: string, projectId: string) => {
     // TODO I may need to apply labelSelector here - below impl is done temporarily.
     // currently added filter post projects retrieval(which can be slower if there are too many projects with same name.
     const projectResource = await getProjectResource(NAMESPACE, projectId);
-    if (projectResource && projectResource.metadata.labels.userName === userName) {
-        return JSON.stringify(projectResource)
+    if (projectResource?.metadata?.labels?.userName === userName) {
+        return projectResource
     }
     return {};
 }
@@ -72,7 +87,6 @@ const prepareProjectResource = (projectId: string, userName: string, projectReso
             }
         }
     }
-    console.log("projectResource : ", projectResource)
     return projectResource
 }
 

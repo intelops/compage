@@ -1,5 +1,5 @@
-import {createObject, getObject, listObjects, patchObject} from "./kube-client";
-import {project_group, project_plural, project_version, ProjectResource, Resource, UserResource} from "./models";
+import {createObject, deleteObject, getObject, listObjects, patchObject} from "./kube-client";
+import {project_group, project_plural, project_version, ProjectResource, Resource} from "./models";
 
 // createProjectResource creates project resource
 export const createProjectResource = async (namespace: string, payload: string) => {
@@ -31,6 +31,15 @@ export const patchProjectResource = async (namespace: string, name: string, payl
         metadata: object.metadata
     };
     return projectResource;
+}
+
+// deleteProjectResource deletes user resource
+export const deleteProjectResource = async (namespace: string, projectId: string) => {
+    await deleteObject({
+        group: project_group,
+        version: project_version,
+        plural: project_plural
+    }, namespace, projectId);
 }
 
 // getProjectResource gets user resource
