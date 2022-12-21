@@ -19,11 +19,17 @@ export const createProjectResource = async (namespace: string, payload: string) 
 
 // patchProjectResource patches project resource
 export const patchProjectResource = async (namespace: string, name: string, payload: string) => {
+    const patch = [{
+        "op": "replace",
+        "path": "/spec",
+        "value": JSON.parse(payload)
+    }];
+
     const object = await patchObject({
         group: project_group,
         version: project_version,
         plural: project_plural
-    }, namespace, name, payload);
+    }, namespace, name, JSON.stringify(patch));
     const projectResource: ProjectResource = {
         kind: object.kind,
         apiVersion: object.apiVersion,

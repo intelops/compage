@@ -1,6 +1,6 @@
 import {requireUserNameMiddleware} from "../middlewares/auth";
 import {Request, Response, Router} from "express";
-import {createProject, deleteProject, getProject, listProjects} from "../util/project-store";
+import {createProject, deleteProject, getProject, listProjects, updateProject} from "../util/project-store";
 import {X_USER_NAME_HEADER} from "../util/constants";
 import {ProjectEntity} from "./models";
 
@@ -46,6 +46,22 @@ projectsRouter.post("/", requireUserNameMiddleware, async (request: Request, res
         return response.status(201).json({message: message});
     }
     const message = `'${projectEntity.displayName}' project couldn't be created`
+    console.log(message)
+    return response.status(500).json({message: message});
+});
+
+// update project with details given in request
+projectsRouter.put("/:id", requireUserNameMiddleware, async (request: Request, response: Response) => {
+    const userName = request.header(X_USER_NAME_HEADER);
+    const projectId = request.params.id;
+    const projectEntity: ProjectEntity = request.body;
+    const isUpdated = await updateProject(projectId, <string>userName, projectEntity);
+    if (isUpdated) {
+        const message = `'${projectEntity.displayName}' project updated successfully`
+        console.log(message)
+        return response.status(201).json({message: message});
+    }
+    const message = `'${projectEntity.displayName}' project couldn't be updated`
     console.log(message)
     return response.status(500).json({message: message});
 });

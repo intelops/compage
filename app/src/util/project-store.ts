@@ -6,7 +6,8 @@ import {
     createProjectResource,
     deleteProjectResource,
     getProjectResource,
-    listProjectResources
+    listProjectResources,
+    patchProjectResource
 } from "../store/project-client";
 
 // convertProjectEntityToProjectResourceSpec creates projectResourceSpec on k8s cluster.
@@ -116,13 +117,26 @@ export const createProject = async (userName: string, projectEntity: ProjectEnti
 }
 
 // updateProject updates projectResource on k8s cluster.
-// export const updateProject = async (projectName: string, userName: string, projectEntity: ProjectEntity) => {
-//     const projectResourceSpec = convertProjectEntityToProjectResourceSpec(userName, projectEntity);
-//     const projectResource = prepareProjectResource(userName, projectResourceSpec);
-//     let createdProjectResource = await patchProjectResource(NAMESPACE, projectName, JSON.stringify(projectResource));
-//     if (createdProjectResource.apiVersion) {
-//         console.log(createdProjectResource.metadata.name + " project created")
-//     } else {
-//         console.log(projectResource.metadata.name + " project couldn't be created")
-//     }
-// }
+export const updateProject = async (projectId: string, userName: string, projectEntity: ProjectEntity) => {
+    const existingProjectResource = await getProjectResource(NAMESPACE, projectId);
+    if (existingProjectResource?.metadata?.labels?.userName !== userName) {
+        return false
+    }
+    // for non-existent resources apiVersion is empty.
+    if (existingProjectResource.apiVersion) {
+        existingProjectResource.spec.id = projectId;
+        existingProjectResource.spec.displayName = projectEntity.displayName;
+        existingProjectResource.spec.metadata = JSON.stringify(projectEntity.metadata);
+        existingProjectResource.spec.yaml = JSON.stringify(projectEntity.yaml);
+        existingProjectResource.spec.version = projectEntity.version
+
+        // send spec only as the called method considers updating specs only.
+        // existingProjectResource.metadata.name = projectId here
+        const patchedProjectResource = await patchProjectResource(NAMESPACE, existingProjectResource.metadata.name, JSON.stringify(existingProjectResource.spec));
+        console.log(patchedProjectResource)
+        if (patchedProjectResource.apiVersion) {
+            return true
+        }
+    }
+    return false
+}

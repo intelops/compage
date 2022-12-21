@@ -71,9 +71,9 @@ export interface ProjectEntity {
     id?: string,
     displayName: string,
     version: string,
-    user: User,
+    user?: User,
     yaml: CompageYaml,
-    repository: Repository,
+    repository?: Repository,
     metadata: Map<string, string>
 }
 
