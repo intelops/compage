@@ -65,12 +65,12 @@ export const getProjectResource = async (namespace: string, projectId: string) =
 }
 
 // listProjectResources lists project resources
-export const listProjectResources = async (namespace: string, userName: string) => {
+export const listProjectResources = async (namespace: string, labelSelector: string) => {
     const objects = await listObjects({
         group: project_group,
         version: project_version,
         plural: project_plural
-    }, namespace, "userName=" + userName);
+    }, namespace, labelSelector);
     const projectResources: ProjectResource[] = [];
     for (let i = 0; i < objects.items.length; i++) {
         let uR = objects.items[i];

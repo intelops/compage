@@ -24,20 +24,25 @@ const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: 
     return projectResourceSpec
 }
 
+// convertProjectResourceToProjectEntity converts projectResource to projectEntity
+const convertProjectResourceToProjectEntity = (projectResource: ProjectResource) => {
+    const projectEntity: ProjectEntity = {
+        metadata: JSON.parse(projectResource.spec.metadata),
+        id: projectResource.spec.id,
+        displayName: projectResource.spec.displayName,
+        repository: projectResource.spec.repository,
+        user: projectResource.spec.user,
+        version: projectResource.spec.version,
+        yaml: JSON.parse(JSON.stringify(projectResource.spec.yaml))
+    }
+    return projectEntity
+}
+
 // convertListOfProjectResourceToListOfProjectEntity converts projectResourceList to ProjectEntityList
 const convertListOfProjectResourceToListOfProjectEntity = (projectResources: ProjectResource[]) => {
     let projectEntities: ProjectEntity[] = []
     for (let i = 0; i < projectResources.length; i++) {
-        let projectEntity: ProjectEntity = {
-            metadata: JSON.parse(projectResources[i].spec.metadata),
-            id: projectResources[i].spec.id,
-            // metadata: projectResources[i].spec.metadata,
-            displayName: projectResources[i].spec.displayName,
-            repository: projectResources[i].spec.repository,
-            user: projectResources[i].spec.user,
-            version: projectResources[i].spec.version,
-            yaml: JSON.parse(JSON.stringify(projectResources[i].spec.yaml))
-        }
+        const projectEntity = convertProjectResourceToProjectEntity(projectResources[i])
         projectEntities.push(projectEntity)
     }
     return projectEntities
@@ -45,7 +50,7 @@ const convertListOfProjectResourceToListOfProjectEntity = (projectResources: Pro
 
 // getProjects returns all projects for userName supplied
 export const listProjects = async (userName: string) => {
-    let listOfProjectResource = await listProjectResources(NAMESPACE, userName);
+    let listOfProjectResource = await listProjectResources(NAMESPACE, "userName=" + userName);
     if (listOfProjectResource) {
         return convertListOfProjectResourceToListOfProjectEntity(JSON.parse(JSON.stringify(listOfProjectResource)));
     }
@@ -68,7 +73,7 @@ export const getProject = async (userName: string, projectId: string) => {
     // currently added filter post projects retrieval(which can be slower if there are too many projects with same name.
     const projectResource = await getProjectResource(NAMESPACE, projectId);
     if (projectResource?.metadata?.labels?.userName === userName) {
-        return projectResource
+        return convertProjectResourceToProjectEntity(projectResource)
     }
     return {};
 }

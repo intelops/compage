@@ -67,6 +67,7 @@ export interface Project {
     metadata: string
 }
 
+// ProjectEntity is for transferring info about projects from client to server
 export interface ProjectEntity {
     id: string,
     displayName: string,

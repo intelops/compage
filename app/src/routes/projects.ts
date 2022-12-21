@@ -26,7 +26,12 @@ projectsRouter.delete("/:id", requireUserNameMiddleware, async (request: Request
 projectsRouter.get("/:id", requireUserNameMiddleware, async (request: Request, response: Response) => {
     const userName = request.header(X_USER_NAME_HEADER);
     const projectId = request.params.id;
-    return response.status(200).json(await getProject(<string>userName, projectId));
+    const projectResource = await getProject(<string>userName, projectId);
+    // check if there is any keys in the object.
+    if (Object.keys(projectResource).length !== 0) {
+        return response.status(200).json(projectResource);
+    }
+    return response.status(404).json();
 });
 
 // list all projects for given user
