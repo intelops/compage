@@ -5,19 +5,20 @@ import * as os from "os";
 import {pushToExistingProjectOnGithub, PushToExistingProjectOnGithubRequest} from "../util/simple-git/existing-project";
 import {getToken} from "../util/user-store";
 import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
-import {GenerateProjectRequest, GenerateProjectResponse, Project} from "./models";
+import {GenerateProjectResponse, Project} from "./models";
 import {requireUserNameMiddleware} from "../middlewares/auth";
+import {getProjectResource} from "../store/project-client";
+import {NAMESPACE, X_USER_NAME_HEADER} from "../util/constants";
 
 const rimraf = require("rimraf");
 const tar = require('tar')
 const compageRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
 
-const getGenerateProjectResponse = (generateProjectRequest: GenerateProjectRequest, message: string, error: string) => {
+const getGenerateProjectResponse = (userName: string, projectId: string, message: string, error: string) => {
     let generateProjectResponse: GenerateProjectResponse = {
-        repositoryName: generateProjectRequest.repository.name,
-        userName: generateProjectRequest.user.name,
-        projectName: generateProjectRequest.project.displayName,
+        userName: userName,
+        projectId: projectId,
         message: message,
         error: error
     }
@@ -25,8 +26,10 @@ const getGenerateProjectResponse = (generateProjectRequest: GenerateProjectReque
 }
 
 // generateProject (grpc calls to core)
-compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res) => {
-    const generateProjectRequest: GenerateProjectRequest = req.body;
+compageRouter.post("/generate_project/:id", requireUserNameMiddleware, async (request, resource) => {
+    // TODO the below || op is not required, as the check is already done in middleware.
+    const userName = request.header(X_USER_NAME_HEADER) || "";
+    const projectId = request.params.id;
     const cleanup = (downloadedProjectPath: string) => {
         // remove directory created, delete directory recursively
         rimraf(downloadedProjectPath, () => {
@@ -34,32 +37,39 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
         });
     }
 
+    // retrieve project from k8s
+    const projectResource = await getProjectResource(NAMESPACE, projectId);
+    if (!projectResource.apiVersion) {
+        let message = `unable to generate project`
+        let error = `no project found for id : ${projectId}`
+        return resource.status(500).json(getGenerateProjectResponse(userName, projectId, message, error));
+    }
     // create directory hierarchy here itself as creating it after receiving data will not be proper.
-    const originalProjectPath = `${os.tmpdir()}/${generateProjectRequest.project.displayName}`
+    const originalProjectPath = `${os.tmpdir()}/${projectResource.spec.displayName}`
     const downloadedProjectPath = `${originalProjectPath}_downloaded`
     try {
         fs.mkdirSync(downloadedProjectPath, {recursive: true});
     } catch (err: any) {
         if (err.code !== 'EEXIST') {
-            let message = `unable to generate project : ${generateProjectRequest.project.displayName}`
-            let error = `unable to generate project : ${generateProjectRequest.project.displayName} directory with error : ${err}`
-            return res.status(500).json(getGenerateProjectResponse(generateProjectRequest, message, error));
+            let message = `unable to generate project : ${projectResource.spec.displayName}`
+            let error = `unable to generate project : ${projectResource.spec.displayName} directory with error : ${err}`
+            return resource.status(500).json(getGenerateProjectResponse(userName, projectId, message, error));
         } else {
             // first clean up and then recreate (it might be a residue of previous run)
             cleanup(downloadedProjectPath)
             fs.mkdirSync(downloadedProjectPath, {recursive: true});
         }
     }
-    const projectTarFilePath = `${downloadedProjectPath}/${generateProjectRequest.project.displayName}_downloaded.tar.gz`;
+    const projectTarFilePath = `${downloadedProjectPath}/${projectResource.spec.displayName}_downloaded.tar.gz`;
 
     // save project metadata (in compage db or somewhere)
     // need to save project-name, compage-yaml version, github repo and latest commit to the db
     const payload: Project = {
-        projectName: generateProjectRequest.project.displayName,
-        userName: generateProjectRequest.user.name,
-        yaml: JSON.stringify(generateProjectRequest.yaml),
-        repositoryName: generateProjectRequest.repository.name,
-        metadata: JSON.stringify(generateProjectRequest.metadata)
+        projectName: projectResource.spec.displayName,
+        userName: projectResource.spec.user.name,
+        yaml: JSON.stringify(projectResource.spec.yaml),
+        repositoryName: projectResource.spec.repository.name,
+        metadata: JSON.stringify(projectResource.spec.metadata)
     }
 
     // call to grpc server to generate the project
@@ -75,9 +85,9 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
 
     // error while receiving the file from core component
     call.on('error', async (response: any) => {
-        let message = `unable to generate project : ${generateProjectRequest.project.displayName}`
+        let message = `unable to generate project : ${projectResource.spec.displayName}`
         let error = response.details
-        return res.status(500).json(getGenerateProjectResponse(generateProjectRequest, message, error));
+        return resource.status(500).json(getGenerateProjectResponse(userName, projectId, message, error));
     });
 
     // file has been transferred, lets save it to github.
@@ -95,46 +105,46 @@ compageRouter.post("/create_project", requireUserNameMiddleware, async (req, res
         fscrs.pipe(extract)
 
         extract.on('finish', async () => {
-            let password = <string>await getToken(<string>generateProjectRequest.user.name);
+            let password = <string>await getToken(<string>projectResource.spec.user?.name);
             // clone existing repository
             const cloneExistingProjectFromGithubRequest: CloneExistingProjectFromGithubRequest = {
                 clonedProjectPath: `${downloadedProjectPath}`,
-                userName: <string>generateProjectRequest.user.name,
+                userName: <string>projectResource.spec.user.name,
                 password: password,
-                repository: generateProjectRequest.repository
+                repository: projectResource.spec.repository
             }
 
             let error: string = await cloneExistingProjectFromGithub(cloneExistingProjectFromGithubRequest)
             if (error.length > 0) {
                 // send status back to ui
-                let message = `couldn't generate project: ${generateProjectRequest.project.displayName} due to : ${error}.`
+                let message = `couldn't generate project: ${projectResource.spec.displayName} due to : ${error}.`
                 // error = ""
-                return res.status(500).json(getGenerateProjectResponse(generateProjectRequest, message, error));
+                return resource.status(500).json(getGenerateProjectResponse(userName, projectId, message, error));
             }
 
             // save to GitHub
             const pushToExistingProjectOnGithubRequest: PushToExistingProjectOnGithubRequest = {
                 generatedProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
-                existingProject: cloneExistingProjectFromGithubRequest.clonedProjectPath + "/" + generateProjectRequest.repository.name,
-                userName: generateProjectRequest.user.name,
-                email: generateProjectRequest.user.email,
+                existingProject: cloneExistingProjectFromGithubRequest.clonedProjectPath + "/" + projectResource.spec.repository?.name,
+                userName: projectResource.spec.user.name,
+                email: projectResource.spec.user.email,
                 password: password,
-                repository: generateProjectRequest.repository
+                repository: projectResource.spec.repository
             }
 
             error = await pushToExistingProjectOnGithub(pushToExistingProjectOnGithubRequest)
             if (error.length > 0) {
                 // send status back to ui
-                let message = `couldn't generate project: ${generateProjectRequest.project.displayName} due to : ${error}.`
-                return res.status(500).json(getGenerateProjectResponse(generateProjectRequest, message, error));
+                let message = `couldn't generate project: ${projectResource.spec.displayName} due to : ${error}.`
+                return resource.status(500).json(getGenerateProjectResponse(userName, projectId, message, error));
             }
 
             console.log(`saved ${downloadedProjectPath} to github`)
             cleanup(downloadedProjectPath);
 
             // send status back to ui
-            let message = `generated project: ${generateProjectRequest.project.displayName} and saved in repository : ${generateProjectRequest.repository.name} successfully`
-            return res.status(200).json(getGenerateProjectResponse(generateProjectRequest, message, error));
+            let message = `generated project: ${projectResource.spec.displayName} and saved in repository : ${projectResource.spec.repository?.name} successfully`
+            return resource.status(200).json(getGenerateProjectResponse(userName, projectId, message, error));
         });
     });
 });

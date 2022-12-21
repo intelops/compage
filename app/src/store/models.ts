@@ -49,11 +49,16 @@ export interface UserResourceSpec {
 export interface ProjectResourceSpec {
     id: string,
     displayName: string,
-    user?: User,
+    user: User,
     yaml: string,
-    repository?: Repository,
+    repository: Repository,
     metadata: string
     version: string,
+}
+
+export interface ProjectResourceStatus {
+    version: string,
+    isGenerated: string
 }
 
 export interface ProjectResourceList {
