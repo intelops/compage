@@ -7,7 +7,7 @@ import {getToken} from "../util/user-store";
 import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
 import {GenerateProjectResponse, Project} from "./models";
 import {requireUserNameMiddleware} from "../middlewares/auth";
-import {getProjectResource} from "../store/project-client";
+import {getProjectResource, patchProjectResource} from "../store/project-client";
 import {NAMESPACE, X_USER_NAME_HEADER} from "../util/constants";
 
 const rimraf = require("rimraf");
@@ -26,10 +26,10 @@ const getGenerateProjectResponse = (userName: string, projectId: string, message
 }
 
 // generateProject (grpc calls to core)
-compageRouter.post("/generate_project/:id", requireUserNameMiddleware, async (request, resource) => {
+compageRouter.post("/generate_project", requireUserNameMiddleware, async (request, resource) => {
     // TODO the below || op is not required, as the check is already done in middleware.
     const userName = request.header(X_USER_NAME_HEADER) || "";
-    const projectId = request.params.id;
+    const {projectId} = request.body;
     const cleanup = (downloadedProjectPath: string) => {
         // remove directory created, delete directory recursively
         rimraf(downloadedProjectPath, () => {
@@ -67,9 +67,9 @@ compageRouter.post("/generate_project/:id", requireUserNameMiddleware, async (re
     const payload: Project = {
         projectName: projectResource.spec.displayName,
         userName: projectResource.spec.user.name,
-        yaml: JSON.stringify(projectResource.spec.yaml),
+        yaml: projectResource.spec.yaml,
         repositoryName: projectResource.spec.repository.name,
-        metadata: JSON.stringify(projectResource.spec.metadata)
+        metadata: projectResource.spec.metadata
     }
 
     // call to grpc server to generate the project
@@ -142,9 +142,22 @@ compageRouter.post("/generate_project/:id", requireUserNameMiddleware, async (re
             console.log(`saved ${downloadedProjectPath} to github`)
             cleanup(downloadedProjectPath);
 
-            // send status back to ui
-            let message = `generated project: ${projectResource.spec.displayName} and saved in repository : ${projectResource.spec.repository?.name} successfully`
-            return resource.status(200).json(getGenerateProjectResponse(userName, projectId, message, error));
+            // update status in k8s
+            const metadata = JSON.parse(projectResource.spec.metadata);
+            metadata.isGenerated = true;
+            metadata.version = projectResource.spec.version;
+            // add metadata back to projectResource.spec
+            projectResource.spec.metadata = metadata
+            const patchedProjectResource = await patchProjectResource(NAMESPACE, projectId, JSON.stringify(projectResource.spec))
+            if (patchedProjectResource.apiVersion) {
+                // send status back to ui
+                let message = `generated project: ${projectResource.spec.displayName} and saved in repository : ${projectResource.spec.repository?.name} successfully`
+                return resource.status(200).json(getGenerateProjectResponse(userName, projectId, message, error));
+            }
+            // send error status back to ui
+            let message = `generated project: ${projectResource.spec.displayName} and saved successfully in repository : ${projectResource.spec.repository?.name} but project couldn't get updated`
+            error = `generated project: ${projectResource.spec.displayName} and saved successfully in repository : ${projectResource.spec.repository?.name} but project couldn't get updated`
+            return resource.status(500).json(getGenerateProjectResponse(userName, projectId, message, error));
         });
     });
 });

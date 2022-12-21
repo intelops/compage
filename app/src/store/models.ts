@@ -17,23 +17,23 @@ export interface ResourceList {
 export interface ProjectResource {
     apiVersion: string,
     kind: string,
-    metadata: ProjectMetadata,
+    metadata: ProjectResourceMetadata,
     spec: ProjectResourceSpec
 }
 
 export interface UserResource {
     apiVersion: string,
     kind: string,
-    metadata: UserMetadata,
+    metadata: UserResourceMetadata,
     spec: UserResourceSpec
 }
 
-export interface UserMetadata {
+export interface UserResourceMetadata {
     name: string,
     namespace: string,
 }
 
-export interface ProjectMetadata {
+export interface ProjectResourceMetadata {
     name: string,
     namespace: string,
     labels: {
@@ -54,11 +54,6 @@ export interface ProjectResourceSpec {
     repository: Repository,
     metadata: string
     version: string,
-}
-
-export interface ProjectResourceStatus {
-    version: string,
-    isGenerated: string
 }
 
 export interface ProjectResourceList {
