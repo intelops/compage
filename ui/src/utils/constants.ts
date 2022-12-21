@@ -27,7 +27,7 @@ export const config = {
     proxy_url_logout: REACT_APP_COMPAGE_APP_SERVER_URL + "/auth/logout",
 
     // compageRoutes
-    proxy_url_create_project: REACT_APP_COMPAGE_APP_SERVER_URL + "/compage/create_project",
+    proxy_url_create_project: REACT_APP_COMPAGE_APP_SERVER_URL + "/compage/generate_project",
 
     // githubRoutes
     proxy_url_create_repository: REACT_APP_COMPAGE_APP_SERVER_URL + "/github/create_repository",

@@ -21,7 +21,7 @@ export const generateProject = createAsyncThunk<GeneratedProjectModel[],
     async (generateProjectRequest: GenerateProjectRequest, thunkApi) => {
         try {
             // Fetch the backend endpoint:
-            const response = await CompageBackendApi().post('/create_project', generateProjectRequest);
+            const response = await CompageBackendApi().post('/generate_project', generateProjectRequest);
             // Get the JSON from the response:
             const data: GeneratedProjectModel[] = await response.data;
             return data;
