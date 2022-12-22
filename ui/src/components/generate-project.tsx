@@ -24,7 +24,7 @@ const GenerateProject = () => {
                     : "Generate Project"}
             </Button>
             <div>
-                {JSON.stringify(generatedProject)}
+                {/*{JSON.stringify(generatedProject)}*/}
                 {/*{generatedProject.name} and {generatedProject.fileChunk}*/}
             </div>
         </>

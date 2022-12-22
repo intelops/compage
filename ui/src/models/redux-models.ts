@@ -6,6 +6,7 @@ export interface AuthenticationModel {
     following: string,
     followers: string,
     public_repos: string,
+    owned_private_repos: string,
     avatar_url: string,
     bio: string
 }

@@ -1,11 +1,17 @@
 import React, {useEffect} from "react";
 import {Navigate} from "react-router-dom";
-import Styled from "styled-components";
-import GitHubIcon from '@mui/icons-material/GitHub';
 import {v4 as uuidv4} from 'uuid';
 import {useAppDispatch, useAppSelector} from "../../hooks/redux-hooks";
 import {fetchUser} from "../../store/authentication-actions";
 import {config} from "../../utils/constants";
+import CardHeader from "@mui/material/CardHeader";
+import CardMedia from "@mui/material/CardMedia";
+import CardContent from "@mui/material/CardContent";
+import Card from "@mui/material/Card";
+import {Button} from "@mui/material";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import Box from "@mui/material/Box";
+import Logo from "../../logo.png";
 
 export const Login = () => {
     const dispatch = useAppDispatch();
@@ -31,115 +37,30 @@ export const Login = () => {
         return <Navigate to="/"/>;
     }
 
-    return (
-        <Wrapper>
-            <section className="container">
-                <div>
-                    <div className="login-container" style={{
-                        cursor: "pointer"
-                    }}>
-                        <a
-                            style={{
-                                cursor: "pointer"
-                            }}
-                            className="login-link"
-                            href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&state=${stateString}`}
-                        >
-                            <GitHubIcon/>
-                            <span>
-                                Login with GitHub
-                            </span>
-                        </a>
-                    </div>
-                </div>
-            </section>
-        </Wrapper>
-    );
+    return <Card sx={{width: 700}}>
+        <CardHeader
+            title={"Compage"}
+            subheader={"by Intelops"}
+        />
+        <CardMedia
+            component="img"
+            height="350"
+            style={{objectFit: "scale-down"}}
+            image={Logo}
+            alt={"Login to Compage"}
+        />
+        <CardContent>
+            <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+            >
+                <Button variant="contained"
+                        href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&state=${stateString}`}
+                        startIcon={<GitHubIcon/>}>
+                    Login with Github
+                </Button>
+            </Box>
+        </CardContent>
+    </Card>
 }
-
-const Wrapper = Styled.section`
-  .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    font-family: Arial;
-    
-
-    > div:nth-child(1) {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
-      transition: 0.3s;
-      width: 25%;
-      height: 45%;
-
-      > h1 {
-        font-size: 2rem;
-        margin-bottom: 20px;
-      }
-
-      > span:nth-child(2) {
-        font-size: 1.1rem;
-        color: #808080;
-        margin-bottom: 70px;
-      }
-
-      > span:nth-child(3) {
-        margin: 10px 0 20px;
-        color: red;
-      }
-
-      .login-container {
-        background-color: #000;
-        width: 70%;
-        border-radius: 3px;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        > .login-link {
-          text-decoration: none;
-          color: #fff;
-          text-transform: uppercase;
-          cursor: default;
-          display: flex;
-          align-items: center;          
-          height: 40px;
-
-          > span:nth-child(2) {
-            margin-left: 5px;
-          }
-        }
-
-        .loader-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;          
-          height: 40px;
-        }
-
-        .loader {
-          border: 4px solid #f3f3f3;
-          border-top: 4px solid #3498db;
-          border-radius: 50%;
-          width: 12px;
-          height: 12px;
-          animation: spin 2s linear infinite;
-        }
-
-        @keyframes spin {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-      }
-    }
-  }
-`;

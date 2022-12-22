@@ -12,7 +12,6 @@ import {
 import {useAppSelector} from "../hooks/redux-hooks";
 import {DiagramMakerContainer} from "./diagram-maker/diagram-maker-container";
 import Button from "@mui/material/Button";
-import GenerateProject from "./generate-project";
 
 export const Home = () => {
     const authentication = useAppSelector(state => state.authentication);
@@ -36,18 +35,18 @@ export const Home = () => {
         diagramMakerData = getData(1050, 550);
     }
 
+    const resetState = () => {
+        removeCurrentConfig()
+        removeCurrentState()
+        removeModifiedState()
+        setReset(true)
+        // after resetting, needs to manually reload so, avoiding manual step here.
+        window.location.reload();
+    };
+
     return (
         <React.Fragment>
-            <DiagramMakerContainer initialData={diagramMakerData} darkTheme={false}/>
-            <Button variant="contained" onClick={() => {
-                removeCurrentConfig()
-                removeCurrentState()
-                removeModifiedState()
-                setReset(true)
-                // after resetting, needs to manually reload so, avoiding manual step here.
-                window.location.reload();
-            }}>Reset state</Button>
-            <GenerateProject></GenerateProject>
+            <DiagramMakerContainer initialData={diagramMakerData} resetState={resetState} darkTheme={false}/>
         </React.Fragment>
     );
 }

@@ -1,1 +1,13 @@
 @import 'react-redux-toastr/src/styles/index';
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* TODO The below config controls if the page should take complete size*/
+#root {
+  height: 100%;
+  display: flex;
+}

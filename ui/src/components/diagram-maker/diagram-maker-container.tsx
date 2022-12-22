@@ -54,8 +54,11 @@ import {NewEdgeProperties} from "../new-properties/new-edge-properties";
 import {NewNodeProperties} from "../new-properties/new-node-properties";
 import {cleanse} from "./helper/helper";
 import JSONPretty from "react-json-pretty";
+import GenerateProject from "../generate-project";
+import Button from "@mui/material/Button";
 
 interface ArgTypes {
+    resetState?: (...args: any) => void;
     initialData?: DiagramMakerData<{}, {}>;
     connectorPlacement?: ConnectorPlacementType;
     showArrowhead?: boolean;
@@ -77,6 +80,7 @@ export const DiagramMakerContainer = ({
                                           actionInterceptor,
                                           plugin,
                                           onAction,
+                                          resetState,
                                       }: ArgTypes) => {
     const containerRef = useRef() as any;
     const diagramMakerRef = useRef() as any;
@@ -363,14 +367,17 @@ export const DiagramMakerContainer = ({
 
     }, [plugin, initialData]);
 
-    return <Grid container spacing={1} sx={{height:'100%'}}>
+    return <Grid container spacing={1} sx={{height: '100%'}}>
         <Grid item xs={10} md={10} style={{
             width: "100%",
-            height: "500px"
+            // TODO added 100% to take the whole webpage
+            // height: window.innerHeight - 150
+            height: "100%"
         }}>
             {showDialog()}
             <div style={{
-                overflow: "auto"
+                overflow: "auto",
+                paddingTop: "75px"
             }} id="diagramMakerContainer" ref={containerRef}></div>
         </Grid>
         <Grid item xs={2} md={2} style={{
@@ -380,11 +387,20 @@ export const DiagramMakerContainer = ({
             <JSONPretty id="jsonPretty"
                         style={{
                             width: "100%",
-                            overflow: "auto",
-                            height: "500px",
+                            overflow: "scroll",
+                            height: "350px",
+                            paddingTop: "75px"
                         }}
                         onJSONPrettyError={e => console.error(e)}
                         data={diagramMaker.state}/>
+            <hr/>
+            <Grid item>
+                <GenerateProject></GenerateProject>
+            </Grid>
+            <hr/>
+            <Grid item>
+                <Button variant="contained" onClick={resetState}>Reset state</Button>
+            </Grid>
         </Grid>
     </Grid>
 }
