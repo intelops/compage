@@ -1,9 +1,9 @@
-import {useAppDispatch, useAppSelector} from "../hooks/redux-hooks";
-import './generate-project.css'
-import {selectStatus} from "../store/compage-slice";
-import {generateProject} from "../service/compage-service";
+import {useAppDispatch, useAppSelector} from "../../hooks/redux-hooks";
+import './generate-project.scss'
+import {selectStatus} from "../../store/compage-slice";
+import {generateProject} from "../../service/compage-service";
 import Button from "@mui/material/Button";
-import {GenerateProjectRequest} from "../models/redux-models";
+import {GenerateProjectRequest} from "../../models/redux-models";
 
 const GenerateProject = () => {
     const dispatch = useAppDispatch();

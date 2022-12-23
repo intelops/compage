@@ -1,13 +1,13 @@
 import React from 'react';
 import './App.scss';
 import {BrowserRouter, Link, Route, Routes} from "react-router-dom";
-import {Login} from "./components/authentication/login";
-import {Home} from "./components/home";
-import Header from "./components/navbar/header";
-import {Repository} from "./components/repository/repository";
-import {Account} from "./components/account";
+import {Login} from "../components/login/login";
+import {Home} from "../components/home/home";
+import Header from "../components/navbar/header";
+import {Repository} from "../components/repository/repository";
+import {Account} from "../components/account/account";
 import {Grid} from "@mui/material";
-import {Footer} from "./components/navbar/footer";
+import {Footer} from "../components/navbar/footer";
 
 export const App = () => {
     return <BrowserRouter>

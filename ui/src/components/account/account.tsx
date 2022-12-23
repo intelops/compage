@@ -6,7 +6,7 @@ import CardContent from '@mui/material/CardContent';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import {red} from '@mui/material/colors';
-import {useAppSelector} from "../hooks/redux-hooks";
+import {useAppSelector} from "../../hooks/redux-hooks";
 import {Navigate} from "react-router-dom";
 
 export const Account = () => {

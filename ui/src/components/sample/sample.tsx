@@ -3,10 +3,10 @@ import {Navigate} from "react-router-dom";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import {Alert, Snackbar, Stack} from "@mui/material";
-import {setCurrentRepositoryDetails} from "../utils/service";
-import {commitCompageYaml, createRepository, listRepositories, pullCompageYaml} from "../backend/rest-service";
-import {GithubRepository, GithubRepositoryContent} from "../backend/models";
-import {useAppSelector} from "../hooks/redux-hooks";
+import {setCurrentRepositoryDetails} from "../../utils/service";
+import {commitCompageYaml, createRepository, listRepositories, pullCompageYaml} from "../../backend/rest-service";
+import {GithubRepository, GithubRepositoryContent} from "../../backend/models";
+import {useAppSelector} from "../../hooks/redux-hooks";
 
 export const Sample = () => {
     const authentication = useAppSelector(state => state.authentication);
