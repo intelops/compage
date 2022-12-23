@@ -11,7 +11,6 @@ import {
 } from "../utils/service";
 import {useAppSelector} from "../hooks/redux-hooks";
 import {DiagramMakerContainer} from "./diagram-maker/diagram-maker-container";
-import Button from "@mui/material/Button";
 
 export const Home = () => {
     const authentication = useAppSelector(state => state.authentication);
@@ -32,7 +31,8 @@ export const Home = () => {
     if (currentConfig && currentConfig !== "{}") {
         diagramMakerData = JSON.parse(currentConfig);
     } else {
-        diagramMakerData = getData(1050, 550);
+        // TODO below passed parameters aren't being used.
+        diagramMakerData = getData(0, 0);
     }
 
     const resetState = () => {

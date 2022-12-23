@@ -17,9 +17,10 @@ const settings = ['Account', 'Logout'];
 const Header = () => {
     const authentication = useAppSelector(state => state.authentication);
     const navigate = useNavigate()
-    let name, avatar_url;
+    let name, avatar_url, login;
     if (authentication.user) {
         name = authentication.user.name;
+        login = authentication.user.login;
         avatar_url = authentication.user.avatar_url;
     }
 
@@ -86,6 +87,9 @@ const Header = () => {
                         open={Boolean(anchorElUser)}
                         onClose={handleCloseUserMenu}
                     >
+                        <MenuItem key="username">
+                            <Typography textAlign="center">Welcome {login}!!!</Typography>
+                        </MenuItem>
                         {settings.map((setting) => getMenuItem(setting))}
                     </Menu>
                 </Box>

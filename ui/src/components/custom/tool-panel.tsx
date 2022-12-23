@@ -46,6 +46,8 @@ export const ToolPanel = (props: ToolPanelProps) => {
                 <Tooltip title="Focus Selected" placement="left-start">
                     <CheckBoxIcon onClick={() => {
                         props.diagramMakerRef().api.focusSelected()
+                        // TODO if resetZoom is done, it reduces the panel size in a weird way
+                        props.diagramMakerRef().api.fit()
                     }}/>
                 </Tooltip>
             </Grid>
@@ -67,6 +69,8 @@ export const ToolPanel = (props: ToolPanelProps) => {
                 <Tooltip title="Reset Zoom" placement="left-start">
                     <SettingsBackupRestoreIcon onClick={() => {
                         props.diagramMakerRef().api.resetZoom()
+                        // TODO if resetZoom is done, it reduces the panel size in a weird way
+                        props.diagramMakerRef().api.fit()
                     }}/>
                 </Tooltip>
             </Grid>

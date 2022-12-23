@@ -211,7 +211,7 @@ export const DiagramMakerContainer = ({
                     }}/>, container);
                 } : undefined,
                 potentialNode: (node: DiagramMakerPotentialNode, container: HTMLElement) => {
-                    return ReactDOM.render(<PotentialNode typeId={node.typeId}/>, container);
+                    return ReactDOM.render(<PotentialNode typeId={node?.typeId}/>, container);
                 },
                 panels: {
                     library: (panel: any, state: any, container: HTMLElement) => {
