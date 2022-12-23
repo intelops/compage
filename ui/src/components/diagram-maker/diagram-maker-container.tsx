@@ -16,6 +16,7 @@ import {
     WorkspaceActions
 } from "diagram-maker";
 
+import {CopyToClipboard} from 'react-copy-to-clipboard';
 import "diagram-maker/dist/diagramMaker.css";
 import "./scss/common.css"
 import "./scss/CircularNode.css"
@@ -86,6 +87,7 @@ export const DiagramMakerContainer = ({
     const diagramMakerRef = useRef() as any;
     const [diagramMaker, setDiagramMaker] = React.useState({
         state: "{}",
+        copied: false,
         config: "{}"
     });
 
@@ -139,12 +141,14 @@ export const DiagramMakerContainer = ({
             const stateJson = cleanse(state);
             if (updateConfig) {
                 setDiagramMaker({
+                    copied: false,
                     config: backupState,
                     state: JSON.stringify(stateJson)
                 })
             } else {
                 setDiagramMaker({
                     ...diagramMaker,
+                    copied: false,
                     state: JSON.stringify(stateJson)
                 })
             }
@@ -387,19 +391,48 @@ export const DiagramMakerContainer = ({
             <JSONPretty id="jsonPretty"
                         style={{
                             width: "100%",
-                            overflow: "scroll",
-                            height: "350px",
+                            overflowY: "scroll",
+                            height: "600px",
                             paddingTop: "75px"
                         }}
                         onJSONPrettyError={e => console.error(e)}
                         data={diagramMaker.state}/>
+            <br/>
+            <Grid item style={{
+                alignItems: "center",
+                display: "flex",
+                flexDirection: "column"
+            }}>
+                <CopyToClipboard text={diagramMaker.state}
+                                 onCopy={() => setDiagramMaker({
+                                     ...diagramMaker,
+                                     copied: true
+                                 })}>
+                    <Button style={{
+                        width: "200px"
+                    }} variant="outlined">
+                        Copy to clipboard
+                    </Button>
+                </CopyToClipboard>
+                {diagramMaker.copied ? <span style={{color: 'green'}}> Copied.</span> : null}
+            </Grid>
             <hr/>
-            <Grid item>
+            <Grid item style={{
+                alignItems: "center",
+                display: "flex",
+                flexDirection: "column"
+            }}>
                 <GenerateProject></GenerateProject>
             </Grid>
             <hr/>
-            <Grid item>
-                <Button variant="contained" onClick={resetState}>Reset state</Button>
+            <Grid item style={{
+                alignItems: "center",
+                display: "flex",
+                flexDirection: "column"
+            }}>
+                <Button style={{
+                    width: "200px"
+                }} variant="contained" color="error" onClick={resetState}>Reset state</Button>
             </Grid>
         </Grid>
     </Grid>

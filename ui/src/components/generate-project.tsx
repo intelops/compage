@@ -18,7 +18,9 @@ const GenerateProject = () => {
     const handleClick = () => dispatch(generateProject(generateProjectRequest));
     return (
         <>
-            <Button variant="contained" onClick={handleClick}>
+            <Button style={{
+                width: "200px"
+            }} variant="contained" onClick={handleClick}>
                 {status === "loading"
                     ? "Generating Project"
                     : "Generate Project"}

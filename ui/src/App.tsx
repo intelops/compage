@@ -18,7 +18,7 @@ export const App = () => {
             justifyContent="center"
             alignItems="center"
             style={{
-                // overflow: "auto",
+                overflow: "auto",
                 width: "100%",
                 // TODO added 100% to take the whole webpage
                 // height: window.innerHeight - 150,
