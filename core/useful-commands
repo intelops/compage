@@ -17,7 +17,7 @@ curl -X POST http://localhost:8080/create_project  -H 'Content-Type: application
 
 protoc --go-grpc_out=cmd/grpc --go_out=cmd/grpc cmd/grpc/protobufs/project.proto
 
-grpcurl -plaintext -d '{"name":"gopher"}' localhost:8809 api.v1.ProjectService.GenerateProject  | jq .fileChunk | tr -d '"\n' | base64 -d > ~/Desktop/gopher.png
+grpcurl -plaintext -d '{"name":"gopher"}' localhost:8809 api.v1.ProjectService.GenerateCode  | jq .fileChunk | tr -d '"\n' | base64 -d > ~/Desktop/gopher.png
 
 // generate grpc code
 go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28

@@ -56,7 +56,7 @@ import {NewNodeProperties} from "../new-properties/new-node-properties";
 import {cleanse} from "./helper/helper";
 import JSONPretty from "react-json-pretty";
 import Button from "@mui/material/Button";
-import {GenerateProject} from "../generate-project/component";
+import {GenerateCode} from "../code-operations/component";
 
 interface ArgTypes {
     resetState?: (...args: any) => void;
@@ -422,7 +422,7 @@ export const DiagramMakerContainer = ({
                 display: "flex",
                 flexDirection: "column"
             }}>
-                <GenerateProject></GenerateProject>
+                <GenerateCode></GenerateCode>
             </Grid>
             <hr/>
             <Grid item style={{

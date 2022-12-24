@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-// GetProject converts *project.GenerateProjectRequest to *core.Project
-func GetProject(input *project.GenerateProjectRequest) (*core.Project, error) {
+// GetProject converts *project.GenerateCodeRequest to *core.Project
+func GetProject(input *project.GenerateCodeRequest) (*core.Project, error) {
 	compageYaml, err := converter.GetCompageYaml(input.Yaml)
 	if err != nil {
 		return nil, err

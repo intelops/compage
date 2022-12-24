@@ -90,24 +90,24 @@ export interface ProjectEntity {
     metadata: Map<string, string>
 }
 
-export interface GenerateProjectRequest {
+export interface GenerateCodeRequest {
     projectId: string,
 }
 
-export interface GeneratedProjectModel {
+export interface GeneratedCodeModel {
     projectId: string,
     userName: string,
     message: string,
     error: string,
 }
 
-export interface GeneratedProjectArrayModel {
+export interface GeneratedCodeArrayModel {
     // In `status` we will watch
     // if todos are being loaded.
     status: "loading" | "idle";
     // `error` will contain an error message.
     error: string | null;
-    generatedProject: GeneratedProjectModel
+    generatedCode: GeneratedCodeModel
 }
 
 // github

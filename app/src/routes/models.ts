@@ -83,11 +83,11 @@ export interface User {
     email: string
 }
 
-export interface GenerateProjectRequest {
+export interface GenerateCodeRequest {
     projectId: string,
 }
 
-export interface GenerateProjectResponse {
+export interface GenerateCodeResponse {
     projectId: string,
     userName: string,
     message: string,

@@ -1,7 +1,7 @@
 apiVersion: compage.kube-tarian.github.com/v1alpha1
 kind: Project
 metadata:
-  name: project-1
+  name: first-project-id
   namespace: compage
   labels:
     username: mahendraintelops

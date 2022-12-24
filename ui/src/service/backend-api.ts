@@ -26,8 +26,8 @@ export const GithubBackendApi = () => {
     })
 }
 
-export const CompageBackendApi = () => {
-    const path = "/compage"
+export const CodeOperationsBackendApi = () => {
+    const path = "/code_operations"
     return axios.create({
         baseURL: config.backend_base_url + path,
         headers: getHeaders()

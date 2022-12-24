@@ -22,8 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProjectServiceClient interface {
-	GenerateProject(ctx context.Context, in *GenerateProjectRequest, opts ...grpc.CallOption) (ProjectService_GenerateProjectClient, error)
-	RegenerateProject(ctx context.Context, in *GenerateProjectRequest, opts ...grpc.CallOption) (ProjectService_RegenerateProjectClient, error)
+	GenerateCode(ctx context.Context, in *GenerateCodeRequest, opts ...grpc.CallOption) (ProjectService_GenerateCodeClient, error)
+	RegenerateCode(ctx context.Context, in *GenerateCodeRequest, opts ...grpc.CallOption) (ProjectService_RegenerateCodeClient, error)
 }
 
 type projectServiceClient struct {
@@ -34,12 +34,12 @@ func NewProjectServiceClient(cc grpc.ClientConnInterface) ProjectServiceClient {
 	return &projectServiceClient{cc}
 }
 
-func (c *projectServiceClient) GenerateProject(ctx context.Context, in *GenerateProjectRequest, opts ...grpc.CallOption) (ProjectService_GenerateProjectClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ProjectService_ServiceDesc.Streams[0], "/api.v1.ProjectService/GenerateProject", opts...)
+func (c *projectServiceClient) GenerateCode(ctx context.Context, in *GenerateCodeRequest, opts ...grpc.CallOption) (ProjectService_GenerateCodeClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ProjectService_ServiceDesc.Streams[0], "/api.v1.ProjectService/GenerateCode", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &projectServiceGenerateProjectClient{stream}
+	x := &projectServiceGenerateCodeClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -49,29 +49,29 @@ func (c *projectServiceClient) GenerateProject(ctx context.Context, in *Generate
 	return x, nil
 }
 
-type ProjectService_GenerateProjectClient interface {
-	Recv() (*GenerateProjectResponse, error)
+type ProjectService_GenerateCodeClient interface {
+	Recv() (*GenerateCodeResponse, error)
 	grpc.ClientStream
 }
 
-type projectServiceGenerateProjectClient struct {
+type projectServiceGenerateCodeClient struct {
 	grpc.ClientStream
 }
 
-func (x *projectServiceGenerateProjectClient) Recv() (*GenerateProjectResponse, error) {
-	m := new(GenerateProjectResponse)
+func (x *projectServiceGenerateCodeClient) Recv() (*GenerateCodeResponse, error) {
+	m := new(GenerateCodeResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func (c *projectServiceClient) RegenerateProject(ctx context.Context, in *GenerateProjectRequest, opts ...grpc.CallOption) (ProjectService_RegenerateProjectClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ProjectService_ServiceDesc.Streams[1], "/api.v1.ProjectService/RegenerateProject", opts...)
+func (c *projectServiceClient) RegenerateCode(ctx context.Context, in *GenerateCodeRequest, opts ...grpc.CallOption) (ProjectService_RegenerateCodeClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ProjectService_ServiceDesc.Streams[1], "/api.v1.ProjectService/RegenerateCode", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &projectServiceRegenerateProjectClient{stream}
+	x := &projectServiceRegenerateCodeClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -81,17 +81,17 @@ func (c *projectServiceClient) RegenerateProject(ctx context.Context, in *Genera
 	return x, nil
 }
 
-type ProjectService_RegenerateProjectClient interface {
-	Recv() (*GenerateProjectResponse, error)
+type ProjectService_RegenerateCodeClient interface {
+	Recv() (*GenerateCodeResponse, error)
 	grpc.ClientStream
 }
 
-type projectServiceRegenerateProjectClient struct {
+type projectServiceRegenerateCodeClient struct {
 	grpc.ClientStream
 }
 
-func (x *projectServiceRegenerateProjectClient) Recv() (*GenerateProjectResponse, error) {
-	m := new(GenerateProjectResponse)
+func (x *projectServiceRegenerateCodeClient) Recv() (*GenerateCodeResponse, error) {
+	m := new(GenerateCodeResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -102,19 +102,19 @@ func (x *projectServiceRegenerateProjectClient) Recv() (*GenerateProjectResponse
 // All implementations should embed UnimplementedProjectServiceServer
 // for forward compatibility
 type ProjectServiceServer interface {
-	GenerateProject(*GenerateProjectRequest, ProjectService_GenerateProjectServer) error
-	RegenerateProject(*GenerateProjectRequest, ProjectService_RegenerateProjectServer) error
+	GenerateCode(*GenerateCodeRequest, ProjectService_GenerateCodeServer) error
+	RegenerateCode(*GenerateCodeRequest, ProjectService_RegenerateCodeServer) error
 }
 
 // UnimplementedProjectServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedProjectServiceServer struct {
 }
 
-func (UnimplementedProjectServiceServer) GenerateProject(*GenerateProjectRequest, ProjectService_GenerateProjectServer) error {
-	return status.Errorf(codes.Unimplemented, "method GenerateProject not implemented")
+func (UnimplementedProjectServiceServer) GenerateCode(*GenerateCodeRequest, ProjectService_GenerateCodeServer) error {
+	return status.Errorf(codes.Unimplemented, "method GenerateCode not implemented")
 }
-func (UnimplementedProjectServiceServer) RegenerateProject(*GenerateProjectRequest, ProjectService_RegenerateProjectServer) error {
-	return status.Errorf(codes.Unimplemented, "method RegenerateProject not implemented")
+func (UnimplementedProjectServiceServer) RegenerateCode(*GenerateCodeRequest, ProjectService_RegenerateCodeServer) error {
+	return status.Errorf(codes.Unimplemented, "method RegenerateCode not implemented")
 }
 
 // UnsafeProjectServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -128,45 +128,45 @@ func RegisterProjectServiceServer(s grpc.ServiceRegistrar, srv ProjectServiceSer
 	s.RegisterService(&ProjectService_ServiceDesc, srv)
 }
 
-func _ProjectService_GenerateProject_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(GenerateProjectRequest)
+func _ProjectService_GenerateCode_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GenerateCodeRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(ProjectServiceServer).GenerateProject(m, &projectServiceGenerateProjectServer{stream})
+	return srv.(ProjectServiceServer).GenerateCode(m, &projectServiceGenerateCodeServer{stream})
 }
 
-type ProjectService_GenerateProjectServer interface {
-	Send(*GenerateProjectResponse) error
+type ProjectService_GenerateCodeServer interface {
+	Send(*GenerateCodeResponse) error
 	grpc.ServerStream
 }
 
-type projectServiceGenerateProjectServer struct {
+type projectServiceGenerateCodeServer struct {
 	grpc.ServerStream
 }
 
-func (x *projectServiceGenerateProjectServer) Send(m *GenerateProjectResponse) error {
+func (x *projectServiceGenerateCodeServer) Send(m *GenerateCodeResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _ProjectService_RegenerateProject_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(GenerateProjectRequest)
+func _ProjectService_RegenerateCode_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GenerateCodeRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(ProjectServiceServer).RegenerateProject(m, &projectServiceRegenerateProjectServer{stream})
+	return srv.(ProjectServiceServer).RegenerateCode(m, &projectServiceRegenerateCodeServer{stream})
 }
 
-type ProjectService_RegenerateProjectServer interface {
-	Send(*GenerateProjectResponse) error
+type ProjectService_RegenerateCodeServer interface {
+	Send(*GenerateCodeResponse) error
 	grpc.ServerStream
 }
 
-type projectServiceRegenerateProjectServer struct {
+type projectServiceRegenerateCodeServer struct {
 	grpc.ServerStream
 }
 
-func (x *projectServiceRegenerateProjectServer) Send(m *GenerateProjectResponse) error {
+func (x *projectServiceRegenerateCodeServer) Send(m *GenerateCodeResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -179,13 +179,13 @@ var ProjectService_ServiceDesc = grpc.ServiceDesc{
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "GenerateProject",
-			Handler:       _ProjectService_GenerateProject_Handler,
+			StreamName:    "GenerateCode",
+			Handler:       _ProjectService_GenerateCode_Handler,
 			ServerStreams: true,
 		},
 		{
-			StreamName:    "RegenerateProject",
-			Handler:       _ProjectService_RegenerateProject_Handler,
+			StreamName:    "RegenerateCode",
+			Handler:       _ProjectService_RegenerateCode_Handler,
 			ServerStreams: true,
 		},
 	},

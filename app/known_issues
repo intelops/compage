@@ -4,7 +4,7 @@ Issue : The below error occurs when grpc server is unreachable.
     "repositoryName": "first-project",
     "userName": "mahendraintelops",
     "projectName": "first-project",
-    "message": "unable to generate project : first-project",
+    "message": "unable to generate code : first-project",
     "error": "No connection established"
 }
 Possible Solution : Need to add some code in node server to let ui know about the unavailability.
@@ -22,9 +22,9 @@ GitConstructError: Cannot use simple-git on a directory that does not exist
     at new Promise (<anonymous>)
     at __awaiter (/home/mahendra/DevEnv/compage-dev/compage/compage/src/util/simple-git/existing-project.ts:27:12)
     at pushToExistingProjectOnGithub (/home/mahendra/DevEnv/compage-dev/compage/compage/src/util/simple-git/existing-project.ts:14:131)
-    at /home/mahendra/DevEnv/compage-dev/compage/compage/src/routes/compage.ts:137:48
+    at /home/mahendra/DevEnv/compage-dev/compage/compage/src/routes/code-operations.ts:137:48
     at Generator.next (<anonymous>)
-    at fulfilled (/home/mahendra/DevEnv/compage-dev/compage/compage/src/routes/compage.ts:28:58) {
+    at fulfilled (/home/mahendra/DevEnv/compage-dev/compage/compage/src/routes/code-operations.ts:28:58) {
   task: undefined,
   config: {
     baseDir: '/tmp/first-project_downloaded/first-project',

@@ -3,22 +3,22 @@ import React from 'react';
 import {useAppDispatch, useAppSelector} from '../../hooks/redux-hooks';
 import {selectStatus} from './slice';
 import Button from "@mui/material/Button";
-import {generateProjectAsync} from "./async-apis/generateProject";
+import {generateCodeAsync} from "./async-apis/generate";
 
-export const GenerateProject = () => {
+export const GenerateCode = () => {
     // TODO below values can be used if we want to get data from api
     // const data = useAppSelector(selectData);
     // const error = useAppSelector(selectError);
     const status = useAppSelector(selectStatus);
 
     const dispatch = useAppDispatch();
-    const generateProjectRequest = {
+    const generateCodeRequest = {
         // TODO refer selected project here
-        projectId: "mahen-first-31346"
+        projectId: "mahen-first-14510"
     }
 
-    // When clicked, dispatch `generateProject`:
-    const handleClick = () => dispatch(generateProjectAsync(generateProjectRequest));
+    // When clicked, dispatch `generateCode`:
+    const handleClick = () => dispatch(generateCodeAsync(generateCodeRequest));
 
     return (
         <>
@@ -28,8 +28,8 @@ export const GenerateProject = () => {
                 width: "200px"
             }} variant="contained" onClick={handleClick}>
                 {status === "loading"
-                    ? "Generating Project"
-                    : "Generate Project"}
+                    ? "Generating Code"
+                    : "Generate Code"}
             </Button>
         </>
     );

@@ -5,32 +5,32 @@ import * as os from "os";
 import {pushToExistingProjectOnGithub, PushToExistingProjectOnGithubRequest} from "../util/simple-git/existing-project";
 import {getToken} from "../util/user-store";
 import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
-import {GenerateProjectRequest, GenerateProjectResponse, Project} from "./models";
+import {GenerateCodeRequest, GenerateCodeResponse, Project} from "./models";
 import {requireUserNameMiddleware} from "../middlewares/auth";
 import {getProjectResource, patchProjectResource} from "../store/project-client";
 import {NAMESPACE, X_USER_NAME_HEADER} from "../util/constants";
 
 const rimraf = require("rimraf");
 const tar = require('tar')
-const compageRouter = Router();
+const codeOperationsRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
 
-const getGenerateProjectResponse = (userName: string, projectId: string, message: string, error: string) => {
-    let generateProjectResponse: GenerateProjectResponse = {
+const getGenerateCodeResponse = (userName: string, projectId: string, message: string, error: string) => {
+    let generateCodeResponse: GenerateCodeResponse = {
         userName: userName,
         projectId: projectId,
         message: message,
         error: error
     }
-    return generateProjectResponse;
+    return generateCodeResponse;
 }
 
-// generateProject (grpc calls to core)
-compageRouter.post("/generate_project", requireUserNameMiddleware, async (request, resource) => {
+// generateCode (grpc calls to core)
+codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (request, resource) => {
     // TODO the below || op is not required, as the check is already done in middleware.
     const userName = request.header(X_USER_NAME_HEADER) || "";
-    const generateProjectRequest: GenerateProjectRequest = request.body;
-    const projectId = generateProjectRequest.projectId
+    const generateCodeRequest: GenerateCodeRequest = request.body;
+    const projectId = generateCodeRequest.projectId
     const cleanup = (downloadedProjectPath: string) => {
         // remove directory created, delete directory recursively
         rimraf(downloadedProjectPath, () => {
@@ -41,9 +41,9 @@ compageRouter.post("/generate_project", requireUserNameMiddleware, async (reques
     // retrieve project from k8s
     const projectResource = await getProjectResource(NAMESPACE, projectId);
     if (!projectResource.apiVersion) {
-        let message = `unable to generate project`
+        let message = `unable to generate code`
         let error = `no project found for id : ${projectId}`
-        return resource.status(500).json(getGenerateProjectResponse(userName, projectId, message, error));
+        return resource.status(500).json(getGenerateCodeResponse(userName, projectId, message, error));
     }
     // create directory hierarchy here itself as creating it after receiving data will not be proper.
     const originalProjectPath = `${os.tmpdir()}/${projectResource.spec.displayName}`
@@ -52,9 +52,9 @@ compageRouter.post("/generate_project", requireUserNameMiddleware, async (reques
         fs.mkdirSync(downloadedProjectPath, {recursive: true});
     } catch (err: any) {
         if (err.code !== 'EEXIST') {
-            let message = `unable to generate project : ${projectResource.spec.displayName}`
-            let error = `unable to generate project : ${projectResource.spec.displayName} directory with error : ${err}`
-            return resource.status(500).json(getGenerateProjectResponse(userName, projectId, message, error));
+            let message = `unable to generate code : ${projectResource.spec.displayName}`
+            let error = `unable to generate code : ${projectResource.spec.displayName} directory with error : ${err}`
+            return resource.status(500).json(getGenerateCodeResponse(userName, projectId, message, error));
         } else {
             // first clean up and then recreate (it might be a residue of previous run)
             cleanup(downloadedProjectPath)
@@ -74,7 +74,7 @@ compageRouter.post("/generate_project", requireUserNameMiddleware, async (reques
     }
 
     // call to grpc server to generate the project
-    let call = projectGrpcClient.GenerateProject(payload);
+    let call = projectGrpcClient.GenerateCode(payload);
     // receive the data(tar file) in chunks.
     call.on('data', async (response: { fileChunk: any }) => {
         // chunk is available, append it to the given path.
@@ -86,9 +86,9 @@ compageRouter.post("/generate_project", requireUserNameMiddleware, async (reques
 
     // error while receiving the file from core component
     call.on('error', async (response: any) => {
-        let message = `unable to generate project : ${projectResource.spec.displayName}`
+        let message = `unable to generate code : ${projectResource.spec.displayName}`
         let error = response.details
-        return resource.status(500).json(getGenerateProjectResponse(userName, projectId, message, error));
+        return resource.status(500).json(getGenerateCodeResponse(userName, projectId, message, error));
     });
 
     // file has been transferred, lets save it to github.
@@ -118,9 +118,9 @@ compageRouter.post("/generate_project", requireUserNameMiddleware, async (reques
             let error: string = await cloneExistingProjectFromGithub(cloneExistingProjectFromGithubRequest)
             if (error.length > 0) {
                 // send status back to ui
-                let message = `couldn't generate project: ${projectResource.spec.displayName} due to : ${error}.`
+                let message = `couldn't generate code: ${projectResource.spec.displayName} due to : ${error}.`
                 // error = ""
-                return resource.status(500).json(getGenerateProjectResponse(userName, projectId, message, error));
+                return resource.status(500).json(getGenerateCodeResponse(userName, projectId, message, error));
             }
 
             // save to GitHub
@@ -136,8 +136,8 @@ compageRouter.post("/generate_project", requireUserNameMiddleware, async (reques
             error = await pushToExistingProjectOnGithub(pushToExistingProjectOnGithubRequest)
             if (error.length > 0) {
                 // send status back to ui
-                let message = `couldn't generate project: ${projectResource.spec.displayName} due to : ${error}.`
-                return resource.status(500).json(getGenerateProjectResponse(userName, projectId, message, error));
+                let message = `couldn't generate code: ${projectResource.spec.displayName} due to : ${error}.`
+                return resource.status(500).json(getGenerateCodeResponse(userName, projectId, message, error));
             }
 
             console.log(`saved ${downloadedProjectPath} to github`)
@@ -153,18 +153,18 @@ compageRouter.post("/generate_project", requireUserNameMiddleware, async (reques
             if (patchedProjectResource.apiVersion) {
                 // send status back to ui
                 let message = `generated project: ${projectResource.spec.displayName} and saved in repository : ${projectResource.spec.repository?.name} successfully`
-                return resource.status(200).json(getGenerateProjectResponse(userName, projectId, message, error));
+                return resource.status(200).json(getGenerateCodeResponse(userName, projectId, message, error));
             }
             // send error status back to ui
             let message = `generated project: ${projectResource.spec.displayName} and saved successfully in repository : ${projectResource.spec.repository?.name} but project couldn't get updated`
             error = `generated project: ${projectResource.spec.displayName} and saved successfully in repository : ${projectResource.spec.repository?.name} but project couldn't get updated`
-            return resource.status(500).json(getGenerateProjectResponse(userName, projectId, message, error));
+            return resource.status(500).json(getGenerateCodeResponse(userName, projectId, message, error));
         });
     });
 });
 
 // updateProject (grpc calls to core)
-compageRouter.post("/update_project", requireUserNameMiddleware, async (req, res) => {
+codeOperationsRouter.post("/update_project", requireUserNameMiddleware, async (req, res) => {
     const {repositoryName, yaml, projectName, userName} = req.body;
     try {
         const payload = {
@@ -184,4 +184,4 @@ compageRouter.post("/update_project", requireUserNameMiddleware, async (req, res
     }
 });
 
-export default compageRouter;
+export default codeOperationsRouter;

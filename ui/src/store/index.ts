@@ -8,7 +8,7 @@ import storageSession from 'reduxjs-toolkit-persist/lib/storage/session'
 import {FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE} from "reduxjs-toolkit-persist";
 import {reducer as toastrReducer} from 'react-redux-toastr'
 import {Action} from "redux";
-import compageReducer from "../components/generate-project/slice";
+import codeOperationsReducer from "../components/code-operations/slice";
 
 const rootPersistConfig = {
     key: 'root',
@@ -22,7 +22,7 @@ const authenticationPersistConfig = {
 }
 
 const persistedRootReducer = combineReducers({
-    compage: persistReducer(rootPersistConfig, compageReducer),
+    codeOperations: persistReducer(rootPersistConfig, codeOperationsReducer),
     authentication: persistReducer(authenticationPersistConfig, authenticationSlice.reducer),
     toastr: toastrReducer,
 })

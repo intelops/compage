@@ -76,7 +76,7 @@ func contains(filePaths []string, filePathName string) bool {
 
 // GoTemplateRunner runs templates parser to generate a project with config passed
 func GoTemplateRunner(coreProject *core.Project, goNode *languages.LanguageNode) error {
-	// generateProject - copy relevant files from template
+	// generateCode - copy relevant files from template
 	nodeDirectoryName, err := copyRelevantFiles(coreProject, goNode)
 	if err != nil {
 		return err

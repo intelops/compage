@@ -1,4 +1,4 @@
-export interface GenerateProjectResponse {
+export interface GenerateCodeResponse {
     projectId: string,
     userName: string,
     message: string,
@@ -6,11 +6,11 @@ export interface GenerateProjectResponse {
 }
 
 // This type describes the error object structure:
-export type GenerateProjectError = {
+export type GenerateCodeError = {
     message: string;
 };
 
-// generate project models
-export interface GenerateProjectRequest {
+// generate code models
+export interface GenerateCodeRequest {
     projectId: string,
 }

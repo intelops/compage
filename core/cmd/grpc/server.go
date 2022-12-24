@@ -24,8 +24,8 @@ func New() project.ProjectServiceServer {
 	return &server{}
 }
 
-// GenerateProject implements api.v1.GenerateProject
-func (s *server) GenerateProject(projectRequest *project.GenerateProjectRequest, server project.ProjectService_GenerateProjectServer) error {
+// GenerateCode implements api.v1.GenerateCode
+func (s *server) GenerateCode(projectRequest *project.GenerateCodeRequest, server project.ProjectService_GenerateCodeServer) error {
 	// converts to core project
 	coreProject, err := grpc.GetProject(projectRequest)
 	if err != nil {
@@ -67,25 +67,25 @@ func (s *server) GenerateProject(projectRequest *project.GenerateProjectRequest,
 	return sendFile(projectRequest, server)
 }
 
-// RegenerateProject implements api.v1.RegenerateProject
-func (s *server) RegenerateProject(generateProjectRequest *project.GenerateProjectRequest, server project.ProjectService_RegenerateProjectServer) error {
-	//projectGrpc, err := grpc.GetProject(generateProjectRequest)
+// RegenerateCode implements api.v1.RegGenerateCode
+func (s *server) RegenerateCode(generateCodeRequest *project.GenerateCodeRequest, server project.ProjectService_RegenerateCodeServer) error {
+	//projectGrpc, err := grpc.GetProject(generateCodeRequest)
 	//if err != nil {
 	//	return err
 	//}
 	//fmt.Println(projectGrpc.CompageYaml)
-	// GenerateProject
-	err := taroperations.CreateTarFile(generateProjectRequest.ProjectName, utils.GetProjectDirectoryName(generateProjectRequest.GetProjectName()))
+	// GenerateCode
+	err := taroperations.CreateTarFile(generateCodeRequest.ProjectName, utils.GetProjectDirectoryName(generateCodeRequest.GetProjectName()))
 	if err != nil {
 		log.Debug(err)
 		return status.Errorf(codes.InvalidArgument,
 			"error while creating a tar file ["+err.Error()+"]")
 	}
-	return sendFile(generateProjectRequest, server)
+	return sendFile(generateCodeRequest, server)
 }
 
-func sendFile(generateProjectRequest *project.GenerateProjectRequest, server project.ProjectService_GenerateProjectServer) error {
-	f, ok := taroperations.GetFile(taroperations.GetProjectTarFilePath(generateProjectRequest.ProjectName))
+func sendFile(generateCodeRequest *project.GenerateCodeRequest, server project.ProjectService_GenerateCodeServer) error {
+	f, ok := taroperations.GetFile(taroperations.GetProjectTarFilePath(generateCodeRequest.ProjectName))
 	if !ok {
 		return status.Error(codes.NotFound, "file is not found")
 	}
@@ -93,7 +93,7 @@ func sendFile(generateProjectRequest *project.GenerateProjectRequest, server pro
 	if err != nil {
 		return status.Error(codes.Internal, "error during sending header")
 	}
-	fileChunk := &project.GenerateProjectResponse{FileChunk: make([]byte, chunkSize)}
+	fileChunk := &project.GenerateCodeResponse{FileChunk: make([]byte, chunkSize)}
 	var n int
 Loop:
 	for {

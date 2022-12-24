@@ -11,7 +11,7 @@ type Node struct {
 type ConsumerData struct {
 	// Language node's(component) language.
 	Language string `json:"language"`
-	// Template its template to be used to generate project.
+	// Template its template to be used to generate code.
 	Template string `json:"template"`
 	// Name of component (required, this will be service and deployment name).
 	Name string `json:"name"`

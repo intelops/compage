@@ -1,7 +1,7 @@
-import generateProjectReducer, {GenerateProjectState,} from './slice';
+import generateCodeReducer, {GenerateCodeState,} from './slice';
 
 describe('counter reducer', () => {
-    const initialState: GenerateProjectState = {
+    const initialState: GenerateCodeState = {
         data: {
             projectId: "",
             error: "",
@@ -13,7 +13,7 @@ describe('counter reducer', () => {
     };
 
     it('should handle initial state', () => {
-        expect(generateProjectReducer(undefined, {type: 'unknown'})).toEqual({
+        expect(generateCodeReducer(undefined, {type: 'unknown'})).toEqual({
             data: {
                 "name": "",
                 "fileChunk": undefined

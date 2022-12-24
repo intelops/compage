@@ -2,7 +2,7 @@ import express, {Application, Request, Response, Router} from 'express';
 import "dotenv/config";
 import bodyParser from 'body-parser';
 import helmet from "helmet";
-import compageRouter from "./routes/compage";
+import codeOperationsRouter from "./routes/code-operations";
 import githubRouter from "./routes/github";
 import authRouter from "./routes/auth";
 import config from "./util/constants";
@@ -34,7 +34,7 @@ app.get('/', (req: Request, res: Response) => {
 
 const routes = Router();
 routes.use('/projects', projectsRouter)
-routes.use('/compage', compageRouter);
+routes.use('/code_operations', codeOperationsRouter);
 routes.use('/github', githubRouter);
 routes.use('/auth', authRouter);
 app.use(routes)

@@ -12,7 +12,7 @@ func StartRestServer() error {
 		return err
 	}
 	router.GET("/ping", handlers.Ping)
-	router.POST("/generate_project", handlers.GenerateProject)
-	router.PUT("/regenerate_project", handlers.RegenerateProject)
+	router.POST("/generate_code", handlers.GenerateCode)
+	router.PUT("/regenerate_code", handlers.RegenerateCode)
 	return router.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
