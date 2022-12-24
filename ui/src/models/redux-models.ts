@@ -70,23 +70,24 @@ export interface CompageYaml {
 
 export interface Repository {
     name: string,
-    tag?: string,
-    branch?: string
+    tag: string,
+    branch: string
 }
 
 export interface User {
     name: string,
-    email?: string
+    email: string
 }
 
+// ProjectEntity is for transferring info about projects from client to server
 export interface ProjectEntity {
-    id?: string,
-    name: string,
-    user?: User,
-    yaml?: CompageYaml,
-    repository?: Repository,
-    metadata?: Map<string, string>,
-    version?: string
+    id: string,
+    displayName: string,
+    version: string,
+    user: User,
+    yaml: CompageYaml,
+    repository: Repository,
+    metadata: Map<string, string>
 }
 
 export interface GenerateProjectRequest {
@@ -94,8 +95,10 @@ export interface GenerateProjectRequest {
 }
 
 export interface GeneratedProjectModel {
-    "name": string,
-    "fileChunk": any
+    projectId: string,
+    userName: string,
+    message: string,
+    error: string,
 }
 
 export interface GeneratedProjectArrayModel {

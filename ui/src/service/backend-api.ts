@@ -34,6 +34,14 @@ export const CompageBackendApi = () => {
     },)
 }
 
+export const ProjectsBackendApi = () => {
+    const path = "/projects"
+    return axios.create({
+        baseURL: config.backend_base_url + path,
+        headers: getHeaders()
+    },)
+}
+
 const getHeaders = () => {
     return {
         post: {

@@ -7,8 +7,10 @@ const initialCompageState: GeneratedProjectArrayModel = {
     error: null,
     status: "idle",
     generatedProject: {
-        "name": "",
-        "fileChunk": undefined
+        projectId: "",
+        error: "",
+        message: "",
+        userName: ""
     }
 }
 

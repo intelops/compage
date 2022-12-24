@@ -55,8 +55,8 @@ import {NewEdgeProperties} from "../new-properties/new-edge-properties";
 import {NewNodeProperties} from "../new-properties/new-node-properties";
 import {cleanse} from "./helper/helper";
 import JSONPretty from "react-json-pretty";
-import GenerateProject from "../generate-project/generate-project";
 import Button from "@mui/material/Button";
+import {GenerateProject} from "../generate-project/component";
 
 interface ArgTypes {
     resetState?: (...args: any) => void;
