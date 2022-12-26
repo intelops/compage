@@ -13,11 +13,11 @@ import Box from "@mui/material/Box";
 import Logo from "../../logo.png";
 import {LoginRequest} from "./model";
 import {loginAsync} from "./async-apis/login";
-import {selectData} from "./slice";
+import {selectAuthData} from "./slice";
 
 export const Login = () => {
     const dispatch = useAppDispatch();
-    const auth = useAppSelector(selectData);
+    const authData = useAppSelector(selectAuthData);
     const {client_id, redirect_uri} = config;
     const stateString = uuidv4();
     const scope = "user repo workflow";
@@ -38,7 +38,7 @@ export const Login = () => {
         }
     }, [dispatch]);
 
-    if (auth.login) {
+    if (authData.login) {
         return <Navigate to="/"/>;
     }
 

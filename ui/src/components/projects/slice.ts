@@ -33,8 +33,8 @@ export const projectsSlice = createSlice({
     },
 });
 
-export const selectData = (state: RootState) => state.projects.data;
-export const selectError = (state: RootState) => state.projects.error;
-export const selectStatus = (state: RootState) => state.projects.status;
+export const selectProjectsData = (state: RootState) => state.projects.data;
+export const selectProjectsError = (state: RootState) => state.projects.error;
+export const selectProjectsStatus = (state: RootState) => state.projects.status;
 
 export default projectsSlice.reducer;

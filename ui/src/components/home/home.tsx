@@ -11,12 +11,12 @@ import {
 } from "../../utils/service";
 import {useAppSelector} from "../../hooks/redux-hooks";
 import {DiagramMakerContainer} from "../diagram-maker/diagram-maker-container";
-import {selectData} from "../auth/slice";
+import {selectAuthData} from "../auth/slice";
 
 export const Home = () => {
-    const auth = useAppSelector(selectData);
+    const authData = useAppSelector(selectAuthData);
 
-    if (!auth.login) {
+    if (!authData.login) {
         return <Navigate to="/login"/>;
     }
     if (getCurrentRepositoryDetails() === null || getCurrentRepositoryDetails() === undefined) {

@@ -14,11 +14,11 @@ import Button from "@mui/material/Button";
 import {setCurrentRepositoryDetails} from "../../utils/service";
 import {useAppSelector} from "../../hooks/redux-hooks";
 import {toastr} from 'react-redux-toastr'
-import {selectData} from "../auth/slice";
+import {selectAuthData} from "../auth/slice";
 
 export const Repository = () => {
     const navigate = useNavigate()
-    const auth = useAppSelector(selectData);
+    const authData = useAppSelector(selectAuthData);
     const [data, setData] = useState({
         errorMessage: "",
         isLoading: true,
@@ -40,20 +40,20 @@ export const Repository = () => {
     }
 
     useEffect(() => {
-        listRepositories(auth.login)
+        listRepositories(authData.login)
             .then(items => {
                 setData({...data, isOpen: true, isLoading: false, repositories: getRepositories(items)})
             })
     }, [setData])
 
-    if (!auth.login) {
+    if (!authData.login) {
         return <Navigate to="/login"/>;
     }
 
     const handleCreate = () => {
         // give a call to create repository if it's new
         if (data.isCreateNew) {
-            createRepository(auth.login, data.currentRepository, data.description)
+            createRepository(authData.login, data.currentRepository, data.description)
                 .then(createdItem => {
                     if (createdItem) {
                         if (JSON.stringify(createdItem).toLowerCase().includes("Bad Credentials".toLowerCase())) {
@@ -94,7 +94,7 @@ export const Repository = () => {
         }
         // set the current repository retails post response from server
         // give call to pull the latest contents
-        pullCompageYaml(auth.login, data.currentRepository)
+        pullCompageYaml(authData.login, data.currentRepository)
             .then(pulledItem => {
                 if (pulledItem) {
                     if (JSON.stringify(pulledItem).toLowerCase().includes("Bad Credentials".toLowerCase())) {

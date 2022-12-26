@@ -11,19 +11,13 @@ import MenuItem from '@mui/material/MenuItem';
 import Logo from "../../logo.png";
 import {useAppSelector} from "../../hooks/redux-hooks";
 import {Link, useNavigate} from "react-router-dom";
-import {selectData} from "../auth/slice";
+import {selectAuthData} from "../auth/slice";
 
 const settings = ['Account', 'Logout'];
 
 const Header = () => {
-    const auth = useAppSelector(selectData);
+    const authData = useAppSelector(selectAuthData);
     const navigate = useNavigate()
-    let name, avatar_url, login;
-    if (auth) {
-        name = auth.name;
-        login = auth.login;
-        avatar_url = auth.avatar_url;
-    }
 
     const handleLogout = () => {
         sessionStorage.clear();
@@ -49,7 +43,7 @@ const Header = () => {
 
     const getMenuItem = (setting: string) => {
         if (setting === "Logout") {
-            if (auth.login) {
+            if (authData.login) {
                 return <MenuItem key={setting} onClick={handleLogout}>
                     <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
@@ -64,12 +58,12 @@ const Header = () => {
     }
 
     const getMenu = () => {
-        if (auth.login) {
+        if (authData.login) {
             return <Toolbar>
                 <Box sx={{flexGrow: 0}}>
                     <Tooltip title="Account Details">
                         <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                            <Avatar alt={name} src={avatar_url}/>
+                            <Avatar alt={authData.name} src={authData.avatar_url}/>
                         </IconButton>
                     </Tooltip>
                     <Menu
@@ -89,7 +83,7 @@ const Header = () => {
                         onClose={handleCloseUserMenu}
                     >
                         <MenuItem key="username">
-                            <Typography textAlign="center">Welcome {login}!!!</Typography>
+                            <Typography textAlign="center">Welcome {authData.login}!!!</Typography>
                         </MenuItem>
                         {settings.map((setting) => getMenuItem(setting))}
                     </Menu>
@@ -100,7 +94,7 @@ const Header = () => {
     }
 
     const getLogo = () => {
-        if (auth.login) {
+        if (authData.login) {
             return <Toolbar component="div" sx={{flexGrow: 1}}>
                 <Link to={"/home"}>
                     <Box

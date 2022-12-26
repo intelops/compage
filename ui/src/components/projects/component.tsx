@@ -1,24 +1,24 @@
 import React from 'react';
 
 import {useAppDispatch, useAppSelector} from '../../hooks/redux-hooks';
-import {selectStatus} from './slice';
+import {selectProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
 import {createProjectAsync} from "./async-apis/createProject";
 import {CreateProjectRequest} from "./model";
 import {CompageYaml, Repository, User} from "../../models/redux-models";
-import {selectData} from "../auth/slice";
+import {selectAuthData} from "../auth/slice";
 
 export const CreateProject = () => {
     // TODO below values can be used if we want to get data from api
     // const data = useAppSelector(selectData);
     // const error = useAppSelector(selectError);
-    const status = useAppSelector(selectStatus);
-    const auth = useAppSelector(selectData);
+    const projectsStatus = useAppSelector(selectProjectsStatus);
+    const authData = useAppSelector(selectAuthData);
 
     const dispatch = useAppDispatch();
     const prepareCreateProjectRequest = () => {
         const user: User = {
-            email: auth.email, name: auth.name
+            email: authData.email, name: authData.name
         }
         const repository: Repository = {branch: "", name: "", tag: ""}
         const yaml: CompageYaml = {edges: undefined, nodes: undefined, version: ""}
@@ -124,7 +124,7 @@ export const CreateProject = () => {
             <Button style={{
                 width: "200px"
             }} variant="contained" onClick={handleClick}>
-                {status === "loading"
+                {projectsStatus === "loading"
                     ? "Creating Project"
                     : "Create Project"}
             </Button>

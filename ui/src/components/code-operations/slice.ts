@@ -33,8 +33,8 @@ export const codeOperationsSlice = createSlice({
     },
 });
 
-export const selectData = (state: RootState) => state.codeOperations.data;
-export const selectError = (state: RootState) => state.codeOperations.error;
-export const selectStatus = (state: RootState) => state.codeOperations.status;
+export const selectCodeOperationsData = (state: RootState) => state.codeOperations.data;
+export const selectCodeOperationsError = (state: RootState) => state.codeOperations.error;
+export const selectCodeOperationsStatus = (state: RootState) => state.codeOperations.status;
 
 export default codeOperationsSlice.reducer;
