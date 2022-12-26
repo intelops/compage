@@ -4,7 +4,6 @@ import {BrowserRouter, Link, Route, Routes} from "react-router-dom";
 import {Login} from "../components/auth/component";
 import {Home} from "../components/home/home";
 import Header from "../components/navbar/header";
-import {Repository} from "../components/repository/repository";
 import {Account} from "../components/account/account";
 import {Grid} from "@mui/material";
 import {Footer} from "../components/navbar/footer";
@@ -30,7 +29,6 @@ export const App = () => {
             <br/>
             <Routes>
                 <Route path="/login" element={<Login/>}/>
-                <Route path="/repository" element={<Repository/>}/>
                 <Route path="/home" element={<Home/>}/>
                 <Route path="/account" element={<Account/>}/>
                 <Route path="/" element={<Home/>}/>
