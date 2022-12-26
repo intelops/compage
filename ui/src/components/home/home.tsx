@@ -36,6 +36,11 @@ export const Home = () => {
     }
 
     const resetState = () => {
+        const message = "Are you sure you want to reset the project?";
+        // TODO add project id here
+        if (!window.confirm(message)) {
+            return;
+        }
         removeCurrentConfig()
         removeCurrentState()
         removeModifiedState()
