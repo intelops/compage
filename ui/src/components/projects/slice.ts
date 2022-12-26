@@ -1,6 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {RootState} from '../../store';
-import {createProjectAsync} from "./async-apis/create";
+import {createProjectAsync} from "./async-apis/createProject";
 
 export interface ProjectState {
     data: any;

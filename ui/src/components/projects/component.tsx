@@ -3,7 +3,7 @@ import React from 'react';
 import {useAppDispatch, useAppSelector} from '../../hooks/redux-hooks';
 import {selectStatus} from './slice';
 import Button from "@mui/material/Button";
-import {createProjectAsync} from "./async-apis/create";
+import {createProjectAsync} from "./async-apis/createProject";
 
 export const CreateProject = () => {
     // TODO below values can be used if we want to get data from api
