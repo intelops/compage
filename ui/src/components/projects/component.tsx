@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
+import React from 'react';
 
 import {useAppDispatch, useAppSelector} from '../../hooks/redux-hooks';
 import {selectProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
 import {createProjectAsync} from "./async-apis/createProject";
-import {CreateProjectRequest} from "./model";
-import {CompageYaml, Repository, User} from "../../models/redux-models";
+import {CreateProjectRequest, Repository, User} from "./model";
+import {CompageYaml} from "../diagram-maker/models";
 import {selectAuthData} from "../auth/slice";
 
 export const CreateProject = () => {

@@ -23,13 +23,13 @@ export const Repository = () => {
         errorMessage: "",
         isLoading: true,
         isOpen: false,
-        repositories: [],
-        currentRepository: "",
+        projects: [],
+        currentProject: "",
         isCreateNew: false,
         description: ""
     });
 
-    const getRepositories = (items: GithubRepository[]) => {
+    const getProjects = (items: GithubRepository[]) => {
         console.log("items : ", items)
         return items;
     }
@@ -42,7 +42,7 @@ export const Repository = () => {
     useEffect(() => {
         listRepositories(authData.login)
             .then(items => {
-                setData({...data, isOpen: true, isLoading: false, repositories: getRepositories(items)})
+                setData({...data, isOpen: true, isLoading: false, projects: getProjects(items)})
             })
     }, [setData])
 
@@ -51,9 +51,9 @@ export const Repository = () => {
     }
 
     const handleCreate = () => {
-        // give a call to create repository if it's new
+        // give a call to create project if it's new
         if (data.isCreateNew) {
-            createRepository(authData.login, data.currentRepository, data.description)
+            createRepository(authData.login, data.currentProject, data.description)
                 .then(createdItem => {
                     if (createdItem) {
                         if (JSON.stringify(createdItem).toLowerCase().includes("Bad Credentials".toLowerCase())) {
@@ -75,7 +75,7 @@ export const Repository = () => {
                             //     isOpen: true
                             // })
                             const currentRepositoryDetails = {
-                                repositoryName: data.currentRepository,
+                                repositoryName: data.currentProject,
                             }
                             setCurrentRepositoryDetails(JSON.stringify(currentRepositoryDetails))
                         }
@@ -94,7 +94,7 @@ export const Repository = () => {
         }
         // set the current repository retails post response from server
         // give call to pull the latest contents
-        pullCompageYaml(authData.login, data.currentRepository)
+        pullCompageYaml(authData.login, data.currentProject)
             .then(pulledItem => {
                 if (pulledItem) {
                     if (JSON.stringify(pulledItem).toLowerCase().includes("Bad Credentials".toLowerCase())) {
@@ -116,7 +116,7 @@ export const Repository = () => {
                         //     isOpen: true
                         // })
                         const currentRepositoryDetails = {
-                            repositoryName: data.currentRepository,
+                            repositoryName: data.currentProject,
                         }
                         setCurrentRepositoryDetails(JSON.stringify(currentRepositoryDetails))
                     }
@@ -132,7 +132,7 @@ export const Repository = () => {
             // })
         });
         const currentRepositoryDetails = {
-            repositoryName: data.currentRepository,
+            repositoryName: data.currentProject,
             //TODO
             details: "githubRepositoryContent"
         }
@@ -141,17 +141,17 @@ export const Repository = () => {
         navigate('/home');
     }
 
-    const handleExistingRepositoriesChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleExistingProjectsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setData({
             ...data,
-            currentRepository: event.target.value
+            currentProject: event.target.value
         });
     };
 
-    const handleNewRepositoryChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleNewProjectChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setData({
             ...data,
-            currentRepository: event.target.value
+            currentProject: event.target.value
         });
     };
 
@@ -171,8 +171,8 @@ export const Repository = () => {
 
     const isValid = () => {
         if (data.isCreateNew) {
-            for (const repository of data.repositories) {
-                if (data.currentRepository === repository.name) {
+            for (const repository of data.projects) {
+                if (data.currentProject === repository.name) {
                     return false
                 }
             }
@@ -206,15 +206,15 @@ export const Repository = () => {
                 id="name"
                 label="Name of Repository"
                 type="text"
-                value={data.currentRepository}
-                onChange={handleNewRepositoryChange}
+                value={data.currentProject}
+                onChange={handleNewProjectChange}
                 variant="outlined"
             />;
         }
         return "";
     }
 
-    const getExistingRepositories = () => {
+    const getExistingProjects = () => {
         if (!data.isCreateNew) {
             return <TextField
                 required
@@ -223,13 +223,13 @@ export const Repository = () => {
                 disabled={data.isCreateNew}
                 margin="dense"
                 id="repository"
-                label="Existing Repositories"
+                label="Existing Projects"
                 type="text"
-                value={data.currentRepository}
-                onChange={handleExistingRepositoriesChange}
+                value={data.currentProject}
+                onChange={handleExistingProjectsChange}
                 variant="outlined">
                 {
-                    !data && data.repositories.map((githubRepository: GithubRepository) => (
+                    !data && data.projects.map((githubRepository: GithubRepository) => (
                         <MenuItem key={githubRepository.name} value={githubRepository.name}>
                             {githubRepository.full_name}
                         </MenuItem>
@@ -258,7 +258,7 @@ export const Repository = () => {
                     />
                     {getName()}
                     {getDescription()}
-                    {getExistingRepositories()}
+                    {getExistingProjects()}
                 </Stack>
             </DialogContent>
             <DialogActions>
@@ -268,7 +268,7 @@ export const Repository = () => {
                     type="button">Toastr Success</Button>
                 <Button variant="contained"
                         onClick={handleCreate}
-                        disabled={data.currentRepository === "" || !isValid()}>Choose</Button>
+                        disabled={data.currentProject === "" || !isValid()}>Choose</Button>
             </DialogActions>
         </Dialog>
 

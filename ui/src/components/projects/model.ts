@@ -1,4 +1,4 @@
-import {CompageYaml, Repository, User} from "../../models/redux-models";
+import {CompageYaml} from "../diagram-maker/models";
 
 export interface CreateProjectResponse {
     projectId: string,
@@ -21,4 +21,15 @@ export interface CreateProjectRequest {
     yaml: CompageYaml,
     repository: Repository,
     metadata?: Map<string, string>
+}
+
+export interface Repository {
+    name: string,
+    tag: string,
+    branch: string
+}
+
+export interface User {
+    name: string,
+    email: string
 }

@@ -63,16 +63,3 @@ export interface CompageYaml {
     nodes: Map<string, CompageNode>
     version: string
 }
-
-export interface Repository {
-    name: string,
-    tag: string,
-    branch: string
-}
-
-export interface User {
-    name: string,
-    email: string
-}
-
-// github
