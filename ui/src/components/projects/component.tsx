@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '../../hooks/redux-hooks';
 import {selectProjectsStatus} from './slice';
@@ -9,13 +9,10 @@ import {CompageYaml, Repository, User} from "../../models/redux-models";
 import {selectAuthData} from "../auth/slice";
 
 export const CreateProject = () => {
-    // TODO below values can be used if we want to get data from api
-    // const data = useAppSelector(selectData);
-    // const error = useAppSelector(selectError);
     const projectsStatus = useAppSelector(selectProjectsStatus);
     const authData = useAppSelector(selectAuthData);
-
     const dispatch = useAppDispatch();
+
     const prepareCreateProjectRequest = () => {
         const user: User = {
             email: authData.email, name: authData.name

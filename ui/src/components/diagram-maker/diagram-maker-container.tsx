@@ -444,6 +444,7 @@ export const DiagramMakerContainer = ({
                     width: "200px"
                 }} variant="contained" color="error" onClick={resetState}>Reset state</Button>
             </Grid>
+            <hr/>
             <Grid item style={{
                 alignItems: "center",
                 display: "flex",
