@@ -1,6 +1,5 @@
 import React, {ChangeEvent, useEffect, useState} from "react";
 import {Navigate, useNavigate} from "react-router-dom";
-import {createRepository, listRepositories, pullCompageYaml} from "../../backend/rest-service";
 import {GithubRepository} from "../../backend/models";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -40,10 +39,9 @@ export const Repository = () => {
     }
 
     useEffect(() => {
-        listRepositories(authData.login)
-            .then(items => {
-                setData({...data, isOpen: true, isLoading: false, projects: getProjects(items)})
-            })
+        // TODO
+        // dispatch listProjects
+        // setData({...data, isOpen: true, isLoading: false, projects: getProjects(items)})
     }, [setData])
 
     if (!authData.login) {
@@ -53,84 +51,12 @@ export const Repository = () => {
     const handleCreate = () => {
         // give a call to create project if it's new
         if (data.isCreateNew) {
-            createRepository(authData.login, data.currentProject, data.description)
-                .then(createdItem => {
-                    if (createdItem) {
-                        if (JSON.stringify(createdItem).toLowerCase().includes("Bad Credentials".toLowerCase())) {
-                            //TODO
-                            // setOperationState({
-                            //     ...operationState,
-                            //     message: " : Received response : " + createdItem,
-                            //     severity: 'error',
-                            //     operation: "createRepository",
-                            //     isOpen: true
-                            // })
-                        } else {
-                            //TODO
-                            // setOperationState({
-                            //     ...operationState,
-                            //     message: " : Received response : " + createdItem,
-                            //     severity: 'success',
-                            //     operation: "createRepository",
-                            //     isOpen: true
-                            // })
-                            const currentRepositoryDetails = {
-                                repositoryName: data.currentProject,
-                            }
-                            setCurrentRepositoryDetails(JSON.stringify(currentRepositoryDetails))
-                        }
-                    }
-                })
-                .catch(error => {
-                    //TODO
-                    // setOperationState({
-                    //     ...operationState,
-                    //     message: " : Received error : " + error,
-                    //     severity: 'error',
-                    //     operation: "createRepository",
-                    //     isOpen: true
-                    // })
-                });
+            // TODO
+            // authData.login, data.currentProject, data.description
+            // use above data to create new project
         }
         // set the current repository retails post response from server
         // give call to pull the latest contents
-        pullCompageYaml(authData.login, data.currentProject)
-            .then(pulledItem => {
-                if (pulledItem) {
-                    if (JSON.stringify(pulledItem).toLowerCase().includes("Bad Credentials".toLowerCase())) {
-                        //TODO
-                        // setOperationState({
-                        //     ...operationState,
-                        //     message: " : Received response : " + createdItem,
-                        //     severity: 'error',
-                        //     operation: "createRepository",
-                        //     isOpen: true
-                        // })
-                    } else {
-                        //TODO
-                        // setOperationState({
-                        //     ...operationState,
-                        //     message: " : Received response : " + createdItem,
-                        //     severity: 'success',
-                        //     operation: "createRepository",
-                        //     isOpen: true
-                        // })
-                        const currentRepositoryDetails = {
-                            repositoryName: data.currentProject,
-                        }
-                        setCurrentRepositoryDetails(JSON.stringify(currentRepositoryDetails))
-                    }
-                }
-            }).catch(error => {
-            //TODO
-            // setOperationState({
-            //     ...operationState,
-            //     message: " : Received error : " + error,
-            //     severity: 'error',
-            //     operation: "createRepository",
-            //     isOpen: true
-            // })
-        });
         const currentRepositoryDetails = {
             repositoryName: data.currentProject,
             //TODO

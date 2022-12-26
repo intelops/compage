@@ -58,7 +58,6 @@ import JSONPretty from "react-json-pretty";
 import Button from "@mui/material/Button";
 import {GenerateCode} from "../code-operations/component";
 import {CreateProject} from "../projects/component";
-import {Sample} from "../sample/sample";
 
 interface ArgTypes {
     resetState?: (...args: any) => void;
@@ -445,13 +444,6 @@ export const DiagramMakerContainer = ({
                 }} variant="contained" color="error" onClick={resetState}>Reset state</Button>
             </Grid>
             <hr/>
-            <Grid item style={{
-                alignItems: "center",
-                display: "flex",
-                flexDirection: "column"
-            }}>
-                <Sample></Sample>
-            </Grid>
         </Grid>
     </Grid>
 }
