@@ -6,18 +6,19 @@ import Button from "@mui/material/Button";
 import {createProjectAsync} from "./async-apis/createProject";
 import {CreateProjectRequest} from "./model";
 import {CompageYaml, Repository, User} from "../../models/redux-models";
+import {selectData} from "../auth/slice";
 
 export const CreateProject = () => {
     // TODO below values can be used if we want to get data from api
     // const data = useAppSelector(selectData);
     // const error = useAppSelector(selectError);
     const status = useAppSelector(selectStatus);
-    const authentication = useAppSelector(state => state.authentication);
+    const auth = useAppSelector(selectData);
 
     const dispatch = useAppDispatch();
     const prepareCreateProjectRequest = () => {
         const user: User = {
-            email: authentication.user.email, name: authentication.user.name
+            email: auth.email, name: auth.name
         }
         const repository: Repository = {branch: "", name: "", tag: ""}
         const yaml: CompageYaml = {edges: undefined, nodes: undefined, version: ""}

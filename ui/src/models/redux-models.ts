@@ -11,10 +11,6 @@ export interface AuthenticationModel {
     bio: string
 }
 
-export interface AuthenticationArrayModel {
-    user: AuthenticationModel
-}
-
 export interface Resource {
     Name: string,
     // the below map can contain metadata about the field.

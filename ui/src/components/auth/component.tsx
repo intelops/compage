@@ -2,7 +2,6 @@ import React, {useEffect} from "react";
 import {Navigate} from "react-router-dom";
 import {v4 as uuidv4} from 'uuid';
 import {useAppDispatch, useAppSelector} from "../../hooks/redux-hooks";
-import {fetchUser} from "../../store/authentication-actions";
 import {config} from "../../utils/constants";
 import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
@@ -12,10 +11,13 @@ import {Button} from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import Box from "@mui/material/Box";
 import Logo from "../../logo.png";
+import {LoginRequest} from "./model";
+import {loginAsync} from "./async-apis/login";
+import {selectData} from "./slice";
 
 export const Login = () => {
     const dispatch = useAppDispatch();
-    const authentication = useAppSelector(state => state.authentication);
+    const auth = useAppSelector(selectData);
     const {client_id, redirect_uri} = config;
     const stateString = uuidv4();
     const scope = "user repo workflow";
@@ -29,11 +31,14 @@ export const Login = () => {
         if (hasCode && hasState) {
             const newUrl = url.split("?code=");
             window.history.pushState({}, null, newUrl[0]);
-            dispatch(fetchUser(newUrl[1].substring(0, newUrl[1].indexOf("&"))))
+            const loginRequest: LoginRequest = {
+                code: newUrl[1].substring(0, newUrl[1].indexOf("&"))
+            }
+            dispatch(loginAsync(loginRequest))
         }
     }, [dispatch]);
 
-    if (authentication.user.login) {
+    if (auth.login) {
         return <Navigate to="/"/>;
     }
 

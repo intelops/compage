@@ -8,9 +8,10 @@ import Typography from '@mui/material/Typography';
 import {red} from '@mui/material/colors';
 import {useAppSelector} from "../../hooks/redux-hooks";
 import {Navigate} from "react-router-dom";
+import {selectData} from "../auth/slice";
 
 export const Account = () => {
-    const authentication = useAppSelector(state => state.authentication);
+    const auth = useAppSelector(selectData);
     const {
         avatar_url,
         bio,
@@ -21,8 +22,8 @@ export const Account = () => {
         following,
         login,
         email
-    } = authentication.user
-    if (!authentication.user.login) {
+    } = auth
+    if (!auth.login) {
         return <Navigate to="/login"/>;
     }
     let title = name

@@ -7,9 +7,10 @@ import {setCurrentRepositoryDetails} from "../../utils/service";
 import {commitCompageYaml, createRepository, listRepositories, pullCompageYaml} from "../../backend/rest-service";
 import {GithubRepository, GithubRepositoryContent} from "../../backend/models";
 import {useAppSelector} from "../../hooks/redux-hooks";
+import {selectData} from "../auth/slice";
 
 export const Sample = () => {
-    const authentication = useAppSelector(state => state.authentication);
+    const auth = useAppSelector(selectData);
 
     const [operationState, setOperationState] = useState({
         severity: "",
@@ -17,7 +18,7 @@ export const Sample = () => {
         operation: "",
         isOpen: false
     })
-    if (!authentication.user.login) {
+    if (!auth.login) {
         return <Navigate to="/login"/>;
     }
 
@@ -56,7 +57,7 @@ export const Sample = () => {
                     </Snackbar>
                     <Button variant="contained" onClick={
                         () => {
-                            listRepositories(authentication.user.login)
+                            listRepositories(auth.login)
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
@@ -82,7 +83,7 @@ export const Sample = () => {
                                             const newRepositoryName = "Sample1";
                                             if (!isRepositoryNameExists(newRepositoryName, data)) {
                                                 // check for repo existence
-                                                createRepository(authentication.user.login, newRepositoryName, "Sample repo description")
+                                                createRepository(auth.login, newRepositoryName, "Sample repo description")
                                                     .then((response: Response) => {
                                                         if (!response.ok) {
                                                             setOperationState({
@@ -152,7 +153,7 @@ export const Sample = () => {
                     </Button>
                     <Button variant="contained" onClick={
                         () => {
-                            commitCompageYaml(authentication.user.login, authentication.user.email, "Sample message")
+                            commitCompageYaml(auth.login, auth.email, "Sample message")
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({
@@ -201,7 +202,7 @@ export const Sample = () => {
                     <Button variant="contained" onClick={
                         () => {
                             const repositoryName = "Sample1"
-                            pullCompageYaml(authentication.user.login, repositoryName)
+                            pullCompageYaml(auth.login, repositoryName)
                                 .then((response: Response) => {
                                     if (!response.ok) {
                                         setOperationState({

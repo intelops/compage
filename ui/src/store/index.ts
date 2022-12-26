@@ -1,5 +1,4 @@
 import {combineReducers, configureStore, ThunkAction} from '@reduxjs/toolkit';
-import authenticationSlice from "./authentication-slice";
 import storage from 'redux-persist/lib/storage';
 import {persistReducer, persistStore} from 'redux-persist';
 // import thunk from 'redux-thunk';
@@ -10,6 +9,7 @@ import {reducer as toastrReducer} from 'react-redux-toastr'
 import {Action} from "redux";
 import codeOperationsReducer from "../components/code-operations/slice";
 import projectsReducer from "../components/projects/slice";
+import authReducer from "../components/auth/slice";
 
 const rootPersistConfig = {
     key: 'root',
@@ -25,7 +25,7 @@ const authenticationPersistConfig = {
 const persistedRootReducer = combineReducers({
     codeOperations: persistReducer(rootPersistConfig, codeOperationsReducer),
     projects: persistReducer(rootPersistConfig, projectsReducer),
-    authentication: persistReducer(authenticationPersistConfig, authenticationSlice.reducer),
+    auth: persistReducer(authenticationPersistConfig, authReducer),
     toastr: toastrReducer,
 })
 

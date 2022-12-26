@@ -11,17 +11,18 @@ import MenuItem from '@mui/material/MenuItem';
 import Logo from "../../logo.png";
 import {useAppSelector} from "../../hooks/redux-hooks";
 import {Link, useNavigate} from "react-router-dom";
+import {selectData} from "../auth/slice";
 
 const settings = ['Account', 'Logout'];
 
 const Header = () => {
-    const authentication = useAppSelector(state => state.authentication);
+    const auth = useAppSelector(selectData);
     const navigate = useNavigate()
     let name, avatar_url, login;
-    if (authentication.user) {
-        name = authentication.user.name;
-        login = authentication.user.login;
-        avatar_url = authentication.user.avatar_url;
+    if (auth) {
+        name = auth.name;
+        login = auth.login;
+        avatar_url = auth.avatar_url;
     }
 
     const handleLogout = () => {
@@ -48,7 +49,7 @@ const Header = () => {
 
     const getMenuItem = (setting: string) => {
         if (setting === "Logout") {
-            if (authentication.user.login) {
+            if (auth.login) {
                 return <MenuItem key={setting} onClick={handleLogout}>
                     <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
@@ -63,7 +64,7 @@ const Header = () => {
     }
 
     const getMenu = () => {
-        if (authentication.user.login) {
+        if (auth.login) {
             return <Toolbar>
                 <Box sx={{flexGrow: 0}}>
                     <Tooltip title="Account Details">
@@ -99,7 +100,7 @@ const Header = () => {
     }
 
     const getLogo = () => {
-        if (authentication.user.login) {
+        if (auth.login) {
             return <Toolbar component="div" sx={{flexGrow: 1}}>
                 <Link to={"/home"}>
                     <Box

@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.scss';
 import {BrowserRouter, Link, Route, Routes} from "react-router-dom";
-import {Login} from "../components/login/login";
+import {Login} from "../components/auth/component";
 import {Home} from "../components/home/home";
 import Header from "../components/navbar/header";
 import {Repository} from "../components/repository/repository";
