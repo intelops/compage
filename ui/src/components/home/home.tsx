@@ -45,6 +45,7 @@ export const Home = () => {
         removeCurrentState()
         removeModifiedState()
         setReset(true)
+        // TODO just reset to last saved state.
         // after resetting, needs to manually reload so, avoiding manual step here.
         window.location.reload();
     };

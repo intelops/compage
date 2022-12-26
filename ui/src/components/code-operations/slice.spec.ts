@@ -1,23 +1,15 @@
-import generateCodeReducer, {GenerateCodeState,} from './slice';
+import codeOperationsReducer, {CodeOperationsState,} from './slice';
 
-describe('counter reducer', () => {
-    const initialState: GenerateCodeState = {
-        data: {
-            projectId: "",
-            error: "",
-            message: "",
-            userName: ""
-        },
+describe('codeOperations reducer', () => {
+    const initialState: CodeOperationsState = {
+        data: [],
         status: 'idle',
         error: null
     };
 
     it('should handle initial state', () => {
-        expect(generateCodeReducer(undefined, {type: 'unknown'})).toEqual({
-            data: {
-                "name": "",
-                "fileChunk": undefined
-            },
+        expect(codeOperationsReducer(undefined, {type: 'unknown'})).toEqual({
+            data: [],
             status: 'idle',
             error: null
         });

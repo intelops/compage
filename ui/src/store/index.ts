@@ -9,6 +9,7 @@ import {FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE} from "reduxjs-toolkit
 import {reducer as toastrReducer} from 'react-redux-toastr'
 import {Action} from "redux";
 import codeOperationsReducer from "../components/code-operations/slice";
+import projectsReducer from "../components/projects/slice";
 
 const rootPersistConfig = {
     key: 'root',
@@ -23,6 +24,7 @@ const authenticationPersistConfig = {
 
 const persistedRootReducer = combineReducers({
     codeOperations: persistReducer(rootPersistConfig, codeOperationsReducer),
+    projects: persistReducer(rootPersistConfig, projectsReducer),
     authentication: persistReducer(authenticationPersistConfig, authenticationSlice.reducer),
     toastr: toastrReducer,
 })

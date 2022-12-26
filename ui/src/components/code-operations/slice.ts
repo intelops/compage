@@ -1,21 +1,15 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {RootState} from '../../store';
-import {generateCodeAsync} from "./async-apis/generate";
-import {GenerateCodeResponse} from "./model";
+import {generateCodeAsync} from "./async-apis/generateCode";
 
-export interface GenerateCodeState {
-    data: GenerateCodeResponse;
+export interface CodeOperationsState {
+    data: any;
     status: 'idle' | 'loading' | 'failed';
     error: string | null;
 }
 
-const initialState: GenerateCodeState = {
-    data: {
-        "projectId": "",
-        "userName": "",
-        "message": "",
-        "error": ""
-    },
+const initialState: CodeOperationsState = {
+    data: [],
     status: 'idle',
     error: null
 };
