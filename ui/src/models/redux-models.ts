@@ -31,7 +31,7 @@ export interface ServerType {
 export interface NodeConsumerData {
     name: string,
     template: string,
-    serverTypes: ServerType[],
+    serverTypes?: ServerType[],
     language: string,
     metadata: Map<string, string>,
     annotations: Map<string, string>
@@ -77,37 +77,6 @@ export interface Repository {
 export interface User {
     name: string,
     email: string
-}
-
-// ProjectEntity is for transferring info about projects from client to server
-export interface ProjectEntity {
-    id: string,
-    displayName: string,
-    version: string,
-    user: User,
-    yaml: CompageYaml,
-    repository: Repository,
-    metadata: Map<string, string>
-}
-
-export interface GenerateCodeRequest {
-    projectId: string,
-}
-
-export interface GeneratedCodeModel {
-    projectId: string,
-    userName: string,
-    message: string,
-    error: string,
-}
-
-export interface GeneratedCodeArrayModel {
-    // In `status` we will watch
-    // if todos are being loaded.
-    status: "loading" | "idle";
-    // `error` will contain an error message.
-    error: string | null;
-    generatedCode: GeneratedCodeModel
 }
 
 // github

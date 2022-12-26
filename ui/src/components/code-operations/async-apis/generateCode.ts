@@ -18,7 +18,7 @@ export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, Generate
                 });
             }
             console.log("Successfully generated code-" + generateCodeRequest.projectId)
-            toastr.info('Success : ' + generateCodeRequest.projectId, "Successfully generated code : " + generateCodeRequest.projectId);
+            toastr.success('Success : ' + generateCodeRequest.projectId, "Successfully generated code : " + generateCodeRequest.projectId);
             return response.data;
         } catch (e) {
             return thunkApi.rejectWithValue({

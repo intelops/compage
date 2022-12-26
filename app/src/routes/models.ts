@@ -16,8 +16,8 @@ export interface NodeConsumerData {
     template: string,
     serverTypes: ServerType[],
     language: string,
-    metadata: Map<string, string>,
-    annotations: Map<string, string>
+    metadata?: Map<string, string>,
+    annotations?: Map<string, string>
 }
 
 export interface CompageNode {
@@ -34,8 +34,8 @@ export interface ClientType {
 export interface EdgeConsumerData {
     externalNodeName: string,
     clientTypes: ClientType[],
-    metadata: Map<string, string>,
-    annotations: Map<string, string>
+    metadata?: Map<string, string>,
+    annotations?: Map<string, string>
 }
 
 export interface CompageEdge {

@@ -57,6 +57,8 @@ import {cleanse} from "./helper/helper";
 import JSONPretty from "react-json-pretty";
 import Button from "@mui/material/Button";
 import {GenerateCode} from "../code-operations/component";
+import {CreateProject} from "../projects/component";
+import {Sample} from "../sample/sample";
 
 interface ArgTypes {
     resetState?: (...args: any) => void;
@@ -430,9 +432,24 @@ export const DiagramMakerContainer = ({
                 display: "flex",
                 flexDirection: "column"
             }}>
+                <CreateProject></CreateProject>
+            </Grid>
+            <hr/>
+            <Grid item style={{
+                alignItems: "center",
+                display: "flex",
+                flexDirection: "column"
+            }}>
                 <Button style={{
                     width: "200px"
                 }} variant="contained" color="error" onClick={resetState}>Reset state</Button>
+            </Grid>
+            <Grid item style={{
+                alignItems: "center",
+                display: "flex",
+                flexDirection: "column"
+            }}>
+                <Sample></Sample>
             </Grid>
         </Grid>
     </Grid>

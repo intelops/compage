@@ -1,3 +1,5 @@
+import {CompageYaml, Repository, User} from "../../models/redux-models";
+
 export interface CreateProjectResponse {
     projectId: string,
     userName: string,
@@ -12,5 +14,11 @@ export type CreateProjectError = {
 
 // create project models
 export interface CreateProjectRequest {
-    projectId: string,
+    id?: string,
+    displayName: string,
+    version: string,
+    user: User,
+    yaml: CompageYaml,
+    repository: Repository,
+    metadata?: Map<string, string>
 }
