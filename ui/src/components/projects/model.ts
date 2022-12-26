@@ -33,3 +33,23 @@ export interface User {
     name: string,
     email: string
 }
+
+// listProjects models (the structure matches as of now with CreateProjectRequest but have kept it
+// separate for future customizations)
+export interface ListProjectsResponse {
+    id: string,
+    displayName: string,
+    version: string,
+    user: User,
+    yaml: CompageYaml,
+    repository: Repository,
+    metadata: Map<string, string>
+}
+
+export interface ListProjectsRequest {
+}
+
+// This type describes the error object structure:
+export type ListProjectsError = {
+    message: string;
+};

@@ -3,10 +3,10 @@ import React from 'react';
 import {useAppDispatch, useAppSelector} from '../../hooks/redux-hooks';
 import {selectProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
-import {createProjectAsync} from "./async-apis/createProject";
-import {CreateProjectRequest, Repository, User} from "./model";
+import {CreateProjectRequest, ListProjectsRequest, Repository, User} from "./model";
 import {CompageYaml} from "../diagram-maker/models";
 import {selectAuthData} from "../auth/slice";
+import {listProjectsAsync} from "./async-apis/listProjects";
 
 export const CreateProject = () => {
     const projectsStatus = useAppSelector(selectProjectsStatus);
@@ -110,9 +110,11 @@ export const CreateProject = () => {
     };
     // TODO refer selected project here
     const createProjectRequest: CreateProjectRequest = prepareCreateProjectRequest()
+    const listProjectsRequest: ListProjectsRequest = prepareCreateProjectRequest()
 
     // When clicked, dispatch `createProject`:
-    const handleClick = () => dispatch(createProjectAsync(createProjectRequest));
+    // const handleClick = () => dispatch(createProjectAsync(createProjectRequest));
+    const handleClick = () => dispatch(listProjectsAsync(listProjectsRequest));
 
     return (
         <>
