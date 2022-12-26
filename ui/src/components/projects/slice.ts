@@ -1,6 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {RootState} from '../../store';
 import {createProjectAsync} from "./async-apis/createProject";
+import {listProjectsAsync} from "./async-apis/listProjects";
 
 export interface ProjectState {
     data: any;
@@ -27,6 +28,16 @@ export const projectsSlice = createSlice({
             state.error = null
             state.data = action.payload;
         }).addCase(createProjectAsync.rejected, (state, action) => {
+            state.status = 'failed';
+            if (action.payload) state.error = JSON.stringify(action.payload);
+        }).addCase(listProjectsAsync.pending, (state) => {
+            state.status = 'loading';
+            state.error = null;
+        }).addCase(listProjectsAsync.fulfilled, (state, action) => {
+            state.status = 'idle';
+            state.error = null
+            state.data = action.payload;
+        }).addCase(listProjectsAsync.rejected, (state, action) => {
             state.status = 'failed';
             if (action.payload) state.error = JSON.stringify(action.payload);
         });
