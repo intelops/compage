@@ -1,7 +1,7 @@
 import React, {ChangeEvent, useEffect, useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '../../hooks/redux-hooks';
-import {selectListProjectsData, selectProjectsStatus} from './slice';
+import {selectCreateProjectStatus, selectListProjectsData, selectListProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
 import {CreateProjectRequest, ListProjectsRequest, ListProjectsResponse, Repository, User} from "./model";
 import {CompageYaml} from "../diagram-maker/models";
@@ -18,7 +18,8 @@ import DialogActions from "@mui/material/DialogActions";
 import {listProjectsAsync} from "./async-apis/listProjects";
 
 export const ChangeProject = () => {
-    const projectsStatus = useAppSelector(selectProjectsStatus);
+    const createProjectStatus = useAppSelector(selectCreateProjectStatus);
+    const listProjectsStatus = useAppSelector(selectListProjectsStatus);
     const authData = useAppSelector(selectAuthData);
     const listProjectsData = useAppSelector(selectListProjectsData);
 
@@ -43,10 +44,6 @@ export const ChangeProject = () => {
     if (!authData.login) {
         return <Navigate to="/login"/>;
     }
-
-    // if (listProjectsData.length > 0 && projectsStatus !== 'loading') {
-    //     setData({...data, isOpen: true, isLoading: false})
-    // }
 
     const handleClose = () => {
         setData({...data, isOpen: false})
@@ -74,7 +71,6 @@ export const ChangeProject = () => {
         // setData({...data, isOpen: false})
         // navigate('/home');
     }
-
 
     const handleExistingProjectsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setData({
@@ -107,6 +103,7 @@ export const ChangeProject = () => {
     const handleIsCreateNewChange = (event: ChangeEvent<HTMLInputElement>) => {
         setData({
             ...data,
+            projectName: "",
             isCreateNew: event.target.checked
         });
     };
@@ -125,7 +122,6 @@ export const ChangeProject = () => {
     const getRepositoryName = (): React.ReactNode => {
         if (data.isCreateNew) {
             return <TextField
-                required
                 fullWidth
                 margin="dense"
                 id="repositoryName"
@@ -297,10 +293,10 @@ export const ChangeProject = () => {
     };
     // TODO refer selected project here
     const createProjectRequest: CreateProjectRequest = prepareCreateProjectRequest()
-    const listProjectsRequest: ListProjectsRequest = prepareCreateProjectRequest()
+    const listProjectsRequest: ListProjectsRequest = {}
 
     // When clicked, open the dialog
-    const handleChangeProject = () => {
+    const handleChangeProjectClick = () => {
         setData({...data, isOpen: true})
     };
 
@@ -317,44 +313,42 @@ export const ChangeProject = () => {
         }
         return <Button variant="contained"
                        onClick={handleCreateProjectClick}
-                       disabled={data.projectName === "" || !isValid()}>
-            {projectsStatus === 'loading'
+                       disabled={createProjectStatus === 'loading' || data.projectName === "" || !isValid()}>
+            {createProjectStatus === 'loading'
                 ? "Creating Project"
                 : "Create Project"}
         </Button>
     }
 
-    return (
-        <>
-            <Dialog open={data.isOpen} onClose={handleClose}>
-                <DialogTitle>Create/Choose Repo</DialogTitle>
-                <Divider/>
-                <DialogContent>
-                    <Stack direction="column" spacing={2}>
-                        <FormControlLabel
-                            label="Create new?"
-                            control={<Checkbox
-                                size="medium"
-                                checked={data.isCreateNew}
-                                onChange={handleIsCreateNewChange}
-                            />}
-                        />
-                        {getProjectName()}
-                        {getRepositoryName()}
-                        {getRepositoryBranch()}
-                        {getExistingProjects()}
-                    </Stack>
-                </DialogContent>
-                <DialogActions>
-                    <Button variant="outlined" color="secondary" onClick={handleClose}>Cancel</Button>
-                    {getActionButtons()}
-                </DialogActions>
-            </Dialog>
-            <Button style={{
-                width: "200px"
-            }} variant="contained" onClick={handleChangeProject}>
-                Change Project
-            </Button>
-        </>
-    );
+    return <React.Fragment>
+        <Dialog open={data.isOpen} onClose={handleClose}>
+            <DialogTitle>Create/Choose Repo</DialogTitle>
+            <Divider/>
+            <DialogContent>
+                <Stack direction="column" spacing={2}>
+                    <FormControlLabel
+                        label="Create new?"
+                        control={<Checkbox
+                            size="medium"
+                            checked={data.isCreateNew}
+                            onChange={handleIsCreateNewChange}
+                        />}
+                    />
+                    {getProjectName()}
+                    {getRepositoryName()}
+                    {getRepositoryBranch()}
+                    {getExistingProjects()}
+                </Stack>
+            </DialogContent>
+            <DialogActions>
+                <Button variant="outlined" color="secondary" onClick={handleClose}>Cancel</Button>
+                {getActionButtons()}
+            </DialogActions>
+        </Dialog>
+        <Button style={{
+            width: "200px"
+        }} variant="contained" onClick={handleChangeProjectClick}>
+            Change Project
+        </Button>
+    </React.Fragment>
 }
