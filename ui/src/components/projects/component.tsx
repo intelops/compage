@@ -3,11 +3,10 @@ import React, {ChangeEvent, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../hooks/redux-hooks';
 import {selectListProjectsData, selectProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
-import {CreateProjectRequest, ListProjectsRequest, Repository, User} from "./model";
+import {CreateProjectRequest, ListProjectsRequest, ListProjectsResponse, Repository, User} from "./model";
 import {CompageYaml} from "../diagram-maker/models";
 import {selectAuthData} from "../auth/slice";
 import {Navigate, useNavigate} from "react-router-dom";
-import {setCurrentRepositoryDetails} from "../../utils/service";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Dialog from "@mui/material/Dialog";
@@ -187,17 +186,15 @@ export const ChangeProject = () => {
                 value={data.projectName}
                 onChange={handleExistingProjectsChange}
                 variant="outlined">
-                {/*{*/}
-                {/*    !listProjectsData && listProjectsData.map((listProjectsResponse: ListProjectsResponse) =>*/}
-                {/*        (*/}
-                {/*            <MenuItem key={listProjectsResponse.id} value={listProjectsResponse.id}>*/}
-                {/*                {listProjectsResponse.displayName}*/}
-                {/*            </MenuItem>*/}
-                {/*        )*/}
-                {/*    )*/}
-                {/*}*/}
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                {
+                    listProjectsData && listProjectsData.map((listProjectsResponse: ListProjectsResponse) =>
+                        (
+                            <MenuItem key={listProjectsResponse.id} value={listProjectsResponse.id}>
+                                {listProjectsResponse.displayName} [{listProjectsResponse.id}]
+                            </MenuItem>
+                        )
+                    )
+                }
             </TextField>;
         }
         return ""
@@ -314,8 +311,7 @@ export const ChangeProject = () => {
     const getActionButtons = (): React.ReactNode => {
         if (!data.isCreateNew) {
             return <Button variant="contained"
-                           onClick={handleChooseProjectClick}
-                           disabled={data.projectName === "" || !isValid()}>
+                           onClick={handleChooseProjectClick}>
                 Choose Project
             </Button>;
         }
