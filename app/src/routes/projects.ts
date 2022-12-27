@@ -3,7 +3,7 @@ import {Request, Response, Router} from "express";
 import {createProject, deleteProject, getProject, listProjects, updateProject} from "../util/project-store";
 import {X_USER_NAME_HEADER} from "../util/constants";
 import {ProjectEntity} from "./models";
-import {createRepository} from "./github";
+import {createRepository} from "../store/github-client";
 
 const projectsRouter = Router();
 
@@ -51,11 +51,10 @@ projectsRouter.post("/", requireUserNameMiddleware, async (request: Request, res
     const projectEntity: ProjectEntity = request.body;
     const createdProjectResource = await createProject(<string>userName, projectEntity);
     if (createdProjectResource.apiVersion) {
-        // TODO Create github repo and save yaml to github (project's yaml to github repo)
         try {
             const axiosResponse = await createRepository(projectEntity.user.name, projectEntity.repository.name, projectEntity.repository.name);
             if (axiosResponse.data) {
-                console.log("data : ", axiosResponse.data)
+                // TODO create compage.yaml file in github repo
                 const message = `'${createdProjectResource.metadata.name}' project created successfully.`
                 console.log(message)
                 return response.status(201).json({message: message});
@@ -68,9 +67,9 @@ projectsRouter.post("/", requireUserNameMiddleware, async (request: Request, res
             let message = `Repository for '${createdProjectResource.metadata.name}' couldn't be created.`
             const error = JSON.parse(JSON.stringify(e));
             if (error.status === 422) {
-                message = message + " Please choose different Repository Name."
+                message = `${message} Please choose different Repository Name.`
             } else {
-                message = message + `Received error code while creating github repository for '${createdProjectResource.metadata.name}': ` + error.status
+                message = `${message} Received error code while creating github repository for '${createdProjectResource.metadata.name}': ` + error.status
             }
             console.log(message)
             return response.status(500).json({message: message});
