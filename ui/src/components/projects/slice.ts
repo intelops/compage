@@ -4,13 +4,18 @@ import {createProjectAsync} from "./async-apis/createProject";
 import {listProjectsAsync} from "./async-apis/listProjects";
 
 export interface ProjectState {
-    data: any;
+    createProjectData: any;
+    listProjectsData: any;
+    getProjectData: any;
+
     status: 'idle' | 'loading' | 'failed';
     error: string | null;
 }
 
 const initialState: ProjectState = {
-    data: [],
+    getProjectData: {},
+    listProjectsData: [],
+    createProjectData: {},
     status: 'idle',
     error: null
 };
@@ -26,7 +31,7 @@ export const projectsSlice = createSlice({
         }).addCase(createProjectAsync.fulfilled, (state, action) => {
             state.status = 'idle';
             state.error = null
-            state.data = action.payload;
+            state.createProjectData = action.payload;
         }).addCase(createProjectAsync.rejected, (state, action) => {
             state.status = 'failed';
             if (action.payload) state.error = JSON.stringify(action.payload);
@@ -36,7 +41,7 @@ export const projectsSlice = createSlice({
         }).addCase(listProjectsAsync.fulfilled, (state, action) => {
             state.status = 'idle';
             state.error = null
-            state.data = action.payload;
+            state.listProjectsData = action.payload;
         }).addCase(listProjectsAsync.rejected, (state, action) => {
             state.status = 'failed';
             if (action.payload) state.error = JSON.stringify(action.payload);
@@ -44,7 +49,9 @@ export const projectsSlice = createSlice({
     },
 });
 
-export const selectProjectsData = (state: RootState) => state.projects.data;
+export const selectCreateProjectData = (state: RootState) => state.projects.createProjectData;
+export const selectListProjectsData = (state: RootState) => state.projects.listProjectsData;
+export const selectGetProjectData = (state: RootState) => state.projects.getProjectData;
 export const selectProjectsError = (state: RootState) => state.projects.error;
 export const selectProjectsStatus = (state: RootState) => state.projects.status;
 

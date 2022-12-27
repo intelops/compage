@@ -1,7 +1,7 @@
 import React, {ChangeEvent, useEffect, useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '../../hooks/redux-hooks';
-import {selectProjectsData, selectProjectsStatus} from './slice';
+import {selectListProjectsData, selectProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
 import {CreateProjectRequest, ListProjectsRequest, Repository, User} from "./model";
 import {CompageYaml} from "../diagram-maker/models";
@@ -21,7 +21,7 @@ import DialogActions from "@mui/material/DialogActions";
 export const CreateProject = () => {
     const projectsStatus = useAppSelector(selectProjectsStatus);
     const authData = useAppSelector(selectAuthData);
-    const projectsData = useAppSelector(selectProjectsData);
+    const listProjectsData = useAppSelector(selectListProjectsData);
 
     const dispatch = useAppDispatch();
     const navigate = useNavigate()
@@ -47,7 +47,7 @@ export const CreateProject = () => {
         return <Navigate to="/login"/>;
     }
 
-    // if (projectsData.length > 0 && projectsStatus !== 'loading') {
+    // if (listProjectsData.length > 0 && projectsStatus !== 'loading') {
     //     setData({...data, isOpen: true, isLoading: false})
     // }
 
@@ -60,7 +60,7 @@ export const CreateProject = () => {
         // give a call to create project if it's new
         if (data.isCreateNew) {
             // TODO
-            dispatch(createProjectAsync(createProjectRequest));
+            // dispatch(createProjectAsync(createProjectRequest));
             // authData.login, data.currentProject, data.description
             // use above data to create new project
         }
@@ -114,7 +114,7 @@ export const CreateProject = () => {
 
     const isValid = () => {
         if (data.isCreateNew) {
-            for (const project of projectsData) {
+            for (const project of listProjectsData) {
                 if (data.projectName === project.id) {
                     return false
                 }
@@ -174,7 +174,7 @@ export const CreateProject = () => {
     }
 
     const getExistingProjects = () => {
-        console.log("existingPrj : ", projectsData)
+        console.log("existingPrj : ", listProjectsData)
         if (!data.isCreateNew) {
             return <TextField
                 required
@@ -189,7 +189,7 @@ export const CreateProject = () => {
                 onChange={handleExistingProjectsChange}
                 variant="outlined">
                 {/*{*/}
-                {/*    !projectsData && projectsData.map((listProjectsResponse: ListProjectsResponse) =>*/}
+                {/*    !listProjectsData && listProjectsData.map((listProjectsResponse: ListProjectsResponse) =>*/}
                 {/*        (*/}
                 {/*            <MenuItem key={listProjectsResponse.id} value={listProjectsResponse.id}>*/}
                 {/*                {listProjectsResponse.displayName}*/}
@@ -218,7 +218,7 @@ export const CreateProject = () => {
             "        \"email\": \"mahendra.b@intelops.dev\"\n" +
             "    },\n" +
             "    \"repository\": {\n" +
-            "        \"name\": \"first-project\",\n" +
+            "        \"name\": \"first-project11\",\n" +
             "        \"branch\": \"main\"\n" +
             "    },\n" +
             "    \"displayName\": \"first-project\",\n" +

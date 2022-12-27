@@ -1,13 +1,8 @@
 import axios from "axios";
-import {Router} from "express";
 import {getToken} from "../util/user-store";
-import {requireUserNameMiddleware} from "../middlewares/auth";
 
-const githubRouter = Router();
-
-githubRouter.post("/create_repository", requireUserNameMiddleware, async (req, res) => {
-    const {repositoryName, description, userName} = req.body;
-    axios({
+export const createRepository = async (userName: string, repositoryName: string, description: string) => {
+    return axios({
         headers: {
             Accept: "application/vnd.github+json",
             Authorization: `Bearer ${await getToken(userName)}`,
@@ -17,80 +12,52 @@ githubRouter.post("/create_repository", requireUserNameMiddleware, async (req, r
             description: description,
             private: true,
         }
-    }).then(response => {
-        if (response.status !== 200) {
-            return res.status(response.status).json(response.statusText)
-        }
-        return res.status(200).json(response.data);
-    }).catch((error) => {
-        return res.status(500).json(error);
     });
-});
+}
 
-githubRouter.get("/list_repositories", requireUserNameMiddleware, async (req, res) => {
-    const {userName} = req.query;
-    axios({
+export const listRepositories = async (userName: string) => {
+    return axios({
         headers: {
             Accept: "application/vnd.github+json",
             Authorization: `Bearer ${await getToken(<string>userName)}`,
         },
         url: `https://api.github.com/user/repos`,
         method: "GET"
-    }).then(response => {
-        if (response.status !== 200) {
-            return res.status(response.status).json(response.statusText)
-        }
-        return res.status(200).json(response.data);
-    }).catch((error) => {
-        return res.status(500).json(error);
-    });
-});
+    })
+}
 
-githubRouter.put("/commit_compage_yaml", requireUserNameMiddleware, async (req, res) => {
-    const {message, committer, content, repositoryName, sha} = req.body;
-    axios({
+export const commitCompageYaml = async (userName: string,
+                                        email: string,
+                                        repositoryName: string,
+                                        content: string,
+                                        message: string,
+                                        sha: string) => {
+    return axios({
         headers: {
             Accept: "application/vnd.github+json",
-            Authorization: `Bearer ${await getToken(committer.userName)}`,
+            Authorization: `Bearer ${await getToken(userName)}`,
         },
-        url: `https://api.github.com/repos/${committer.userName}/${repositoryName}/contents/.compage/config.json`,
+        url: `https://api.github.com/repos/${userName}/${repositoryName}/contents/.compage/config.json`,
         method: "PUT",
         data: {
             message: message,
             content: content,
             committer: {
-                name: committer.userName,
-                email: committer.email
+                name: userName,
+                email: email
             },
             sha: sha
         }
-    }).then((response) => {
-        if (response.status !== 200) {
-            return res.status(response.status).json(response)
-        }
-        return res.status(200).json(response.data);
-    }).catch((error) => {
-        return res.status(400).json(error);
-    });
-});
+    })
+}
 
-githubRouter.get("/pull_compage_yaml", requireUserNameMiddleware, async (req, res) => {
-    const {userName, repositoryName} = req.query;
-    axios({
+export const pullCompageYaml = async (userName: string, repositoryName: string) => {
+    return axios({
         headers: {
             Accept: "application/vnd.github+json",
             Authorization: `Bearer ${await getToken(<string>userName)}`,
         },
         url: `https://api.github.com/repos/${userName}/${repositoryName}/contents/.compage/config.json`,
         method: "GET",
-    }).then((response) => {
-        if (response.status !== 200) {
-            return res.status(response.status).json(response.statusText)
-        }
-        return res.status(200).json(response.data);
-    }).catch((error) => {
-        return res.status(500).json(error);
-    });
-});
-
-export default githubRouter;
+    })
+}

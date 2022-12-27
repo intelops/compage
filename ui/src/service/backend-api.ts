@@ -36,10 +36,28 @@ export const CodeOperationsBackendApi = () => {
 
 export const ProjectsBackendApi = () => {
     const path = "/projects"
-    return axios.create({
+    const projectsBackendApiClient = axios.create({
         baseURL: config.backend_base_url + path,
         headers: getHeaders()
-    },)
+    },);
+
+    //we intercept every requests
+    projectsBackendApiClient.interceptors.request.use(async function (config) {
+        //anything you want to attach to the requests such as token
+        return config;
+    }, error => {
+        return Promise.reject(error)
+    })
+
+//we intercept every response
+    projectsBackendApiClient.interceptors.request.use(async function (config) {
+
+        return config;
+    }, error => {
+//check for authentication or anything like that
+        return Promise.reject(error)
+    })
+    return projectsBackendApiClient;
 }
 
 const getHeaders = () => {

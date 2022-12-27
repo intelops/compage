@@ -3,7 +3,6 @@ import "dotenv/config";
 import bodyParser from 'body-parser';
 import helmet from "helmet";
 import codeOperationsRouter from "./routes/code-operations";
-import githubRouter from "./routes/github";
 import authRouter from "./routes/auth";
 import config from "./util/constants";
 import projectsRouter from "./routes/projects";
@@ -35,7 +34,6 @@ app.get('/', (req: Request, res: Response) => {
 const routes = Router();
 routes.use('/projects', projectsRouter)
 routes.use('/code_operations', codeOperationsRouter);
-routes.use('/github', githubRouter);
 routes.use('/auth', authRouter);
 app.use(routes)
 
