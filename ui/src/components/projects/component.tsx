@@ -6,7 +6,6 @@ import Button from "@mui/material/Button";
 import {CreateProjectRequest, ListProjectsRequest, Repository, User} from "./model";
 import {CompageYaml} from "../diagram-maker/models";
 import {selectAuthData} from "../auth/slice";
-import {createProjectAsync} from "./async-apis/createProject";
 import {Navigate, useNavigate} from "react-router-dom";
 import {setCurrentRepositoryDetails} from "../../utils/service";
 import TextField from "@mui/material/TextField";
@@ -19,7 +18,7 @@ import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import DialogActions from "@mui/material/DialogActions";
 import {listProjectsAsync} from "./async-apis/listProjects";
 
-export const CreateProject = () => {
+export const ChangeProject = () => {
     const projectsStatus = useAppSelector(selectProjectsStatus);
     const authData = useAppSelector(selectAuthData);
     const listProjectsData = useAppSelector(selectListProjectsData);
@@ -29,7 +28,6 @@ export const CreateProject = () => {
 
     const [data, setData] = useState({
         errorMessage: "",
-        isLoading: false,
         isOpen: false,
         projectName: "",
         isCreateNew: false,
@@ -41,8 +39,7 @@ export const CreateProject = () => {
     useEffect(() => {
         // dispatch listProjects
         dispatch(listProjectsAsync(listProjectsRequest));
-        setData({...data, isLoading: projectsStatus === 'loading'})
-    }, [setData])
+    }, [])
 
     if (!authData.login) {
         return <Navigate to="/login"/>;
@@ -57,24 +54,26 @@ export const CreateProject = () => {
         navigate('/home');
     }
 
-    const handleCreate = () => {
-        // give a call to create project if it's new
-        if (data.isCreateNew) {
-            // TODO
-            // dispatch(createProjectAsync(createProjectRequest));
-            // authData.login, data.currentProject, data.description
-            // use above data to create new project
-        }
-        // set the current repository retails post response from server
-        // give call to pull the latest contents
-        const currentRepositoryDetails = {
-            repositoryName: data.projectName,
-            // TODO
-            details: "githubRepositoryContent"
-        }
-        setCurrentRepositoryDetails(JSON.stringify(currentRepositoryDetails))
-        setData({...data, isOpen: false})
-        navigate('/home');
+    const handleCreateProjectClick = () => {
+        console.log("handleCreateProjectClick clicked");
+        console.log(JSON.stringify(data));
+        // // give a call to create project if it's new
+        // if (data.isCreateNew) {
+        //     // TODO
+        //     // dispatch(createProjectAsync(createProjectRequest));
+        //     // authData.login, data.currentProject, data.description
+        //     // use above data to create new project
+        // }
+        // // set the current repository retails post response from server
+        // // give call to pull the latest contents
+        // const currentRepositoryDetails = {
+        //     repositoryName: data.projectName,
+        //     // TODO
+        //     details: "githubRepositoryContent"
+        // }
+        // setCurrentRepositoryDetails(JSON.stringify(currentRepositoryDetails))
+        // setData({...data, isOpen: false})
+        // navigate('/home');
     }
 
 
@@ -124,7 +123,7 @@ export const CreateProject = () => {
         return true;
     }
 
-    const getRepositoryName = () => {
+    const getRepositoryName = (): React.ReactNode => {
         if (data.isCreateNew) {
             return <TextField
                 required
@@ -133,7 +132,7 @@ export const CreateProject = () => {
                 id="repositoryName"
                 label="Repository Name"
                 type="text"
-                value={data.repositoryBranch}
+                value={data.repositoryName}
                 onChange={handleRepositoryNameChange}
                 variant="outlined"
             />;
@@ -141,7 +140,7 @@ export const CreateProject = () => {
         return ""
     }
 
-    const getRepositoryBranch = () => {
+    const getRepositoryBranch = (): React.ReactNode => {
         if (data.isCreateNew) {
             return <TextField
                 fullWidth
@@ -157,7 +156,7 @@ export const CreateProject = () => {
         return ""
     }
 
-    const getProjectName = () => {
+    const getProjectName = (): React.ReactNode => {
         if (data.isCreateNew) {
             return <TextField
                 required
@@ -174,8 +173,7 @@ export const CreateProject = () => {
         return "";
     }
 
-    const getExistingProjects = () => {
-        console.log("existingPrj : ", listProjectsData)
+    const getExistingProjects = (): React.ReactNode => {
         if (!data.isCreateNew) {
             return <TextField
                 required
@@ -304,12 +302,34 @@ export const CreateProject = () => {
     const createProjectRequest: CreateProjectRequest = prepareCreateProjectRequest()
     const listProjectsRequest: ListProjectsRequest = prepareCreateProjectRequest()
 
-    // When clicked, dispatch `createProject`:
-    const handleClick = () => dispatch(createProjectAsync(createProjectRequest));
+    // When clicked, open the dialog
+    const handleChangeProject = () => {
+        setData({...data, isOpen: true})
+    };
+
+    const handleChooseProjectClick = () => {
+        console.log("handleChooseProjectClick clicked")
+    }
+
+    const getActionButtons = (): React.ReactNode => {
+        if (!data.isCreateNew) {
+            return <Button variant="contained"
+                           onClick={handleChooseProjectClick}
+                           disabled={data.projectName === "" || !isValid()}>
+                Choose Project
+            </Button>;
+        }
+        return <Button variant="contained"
+                       onClick={handleCreateProjectClick}
+                       disabled={data.projectName === "" || !isValid()}>
+            {projectsStatus === 'loading'
+                ? "Creating Project"
+                : "Create Project"}
+        </Button>
+    }
 
     return (
         <>
-            {data.isLoading && <p>Wait I'm Loading repos for you</p>}
             <Dialog open={data.isOpen} onClose={handleClose}>
                 <DialogTitle>Create/Choose Repo</DialogTitle>
                 <Divider/>
@@ -331,19 +351,13 @@ export const CreateProject = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button variant="outlined" color="secondary" onClick={handleClose}>Cancel</Button>
-                    <Button variant="contained"
-                            onClick={handleCreate}
-                            disabled={data.projectName === "" || !isValid()}>Choose</Button>
+                    {getActionButtons()}
                 </DialogActions>
             </Dialog>
-            {/*<span>{JSON.stringify(data)}</span>*/}
-            {/*<span>{JSON.stringify(error)}</span>*/}
             <Button style={{
                 width: "200px"
-            }} variant="contained" onClick={handleClick}>
-                {projectsStatus === "loading"
-                    ? "Creating Project"
-                    : "Create Project"}
+            }} variant="contained" onClick={handleChangeProject}>
+                Change Project
             </Button>
         </>
     );

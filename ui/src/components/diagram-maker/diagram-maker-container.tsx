@@ -57,7 +57,7 @@ import {cleanse} from "./helper/helper";
 import JSONPretty from "react-json-pretty";
 import Button from "@mui/material/Button";
 import {GenerateCode} from "../code-operations/component";
-import {CreateProject} from "../projects/component";
+import {ChangeProject} from "../projects/component";
 
 interface ArgTypes {
     resetState?: (...args: any) => void;
@@ -431,7 +431,7 @@ export const DiagramMakerContainer = ({
                 display: "flex",
                 flexDirection: "column"
             }}>
-                <CreateProject></CreateProject>
+                <ChangeProject></ChangeProject>
             </Grid>
             <hr/>
             <Grid item style={{

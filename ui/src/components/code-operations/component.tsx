@@ -17,8 +17,12 @@ export const GenerateCode = () => {
         projectId: "mahen-first-14510"
     }
 
-    // When clicked, dispatch `generateCode`:
-    const handleClick = () => dispatch(generateCodeAsync(generateCodeRequest));
+    // When clicked, dispatch `generateCode`
+    const handleGenerateCodeClick = () => {
+        if (codeOperationsStatus !== 'loading') {
+            dispatch(generateCodeAsync(generateCodeRequest))
+        }
+    };
 
     return (
         <>
@@ -26,7 +30,7 @@ export const GenerateCode = () => {
             {/*<span>{JSON.stringify(error)}</span>*/}
             <Button style={{
                 width: "200px"
-            }} variant="contained" onClick={handleClick}>
+            }} variant="contained" onClick={handleGenerateCodeClick}>
                 {codeOperationsStatus === "loading"
                     ? "Generating Code"
                     : "Generate Code"}
