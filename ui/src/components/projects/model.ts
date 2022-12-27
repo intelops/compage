@@ -53,3 +53,24 @@ export interface ListProjectsRequest {
 export type ListProjectsError = {
     message: string;
 };
+
+// getProject models (the structure matches as of now with CreateProjectRequest but have kept it
+// separate for future customizations)
+export interface GetProjectResponse {
+    id: string,
+    displayName: string,
+    version: string,
+    user: User,
+    yaml: CompageYaml,
+    repository: Repository,
+    metadata: Map<string, string>
+}
+
+export interface GetProjectRequest {
+    id: string,
+}
+
+// This type describes the error object structure:
+export type GetProjectError = {
+    message: string;
+};
