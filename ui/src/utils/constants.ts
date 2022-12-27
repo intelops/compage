@@ -1,4 +1,4 @@
-const assert = require('assert').strict
+import assert from 'assert'
 
 // const configValue : string = process.env.REACT_APP_SOME_CONFIGURATION
 

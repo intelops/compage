@@ -7,12 +7,12 @@ interface ContextEdgeProps {
 }
 
 export const ContextEdge = (props: ContextEdgeProps) => {
-    let parsedModifiedState = getParsedModifiedState();
+    const parsedModifiedState = getParsedModifiedState();
 
     const [payload] = React.useState({
-        type: parsedModifiedState.edges[props.id]?.consumerData["type"] !== undefined ? parsedModifiedState.edges[props.id].consumerData["type"] : "",
-        name: parsedModifiedState.edges[props.id]?.consumerData["name"] !== undefined ? parsedModifiedState.edges[props.id].consumerData["name"] : "",
-        protocol: parsedModifiedState.edges[props.id]?.consumerData["protocol"] !== undefined ? parsedModifiedState.edges[props.id].consumerData["protocol"] : "",
+        type: parsedModifiedState.edges[props.id]?.consumerData.type !== undefined ? parsedModifiedState.edges[props.id].consumerData.type : "",
+        name: parsedModifiedState.edges[props.id]?.consumerData.name !== undefined ? parsedModifiedState.edges[props.id].consumerData.name : "",
+        protocol: parsedModifiedState.edges[props.id]?.consumerData.protocol !== undefined ? parsedModifiedState.edges[props.id].consumerData.protocol : "",
     });
 
     if (!props.id) {

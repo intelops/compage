@@ -18,19 +18,19 @@ interface NewEdgePropertiesProps {
 }
 
 export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
-    let parsedModifiedState = getParsedModifiedState();
+    const parsedModifiedState = getParsedModifiedState();
 
     const [payload, setPayload] = React.useState({
-        name: parsedModifiedState.edges[props.edgeId]?.consumerData["name"] !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData["name"] : "",
-        type: parsedModifiedState.edges[props.edgeId]?.consumerData["type"] !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData["type"] : "",
-        protocol: parsedModifiedState.edges[props.edgeId]?.consumerData["protocol"] !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData["protocol"] : "",
+        name: parsedModifiedState.edges[props.edgeId]?.consumerData.name !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData.name : "",
+        type: parsedModifiedState.edges[props.edgeId]?.consumerData.type !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData.type : "",
+        protocol: parsedModifiedState.edges[props.edgeId]?.consumerData.protocol !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData.protocol : "",
     });
 
     // TODO this is a hack as there is no EDGE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state with additional properties added from UI (Post edge creation)
     const handleUpdate = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        let parsedModifiedState = getParsedModifiedState();
+        const parsedModifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
         // P.S. - We will have the fields in consumerData which are on dialogBox, so we can assign them directly. We also refer the older values when payload state is initialized, so the older values will be persisted as they are if not changed.
         if (!(props.edgeId in parsedModifiedState.edges)) {

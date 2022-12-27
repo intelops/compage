@@ -28,7 +28,7 @@ export const Home = () => {
         // if not pull state from github
     }
 
-    let currentConfig = getCurrentConfig();
+    const currentConfig = getCurrentConfig();
     let diagramMakerData
     if (currentConfig && currentConfig !== "{}") {
         diagramMakerData = JSON.parse(currentConfig);

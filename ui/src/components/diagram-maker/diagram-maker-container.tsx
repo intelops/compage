@@ -161,10 +161,10 @@ export const DiagramMakerContainer = ({
         let plugin, connectorPlacement
         // let initialData = BoundaryRectangularData
         // let connectorPlacement = ConnectorPlacementType.BOUNDARY
-        let showArrowhead = true
-        let shape = Shape.CIRCLE
-        let edgeBadge = true
-        let actionInterceptor = true
+        const showArrowhead = true
+        const shape = Shape.CIRCLE
+        const edgeBadge = true
+        const actionInterceptor = true
         // let onAction: {
         //     action: 'action',
         // }
@@ -360,7 +360,7 @@ export const DiagramMakerContainer = ({
         // diagramMakerRef.current.api.dispatch({
         //     type: EdgeActions.EDGE_MOUSE_OVER,
         // });
-        let currentConfig = getCurrentConfig();
+        const currentConfig = getCurrentConfig();
         if (currentConfig) {
             setData(currentConfig)
         }

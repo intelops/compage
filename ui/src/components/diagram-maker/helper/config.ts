@@ -1,9 +1,9 @@
-interface config {
+interface Config {
     classNames: string[]
     icon: string
 }
 
-export const getConfig = (typeId: string): config => {
+export const getConfig = (typeId: string): Config => {
     switch (typeId) {
         case "node-type-circle":
             // console.log("It is a node-type-circle.");

@@ -7,17 +7,17 @@ interface ContextNodeProps {
 }
 
 export const ContextNode = (props: ContextNodeProps) => {
-    let parsedModifiedState = getParsedModifiedState();
+    const parsedModifiedState = getParsedModifiedState();
 
     const [payload] = React.useState({
-        name: parsedModifiedState.nodes[props.id]?.consumerData["name"] !== undefined ? parsedModifiedState.nodes[props.id].consumerData["name"] : "",
-        type: parsedModifiedState.nodes[props.id]?.consumerData["type"] !== undefined ? parsedModifiedState.nodes[props.id].consumerData["type"] : "",
-        language: parsedModifiedState.nodes[props.id]?.consumerData["language"] !== undefined ? parsedModifiedState.nodes[props.id].consumerData["language"] : "",
-        isServer: parsedModifiedState.nodes[props.id]?.consumerData["isServer"] !== undefined ? parsedModifiedState.nodes[props.id].consumerData["isServer"] : false,
-        isClient: parsedModifiedState.nodes[props.id]?.consumerData["isClient"] !== undefined ? parsedModifiedState.nodes[props.id].consumerData["isClient"] : false,
+        name: parsedModifiedState.nodes[props.id]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.id].consumerData.name : "",
+        type: parsedModifiedState.nodes[props.id]?.consumerData.type !== undefined ? parsedModifiedState.nodes[props.id].consumerData.type : "",
+        language: parsedModifiedState.nodes[props.id]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.id].consumerData.language : "",
+        isServer: parsedModifiedState.nodes[props.id]?.consumerData.isServer !== undefined ? parsedModifiedState.nodes[props.id].consumerData.isServer : false,
+        isClient: parsedModifiedState.nodes[props.id]?.consumerData.isClient !== undefined ? parsedModifiedState.nodes[props.id].consumerData.isClient : false,
         // api resources to be generated
         resources: [],
-        url: parsedModifiedState?.nodes[props.id]?.consumerData["url"] !== undefined ? parsedModifiedState.nodes[props.id].consumerData["url"] : "",
+        url: parsedModifiedState?.nodes[props.id]?.consumerData.url !== undefined ? parsedModifiedState.nodes[props.id].consumerData.url : "",
     });
 
     if (!props.id) {

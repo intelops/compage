@@ -41,20 +41,20 @@ export const ProjectsBackendApi = () => {
         headers: getHeaders()
     },);
 
-    //we intercept every requests
-    projectsBackendApiClient.interceptors.request.use(async function (config) {
-        //anything you want to attach to the requests such as token
-        return config;
+    // we intercept every requests
+    projectsBackendApiClient.interceptors.request.use(async (cnf) => {
+        // anything you want to attach to the requests such as token
+        return cnf;
     }, error => {
         return Promise.reject(error)
     })
 
-//we intercept every response
-    projectsBackendApiClient.interceptors.request.use(async function (config) {
+// we intercept every response
+    projectsBackendApiClient.interceptors.request.use(async (cnf) => {
 
-        return config;
+        return cnf;
     }, error => {
-//check for authentication or anything like that
+// check for authentication or anything like that
         return Promise.reject(error)
     })
     return projectsBackendApiClient;

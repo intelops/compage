@@ -69,7 +69,7 @@ export const CreateProject = () => {
         // give call to pull the latest contents
         const currentRepositoryDetails = {
             repositoryName: data.projectName,
-            //TODO
+            // TODO
             details: "githubRepositoryContent"
         }
         setCurrentRepositoryDetails(JSON.stringify(currentRepositoryDetails))

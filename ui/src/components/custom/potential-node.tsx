@@ -6,7 +6,7 @@ interface PotentialNodeProps {
 }
 
 export const PotentialNode = (props: PotentialNodeProps) => {
-    let config = getConfig(props.typeId);
+    const config = getConfig(props.typeId);
     return <React.Fragment>
         <div style={{border: "1px solid black"}} className={config.classNames + " example-node"}>
             {props.typeId}

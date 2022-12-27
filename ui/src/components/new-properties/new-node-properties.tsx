@@ -19,24 +19,24 @@ interface NewNodePropertiesProps {
 }
 
 export const NewNodeProperties = (props: NewNodePropertiesProps) => {
-    let parsedModifiedState = getParsedModifiedState();
+    const parsedModifiedState = getParsedModifiedState();
 
     const [payload, setPayload] = React.useState({
-        name: parsedModifiedState.nodes[props.nodeId]?.consumerData["name"] !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData["name"] : "",
-        type: parsedModifiedState.nodes[props.nodeId]?.consumerData["type"] !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData["type"] : "",
-        language: parsedModifiedState.nodes[props.nodeId]?.consumerData["language"] !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData["language"] : "",
-        isServer: parsedModifiedState.nodes[props.nodeId]?.consumerData["isServer"] !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData["isServer"] : false,
-        isClient: parsedModifiedState.nodes[props.nodeId]?.consumerData["isClient"] !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData["isClient"] : false,
+        name: parsedModifiedState.nodes[props.nodeId]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.name : "",
+        type: parsedModifiedState.nodes[props.nodeId]?.consumerData.type !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.type : "",
+        language: parsedModifiedState.nodes[props.nodeId]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.language : "",
+        isServer: parsedModifiedState.nodes[props.nodeId]?.consumerData.isServer !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.isServer : false,
+        isClient: parsedModifiedState.nodes[props.nodeId]?.consumerData.isClient !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.isClient : false,
         // api resources to be generated
         resources: [],
-        url: parsedModifiedState?.nodes[props.nodeId]?.consumerData["url"] !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData["url"] : "",
+        url: parsedModifiedState?.nodes[props.nodeId]?.consumerData.url !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.url : "",
     });
 
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state with additional properties added from UI (Post node creation)
     const handleUpdate = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        let parsedModifiedState = getParsedModifiedState();
+        const parsedModifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
         // P.S. - We will have the fields in consumerData which are on dialogBox, so we can assign them directly. We also refer the older values when payload state is initialized, so the older values will be persisted as they are if not changed.
         if (!(props.nodeId in parsedModifiedState.nodes)) {

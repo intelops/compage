@@ -21,7 +21,7 @@ export const loginAsync = createAsyncThunk<LoginResponse, LoginRequest, { reject
 
             const loginResponse: LoginResponse = response.data;
 
-            //TODO This is temporary, need to replace with code extracting from localstorage.
+            // TODO This is temporary, need to replace with code extracting from localstorage.
             localStorage.setItem("CURRENT_USER_NAME", loginResponse.login)
             console.log("Successfully logged in : " + loginResponse.login)
             toastr.success('Success : ' + loginResponse.login, "Successfully logged in.");

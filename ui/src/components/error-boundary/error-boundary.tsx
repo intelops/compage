@@ -19,8 +19,8 @@ export class ErrorBoundary extends React.Component<IErrorProps, IErrorState> {
 
     componentDidCatch(error, errorInfo) {
         this.setState({
-            error: error,
-            errorInfo: errorInfo
+            error,
+            errorInfo
         });
     }
 
