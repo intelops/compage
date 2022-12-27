@@ -17,6 +17,7 @@ import Divider from "@mui/material/Divider";
 import DialogContent from "@mui/material/DialogContent";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import DialogActions from "@mui/material/DialogActions";
+import {listProjectsAsync} from "./async-apis/listProjects";
 
 export const CreateProject = () => {
     const projectsStatus = useAppSelector(selectProjectsStatus);
@@ -39,7 +40,7 @@ export const CreateProject = () => {
 
     useEffect(() => {
         // dispatch listProjects
-        // dispatch(listProjectsAsync(listProjectsRequest));
+        dispatch(listProjectsAsync(listProjectsRequest));
         setData({...data, isLoading: projectsStatus === 'loading'})
     }, [setData])
 

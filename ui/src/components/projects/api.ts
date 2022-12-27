@@ -1,12 +1,12 @@
-import {CreateProjectRequest} from "./model";
+import {CreateProjectRequest, ListProjectsRequest} from "./model";
 import {ProjectsBackendApi} from "../../service/backend-api";
 
 // Sync apis (async apis are in thunk)
 export const createProject = (createProjectRequest: CreateProjectRequest) => {
-    return ProjectsBackendApi().post('/', createProjectRequest)
+    return ProjectsBackendApi().post('/', createProjectRequest);
 }
 
 // Sync apis (async apis are in thunk)
-export const listProjects = () => {
-    return ProjectsBackendApi().get('/')
+export const listProjects = (listProjectsRequest: ListProjectsRequest) => {
+    return ProjectsBackendApi().get('/');
 }

@@ -17,10 +17,10 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
                     message: errorMessage
                 });
             }
-            const message = `Successfully created project: ${createProjectRequest.displayName}`
-            console.log(message)
+            const message = `Successfully created project: ${createProjectRequest.displayName}`;
+            console.log(message);
             toastr.success(`Success: ${createProjectRequest.displayName}`, message);
-            return response.data
+            return response.data;
         }).catch(e => {
             const statusCode = e.response.status;
             const message = JSON.parse(JSON.stringify(e.response.data)).message;

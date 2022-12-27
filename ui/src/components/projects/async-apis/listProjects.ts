@@ -1,29 +1,34 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {ListProjectsError, ListProjectsRequest, ListProjectsResponse} from "../model";
 import {listProjects} from "../api";
-import {toastr} from 'react-redux-toastr'
+import {toastr} from 'react-redux-toastr';
 
 export const listProjectsAsync = createAsyncThunk<ListProjectsResponse, ListProjectsRequest, { rejectValue: ListProjectsError }>(
     'projects/listProjects',
     async (listProjectsRequest: ListProjectsRequest, thunkApi) => {
-        try {
-            const response = await listProjects();
-            // Check if status is not okay:
+        return listProjects(listProjectsRequest).then(response => {
             if (response.status !== 200) {
-                console.log("Failed to list projects. Received : " + response.status)
-                toastr.error('Failure', "Failed to list projects. Received : " + response.status);
-                // Return the error message:
+                const message = `Failed to list projects.`;
+                const errorMessage = `Status: ${response.status}, Message: ${message}`;
+                console.log(errorMessage);
+                toastr.error(`Failure`, errorMessage);
                 return thunkApi.rejectWithValue({
-                    message: "Failed to list projects. Received : " + response.status
+                    message: errorMessage
                 });
             }
-            console.log("Successfully listed projects :", JSON.stringify(response.data))
-            toastr.success('Success', "Successfully listed projects");
+            const message = `Successfully listed projects.`;
+            console.log(`${message}`);
+            toastr.success(`Success`, message);
             return response.data;
-        } catch (e) {
+        }).catch(e => {
+            const statusCode = e.response.status;
+            const message = JSON.parse(JSON.stringify(e.response.data)).message;
+            const errorMessage = `Status: ${statusCode}, Message: ${message}`;
+            console.log(errorMessage);
+            toastr.error(`Failure`, errorMessage);
             return thunkApi.rejectWithValue({
-                message: "Failed to create project. Received :" + e
+                message: errorMessage
             });
-        }
+        })
     }
 );
