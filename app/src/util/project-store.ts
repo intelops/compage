@@ -1,4 +1,4 @@
-import {ProjectEntity} from "../routes/models";
+import {initializeEmptyProjectEntity, ProjectEntity} from "../routes/models";
 
 import {project_group, project_kind, project_version, ProjectResource, ProjectResourceSpec} from "../store/models";
 import {NAMESPACE} from "./constants";
@@ -75,7 +75,7 @@ export const getProject = async (userName: string, projectId: string) => {
     if (projectResource?.metadata?.labels?.userName === userName) {
         return convertProjectResourceToProjectEntity(projectResource)
     }
-    return {};
+    return initializeEmptyProjectEntity();
 }
 
 // prepareProjectResource prepares ProjectResource containing the project details.

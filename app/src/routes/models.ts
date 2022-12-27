@@ -93,3 +93,23 @@ export interface GenerateCodeResponse {
     message: string,
     error: string,
 }
+
+export const initializeEmptyProjectEntity = () => {
+    const repository: Repository = {branch: "", name: "", tag: ""};
+    const user: User = {email: "", name: ""};
+    const yaml: CompageYaml = {
+        edges: new Map<string, CompageEdge>(),
+        nodes: new Map<string, CompageNode>(),
+        version: ""
+    };
+    const projectEntity: ProjectEntity = {
+        displayName: "",
+        id: "",
+        metadata: new Map<string, string>(),
+        repository: repository,
+        user: user,
+        version: "",
+        yaml: yaml
+    }
+    return projectEntity
+}

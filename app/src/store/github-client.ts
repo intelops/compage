@@ -1,13 +1,17 @@
 import axios from "axios";
 import {getToken} from "../util/user-store";
 
+const ACCEPT = `application/vnd.github+json`;
+const USER_REPO_URL = `https://api.github.com/user/repos`;
+const REPO_URL = `https://api.github.com/repos`;
+
 export const createRepository = async (userName: string, repositoryName: string, description: string) => {
     return axios({
         headers: {
-            Accept: "application/vnd.github+json",
+            Accept: ACCEPT,
             Authorization: `Bearer ${await getToken(userName)}`,
         },
-        url: `https://api.github.com/user/repos`, method: "POST", data: {
+        url: USER_REPO_URL, method: "POST", data: {
             name: repositoryName,
             description: description,
             private: true,
@@ -18,10 +22,10 @@ export const createRepository = async (userName: string, repositoryName: string,
 export const listRepositories = async (userName: string) => {
     return axios({
         headers: {
-            Accept: "application/vnd.github+json",
+            Accept: ACCEPT,
             Authorization: `Bearer ${await getToken(<string>userName)}`,
         },
-        url: `https://api.github.com/user/repos`,
+        url: USER_REPO_URL,
         method: "GET"
     })
 }
@@ -34,10 +38,10 @@ export const commitCompageYaml = async (userName: string,
                                         sha: string) => {
     return axios({
         headers: {
-            Accept: "application/vnd.github+json",
+            Accept: ACCEPT,
             Authorization: `Bearer ${await getToken(userName)}`,
         },
-        url: `https://api.github.com/repos/${userName}/${repositoryName}/contents/.compage/config.json`,
+        url: `${REPO_URL}/${userName}/${repositoryName}/contents/.compage/config.json`,
         method: "PUT",
         data: {
             message: message,
@@ -54,10 +58,10 @@ export const commitCompageYaml = async (userName: string,
 export const pullCompageYaml = async (userName: string, repositoryName: string) => {
     return axios({
         headers: {
-            Accept: "application/vnd.github+json",
+            Accept: ACCEPT,
             Authorization: `Bearer ${await getToken(<string>userName)}`,
         },
-        url: `https://api.github.com/repos/${userName}/${repositoryName}/contents/.compage/config.json`,
+        url: `${REPO_URL}/${userName}/${repositoryName}/contents/.compage/config.json`,
         method: "GET",
     })
 }
