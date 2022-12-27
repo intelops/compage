@@ -50,7 +50,7 @@ export interface ProjectResourceSpec {
     id: string,
     displayName: string,
     user: User,
-    yaml: string,
+    json: string,
     repository: Repository,
     metadata: string
     version: string,

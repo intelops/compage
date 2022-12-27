@@ -220,7 +220,7 @@ func copyRelevantFiles(coreProject *core.Project, goNode *languages.LanguageNode
 	//	}
 	//} else if goNode.ConsumerData.IsClient {
 	//	// extract server ports and source - needed this for url
-	//	//m := getEdgeInfoForNode(coreProject.CompageYaml.Edges, node)
+	//	//m := getEdgeInfoForNode(coreProject.CompageJson.Edges, node)
 	//	//fmt.Println(m)
 	//} else {
 	//	//copy common files and removed from filePaths

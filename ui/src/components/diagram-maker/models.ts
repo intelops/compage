@@ -58,7 +58,7 @@ export interface CompageEdge {
     consumerData: EdgeConsumerData
 }
 
-export interface CompageYaml {
+export interface CompageJson {
     edges: Map<string, CompageEdge>,
     nodes: Map<string, CompageNode>
     version: string

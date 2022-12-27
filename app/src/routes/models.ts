@@ -45,7 +45,7 @@ export interface CompageEdge {
     consumerData: EdgeConsumerData
 }
 
-export interface CompageYaml {
+export interface CompageJson {
     edges: Map<string, CompageEdge>,
     nodes: Map<string, CompageNode>
     version: string
@@ -62,7 +62,7 @@ export interface Repository {
 export interface Project {
     projectName: string,
     userName: string,
-    yaml: string,
+    json: string,
     repositoryName: string,
     metadata: string
 }
@@ -73,7 +73,7 @@ export interface ProjectEntity {
     displayName: string,
     version: string,
     user: User,
-    yaml: CompageYaml,
+    json: CompageJson,
     repository: Repository,
     metadata: Map<string, string>
 }
@@ -97,7 +97,7 @@ export interface GenerateCodeResponse {
 export const initializeEmptyProjectEntity = () => {
     const repository: Repository = {branch: "", name: "", tag: ""};
     const user: User = {email: "", name: ""};
-    const yaml: CompageYaml = {
+    const json: CompageJson = {
         edges: new Map<string, CompageEdge>(),
         nodes: new Map<string, CompageNode>(),
         version: ""
@@ -109,7 +109,7 @@ export const initializeEmptyProjectEntity = () => {
         repository: repository,
         user: user,
         version: "",
-        yaml: yaml
+        json: json
     }
     return projectEntity
 }

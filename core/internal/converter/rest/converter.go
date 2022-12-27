@@ -8,13 +8,13 @@ import (
 
 // GetProject converts core.ProjectInput to *core.Project.
 func GetProject(input core.ProjectInput) (*core.Project, error) {
-	compageYaml, err := converter.GetCompageYaml(input.Yaml)
+	compageJson, err := converter.GetCompageJson(input.Json)
 	if err != nil {
 		return nil, err
 	}
 
 	return &core.Project{
-		CompageYaml:    compageYaml,
+		CompageJson:    compageJson,
 		Name:           input.ProjectName,
 		RepositoryName: input.RepositoryName,
 		Metadata:       converter.GetMetadata(input.Metadata),

@@ -14,7 +14,7 @@ func TestAdd(t *testing.T) {
 		UserName:       "mahendraintelops",
 		RepositoryName: "first-project-github",
 		ProjectName:    "first-project",
-		Yaml:           jsonString,
+		Json:           jsonString,
 	}
 	defer func() {
 		//_ = os.RemoveAll("/tmp/first-project")

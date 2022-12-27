@@ -11,7 +11,7 @@ spec:
   user:
     name: mahendraintelops
     email: mahendra.b@intelops.dev
-  yaml: |
+  json: |
     this is sample yaml string
   repository:
     name: first-project

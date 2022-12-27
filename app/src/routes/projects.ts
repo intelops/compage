@@ -3,7 +3,7 @@ import {Request, Response, Router} from "express";
 import {createProject, deleteProject, getProject, listProjects, updateProject} from "../util/project-store";
 import {X_USER_NAME_HEADER} from "../util/constants";
 import {ProjectEntity} from "./models";
-import {createRepository, pullCompageYaml} from "../store/github-client";
+import {createRepository, pullCompageJson} from "../store/github-client";
 
 const projectsRouter = Router();
 
@@ -32,12 +32,12 @@ projectsRouter.get("/:id", requireUserNameMiddleware, async (request: Request, r
     if (projectEntity.id.length !== 0) {
         try {
             // pull .compage/config.json from github repository.
-            const axiosResponse = await pullCompageYaml(projectEntity.user.name, projectEntity.repository.name);
+            const axiosResponse = await pullCompageJson(projectEntity.user.name, projectEntity.repository.name);
             if (axiosResponse.data) {
-                console.log("pulled compageYaml : ", axiosResponse.data);
-                projectEntity.yaml = JSON.parse(axiosResponse.data);
+                console.log("pulled compageJson : ", axiosResponse.data);
+                projectEntity.json = JSON.parse(axiosResponse.data);
 
-                // updating project with latest yaml from github.
+                // updating project with latest json from github.
                 const isUpdated = await updateProject(projectId, <string>userName, projectEntity);
                 if (isUpdated) {
                     const message = `'${projectEntity.displayName}' project is updated after pulling 
@@ -84,7 +84,7 @@ projectsRouter.post("/", requireUserNameMiddleware, async (request: Request, res
         try {
             const axiosResponse = await createRepository(projectEntity.user.name, projectEntity.repository.name, projectEntity.repository.name);
             if (axiosResponse.data) {
-                // TODO create compage.yaml file in github repo
+                // TODO create .compage/config.json file in github repo
                 // copy above code here
                 const message = `'${createdProjectResource.metadata.name}' project and repository created successfully.`;
                 console.log(message);
@@ -120,7 +120,7 @@ projectsRouter.put("/:id", requireUserNameMiddleware, async (request: Request, r
     const projectEntity: ProjectEntity = request.body;
     const isUpdated = await updateProject(projectId, <string>userName, projectEntity);
     if (isUpdated) {
-        // TODO update github repo and save yaml to github (project's yaml to github repo)
+        // TODO update github repo and save json to github (project's json to github repo)
         const message = `'${projectEntity.displayName}' project updated successfully.`;
         console.log(message);
         return response.status(200).json({message: message});

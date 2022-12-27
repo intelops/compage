@@ -20,13 +20,13 @@ type Project struct {
 	Name           string                 `json:"name"`
 	RepositoryName string                 `json:"repositoryName"`
 	UserName       string                 `json:"userName"`
-	CompageYaml    *CompageYaml           `json:"compageYaml"`
+	CompageJson    *CompageJson           `json:"compageJson"`
 	Metadata       map[string]interface{} `json:"metadata"`
 	ModificationDetails
 }
 
-// CompageYaml has all edges and nodes
-type CompageYaml struct {
+// CompageJson has all edges and nodes
+type CompageJson struct {
 	// Linkages (connection details) between Nodes
 	Edges []*edge.Edge `json:"edges"`
 	// Nodes represent components and has details of the component.

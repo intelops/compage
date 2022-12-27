@@ -1,4 +1,4 @@
-import {CompageYaml} from "../diagram-maker/models";
+import {CompageJson} from "../diagram-maker/models";
 
 export interface CreateProjectResponse {
     projectId: string,
@@ -18,7 +18,7 @@ export interface CreateProjectRequest {
     displayName: string,
     version: string,
     user: User,
-    yaml: CompageYaml,
+    yaml: CompageJson,
     repository: Repository,
     metadata?: Map<string, string>
 }
@@ -41,7 +41,7 @@ export interface ListProjectsResponse {
     displayName: string,
     version: string,
     user: User,
-    yaml: CompageYaml,
+    yaml: CompageJson,
     repository: Repository,
     metadata: Map<string, string>
 }
@@ -61,7 +61,7 @@ export interface GetProjectResponse {
     displayName: string,
     version: string,
     user: User,
-    yaml: CompageYaml,
+    yaml: CompageJson,
     repository: Repository,
     metadata: Map<string, string>
 }

@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from '../../hooks/redux-hooks';
 import {selectCreateProjectStatus, selectListProjectsData, selectListProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
 import {CreateProjectRequest, ListProjectsRequest, ListProjectsResponse, Repository, User} from "./model";
-import {CompageYaml} from "../diagram-maker/models";
+import {CompageJson} from "../diagram-maker/models";
 import {selectAuthData} from "../auth/slice";
 import {Navigate, useNavigate} from "react-router-dom";
 import TextField from "@mui/material/TextField";
@@ -201,7 +201,7 @@ export const ChangeProject = () => {
             email: authData.email, name: authData.name
         }
         const repository: Repository = {branch: data.repositoryBranch || 'main', name: data.repositoryName, tag: ""}
-        const yaml: CompageYaml = {edges: undefined, nodes: undefined, version: ""}
+        const yaml: CompageJson = {edges: undefined, nodes: undefined, version: ""}
         const displayName = data.projectName;
         const metadata = data.metadata;
         return JSON.parse("{\n" +

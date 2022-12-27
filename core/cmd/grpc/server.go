@@ -73,7 +73,7 @@ func (s *server) RegenerateCode(generateCodeRequest *project.GenerateCodeRequest
 	//if err != nil {
 	//	return err
 	//}
-	//fmt.Println(projectGrpc.CompageYaml)
+	//fmt.Println(projectGrpc.CompageJson)
 	// GenerateCode
 	err := taroperations.CreateTarFile(generateCodeRequest.ProjectName, utils.GetProjectDirectoryName(generateCodeRequest.GetProjectName()))
 	if err != nil {

@@ -9,7 +9,7 @@ service ProjectService {
 }
 
 message GenerateCodeRequest {
-  string yaml = 1;
+  string json = 1;
   string userName = 2;
   string projectName = 3;
   string repositoryName = 4;

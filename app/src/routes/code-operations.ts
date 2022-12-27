@@ -64,11 +64,11 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
     const projectTarFilePath = `${downloadedProjectPath}/${projectResource.spec.displayName}_downloaded.tar.gz`;
 
     // save project metadata (in compage db or somewhere)
-    // need to save project-name, compage-yaml version, github repo and latest commit to the db
+    // need to save project-name, compage-json version, github repo and latest commit to the db
     const payload: Project = {
         projectName: projectResource.spec.displayName,
         userName: projectResource.spec.user.name,
-        yaml: projectResource.spec.yaml,
+        json: projectResource.spec.json,
         repositoryName: projectResource.spec.repository.name,
         metadata: projectResource.spec.metadata
     }
@@ -165,12 +165,12 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
 
 // updateProject (grpc calls to core)
 codeOperationsRouter.post("/update_project", requireUserNameMiddleware, async (req, res) => {
-    const {repositoryName, yaml, projectName, userName} = req.body;
+    const {repositoryName, json, projectName, userName} = req.body;
     try {
         const payload = {
             "projectName": projectName,
             "userName": userName,
-            "yaml": yaml,
+            "json": json,
             "repositoryName": repositoryName
         }
         projectGrpcClient.UpdateProject(payload, (err: any, response: { fileChunk: any; }) => {

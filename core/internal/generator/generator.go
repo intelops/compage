@@ -19,11 +19,11 @@ func Generator(coreProject *core.Project) error {
 	}
 
 	// Iterate over all nodes and generate code for all nodes.
-	compageYaml := coreProject.CompageYaml
-	for _, compageNode := range compageYaml.Nodes {
+	compageJson := coreProject.CompageJson
+	for _, compageNode := range compageJson.Nodes {
 		log.Debugf("processing node ID : %s ", compageNode.ID)
 		// convert node to languageNode
-		languageNode, err1 := languages.NewLanguageNode(compageYaml, compageNode)
+		languageNode, err1 := languages.NewLanguageNode(compageJson, compageNode)
 		if err1 != nil {
 			// return errors like certain protocols aren't yet supported
 			return err1

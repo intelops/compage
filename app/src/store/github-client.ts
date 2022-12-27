@@ -30,7 +30,7 @@ export const listRepositories = async (userName: string) => {
     })
 }
 
-export const commitCompageYaml = async (userName: string,
+export const commitCompageJson = async (userName: string,
                                         email: string,
                                         repositoryName: string,
                                         content: string,
@@ -55,7 +55,7 @@ export const commitCompageYaml = async (userName: string,
     })
 }
 
-export const pullCompageYaml = async (userName: string, repositoryName: string) => {
+export const pullCompageJson = async (userName: string, repositoryName: string) => {
     return axios({
         headers: {
             Accept: ACCEPT,

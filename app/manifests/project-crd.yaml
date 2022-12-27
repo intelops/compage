@@ -42,7 +42,7 @@ spec:
                       type: string
                     email:
                       type: string
-                yaml:
+                json:
                   type: string
                 repository:
                   type: object

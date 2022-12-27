@@ -77,7 +77,7 @@ type Clients map[string]interface{}
 type Servers map[string]interface{}
 
 // NewLanguageNode converts node to LanguageNode struct
-func NewLanguageNode(compageYaml *core.CompageYaml, node *node.Node) (*LanguageNode, error) {
+func NewLanguageNode(compageJson *core.CompageJson, node *node.Node) (*LanguageNode, error) {
 	goNode := &LanguageNode{
 		ID:          node.ID,
 		Name:        node.ConsumerData.Name,
@@ -93,7 +93,7 @@ func NewLanguageNode(compageYaml *core.CompageYaml, node *node.Node) (*LanguageN
 	}
 
 	// This will be used to create clients to other servers. This is required for custom template plus the, cli/frameworks plan for next release
-	clients, err := GetClientsForNode(compageYaml.Edges, node)
+	clients, err := GetClientsForNode(compageJson.Edges, node)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func GetServersForNode(nodeP *node.Node) (*Servers, error) {
 			}
 		}
 	}
-	// empty servers as no server config received in compageYaml.
+	// empty servers as no server config received in compageJson.
 	return servers, nil
 }
 

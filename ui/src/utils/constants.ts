@@ -25,13 +25,4 @@ export const config = {
     // authRoutes
     proxy_url_check_token: REACT_APP_COMPAGE_APP_SERVER_URL + "/auth/check_token",
     proxy_url_logout: REACT_APP_COMPAGE_APP_SERVER_URL + "/auth/logout",
-
-    // compageRoutes
-    proxy_url_create_project: REACT_APP_COMPAGE_APP_SERVER_URL + "/compage/generate_project",
-
-    // githubRoutes
-    proxy_url_create_repository: REACT_APP_COMPAGE_APP_SERVER_URL + "/github/create_repository",
-    proxy_url_list_repositories: REACT_APP_COMPAGE_APP_SERVER_URL + "/github/list_repositories",
-    proxy_url_commit_compage_yaml: REACT_APP_COMPAGE_APP_SERVER_URL + "/github/commit_compage_yaml",
-    proxy_url_pull_compage_yaml: REACT_APP_COMPAGE_APP_SERVER_URL + "/github/pull_compage_yaml",
 };
