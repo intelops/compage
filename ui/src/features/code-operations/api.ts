@@ -1,5 +1,5 @@
 import {GenerateCodeRequest} from "./model";
-import {CodeOperationsBackendApi} from "../../service/backend-api";
+import {CodeOperationsBackendApi} from "../../utils/backend-api";
 
 // Sync apis (async apis are in thunk)
 export const generateCode = (generateCodeRequest: GenerateCodeRequest) => {

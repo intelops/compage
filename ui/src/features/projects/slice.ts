@@ -1,5 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {RootState} from '../../store';
+import {RootState} from '../../redux/store';
 import {createProjectAsync} from "./async-apis/createProject";
 import {listProjectsAsync} from "./async-apis/listProjects";
 

@@ -6,9 +6,9 @@ import CardContent from '@mui/material/CardContent';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import {red} from '@mui/material/colors';
-import {useAppSelector} from "../../hooks/redux-hooks";
+import {useAppSelector} from "../../redux/hooks";
 import {Navigate} from "react-router-dom";
-import {selectAuthData} from "../auth/slice";
+import {selectAuthData} from "../../features/auth/slice";
 
 export const Account = () => {
     const authData = useAppSelector(selectAuthData);

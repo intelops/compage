@@ -1,4 +1,4 @@
-import {getCurrentConfig, getModifiedState, setModifiedState} from "../../../utils/service";
+import {getCurrentConfig, getModifiedState, setModifiedState} from "../../../utils/localstorage-client";
 
 export const cleanse = (state: string) => {
     const stateJson = JSON.parse(state)

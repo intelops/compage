@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {useAppDispatch, useAppSelector} from '../../hooks/redux-hooks';
+import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectCodeOperationsStatus} from './slice';
 import Button from "@mui/material/Button";
 import {generateCodeAsync} from "./async-apis/generateCode";

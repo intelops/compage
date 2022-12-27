@@ -17,12 +17,7 @@ const REACT_APP_COMPAGE_APP_SERVER_URL = process.env.REACT_APP_COMPAGE_APP_SERVE
 assert.ok(REACT_APP_COMPAGE_APP_SERVER_URL, 'The "REACT_APP_COMPAGE_APP_SERVER_URL" environment variable is required')
 
 export const config = {
-    // github config
     client_id: REACT_APP_GITHUB_APP_CLIENT_ID,
     redirect_uri: REACT_APP_GITHUB_APP_REDIRECT_URI,
     backend_base_url: REACT_APP_COMPAGE_APP_SERVER_URL,
-
-    // authRoutes
-    proxy_url_check_token: REACT_APP_COMPAGE_APP_SERVER_URL + "/auth/check_token",
-    proxy_url_logout: REACT_APP_COMPAGE_APP_SERVER_URL + "/auth/logout",
 };

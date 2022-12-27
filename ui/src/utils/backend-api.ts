@@ -1,5 +1,6 @@
 import axios from 'axios';
-import {config} from "../utils/constants";
+import {config} from "./constants";
+import {retrieveCurrentUserName} from "./localstorage-client";
 
 export const X_USER_NAME_HEADER = "X-User-Name";
 
@@ -36,28 +37,10 @@ export const CodeOperationsBackendApi = () => {
 
 export const ProjectsBackendApi = () => {
     const path = "/projects"
-    const projectsBackendApiClient = axios.create({
+    return axios.create({
         baseURL: config.backend_base_url + path,
         headers: getHeaders()
     },);
-
-    // we intercept every requests
-    projectsBackendApiClient.interceptors.request.use(async (cnf) => {
-        // anything you want to attach to the requests such as token
-        return cnf;
-    }, error => {
-        return Promise.reject(error)
-    })
-
-// we intercept every response
-    projectsBackendApiClient.interceptors.request.use(async (cnf) => {
-
-        return cnf;
-    }, error => {
-// check for authentication or anything like that
-        return Promise.reject(error)
-    })
-    return projectsBackendApiClient;
 }
 
 const getHeaders = () => {
@@ -69,8 +52,4 @@ const getHeaders = () => {
             [X_USER_NAME_HEADER]: retrieveCurrentUserName()
         }
     };
-}
-
-const retrieveCurrentUserName = () => {
-    return localStorage.getItem("CURRENT_USER_NAME")
 }

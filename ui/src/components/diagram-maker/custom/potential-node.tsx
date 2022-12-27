@@ -1,5 +1,5 @@
 import React from 'react';
-import {getConfig} from "../diagram-maker/helper/config";
+import {getConfig} from "../helper/config";
 
 interface PotentialNodeProps {
     typeId: string

@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.scss';
 import {BrowserRouter, Link, Route, Routes} from "react-router-dom";
-import {Login} from "../components/auth/component";
-import {Home} from "../components/home/home";
-import Header from "../components/navbar/header";
-import {Account} from "../components/account/account";
+import {Login} from "../../features/auth/component";
+import {Home} from "../home/home";
+import Header from "../navbar/header";
+import {Account} from "../account/account";
 import {Grid} from "@mui/material";
-import {Footer} from "../components/navbar/footer";
+import {Footer} from "../navbar/footer";
 
 export const App = () => {
     return <BrowserRouter>

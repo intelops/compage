@@ -29,7 +29,7 @@ import {
     createPluginPanel,
     createRectangularConnectorNode,
     createRectangularNode
-} from "../../utils/utils";
+} from "./helper/utils";
 
 import {useBeforeunload} from 'react-beforeunload';
 import {Action, Dispatch} from "redux";
@@ -41,23 +41,23 @@ import {
     setCurrentState,
     setReset,
     shouldReset
-} from "../../utils/service";
-import {ToolPanel} from "../custom/tool-panel";
-import {LibraryPanel} from "../custom/library-panel";
-import {ContextNode} from "../custom/context-node";
-import {ContextEdge} from "../custom/context-edge";
-import {ContextPanel} from "../custom/context-panel";
-import {ContextWorkspace} from "../custom/context-workspace";
-import {EdgeBadge} from "../custom/edge-badge";
-import {PotentialNode} from "../custom/potential-node";
+} from "../../utils/localstorage-client";
+import {ToolPanel} from "./custom/tool-panel";
+import {LibraryPanel} from "./custom/library-panel";
+import {ContextNode} from "./custom/context-node";
+import {ContextEdge} from "./custom/context-edge";
+import {ContextPanel} from "./custom/context-panel";
+import {ContextWorkspace} from "./custom/context-workspace";
+import {EdgeBadge} from "./custom/edge-badge";
+import {PotentialNode} from "./custom/potential-node";
 import {getNodeTypeConfig} from "./helper/node-type-ui";
-import {NewEdgeProperties} from "../new-properties/new-edge-properties";
-import {NewNodeProperties} from "../new-properties/new-node-properties";
+import {NewEdgeProperties} from "./new-properties/new-edge-properties";
+import {NewNodeProperties} from "./new-properties/new-node-properties";
 import {cleanse} from "./helper/helper";
 import JSONPretty from "react-json-pretty";
 import Button from "@mui/material/Button";
-import {GenerateCode} from "../code-operations/component";
-import {ChangeProject} from "../projects/component";
+import {GenerateCode} from "../../features/code-operations/component";
+import {ChangeProject} from "../../features/projects/component";
 
 interface ArgTypes {
     resetState?: (...args: any) => void;

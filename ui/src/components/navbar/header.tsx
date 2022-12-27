@@ -9,9 +9,9 @@ import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Logo from "../../logo.png";
-import {useAppSelector} from "../../hooks/redux-hooks";
+import {useAppSelector} from "../../redux/hooks";
 import {Link, useNavigate} from "react-router-dom";
-import {selectAuthData} from "../auth/slice";
+import {selectAuthData} from "../../features/auth/slice";
 
 const settings = ['Account', 'Logout'];
 

@@ -7,9 +7,9 @@ import storageSession from 'reduxjs-toolkit-persist/lib/storage/session'
 import {FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE} from "reduxjs-toolkit-persist";
 import {reducer as toastrReducer} from 'react-redux-toastr'
 import {Action} from "redux";
-import codeOperationsReducer from "../components/code-operations/slice";
-import projectsReducer from "../components/projects/slice";
-import authReducer from "../components/auth/slice";
+import codeOperationsReducer from "../features/code-operations/slice";
+import projectsReducer from "../features/projects/slice";
+import authReducer from "../features/auth/slice";
 
 const rootPersistConfig = {
     key: 'root',

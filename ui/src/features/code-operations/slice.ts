@@ -1,5 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {RootState} from '../../store';
+import {RootState} from '../../redux/store';
 import {generateCodeAsync} from "./async-apis/generateCode";
 
 export interface CodeOperationsState {

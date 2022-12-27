@@ -1,6 +1,6 @@
 import React from 'react';
 import Divider from "@mui/material/Divider";
-import {getParsedModifiedState} from "../diagram-maker/helper/helper";
+import {getParsedModifiedState} from "../helper/helper";
 
 interface ContextEdgeProps {
     id: string | undefined,

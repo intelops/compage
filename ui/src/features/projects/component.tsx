@@ -1,10 +1,10 @@
 import React, {ChangeEvent, useEffect, useState} from 'react';
 
-import {useAppDispatch, useAppSelector} from '../../hooks/redux-hooks';
+import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectCreateProjectStatus, selectListProjectsData, selectListProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
 import {CreateProjectRequest, ListProjectsRequest, ListProjectsResponse, Repository, User} from "./model";
-import {CompageJson} from "../diagram-maker/models";
+import {CompageJson} from "../../components/diagram-maker/models";
 import {selectAuthData} from "../auth/slice";
 import {Navigate, useNavigate} from "react-router-dom";
 import TextField from "@mui/material/TextField";

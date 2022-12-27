@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import {Navigate} from "react-router-dom";
 import {v4 as uuidv4} from 'uuid';
-import {useAppDispatch, useAppSelector} from "../../hooks/redux-hooks";
+import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {config} from "../../utils/constants";
 import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";

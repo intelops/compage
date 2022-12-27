@@ -1,6 +1,6 @@
 import React from "react";
 import {Navigate} from "react-router-dom";
-import {getData} from "../../data/BoundaryCircular/data";
+import {getData} from "../diagram-maker/data/BoundaryCircular/data";
 import {
     getCurrentConfig,
     getCurrentRepositoryDetails,
@@ -8,10 +8,10 @@ import {
     removeCurrentState,
     removeModifiedState,
     setReset
-} from "../../utils/service";
-import {useAppSelector} from "../../hooks/redux-hooks";
+} from "../../utils/localstorage-client";
+import {useAppSelector} from "../../redux/hooks";
 import {DiagramMakerContainer} from "../diagram-maker/diagram-maker-container";
-import {selectAuthData} from "../auth/slice";
+import {selectAuthData} from "../../features/auth/slice";
 
 export const Home = () => {
     const authData = useAppSelector(selectAuthData);

@@ -1,4 +1,4 @@
-import {CompageJson} from "../diagram-maker/models";
+import {CompageJson} from "../../components/diagram-maker/models";
 
 export interface CreateProjectResponse {
     projectId: string,

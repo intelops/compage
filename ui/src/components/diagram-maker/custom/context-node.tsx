@@ -1,5 +1,5 @@
 import React from 'react';
-import {getParsedModifiedState} from "../diagram-maker/helper/helper";
+import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 
 interface ContextNodeProps {

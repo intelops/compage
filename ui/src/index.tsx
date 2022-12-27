@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.scss';
-import {App} from './app/App';
+import {App} from './components/app/App';
 import reportWebVitals from './reportWebVitals';
 import 'diagram-maker/dist/diagramMaker.css';
 import 'react-json-pretty/themes/monikai.css';
 import {Provider} from "react-redux";
-import {persistor, store} from './store';
+import {persistor, store} from './redux/store';
 import {PersistGate} from 'redux-persist/integration/react';
 import ReduxToastr from 'react-redux-toastr'
 
