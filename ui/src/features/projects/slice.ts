@@ -2,6 +2,8 @@ import {createSlice} from '@reduxjs/toolkit';
 import {RootState} from '../../redux/store';
 import {createProjectAsync} from "./async-apis/createProject";
 import {listProjectsAsync} from "./async-apis/listProjects";
+import {getProjectAsync} from "./async-apis/getProject";
+import {updateProjectAsync} from './async-apis/updateProject';
 
 export interface ProjectState {
     createProject: {
@@ -19,9 +21,19 @@ export interface ProjectState {
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
     }
+    updateProject: {
+        data: any,
+        status: 'idle' | 'loading' | 'failed';
+        error: string | null;
+    }
 }
 
 const initialState: ProjectState = {
+    updateProject: {
+        data: {},
+        status: 'idle',
+        error: null
+    },
     getProject: {
         data: {},
         status: 'idle',
@@ -64,6 +76,26 @@ export const projectsSlice = createSlice({
         }).addCase(listProjectsAsync.rejected, (state, action) => {
             state.listProjects.status = 'failed';
             if (action.payload) state.listProjects.error = JSON.stringify(action.payload);
+        }).addCase(getProjectAsync.pending, (state) => {
+            state.getProject.status = 'loading';
+            state.getProject.error = null;
+        }).addCase(getProjectAsync.fulfilled, (state, action) => {
+            state.getProject.status = 'idle';
+            state.getProject.error = null;
+            state.getProject.data = action.payload;
+        }).addCase(getProjectAsync.rejected, (state, action) => {
+            state.getProject.status = 'failed';
+            if (action.payload) state.getProject.error = JSON.stringify(action.payload);
+        }).addCase(updateProjectAsync.pending, (state) => {
+            state.updateProject.status = 'loading';
+            state.updateProject.error = null;
+        }).addCase(updateProjectAsync.fulfilled, (state, action) => {
+            state.updateProject.status = 'idle';
+            state.updateProject.error = null;
+            state.updateProject.data = action.payload;
+        }).addCase(updateProjectAsync.rejected, (state, action) => {
+            state.updateProject.status = 'failed';
+            if (action.payload) state.updateProject.error = JSON.stringify(action.payload);
         });
     },
 });
@@ -79,5 +111,9 @@ export const selectListProjectsStatus = (state: RootState) => state.projects.lis
 export const selectGetProjectData = (state: RootState) => state.projects.getProject.data;
 export const selectGetProjectError = (state: RootState) => state.projects.getProject.error;
 export const selectGetProjectStatus = (state: RootState) => state.projects.getProject.status;
+
+export const selectUpdateProjectData = (state: RootState) => state.projects.updateProject.data;
+export const selectUpdateProjectError = (state: RootState) => state.projects.updateProject.error;
+export const selectUpdateProjectStatus = (state: RootState) => state.projects.updateProject.status;
 
 export default projectsSlice.reducer;
