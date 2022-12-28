@@ -19,14 +19,6 @@ export const AuthBackendApi = () => {
     })
 }
 
-export const GithubBackendApi = () => {
-    const path = "/github"
-    return axios.create({
-        baseURL: config.backend_base_url + path,
-        headers: getHeaders()
-    })
-}
-
 export const CodeOperationsBackendApi = () => {
     const path = "/code_operations"
     return axios.create({
@@ -49,6 +41,9 @@ const getHeaders = () => {
             [X_USER_NAME_HEADER]: retrieveCurrentUserName()
         },
         get: {
+            [X_USER_NAME_HEADER]: retrieveCurrentUserName()
+        },
+        put: {
             [X_USER_NAME_HEADER]: retrieveCurrentUserName()
         }
     };

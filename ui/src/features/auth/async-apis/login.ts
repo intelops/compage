@@ -2,6 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {LoginError, LoginRequest, LoginResponse} from "../model";
 import {login} from "../api";
 import {toastr} from 'react-redux-toastr'
+import {setCurrentUserName} from "../../../utils/localstorage-client";
 
 export const loginAsync = createAsyncThunk<LoginResponse, LoginRequest, { rejectValue: LoginError }>(
     'auth/login',
@@ -11,7 +12,7 @@ export const loginAsync = createAsyncThunk<LoginResponse, LoginRequest, { reject
 
             // Check if status is not okay:
             if (response.status !== 200) {
-                console.log("Failed to login. Received : " + response.status)
+                console.log("Failed to login. Received : " + response.status);
                 toastr.error('Failure', "Failed to login. Received : " + response.status);
                 // Return the error message:
                 return thunkApi.rejectWithValue({
@@ -22,8 +23,8 @@ export const loginAsync = createAsyncThunk<LoginResponse, LoginRequest, { reject
             const loginResponse: LoginResponse = response.data;
 
             // TODO This is temporary, need to replace with code extracting from localstorage.
-            localStorage.setItem("CURRENT_USER_NAME", loginResponse.login)
-            console.log("Successfully logged in : " + loginResponse.login)
+            setCurrentUserName(loginResponse.login);
+            console.log("Successfully logged in : " + loginResponse.login);
             toastr.success('Success : ' + loginResponse.login, "Successfully logged in.");
             return response.data;
         } catch (e) {

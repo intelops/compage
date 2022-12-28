@@ -2,7 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {GetProjectError, GetProjectRequest, GetProjectResponse} from "../model";
 import {getProject} from "../api";
 import {toastr} from 'react-redux-toastr';
-import {setCurrentRepositoryDetails} from "../../../utils/localstorage-client";
+import {setCurrentProjectContext} from "../../../utils/localstorage-client";
 
 export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRequest, { rejectValue: GetProjectError }>(
     'projects/getProject',
@@ -22,11 +22,11 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
             toastr.success(`Success`, message);
             const getProjectResponse: GetProjectResponse = response.data
             // update details to localstorage client
-            const currentRepositoryDetails = {
+            const currentProjectContext = {
                 projectId: getProjectResponse.id,
                 json: getProjectResponse.json
             }
-            setCurrentRepositoryDetails(JSON.stringify(currentRepositoryDetails))
+            setCurrentProjectContext(JSON.stringify(currentProjectContext))
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;

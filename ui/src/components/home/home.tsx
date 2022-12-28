@@ -3,7 +3,7 @@ import {Navigate} from "react-router-dom";
 import {getData} from "../diagram-maker/data/BoundaryCircular/data";
 import {
     getCurrentConfig,
-    getCurrentRepositoryDetails,
+    getCurrentProjectContext,
     removeCurrentConfig,
     removeCurrentState,
     removeModifiedState,
@@ -19,7 +19,7 @@ export const Home = () => {
     if (!authData.login) {
         return <Navigate to="/login"/>;
     }
-    if (getCurrentRepositoryDetails() === null || getCurrentRepositoryDetails() === undefined) {
+    if (getCurrentProjectContext() === null || getCurrentProjectContext() === undefined) {
         // choose from existing or create a new project
         // return <Navigate to="/repository"/>;
     } else {

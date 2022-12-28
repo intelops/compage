@@ -2,7 +2,6 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {UpdateProjectError, UpdateProjectRequest, UpdateProjectResponse} from "../model";
 import {updateProject} from "../api";
 import {toastr} from 'react-redux-toastr';
-import {setCurrentRepositoryDetails} from "../../../utils/localstorage-client";
 
 export const updateProjectAsync = createAsyncThunk<UpdateProjectResponse, UpdateProjectRequest, { rejectValue: UpdateProjectError }>(
     'projects/updateProject',

@@ -1,16 +1,3 @@
-// Auth
-export interface AuthenticationModel {
-    login?: string,
-    email?: string,
-    name?: string,
-    following: string,
-    followers: string,
-    public_repos: string,
-    owned_private_repos: string,
-    avatar_url: string,
-    bio: string
-}
-
 export interface Resource {
     Name: string,
     // the below map can contain metadata about the field.

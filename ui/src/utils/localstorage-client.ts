@@ -25,15 +25,15 @@ export const getCurrentConfig = () => {
     return localStorage.getItem(CURRENT_CONFIG);
 }
 
-export const setCurrentRepositoryDetails = (currentRepoDetails: string) => {
+export const setCurrentProjectContext = (currentRepoDetails: string) => {
     localStorage.setItem(CURRENT_REPO_DETAILS, currentRepoDetails);
 }
 
-export const getCurrentRepositoryDetails = () => {
+export const getCurrentProjectContext = () => {
     return JSON.parse(localStorage.getItem(CURRENT_REPO_DETAILS));
 }
 
-export const removeCurrentRepositoryDetails = () => {
+export const removeCurrentProjectContext = () => {
     return localStorage.removeItem(CURRENT_REPO_DETAILS);
 }
 
@@ -63,4 +63,8 @@ export const removeModifiedState = () => {
 
 export const retrieveCurrentUserName = () => {
     return localStorage.getItem(CURRENT_USER_NAME);
+}
+
+export const setCurrentUserName = (userName:string) => {
+    localStorage.setItem(CURRENT_USER_NAME, userName)
 }
