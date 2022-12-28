@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectCreateProjectStatus, selectListProjectsData, selectListProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
 import {CreateProjectRequest, ListProjectsRequest, ListProjectsResponse, Repository, User} from "./model";
-import {CompageJson} from "../../components/diagram-maker/models";
+import {CompageEdge, CompageJson, CompageNode} from "../../components/diagram-maker/models";
 import {selectAuthData} from "../auth/slice";
 import {Navigate, useNavigate} from "react-router-dom";
 import TextField from "@mui/material/TextField";
@@ -16,6 +16,7 @@ import DialogContent from "@mui/material/DialogContent";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import DialogActions from "@mui/material/DialogActions";
 import {listProjectsAsync} from "./async-apis/listProjects";
+import {createProjectAsync} from "./async-apis/createProject";
 
 export const ChangeProject = () => {
     const createProjectStatus = useAppSelector(selectCreateProjectStatus);
@@ -33,7 +34,8 @@ export const ChangeProject = () => {
         isCreateNew: false,
         repositoryName: "",
         repositoryBranch: "",
-        metadata: ""
+        //TODO ui for this yet to be added.
+        metadata: new Map<string, string>()
     });
 
     useEffect(() => {
@@ -51,25 +53,8 @@ export const ChangeProject = () => {
     }
 
     const handleCreateProjectClick = () => {
-        console.log("handleCreateProjectClick clicked");
-        console.log(JSON.stringify(data));
-        // // give a call to create project if it's new
-        // if (data.isCreateNew) {
-        //     // TODO
-        //     // dispatch(createProjectAsync(createProjectRequest));
-        //     // authData.login, data.currentProject, data.description
-        //     // use above data to create new project
-        // }
-        // // set the current repository retails post response from server
-        // // give call to pull the latest contents
-        // const currentRepositoryDetails = {
-        //     repositoryName: data.projectName,
-        //     // TODO
-        //     details: "githubRepositoryContent"
-        // }
-        // setCurrentRepositoryDetails(JSON.stringify(currentRepositoryDetails))
-        // setData({...data, isOpen: false})
-        // navigate('/home');
+        dispatch(createProjectAsync(createProjectRequest))
+        setData({...data, isOpen: false})
     }
 
     const handleExistingProjectsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
@@ -198,99 +183,32 @@ export const ChangeProject = () => {
 
     const prepareCreateProjectRequest = () => {
         const user: User = {
-            email: authData.email, name: authData.name
+            email: authData.email,
+            name: authData.name
         }
-        const repository: Repository = {branch: data.repositoryBranch || 'main', name: data.repositoryName, tag: ""}
-        const yaml: CompageJson = {edges: undefined, nodes: undefined, version: ""}
+        const repository: Repository = {
+            branch: data.repositoryBranch || 'main',
+            name: data.repositoryName,
+            tag: "v1"
+        }
+        const json: CompageJson = {
+            edges: new Map<string, CompageEdge>(),
+            nodes: new Map<string, CompageNode>(),
+            version: "v1"
+        }
         const displayName = data.projectName;
         const metadata = data.metadata;
-        return JSON.parse("{\n" +
-            "    \"user\": {\n" +
-            "        \"name\": \"mahendraintelops\",\n" +
-            "        \"email\": \"mahendra.b@intelops.dev\"\n" +
-            "    },\n" +
-            "    \"repository\": {\n" +
-            "        \"name\": \"first-project11\",\n" +
-            "        \"branch\": \"main\"\n" +
-            "    },\n" +
-            "    \"displayName\": \"first-project\",\n" +
-            "    \"version\": \"v1\",\n" +
-            "    \"yaml\": {\n" +
-            "        \"edges\": {\n" +
-            "            \"edge1\": {\n" +
-            "                \"id\": \"edge1\",\n" +
-            "                \"src\": \"node1\",\n" +
-            "                \"dest\": \"node2\",\n" +
-            "                \"consumerData\": {\n" +
-            "                    \"externalNodeName\": \"servicea\",\n" +
-            "                    \"clientTypes\": [\n" +
-            "                        {\n" +
-            "                            \"port\": \"9999\",\n" +
-            "                            \"protocol\": \"REST\"\n" +
-            "                        }\n" +
-            "                    ],\n" +
-            "                    \"metadata\": {},\n" +
-            "                    \"annotations\": {}\n" +
-            "                }\n" +
-            "            }\n" +
-            "        },\n" +
-            "        \"nodes\": {\n" +
-            "            \"node1\": {\n" +
-            "                \"id\": \"node1\",\n" +
-            "                \"typeId\": \"node-type-circle\",\n" +
-            "                \"consumerData\": {\n" +
-            "                    \"name\": \"ServiceA\",\n" +
-            "                    \"template\": \"compage\",\n" +
-            "                    \"serverTypes\": [\n" +
-            "                        {\n" +
-            "                            \"protocol\": \"REST\",\n" +
-            "                            \"port\": \"9999\",\n" +
-            "                            \"framework\": \"net/http\",\n" +
-            "                            \"resources\": [\n" +
-            "                                {\n" +
-            "                                    \"Name\": \"User\",\n" +
-            "                                    \"Fields\": {\n" +
-            "                                        \"id\": \"string\",\n" +
-            "                                        \"name\": \"string\",\n" +
-            "                                        \"city\": \"string\",\n" +
-            "                                        \"mobileNumber\": \"string\"\n" +
-            "                                    }\n" +
-            "                                },\n" +
-            "                                {\n" +
-            "                                    \"Name\": \"Account\",\n" +
-            "                                    \"Fields\": {\n" +
-            "                                        \"id\": \"string\",\n" +
-            "                                        \"branch\": \"string\",\n" +
-            "                                        \"city\": \"string\"\n" +
-            "                                    }\n" +
-            "                                }\n" +
-            "                            ]\n" +
-            "                        }\n" +
-            "                    ],\n" +
-            "                    \"language\": \"Golang\",\n" +
-            "                    \"metadata\": {},\n" +
-            "                    \"annotations\": {}\n" +
-            "                }\n" +
-            "            },\n" +
-            "            \"node2\": {\n" +
-            "                \"id\": \"node2\",\n" +
-            "                \"typeId\": \"node-type-rectangle\",\n" +
-            "                \"consumerData\": {\n" +
-            "                    \"template\": \"compage\",\n" +
-            "                    \"name\": \"ServiceB\",\n" +
-            "                    \"language\": \"Golang\",\n" +
-            "                    \"metadata\": {},\n" +
-            "                    \"annotations\": {}\n" +
-            "                }\n" +
-            "            }\n" +
-            "        },\n" +
-            "        \"version\": \"v1\"\n" +
-            "    },\n" +
-            "    \"metadata\": {\n" +
-            "        \"test\": \"123\"\n" +
-            "    }\n" +
-            "}");
+        const cPR: CreateProjectRequest = {
+            metadata,
+            version: "v1",
+            repository,
+            displayName,
+            user: user,
+            json: json
+        };
+        return cPR;
     };
+
     // TODO refer selected project here
     const createProjectRequest: CreateProjectRequest = prepareCreateProjectRequest()
     const listProjectsRequest: ListProjectsRequest = {}
@@ -302,6 +220,8 @@ export const ChangeProject = () => {
 
     const handleChooseProjectClick = () => {
         console.log("handleChooseProjectClick clicked")
+        // TODO Pull the selected project and set the yaml
+        setData({...data, isOpen: false})
     }
 
     const getActionButtons = (): React.ReactNode => {
