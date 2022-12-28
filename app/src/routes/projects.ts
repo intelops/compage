@@ -44,12 +44,12 @@ projectsRouter.get("/", requireUserNameMiddleware, async (request: Request, resp
 projectsRouter.post("/", requireUserNameMiddleware, async (request: Request, response: Response) => {
     const userName = request.header(X_USER_NAME_HEADER);
     const projectEntity: ProjectEntity = request.body;
-    const createdProjectResource = await createProject(<string>userName, projectEntity);
-    if (createdProjectResource.apiVersion) {
+    const savedProjectEntity: ProjectEntity = await createProject(<string>userName, projectEntity);
+    if (savedProjectEntity.id.length !== 0) {
         // create repository on github and .compage/config.json file/
-        return await createOnGithub(projectEntity, response)
+        return await createOnGithub(savedProjectEntity, response)
     }
-    const message = `'${projectEntity.id}' project couldn't be created.`;
+    const message = `'${savedProjectEntity.id}' project couldn't be created.`;
     console.log(message);
     return response.status(500).json({message: message});
 });
@@ -73,7 +73,7 @@ projectsRouter.put("/:id", requireUserNameMiddleware, async (request: Request, r
 const addToGithub = (projectEntity: ProjectEntity, response: Response) => {
     const sha = "";
     // base64 the json as it's required for github api.
-    const buffer = new Buffer(JSON.stringify(projectEntity.json));
+    const buffer = Buffer.from(JSON.stringify(projectEntity.json));
     const base64Json = buffer.toString('base64');
     return commitCompageJson(
         projectEntity.user.name,
@@ -83,12 +83,12 @@ const addToGithub = (projectEntity: ProjectEntity, response: Response) => {
         "first commit",
         sha).then(resp => {
         console.log("commitCompageJson Response: ", resp.data);
-        const message = `The .compage/config.json in Repository for '${projectEntity.repository.name}' is committed, '${projectEntity.id}' project is created successfully`;
+        const message = `The .compage/config.json in Repository for '${projectEntity.displayName}' is committed, '${projectEntity.displayName}' project is created successfully`;
         console.log(message);
-        return response.status(200).json(message);
+        return response.status(200).json({message: message});
     }).catch(error => {
         const errorObject = JSON.parse(JSON.stringify(error));
-        const message = `The .compage/config.json in Repository for '${projectEntity.repository.name}' couldn't be committed. Received error code while committing .compage/config.json in github repository for '${projectEntity.id}': ${errorObject.status}`
+        const message = `The .compage/config.json in Repository for '${projectEntity.displayName}' couldn't be committed. Received error code while committing .compage/config.json in Github Repository: ${errorObject.status}`
         console.log(message)
         return response.status(500).json({message: message});
     });
@@ -112,19 +112,19 @@ const updateToGithub = (projectEntity: ProjectEntity, response: Response) => {
                 "updated project from ui",
                 sha).then(resp => {
                 console.log("commitCompageJson Response: ", resp.data);
-                const message = `An update to .compage/config.json in Repository for '${projectEntity.repository.name}' is committed, '${projectEntity.id}' project is created/updated successfully`;
+                const message = `An update to .compage/config.json in Repository for '${projectEntity.displayName}' is committed, '${projectEntity.displayName}' project is updated successfully`;
                 console.log(message);
-                return response.status(200).json(message);
+                return response.status(200).json({message: message});
             }).catch(error => {
                 const errorObject = JSON.parse(JSON.stringify(error));
-                const message = `An update to .compage/config.json in Repository for '${projectEntity.repository.name}' couldn't be committed. Received error code while committing .compage/config.json in github repository for '${projectEntity.id}': ${errorObject.status}`
+                const message = `An update to .compage/config.json in Repository for '${projectEntity.displayName}' couldn't be committed. Received error code while committing .compage/config.json in Github Repository for '${projectEntity.displayName}': ${errorObject.status}`
                 console.log(message)
                 return response.status(500).json({message: message});
             });
         })
         .catch(error => {
             const errorObject = JSON.parse(JSON.stringify(error));
-            const message = `The .compage/config.json in Repository for '${projectEntity.repository.name}' couldn't be pulled.. Received error code while pulling .compage/config.json in github repository for '${projectEntity.id}': ${errorObject.status}`
+            const message = `The .compage/config.json in Repository for '${projectEntity.displayName}' couldn't be pulled.. Received error code while pulling .compage/config.json in Github Repository for '${projectEntity.displayName}': ${errorObject.status}`
             console.log(message)
             return response.status(500).json({message: message});
         });
@@ -140,19 +140,18 @@ const updateFromGithub = (projectEntity: ProjectEntity, response: Response) => {
                 .then(isUpdated => {
                     if (isUpdated) {
                         const message = `'${projectEntity.id}' project is updated after pulling 
-                .compage/config.json in Repository for '${projectEntity.repository.name}'`;
+                .compage/config.json in Repository for '${projectEntity.displayName}'`;
                         console.log(message);
                         return response.status(200).json(projectEntity);
                     }
                     const message = `'${projectEntity.id}' project couldn't be updated after pulling 
-                .compage/config.json in Repository for '${projectEntity.repository.name}'`;
+                .compage/config.json in Repository for '${projectEntity.displayName}'`;
                     console.log(message);
                     return response.status(500).json({message: message});
                 });
         }).catch(error => {
             const errorObject = JSON.parse(JSON.stringify(error));
-            const message = `The .compage/config.json in Repository for '${projectEntity.repository.name}' couldn't be pulled.
-                 Received error code while pulling .compage/config.json in github repository for '${projectEntity.id}': ${errorObject.status}`
+            const message = `The .compage/config.json in Repository for '${projectEntity.displayName}' couldn't be pulled. Received error code while pulling .compage/config.json in Github Repository for '${projectEntity.displayName}': ${errorObject.status}`
             console.log(message);
             return response.status(500).json({message: message});
         });
@@ -166,12 +165,14 @@ const createOnGithub = (projectEntity: ProjectEntity, response: Response) => {
             // create .compage/config.json file in github repo
             return addToGithub(projectEntity, response);
         }).catch(error => {
+            // delete project as it's going to be just there.
+            deleteProject(projectEntity.user.name, projectEntity.id).then();
             const errorObject = JSON.parse(JSON.stringify(error));
-            let message = `Repository for '${projectEntity.id}' couldn't be created.`
+            let message = `Repository for project '${projectEntity.displayName}' couldn't be created.`
             if (errorObject.status === 422) {
                 message = `${message} Please choose different Repository Name.`;
             } else {
-                message = `${message} Received error code while creating github repository for '${projectEntity.id}': ${errorObject.status}`;
+                message = `${message} Received error code while creating github repository: ${errorObject.status}`;
             }
             console.log(message)
             return response.status(500).json({message: message});

@@ -118,7 +118,7 @@ export const createProject = async (userName: string, projectEntity: ProjectEnti
     const projectId = generateProjectId(userName, projectEntity.displayName);
     const projectResourceSpec = convertProjectEntityToProjectResourceSpec(projectId, userName, projectEntity);
     const projectResource = prepareProjectResource(projectId, userName, projectResourceSpec);
-    return await createProjectResource(NAMESPACE, JSON.stringify(projectResource));
+    return convertProjectResourceToProjectEntity(await createProjectResource(NAMESPACE, JSON.stringify(projectResource)));
 }
 
 // updateProject updates projectResource on k8s cluster.
