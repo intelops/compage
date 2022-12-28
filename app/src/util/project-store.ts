@@ -125,7 +125,7 @@ export const createProject = async (userName: string, projectEntity: ProjectEnti
 export const updateProject = async (projectId: string, userName: string, projectEntity: ProjectEntity) => {
     const existingProjectResource = await getProjectResource(NAMESPACE, projectId);
     if (existingProjectResource?.metadata?.labels?.userName !== userName) {
-        return false
+        return initializeEmptyProjectEntity();
     }
     // for non-existent resources apiVersion is empty.
     if (existingProjectResource.apiVersion) {
@@ -133,15 +133,15 @@ export const updateProject = async (projectId: string, userName: string, project
         existingProjectResource.spec.displayName = projectEntity.displayName;
         existingProjectResource.spec.metadata = JSON.stringify(projectEntity.metadata);
         existingProjectResource.spec.json = JSON.stringify(projectEntity.json);
-        existingProjectResource.spec.version = projectEntity.version
+        existingProjectResource.spec.version = projectEntity.version;
 
         // send spec only as the called method considers updating specs only.
         // existingProjectResource.metadata.name = projectId here
         const patchedProjectResource = await patchProjectResource(NAMESPACE, existingProjectResource.metadata.name, JSON.stringify(existingProjectResource.spec));
-        console.log(patchedProjectResource)
+        console.log(patchedProjectResource);
         if (patchedProjectResource.apiVersion) {
-            return true
+            return convertProjectResourceToProjectEntity(patchedProjectResource);
         }
     }
-    return false
+    return initializeEmptyProjectEntity();
 }

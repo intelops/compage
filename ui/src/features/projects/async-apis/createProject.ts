@@ -8,7 +8,7 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
     'projects/createProject',
     async (createProjectRequest: CreateProjectRequest, thunkApi) => {
         return createProject(createProjectRequest).then(response => {
-            if (response.status !== 201) {
+            if (response.status !== 200) {
                 const msg = `Failed to create project.`;
                 const errorMessage = `Status: ${response.status}, Message: ${msg}`;
                 console.log(errorMessage);

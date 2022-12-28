@@ -183,8 +183,8 @@ export const ChangeProject = () => {
 
     const prepareCreateProjectRequest = () => {
         const user: User = {
-            email: authData.email,
-            name: authData.name
+            email: authData.email || authData.login,
+            name: authData.login
         }
         const repository: Repository = {
             branch: data.repositoryBranch || 'main',
