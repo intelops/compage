@@ -100,8 +100,9 @@ const updateToGithub = (projectEntity: ProjectEntity, response: Response) => {
     // update github repo and save json to github (project's json to github repo)
     return pullCompageJson(projectEntity.user.name, projectEntity.repository.name)
         .then(resp => {
-            console.log("pullCompageJson Response: ", resp);
-            const sha = JSON.parse(resp.data).sha
+            // TODO remove below line later.
+            // console.log("pullCompageJson Response: ", resp);
+            const sha = resp.data.sha;
             // base64 the json as it's required for github api.
             const buffer = new Buffer(JSON.stringify(projectEntity.json));
             const base64Json = buffer.toString('base64');
@@ -113,7 +114,7 @@ const updateToGithub = (projectEntity: ProjectEntity, response: Response) => {
                 "updated project from ui",
                 sha).then(resp => {
                 console.log("commitCompageJson Response: ", resp.data);
-                const message = `An update to .compage/config.json in Repository for '${projectEntity.displayName}' is committed, '${projectEntity.id}' project is updated successfully`;
+                const message = `An update to .compage/config.json in Repository for '${projectEntity.displayName}' is committed, '${projectEntity.displayName}' is updated successfully`;
                 console.log(message);
                 return response.status(200).json({message: message});
             }).catch(error => {
