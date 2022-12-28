@@ -69,99 +69,76 @@ projectsRouter.put("/:id", requireUserNameMiddleware, async (request: Request, r
     return response.status(500).json({message: message});
 });
 
-const updateToGithub = async (projectEntity: ProjectEntity, response: Response) => {
-    try {
-        // TODO update github repo and save json to github (project's json to github repo)
-        // getBase64EncodedStringForConfig()
-        // sha - pull the file content and then take the sha from response.
-        // commit new changes to .compage/config.json in github repository.
-        const axiosResponse = await commitCompageJson(projectEntity.user.name, projectEntity.user.email, projectEntity.repository.name, JSON.stringify(projectEntity.json), "updated project from ui", "");
-        if (axiosResponse.data) {
-            console.log("committed compageJson : ", axiosResponse.data);
-            const message = `An update to 
-                .compage/config.json in Repository for '${projectEntity.repository.name}' is committed, '${projectEntity.displayName}' project is updated successfully`;
-            console.log(message);
-            return response.status(200).json(message);
-        } else if (axiosResponse.status !== 200) {
-            const message = `An update to 
-                .compage/config.json in Repository for '${projectEntity.repository.name}' couldn't be committed.
-                 Received error code while committing .compage/config.json in github repository for '${projectEntity.displayName}': ${axiosResponse.status}`
-            console.log(message);
-            return response.status(500).json({message: message});
-        }
-    } catch (e) {
-        const error = JSON.parse(JSON.stringify(e));
-        const message = `An update to 
-                .compage/config.json in Repository for '${projectEntity.repository.name}' couldn't be committed.
-                 Received error code while committing .compage/config.json in github repository for '${projectEntity.displayName}': ${error.status}`
+// commits new changes to .compage/config.json in github repository.
+const updateToGithub = (projectEntity: ProjectEntity, response: Response) => {
+    // TODO update github repo and save json to github (project's json to github repo)
+    // getBase64EncodedStringForConfig()
+    // sha - pull the file content and then take the sha from response.
+    return commitCompageJson(
+        projectEntity.user.name,
+        projectEntity.user.email,
+        projectEntity.repository.name,
+        JSON.stringify(projectEntity.json),
+        "updated project from ui",
+        "").then(data => {
+        console.log("commitCompageJson Response: ", data);
+        const message = `An update to .compage/config.json in Repository for '${projectEntity.repository.name}' is committed, '${projectEntity.displayName}' project is created/updated successfully`;
+        console.log(message);
+        return response.status(200).json(message);
+    }).catch(error => {
+        const errorObject = JSON.parse(JSON.stringify(error));
+        const message = `An update to .compage/config.json in Repository for '${projectEntity.repository.name}' couldn't be committed. Received error code while committing .compage/config.json in github repository for '${projectEntity.displayName}': ${errorObject.status}`
         console.log(message)
         return response.status(500).json({message: message});
-    }
+    });
 }
-
-const updateFromGithub = async (projectEntity: ProjectEntity, response: Response) => {
-    try {
-        // pull .compage/config.json from github repository.
-        const axiosResponse = await pullCompageJson(projectEntity.user.name, projectEntity.repository.name);
-        if (axiosResponse.data) {
-            console.log("pulled compageJson : ", axiosResponse.data);
-            projectEntity.json = JSON.parse(axiosResponse.data);
-
-            // updating project with latest json from github.
-            const isUpdated = await updateProject(projectEntity.id, <string>projectEntity.user.name, projectEntity);
-            if (isUpdated) {
-                const message = `'${projectEntity.displayName}' project is updated after pulling 
+// pulls .compage/config.json from github repository and update it in k8s project.
+const updateFromGithub = (projectEntity: ProjectEntity, response: Response) => {
+    return pullCompageJson(projectEntity.user.name, projectEntity.repository.name)
+        .then(data => {
+            console.log("pullCompageJson Response: ", JSON.stringify(data));
+            projectEntity.json = JSON.parse(JSON.stringify(data));
+            // updating project in k8s with latest json from github.
+            return updateProject(projectEntity.id, <string>projectEntity.user.name, projectEntity)
+                .then(isUpdated => {
+                    if (isUpdated) {
+                        const message = `'${projectEntity.displayName}' project is updated after pulling 
                 .compage/config.json in Repository for '${projectEntity.repository.name}'`;
-                console.log(message);
-                return response.status(200).json(projectEntity);
-            }
-
-            const message = `'${projectEntity.displayName}' project couldn't be updated after pulling 
+                        console.log(message);
+                        return response.status(200).json(projectEntity);
+                    }
+                    const message = `'${projectEntity.displayName}' project couldn't be updated after pulling 
                 .compage/config.json in Repository for '${projectEntity.repository.name}'`;
-            console.log(message);
-            return response.status(500).json({message: message});
-        } else if (axiosResponse.status !== 200) {
+                    console.log(message);
+                    return response.status(500).json({message: message});
+                });
+        }).catch(error => {
+            const errorObject = JSON.parse(JSON.stringify(error));
             const message = `The .compage/config.json in Repository for '${projectEntity.repository.name}' couldn't be pulled.
-                 Received error code while pulling .compage/config.json in github repository for '${projectEntity.displayName}': ${axiosResponse.status}`
+                 Received error code while pulling .compage/config.json in github repository for '${projectEntity.displayName}': ${errorObject.status}`
             console.log(message);
             return response.status(500).json({message: message});
-        }
-    } catch (e) {
-        const error = JSON.parse(JSON.stringify(e));
-        const message = `The .compage/config.json in Repository for '${projectEntity.repository.name}' couldn't be pulled. 
-            Received error code while pulling .compage/config.json in github repository for '${projectEntity.displayName}':${error.status}`
-        console.log(message)
-        return response.status(500).json({message: message});
-    }
+        });
 }
 
-const createOnGithub = async (projectEntity: ProjectEntity, response: Response) => {
-    try {
-        const axiosResponse = await createRepository(projectEntity.user.name, projectEntity.repository.name, projectEntity.repository.name);
-        if (axiosResponse.data) {
-            // TODO create .compage/config.json file in github repo
-            // copy above code here
-            const message = `'${projectEntity.id}' project and repository created successfully.`;
-            console.log(message);
-            return response.status(201).json({message: message});
-        } else if (axiosResponse.status !== 200) {
-            const message = `Repository for '${projectEntity.id}' couldn't be created.
-                 Received error code while creating github repository for '${projectEntity.id}': 
-                 ${axiosResponse.status}`;
-            console.log(message);
+// creates repository on github and commits first version of yaml
+const createOnGithub = (projectEntity: ProjectEntity, response: Response) => {
+    return createRepository(projectEntity.user.name, projectEntity.repository.name, projectEntity.repository.name)
+        .then(data => {
+            console.log("createRepository Response: ", JSON.stringify(data))
+            // create .compage/config.json file in github repo
+            return updateToGithub(projectEntity, response);
+        }).catch(error => {
+            const errorObject = JSON.parse(JSON.stringify(error));
+            let message = `Repository for '${projectEntity.id}' couldn't be created.`
+            if (errorObject.status === 422) {
+                message = `${message} Please choose different Repository Name.`;
+            } else {
+                message = `${message} Received error code while creating github repository for '${projectEntity.id}': ${errorObject.status}`;
+            }
+            console.log(message)
             return response.status(500).json({message: message});
-        }
-    } catch (e) {
-        let message = `Repository for '${projectEntity.id}' couldn't be created.`
-        const error = JSON.parse(JSON.stringify(e));
-        if (error.status === 422) {
-            message = `${message} Please choose different Repository Name.`;
-        } else {
-            message = `${message} Received error code while creating github repository for '${projectEntity.id}': ${error.status}`;
-        }
-        console.log(message)
-        return response.status(500).json({message: message});
-    }
+        });
 }
 
 export default projectsRouter;
