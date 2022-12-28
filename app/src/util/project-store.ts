@@ -33,7 +33,7 @@ const convertProjectResourceToProjectEntity = (projectResource: ProjectResource)
         repository: projectResource.spec.repository,
         user: projectResource.spec.user,
         version: projectResource.spec.version,
-        json: JSON.parse(JSON.stringify(projectResource.spec.json))
+        json: JSON.parse(JSON.stringify(projectResource.spec.json || {}))
     }
     return projectEntity
 }
