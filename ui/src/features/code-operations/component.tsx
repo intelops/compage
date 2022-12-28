@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
-import {selectCodeOperationsStatus} from './slice';
+import {selectGenerateCodeStatus} from './slice';
 import Button from "@mui/material/Button";
 import {generateCodeAsync} from "./async-apis/generateCode";
 
@@ -9,7 +9,7 @@ export const GenerateCode = () => {
     // TODO below values can be used if we want to get data from api
     // const data = useAppSelector(selectData);
     // const error = useAppSelector(selectError);
-    const codeOperationsStatus = useAppSelector(selectCodeOperationsStatus);
+    const codeOperationsStatus = useAppSelector(selectGenerateCodeStatus);
 
     const dispatch = useAppDispatch();
     const generateCodeRequest = {
