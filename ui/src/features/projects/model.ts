@@ -18,7 +18,7 @@ export interface CreateProjectRequest {
     displayName: string,
     version: string,
     user: User,
-    yaml: CompageJson,
+    json: CompageJson,
     repository: Repository,
     metadata?: Map<string, string>
 }
@@ -41,7 +41,7 @@ export interface ListProjectsResponse {
     displayName: string,
     version: string,
     user: User,
-    yaml: CompageJson,
+    json: CompageJson,
     repository: Repository,
     metadata: Map<string, string>
 }
@@ -61,7 +61,7 @@ export interface GetProjectResponse {
     displayName: string,
     version: string,
     user: User,
-    yaml: CompageJson,
+    json: CompageJson,
     repository: Repository,
     metadata: Map<string, string>
 }
@@ -72,5 +72,29 @@ export interface GetProjectRequest {
 
 // This type describes the error object structure:
 export type GetProjectError = {
+    message: string;
+};
+
+// updateProject models (the structure matches as of now with UpdateProjectRequest but have kept it
+// separate for future customizations)
+export interface UpdateProjectResponse {
+    projectId: string,
+    userName: string,
+    message: string,
+    error: string,
+}
+
+export interface UpdateProjectRequest {
+    id: string,
+    displayName: string,
+    version: string,
+    user: User,
+    json: CompageJson,
+    repository: Repository,
+    metadata?: Map<string, string>
+}
+
+// This type describes the error object structure:
+export type UpdateProjectError = {
     message: string;
 };
