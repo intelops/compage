@@ -28,7 +28,6 @@ export const ChangeProject = () => {
     const navigate = useNavigate()
 
     const [data, setData] = useState({
-        errorMessage: "",
         isOpen: false,
         projectName: "",
         isCreateNew: false,
@@ -54,7 +53,7 @@ export const ChangeProject = () => {
 
     const handleCreateProjectClick = () => {
         dispatch(createProjectAsync(createProjectRequest))
-        setData({...data, isOpen: false})
+        setData({...data, projectName: "", repositoryBranch: "", repositoryName: "", isOpen: false})
     }
 
     const handleExistingProjectsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
@@ -234,9 +233,7 @@ export const ChangeProject = () => {
         return <Button variant="contained"
                        onClick={handleCreateProjectClick}
                        disabled={createProjectStatus === 'loading' || data.projectName === "" || !isValid()}>
-            {createProjectStatus === 'loading'
-                ? "Creating Project"
-                : "Create Project"}
+            Create Project
         </Button>
     }
 
