@@ -3,10 +3,9 @@ import {Request, Response, Router} from "express";
 import {createProject, deleteProject, getProject, listProjects, updateProject} from "../util/project-store";
 import {X_USER_NAME_HEADER} from "../util/constants";
 import {ProjectEntity} from "./models";
-import {createRepository, pullCompageJson} from "../store/github-client";
+import {commitCompageJson, createRepository, pullCompageJson} from "../store/github-client";
 
 const projectsRouter = Router();
-
 
 // delete project by id for given user
 projectsRouter.delete("/:id", requireUserNameMiddleware, async (request: Request, response: Response) => {
@@ -52,14 +51,14 @@ projectsRouter.get("/:id", requireUserNameMiddleware, async (request: Request, r
                 return response.status(500).json({message: message});
             } else if (axiosResponse.status !== 200) {
                 const message = `The .compage/config.json in Repository for '${projectEntity.repository.name}' couldn't be pulled.
-                 Received error code while committing .compage/config.json in github repository for '${projectEntity.displayName}': ${axiosResponse.status}`
+                 Received error code while pulling .compage/config.json in github repository for '${projectEntity.displayName}': ${axiosResponse.status}`
                 console.log(message);
                 return response.status(500).json({message: message});
             }
         } catch (e) {
             const error = JSON.parse(JSON.stringify(e));
             const message = `The .compage/config.json in Repository for '${projectEntity.repository.name}' couldn't be pulled. 
-            Received error code while committing .compage/config.json in github repository for '${projectEntity.displayName}':${error.status}`
+            Received error code while pulling .compage/config.json in github repository for '${projectEntity.displayName}':${error.status}`
             console.log(message)
             return response.status(500).json({message: message});
         }
@@ -70,8 +69,6 @@ projectsRouter.get("/:id", requireUserNameMiddleware, async (request: Request, r
 // list all projects for given user
 projectsRouter.get("/", requireUserNameMiddleware, async (request: Request, response: Response) => {
     const userName = request.header(X_USER_NAME_HEADER);
-    // TODO remove it later
-    await new Promise(r => setTimeout(r, 5000));
     return response.status(200).json(await listProjects(<string>userName));
 });
 
@@ -120,10 +117,33 @@ projectsRouter.put("/:id", requireUserNameMiddleware, async (request: Request, r
     const projectEntity: ProjectEntity = request.body;
     const isUpdated = await updateProject(projectId, <string>userName, projectEntity);
     if (isUpdated) {
-        // TODO update github repo and save json to github (project's json to github repo)
-        const message = `'${projectEntity.displayName}' project updated successfully.`;
-        console.log(message);
-        return response.status(200).json({message: message});
+        try {
+            // TODO update github repo and save json to github (project's json to github repo)
+            // getBase64EncodedStringForConfig()
+            // sha - pull the file content and then take the sha from response.
+            // commit new changes to .compage/config.json in github repository.
+            const axiosResponse = await commitCompageJson(projectEntity.user.name, projectEntity.user.email, projectEntity.repository.name, JSON.stringify(projectEntity.json), "updated project from ui", "");
+            if (axiosResponse.data) {
+                console.log("committed compageJson : ", axiosResponse.data);
+                const message = `An update to 
+                .compage/config.json in Repository for '${projectEntity.repository.name}' is committed, '${projectEntity.displayName}' project is updated successfully`;
+                console.log(message);
+                return response.status(200).json(message);
+            } else if (axiosResponse.status !== 200) {
+                const message = `An update to 
+                .compage/config.json in Repository for '${projectEntity.repository.name}' couldn't be committed.
+                 Received error code while committing .compage/config.json in github repository for '${projectEntity.displayName}': ${axiosResponse.status}`
+                console.log(message);
+                return response.status(500).json({message: message});
+            }
+        } catch (e) {
+            const error = JSON.parse(JSON.stringify(e));
+            const message = `An update to 
+                .compage/config.json in Repository for '${projectEntity.repository.name}' couldn't be committed.
+                 Received error code while committing .compage/config.json in github repository for '${projectEntity.displayName}': ${error.status}`
+            console.log(message)
+            return response.status(500).json({message: message});
+        }
     }
     const message = `'${projectEntity.displayName}' project couldn't be updated.`;
     console.log(message);
