@@ -69,13 +69,38 @@ projectsRouter.put("/:id", requireUserNameMiddleware, async (request: Request, r
     return response.status(500).json({message: message});
 });
 
+// commits first time changes in .compage/config.json in github repository.
+const addToGithub = (projectEntity: ProjectEntity, response: Response) => {
+    const sha = "";
+    // base64 the json as it's required for github api.
+    const buffer = new Buffer(JSON.stringify(projectEntity.json));
+    const base64Json = buffer.toString('base64');
+    return commitCompageJson(
+        projectEntity.user.name,
+        projectEntity.user.email,
+        projectEntity.repository.name,
+        base64Json,
+        "first commit",
+        sha).then(resp => {
+        console.log("commitCompageJson Response: ", resp.data);
+        const message = `The .compage/config.json in Repository for '${projectEntity.repository.name}' is committed, '${projectEntity.id}' project is created successfully`;
+        console.log(message);
+        return response.status(200).json(message);
+    }).catch(error => {
+        const errorObject = JSON.parse(JSON.stringify(error));
+        const message = `The .compage/config.json in Repository for '${projectEntity.repository.name}' couldn't be committed. Received error code while committing .compage/config.json in github repository for '${projectEntity.id}': ${errorObject.status}`
+        console.log(message)
+        return response.status(500).json({message: message});
+    });
+}
+
 // commits new changes to .compage/config.json in github repository.
 const updateToGithub = (projectEntity: ProjectEntity, response: Response) => {
     // update github repo and save json to github (project's json to github repo)
     return pullCompageJson(projectEntity.user.name, projectEntity.repository.name)
-        .then(res => {
-            console.log("pullCompageJson Response: ", res);
-            const sha = JSON.parse(res.data).sha
+        .then(resp => {
+            console.log("pullCompageJson Response: ", resp);
+            const sha = JSON.parse(resp.data).sha
             // base64 the json as it's required for github api.
             const buffer = new Buffer(JSON.stringify(projectEntity.json));
             const base64Json = buffer.toString('base64');
@@ -85,8 +110,8 @@ const updateToGithub = (projectEntity: ProjectEntity, response: Response) => {
                 projectEntity.repository.name,
                 base64Json,
                 "updated project from ui",
-                sha).then(data => {
-                console.log("commitCompageJson Response: ", data);
+                sha).then(resp => {
+                console.log("commitCompageJson Response: ", resp.data);
                 const message = `An update to .compage/config.json in Repository for '${projectEntity.repository.name}' is committed, '${projectEntity.id}' project is created/updated successfully`;
                 console.log(message);
                 return response.status(200).json(message);
@@ -107,9 +132,9 @@ const updateToGithub = (projectEntity: ProjectEntity, response: Response) => {
 // pulls .compage/config.json from github repository and update it in k8s project.
 const updateFromGithub = (projectEntity: ProjectEntity, response: Response) => {
     return pullCompageJson(projectEntity.user.name, projectEntity.repository.name)
-        .then(data => {
-            console.log("pullCompageJson Response: ", JSON.stringify(data));
-            projectEntity.json = JSON.parse(JSON.stringify(data));
+        .then(resp => {
+            console.log("pullCompageJson Response: ", JSON.stringify(resp.data));
+            projectEntity.json = JSON.parse(JSON.stringify(resp.data));
             // updating project in k8s with latest json from github.
             return updateProject(projectEntity.id, <string>projectEntity.user.name, projectEntity)
                 .then(isUpdated => {
@@ -136,10 +161,10 @@ const updateFromGithub = (projectEntity: ProjectEntity, response: Response) => {
 // creates repository on github and commits first version of yaml
 const createOnGithub = (projectEntity: ProjectEntity, response: Response) => {
     return createRepository(projectEntity.user.name, projectEntity.repository.name, projectEntity.repository.name)
-        .then(data => {
-            console.log("createRepository Response: ", JSON.stringify(data))
+        .then(resp => {
+            console.log("createRepository Response: ", JSON.stringify(resp.data))
             // create .compage/config.json file in github repo
-            return updateToGithub(projectEntity, response);
+            return addToGithub(projectEntity, response);
         }).catch(error => {
             const errorObject = JSON.parse(JSON.stringify(error));
             let message = `Repository for '${projectEntity.id}' couldn't be created.`
