@@ -23,7 +23,7 @@ import "./scss/CircularNode.css"
 import "./scss/RectangularNode.css"
 import "./scss/Logger.css"
 
-import React, {useRef} from "react";
+import React, {useRef, useState} from "react";
 import {
     createCircularNode,
     createPluginPanel,
@@ -57,7 +57,9 @@ import {cleanse} from "./helper/helper";
 import JSONPretty from "react-json-pretty";
 import Button from "@mui/material/Button";
 import {GenerateCode} from "../../features/code-operations/component";
-import {ChangeProject} from "../../features/projects/component";
+import {SwitchProject} from "../../features/projects/switch-project";
+import {useNavigate} from "react-router-dom";
+import {Panel} from "./panel";
 
 interface ArgTypes {
     resetState?: (...args: any) => void;
@@ -418,21 +420,7 @@ export const DiagramMakerContainer = ({
                 {diagramMaker.copied ? <span style={{color: 'green'}}> Copied.</span> : null}
             </Grid>
             <hr/>
-            <Grid item style={{
-                alignItems: "center",
-                display: "flex",
-                flexDirection: "column"
-            }}>
-                <GenerateCode></GenerateCode>
-            </Grid>
-            <hr/>
-            <Grid item style={{
-                alignItems: "center",
-                display: "flex",
-                flexDirection: "column"
-            }}>
-                <ChangeProject></ChangeProject>
-            </Grid>
+            <Panel/>
             <hr/>
             <Grid item style={{
                 alignItems: "center",
