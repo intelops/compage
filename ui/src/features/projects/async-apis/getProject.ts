@@ -13,14 +13,14 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
                 const msg = `Failed to retrieve project.`;
                 const errorMessage = `Status: ${response.status}, Message: ${msg}`;
                 console.log(errorMessage);
-                toastr.error(`Failure`, errorMessage);
+                toastr.error(`getProject [Failure]`, errorMessage);
                 return thunkApi.rejectWithValue({
                     message: errorMessage
                 });
             }
             const message = `Successfully retrieved project.`;
             console.log(`${message}`);
-            toastr.success(`Success`, message);
+            toastr.success(`getProject [Success]`, message);
             const getProjectResponse: GetProjectResponse = response.data
             // update details to localstorage client
             const currentProjectContext: CurrentProjectContext = {
@@ -34,7 +34,7 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
             const message = JSON.parse(JSON.stringify(e.response.data)).message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;
             console.log(errorMessage);
-            toastr.error(`Failure`, errorMessage);
+            toastr.error(`getProject [Failure]`, errorMessage);
             return thunkApi.rejectWithValue({
                 message: errorMessage
             });

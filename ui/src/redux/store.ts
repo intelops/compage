@@ -6,10 +6,12 @@ import {persistReducer, persistStore} from 'redux-persist';
 import storageSession from 'reduxjs-toolkit-persist/lib/storage/session'
 import {FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE} from "reduxjs-toolkit-persist";
 import {reducer as toastrReducer} from 'react-redux-toastr'
-import {Action} from "redux";
+import {Action, Reducer} from "redux";
 import codeOperationsReducer from "../features/code-operations/slice";
 import projectsReducer from "../features/projects/slice";
 import authReducer from "../features/auth/slice";
+import {unauthenticatedMiddleware} from "./unauthenticatedMiddleware";
+import {RESET_STATE_ACTION_TYPE} from "./reset-state-action";
 
 const rootPersistConfig = {
     key: 'root',
@@ -29,21 +31,35 @@ const persistedRootReducer = combineReducers({
     toastr: toastrReducer,
 })
 
+
+export const rootReducer: Reducer<RootState> = (
+    state,
+    action
+) => {
+    if (action.type === RESET_STATE_ACTION_TYPE) {
+        state = {} as RootState;
+    }
+
+    return persistedRootReducer(state, action);
+};
+
 export const store = configureStore(
     {
         devTools: process.env.NODE_ENV !== 'production',
-        reducer: persistedRootReducer,
+        reducer: rootReducer,
         // middleware: [thunk]
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
                 serializableCheck: {
                     ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
                 },
-            }),
+            }).concat([
+                unauthenticatedMiddleware
+            ]),
     }
 )
 
-export type RootState = ReturnType<typeof store.getState>
+export type RootState = ReturnType<typeof persistedRootReducer>
 export type AppDispatch = typeof store.dispatch
 export const persistor = persistStore(store);
 export type AppThunk<ReturnType = void> = ThunkAction<ReturnType,

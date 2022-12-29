@@ -6,29 +6,30 @@ import {toastr} from 'react-redux-toastr'
 export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, GenerateCodeRequest, { rejectValue: GenerateCodeError }>(
     'code-operations/generateCode',
     async (generateCodeRequest: GenerateCodeRequest, thunkApi) => {
-        try {
-            const response = await generateCode(generateCodeRequest);
+        return generateCode(generateCodeRequest).then(response => {
             // Check if status is not okay:
             if (response.status !== 200) {
-                console.log(`Failed to generate code. Received: ${response.status}`)
-                toastr.error(`Failure : ${generateCodeRequest.projectId}`, `Failed to generate code. Received: ${response.status}`);
+                const message = `Failed to generate code for '${generateCodeRequest.projectId}'. Received: ${response.status}`;
+                console.log(message);
+                toastr.error(`generateCode [Failure]`, message);
                 // Return the error message:
                 return thunkApi.rejectWithValue({
-                    message: `Failed to generate code. Received: ${response.status}`
+                    message: message
                 });
             }
-            console.log(`Successfully generated code-  ${generateCodeRequest.projectId}`);
-            toastr.success(`Success: ${generateCodeRequest.projectId}`, `Successfully generated code: ${generateCodeRequest.projectId}`);
+            const message = `Successfully generated code for '${generateCodeRequest.projectId}'`;
+            console.log(message);
+            toastr.success(`generateCode [Success]`, `${message}`);
             return response.data;
-        } catch (e) {
+        }).catch(e => {
             const statusCode = e.response.status;
             const message = JSON.parse(JSON.stringify(e.response.data)).message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;
             console.log(errorMessage);
-            toastr.error(`Failure`, errorMessage);
+            toastr.error(`generateCode [Failure]`, errorMessage);
             return thunkApi.rejectWithValue({
-                message: `Failed to generate code. Received: ${e}`
+                message: errorMessage
             });
-        }
+        })
     }
 );

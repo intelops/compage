@@ -91,7 +91,34 @@ export interface GenerateCodeResponse {
     projectId: string,
     userName: string,
     message: string,
-    error: string,
+}
+
+export interface GenerateCodeError {
+    message: string,
+}
+
+export interface CreateProjectResponse {
+    projectId: string,
+    userName: string,
+    message: string,
+}
+
+export interface CreateProjectError {
+    message: string,
+}
+
+export interface UpdateProjectResponse {
+    projectId: string,
+    userName: string,
+    message: string,
+}
+
+export interface UpdateProjectError {
+    message: string,
+}
+
+export interface DeleteProjectError {
+    message: string,
 }
 
 export const initializeEmptyProjectEntity = () => {

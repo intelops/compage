@@ -2,7 +2,13 @@ import {requireUserNameMiddleware} from "../middlewares/auth";
 import {Request, Response, Router} from "express";
 import {createProject, deleteProject, getProject, listProjects, updateProject} from "../util/project-store";
 import {X_USER_NAME_HEADER} from "../util/constants";
-import {ProjectEntity} from "./models";
+import {
+    CreateProjectError,
+    CreateProjectResponse, DeleteProjectError,
+    ProjectEntity,
+    UpdateProjectError,
+    UpdateProjectResponse
+} from "./models";
 import {commitCompageJson, createRepository, pullCompageJson} from "../store/github-client";
 
 const projectsRouter = Router();
@@ -19,7 +25,7 @@ projectsRouter.delete("/:id", requireUserNameMiddleware, async (request: Request
     }
     const message = `'${projectId}' project couldn't be deleted.`;
     console.log(message);
-    return response.status(500).json({message: message});
+    return response.status(500).json(getDeleteProjectError(message));
 });
 
 // get project by id for given user
@@ -51,9 +57,9 @@ projectsRouter.post("/", requireUserNameMiddleware, async (request: Request, res
         // create repository on github and .compage/config.json file/
         return await createOnGithub(savedProjectEntity, response)
     }
-    const message = `'${savedProjectEntity.id}' project couldn't be created.`;
+    const message = `${savedProjectEntity.displayName}[${savedProjectEntity.id}] project couldn't be created.`;
     console.log(message);
-    return response.status(500).json({message: message});
+    return response.status(500).json(getCreateProjectError(message));
 });
 
 // update project with details given in request
@@ -66,9 +72,9 @@ projectsRouter.put("/:id", requireUserNameMiddleware, async (request: Request, r
         // update github with .compage/config.json
         return await updateToGithub(updatedProjectEntity, response);
     }
-    const message = `'${projectEntity.id}' project couldn't be updated.`;
+    const message = `${projectEntity.displayName}[${projectEntity.id}] project couldn't be updated.`;
     console.log(message);
-    return response.status(500).json({message: message});
+    return response.status(500).json(getUpdateProjectError(message));
 });
 
 // commits first time changes in .compage/config.json in github repository.
@@ -86,14 +92,14 @@ const addToGithub = (projectEntity: ProjectEntity, response: Response) => {
         sha).then(resp => {
         // TODO remove below later
         // console.log("commitCompageJson Response: ", resp.data);
-        const message = `The .compage/config.json in Repository for '${projectEntity.displayName}' is committed, '${projectEntity.id}' project is created successfully.`;
+        const message = `The .compage/config.json in Repository for '${projectEntity.displayName}' is committed, ${projectEntity.displayName}[${projectEntity.id}] project is created successfully.`;
         console.log(message);
-        return response.status(200).json(projectEntity);
+        return response.status(200).json(getCreateProjectResponse(projectEntity.user.name, projectEntity.id, message));
     }).catch(error => {
         const errorObject = JSON.parse(JSON.stringify(error));
         const message = `The .compage/config.json in Repository for '${projectEntity.displayName}' couldn't be committed. Received error code while committing .compage/config.json in Github Repository: ${errorObject.status}`
         console.log(message)
-        return response.status(500).json({message: message});
+        return response.status(500).json(getCreateProjectError(message));
     });
 }
 
@@ -118,19 +124,19 @@ const updateToGithub = (projectEntity: ProjectEntity, response: Response) => {
                 console.log("commitCompageJson Response: ", resp.data);
                 const message = `An update to .compage/config.json in Repository for '${projectEntity.displayName}' is committed, '${projectEntity.displayName}' is updated successfully`;
                 console.log(message);
-                return response.status(200).json(projectEntity);
+                return response.status(200).json(getUpdateProjectResponse(projectEntity.user.name, projectEntity.id, message));
             }).catch(error => {
                 const errorObject = JSON.parse(JSON.stringify(error));
                 const message = `An update to .compage/config.json in Repository for '${projectEntity.displayName}' couldn't be committed. Received error code while committing .compage/config.json in Github Repository: ${errorObject.status}`
                 console.log(message)
-                return response.status(500).json({message: message});
+                return response.status(500).json(getUpdateProjectError(message));
             });
         })
         .catch(error => {
             const errorObject = JSON.parse(JSON.stringify(error));
             const message = `The .compage/config.json in Repository for '${projectEntity.displayName}' couldn't be pulled. Received error code while pulling .compage/config.json in Github Repository: ${errorObject.status}`
             console.log(message)
-            return response.status(500).json({message: message});
+            return response.status(500).json(getUpdateProjectError(message));
         });
 }
 // pulls .compage/config.json from github repository and update it in k8s project.
@@ -145,11 +151,11 @@ const updateFromGithub = (projectEntity: ProjectEntity, response: Response) => {
             return updateProject(projectEntity.id, <string>projectEntity.user.name, projectEntity)
                 .then(updatedProjectEntity => {
                     if (updatedProjectEntity.id.length !== 0) {
-                        const message = `'${updatedProjectEntity.id}' project is updated after pulling .compage/config.json in Github Repository.`;
+                        const message = `${updatedProjectEntity.displayName}[${updatedProjectEntity.id}] project is updated after pulling .compage/config.json in Github Repository.`;
                         console.log(message);
                         return response.status(200).json(updatedProjectEntity);
                     }
-                    const message = `'${projectEntity.id}' project couldn't be updated after pulling .compage/config.json in Repository for '${projectEntity.id}'`;
+                    const message = `${updatedProjectEntity.displayName}[${updatedProjectEntity.id}] project couldn't be updated after pulling .compage/config.json in Repository for '${projectEntity.id}'`;
                     console.log(message);
                     return response.status(500).json({message: message});
                 });
@@ -180,8 +186,47 @@ const createOnGithub = (projectEntity: ProjectEntity, response: Response) => {
                 message = `${message} Received error code while creating github repository: ${errorObject.status}`;
             }
             console.log(message)
-            return response.status(500).json({message: message});
+            return response.status(500).json(getCreateProjectError(message));
         });
+}
+
+const getCreateProjectResponse = (userName: string, projectId: string, message: string) => {
+    const createProjectResponse: CreateProjectResponse = {
+        userName: userName,
+        projectId: projectId,
+        message: message,
+    }
+    return createProjectResponse;
+}
+
+const getCreateProjectError = (message: string) => {
+    const createProjectError: CreateProjectError = {
+        message: message,
+    }
+    return createProjectError;
+}
+
+const getUpdateProjectResponse = (userName: string, projectId: string, message: string) => {
+    const updateProjectResponse: UpdateProjectResponse = {
+        userName: userName,
+        projectId: projectId,
+        message: message,
+    }
+    return updateProjectResponse;
+}
+
+const getUpdateProjectError = (message: string) => {
+    const updateProjectError: UpdateProjectError = {
+        message: message,
+    }
+    return updateProjectError;
+}
+
+const getDeleteProjectError = (message: string) => {
+    const deleteProjectError: DeleteProjectError = {
+        message: message,
+    }
+    return deleteProjectError;
 }
 
 export default projectsRouter;

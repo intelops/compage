@@ -5,7 +5,7 @@ import * as os from "os";
 import {pushToExistingProjectOnGithub, PushToExistingProjectOnGithubRequest} from "../util/simple-git/existing-project";
 import {getToken} from "../util/user-store";
 import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
-import {GenerateCodeRequest, GenerateCodeResponse, Project} from "./models";
+import {GenerateCodeError, GenerateCodeRequest, GenerateCodeResponse, Project} from "./models";
 import {requireUserNameMiddleware} from "../middlewares/auth";
 import {getProjectResource, patchProjectResource} from "../store/project-client";
 import {NAMESPACE, X_USER_NAME_HEADER} from "../util/constants";
@@ -14,16 +14,6 @@ const rimraf = require("rimraf");
 const tar = require('tar')
 const codeOperationsRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
-
-const getGenerateCodeResponse = (userName: string, projectId: string, message: string, error: string) => {
-    let generateCodeResponse: GenerateCodeResponse = {
-        userName: userName,
-        projectId: projectId,
-        message: message,
-        error: error
-    }
-    return generateCodeResponse;
-}
 
 // generateCode (grpc calls to core)
 codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (request, resource) => {
@@ -41,27 +31,32 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
     // retrieve project from k8s
     const projectResource = await getProjectResource(NAMESPACE, projectId);
     if (!projectResource.apiVersion) {
-        let message = `unable to generate code`
-        let error = `no project found for id : ${projectId}`
-        return resource.status(500).json(getGenerateCodeResponse(userName, projectId, message, error));
+        const message = `unable to generate code, no project found for id: ${projectId}`
+        return resource.status(500).json(getGenerateCodeError(message));
+    }
+    if (!projectResource.spec.json
+        || projectResource.spec.json === "{}"
+        || projectResource.spec.json.length === 0
+        || JSON.parse(projectResource.spec.json).nodes.length === 0) {
+        const message = `unable to generate code, have at least a node added to your project: ${projectResource.spec.displayName}[${projectId}].`
+        return resource.status(500).json(getGenerateCodeError(message));
     }
     // create directory hierarchy here itself as creating it after receiving data will not be proper.
-    const originalProjectPath = `${os.tmpdir()}/${projectResource.spec.displayName}`
-    const downloadedProjectPath = `${originalProjectPath}_downloaded`
+    const originalProjectPath = `${os.tmpdir()}/${projectResource.metadata.name}`;
+    const downloadedProjectPath = `${originalProjectPath}_downloaded`;
     try {
         fs.mkdirSync(downloadedProjectPath, {recursive: true});
     } catch (err: any) {
         if (err.code !== 'EEXIST') {
-            let message = `unable to generate code : ${projectResource.spec.displayName}`
-            let error = `unable to generate code : ${projectResource.spec.displayName} directory with error : ${err}`
-            return resource.status(500).json(getGenerateCodeResponse(userName, projectId, message, error));
+            const message = `unable to generate code for ${projectResource.spec.displayName}[${projectResource.metadata.name}] => ${err}`
+            return resource.status(500).json(getGenerateCodeError(message));
         } else {
             // first clean up and then recreate (it might be a residue of previous run)
-            cleanup(downloadedProjectPath)
+            cleanup(downloadedProjectPath);
             fs.mkdirSync(downloadedProjectPath, {recursive: true});
         }
     }
-    const projectTarFilePath = `${downloadedProjectPath}/${projectResource.spec.displayName}_downloaded.tar.gz`;
+    const projectTarFilePath = `${downloadedProjectPath}/${projectResource.metadata.name}_downloaded.tar.gz`;
 
     // save project metadata (in compage db or somewhere)
     // need to save project-name, compage-json version, github repo and latest commit to the db
@@ -86,9 +81,8 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
 
     // error while receiving the file from core component
     call.on('error', async (response: any) => {
-        let message = `unable to generate code : ${projectResource.spec.displayName}`
-        let error = response.details
-        return resource.status(500).json(getGenerateCodeResponse(userName, projectId, message, error));
+        const message = `unable to generate code for ${projectResource.spec.displayName}[${projectResource.metadata.name}] => ${response.details}`
+        return resource.status(500).json(getGenerateCodeError(message));
     });
 
     // file has been transferred, lets save it to github.
@@ -118,9 +112,8 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
             let error: string = await cloneExistingProjectFromGithub(cloneExistingProjectFromGithubRequest)
             if (error.length > 0) {
                 // send status back to ui
-                let message = `couldn't generate code: ${projectResource.spec.displayName} due to : ${error}.`
-                // error = ""
-                return resource.status(500).json(getGenerateCodeResponse(userName, projectId, message, error));
+                const message = `unable to generate code for ${projectResource.spec.displayName}[${projectResource.metadata.name}] => ${error}.`
+                return resource.status(500).json(getGenerateCodeError(message));
             }
 
             // save to GitHub
@@ -136,11 +129,11 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
             error = await pushToExistingProjectOnGithub(pushToExistingProjectOnGithubRequest)
             if (error.length > 0) {
                 // send status back to ui
-                let message = `couldn't generate code: ${projectResource.spec.displayName} due to : ${error}.`
-                return resource.status(500).json(getGenerateCodeResponse(userName, projectId, message, error));
+                const message = `unable to generate code for ${projectResource.spec.displayName}[${projectResource.metadata.name}] => ${error}.`
+                return resource.status(500).json(getGenerateCodeError(message));
             }
 
-            console.log(`saved ${downloadedProjectPath} to github`)
+            console.log(`saved ${downloadedProjectPath} to github.`)
             cleanup(downloadedProjectPath);
 
             // update status in k8s
@@ -152,19 +145,18 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
             const patchedProjectResource = await patchProjectResource(NAMESPACE, projectId, JSON.stringify(projectResource.spec))
             if (patchedProjectResource.apiVersion) {
                 // send status back to ui
-                let message = `generated project: ${projectResource.spec.displayName} and saved in repository : ${projectResource.spec.repository?.name} successfully`
-                return resource.status(200).json(getGenerateCodeResponse(userName, projectId, message, error));
+                const message = `successfully generated project for ${projectResource.spec.displayName}[${projectResource.metadata.name}] and saved in repository '${projectResource.spec.repository?.name}'.`
+                return resource.status(200).json(getGenerateCodeResponse(userName, projectId, message));
             }
             // send error status back to ui
-            let message = `generated project: ${projectResource.spec.displayName} and saved successfully in repository : ${projectResource.spec.repository?.name} but project couldn't get updated`
-            error = `generated project: ${projectResource.spec.displayName} and saved successfully in repository : ${projectResource.spec.repository?.name} but project couldn't get updated`
-            return resource.status(500).json(getGenerateCodeResponse(userName, projectId, message, error));
+            const message = `generated project: ${projectResource.spec.displayName}[${projectResource.metadata.name}] and saved successfully in repository '${projectResource.spec.repository?.name}' but project couldn't get updated.`
+            return resource.status(500).json(getGenerateCodeError(message));
         });
     });
 });
 
 // updateProject (grpc calls to core)
-codeOperationsRouter.post("/update_project", requireUserNameMiddleware, async (req, res) => {
+codeOperationsRouter.post("/re_generate_code", requireUserNameMiddleware, async (req, res) => {
     const {repositoryName, json, projectName, userName} = req.body;
     try {
         const payload = {
@@ -173,7 +165,7 @@ codeOperationsRouter.post("/update_project", requireUserNameMiddleware, async (r
             "json": json,
             "repositoryName": repositoryName
         }
-        projectGrpcClient.UpdateProject(payload, (err: any, response: { fileChunk: any; }) => {
+        projectGrpcClient.RegenerateCode(payload, (err: any, response: { fileChunk: any; }) => {
             if (err) {
                 return res.status(500).json(err);
             }
@@ -183,5 +175,21 @@ codeOperationsRouter.post("/update_project", requireUserNameMiddleware, async (r
         return res.status(500).json(err);
     }
 });
+
+const getGenerateCodeResponse = (userName: string, projectId: string, message: string) => {
+    const generateCodeResponse: GenerateCodeResponse = {
+        userName: userName,
+        projectId: projectId,
+        message: message,
+    }
+    return generateCodeResponse;
+}
+
+const getGenerateCodeError = (message: string) => {
+    const generateCodeError: GenerateCodeError = {
+        message: message,
+    }
+    return generateCodeError;
+}
 
 export default codeOperationsRouter;

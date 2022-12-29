@@ -11,14 +11,14 @@ export const updateProjectAsync = createAsyncThunk<UpdateProjectResponse, Update
                 const msg = `Failed to update project.`;
                 const errorMessage = `Status: ${response.status}, Message: ${msg}`;
                 console.log(errorMessage);
-                toastr.error(`Failure`, errorMessage);
+                toastr.error(`updateProject [Failure]`, errorMessage);
                 return thunkApi.rejectWithValue({
                     message: errorMessage
                 });
             }
             const message = `Successfully update project.`;
             console.log(`${message}`);
-            toastr.success(`Success`, message);
+            toastr.success(`updateProject [Success]`, message);
             // no need to save state in localstorage for this type of request.
             return response.data;
         }).catch(e => {
@@ -26,7 +26,7 @@ export const updateProjectAsync = createAsyncThunk<UpdateProjectResponse, Update
             const message = JSON.parse(JSON.stringify(e.response.data)).message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;
             console.log(errorMessage);
-            toastr.error(`Failure`, errorMessage);
+            toastr.error(`updateProject [Failure]`, errorMessage);
             return thunkApi.rejectWithValue({
                 message: errorMessage
             });

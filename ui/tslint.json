@@ -10,6 +10,7 @@
     "no-empty-interface": false,
     "interface-name": false,
     "object-literal-sort-keys": false,
+    "semicolon":true,
     "member-access": [
       true,
       "no-public"

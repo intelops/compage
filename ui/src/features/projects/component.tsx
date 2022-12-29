@@ -3,7 +3,14 @@ import React, {ChangeEvent, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectCreateProjectStatus, selectListProjectsData, selectListProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
-import {CreateProjectRequest, ListProjectsRequest, ListProjectsResponse, Repository, User} from "./model";
+import {
+    CreateProjectRequest,
+    GetProjectRequest,
+    ListProjectsRequest,
+    ListProjectsResponse,
+    Repository,
+    User
+} from "./model";
 import {CompageEdge, CompageJson, CompageNode} from "../../components/diagram-maker/models";
 import {selectAuthData} from "../auth/slice";
 import {Navigate, useNavigate} from "react-router-dom";
@@ -17,6 +24,7 @@ import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import DialogActions from "@mui/material/DialogActions";
 import {listProjectsAsync} from "./async-apis/listProjects";
 import {createProjectAsync} from "./async-apis/createProject";
+import {getProjectAsync} from "./async-apis/getProject";
 
 export const ChangeProject = () => {
     const createProjectStatus = useAppSelector(selectCreateProjectStatus);
@@ -218,6 +226,10 @@ export const ChangeProject = () => {
     const handleChooseProjectClick = () => {
         console.log("handleChooseProjectClick clicked")
         // TODO Pull the selected project and set the yaml
+        const getProjectRequest: GetProjectRequest = {
+            id: data.projectName
+        };
+        dispatch(getProjectAsync(getProjectRequest))
         setData({...data, isOpen: false})
     }
 

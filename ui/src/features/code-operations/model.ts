@@ -2,7 +2,6 @@ export interface GenerateCodeResponse {
     projectId: string,
     userName: string,
     message: string,
-    error: string,
 }
 
 // This type describes the error object structure:

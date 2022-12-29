@@ -13,28 +13,29 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
                 const msg = `Failed to create project.`;
                 const errorMessage = `Status: ${response.status}, Message: ${msg}`;
                 console.log(errorMessage);
-                toastr.error(`Failure: ${createProjectRequest.displayName}`, errorMessage);
+                toastr.error(`createProject [Failure]`, errorMessage);
                 // Return the error message:
                 return thunkApi.rejectWithValue({
                     message: errorMessage
                 });
             }
+            const createProjectResponse: CreateProjectResponse = response.data;
             // update details to localstorage client
             const currentProjectContext: CurrentProjectContext = {
-                projectId: createProjectRequest.id,
+                projectId: createProjectResponse.projectId,
                 json: createProjectRequest.json
             }
             setCurrentProjectContext(currentProjectContext)
-            const message = `Successfully created project: ${createProjectRequest.displayName}`;
+            const message = `Successfully created project: ${createProjectRequest.displayName}[${createProjectResponse.projectId}]`;
             console.log(message);
-            toastr.success(`Success: ${createProjectRequest.displayName}`, message);
+            toastr.success(`createProject [Success]`, message);
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;
             const message = JSON.parse(JSON.stringify(e.response.data)).message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;
             console.log(errorMessage);
-            toastr.error(`Failure: ${createProjectRequest.displayName}`, errorMessage);
+            toastr.error(`createProject [Failure]`, errorMessage);
             return thunkApi.rejectWithValue({
                 message: errorMessage
             });
