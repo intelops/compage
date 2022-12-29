@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Navigate, useNavigate} from "react-router-dom";
 import {getData} from "../diagram-maker/data/BoundaryCircular/data";
-import {getCurrentConfig, getCurrentProjectContext} from "../../utils/localstorage-client";
+import {getCurrentProjectContext} from "../../utils/localstorage-client";
 import {useAppSelector} from "../../redux/hooks";
 import {DiagramMakerContainer} from "../diagram-maker/diagram-maker-container";
 import {selectAuthData} from "../../features/auth/slice";
@@ -21,10 +21,14 @@ export const Home = () => {
     }
 
     const getDiagramData = () => {
-        const currentConfig = getCurrentConfig();
+        const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
         let diagramMakerData
-        if (currentConfig && currentConfig !== "{}") {
-            diagramMakerData = JSON.parse(currentConfig);
+        if (currentProjectContext
+            && currentProjectContext.json
+            && Object.keys(currentProjectContext.json).length !== 0
+            && Object.keys(currentProjectContext.json.nodes).length !== 0
+        ) {
+            diagramMakerData = currentProjectContext;
         } else {
             // TODO below passed parameters aren't being used.
             diagramMakerData = getData(0, 0);
