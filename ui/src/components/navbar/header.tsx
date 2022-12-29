@@ -21,6 +21,7 @@ const Header = () => {
 
     const handleLogout = () => {
         sessionStorage.clear();
+        localStorage.clear();
         // TODO Call backend service to invalidate the token
         handleCloseUserMenu()
         window.location.reload();
