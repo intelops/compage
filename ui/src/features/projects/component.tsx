@@ -28,7 +28,6 @@ import {getProjectAsync} from "./async-apis/getProject";
 
 export const ChangeProject = () => {
     const createProjectStatus = useAppSelector(selectCreateProjectStatus);
-    const listProjectsStatus = useAppSelector(selectListProjectsStatus);
     const authData = useAppSelector(selectAuthData);
     const listProjectsData = useAppSelector(selectListProjectsData);
 
@@ -44,12 +43,6 @@ export const ChangeProject = () => {
         //TODO ui for this yet to be added.
         metadata: new Map<string, string>()
     });
-
-    useEffect(() => {
-        // dispatch listProjects
-        const listProjectsRequest: ListProjectsRequest = {}
-        dispatch(listProjectsAsync(listProjectsRequest));
-    }, [])
 
     if (!authData.login) {
         return <Navigate to="/login"/>;

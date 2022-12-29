@@ -3,12 +3,12 @@ import {ProjectsBackendApi} from "../../utils/backend-api";
 
 // Sync apis (async apis are in thunk)
 export const createProject = (createProjectRequest: CreateProjectRequest) => {
-    return ProjectsBackendApi().post('/', createProjectRequest);
+    return ProjectsBackendApi().post('', createProjectRequest);
 }
 
 // Sync apis (async apis are in thunk)
 export const listProjects = (listProjectsRequest: ListProjectsRequest) => {
-    return ProjectsBackendApi().get('/');
+    return ProjectsBackendApi().get('');
 }
 
 // Sync apis (async apis are in thunk)
