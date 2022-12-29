@@ -62,7 +62,7 @@ export const App = () => {
                     <Route path="/" element={<Home/>}/>
                     <Route path="*" element={<p>Path not resolved <Link to={"/home"}> go to home</Link></p>}/>
                 </Routes>
-                <Footer/>
+                {/*<Footer/>*/}
             </Grid>
         </BrowserRouter>
     </LoadingOverlay>

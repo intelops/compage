@@ -1,6 +1,8 @@
+import {CurrentProjectContext} from "../components/diagram-maker/models";
+
 export const CURRENT_STATE = "STATE";
 export const CURRENT_CONFIG = "CONFIG";
-export const CURRENT_REPO_DETAILS = "CURRENT_REPO_DETAILS";
+export const PROJECT_CONTEXT = "CURRENT_PROJECT_CONTEXT";
 export const RESET = "RESET";
 export const MODIFIED_STATE = "MODIFIED_STATE";
 export const CURRENT_USER_NAME = "CURRENT_USER_NAME";
@@ -25,16 +27,16 @@ export const getCurrentConfig = () => {
     return localStorage.getItem(CURRENT_CONFIG);
 }
 
-export const setCurrentProjectContext = (currentRepoDetails: string) => {
-    localStorage.setItem(CURRENT_REPO_DETAILS, currentRepoDetails);
+export const setCurrentProjectContext = (currentProjectContext: CurrentProjectContext) => {
+    localStorage.setItem(PROJECT_CONTEXT, JSON.stringify(currentProjectContext));
 }
 
-export const getCurrentProjectContext = () => {
-    return JSON.parse(localStorage.getItem(CURRENT_REPO_DETAILS));
+export const getCurrentProjectContext = (): CurrentProjectContext => {
+    return JSON.parse(localStorage.getItem(PROJECT_CONTEXT));
 }
 
 export const removeCurrentProjectContext = () => {
-    return localStorage.removeItem(CURRENT_REPO_DETAILS);
+    return localStorage.removeItem(PROJECT_CONTEXT);
 }
 
 export const removeCurrentConfig = () => {
@@ -65,6 +67,6 @@ export const retrieveCurrentUserName = () => {
     return localStorage.getItem(CURRENT_USER_NAME);
 }
 
-export const setCurrentUserName = (userName:string) => {
+export const setCurrentUserName = (userName: string) => {
     localStorage.setItem(CURRENT_USER_NAME, userName)
 }

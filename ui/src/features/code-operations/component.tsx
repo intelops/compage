@@ -4,21 +4,20 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectGenerateCodeStatus} from './slice';
 import Button from "@mui/material/Button";
 import {generateCodeAsync} from "./async-apis/generateCode";
+import {getCurrentProjectContext} from "../../utils/localstorage-client";
+import {CurrentProjectContext} from "../../components/diagram-maker/models";
 
 export const GenerateCode = () => {
-    // TODO below values can be used if we want to get data from api
-    // const data = useAppSelector(selectData);
-    // const error = useAppSelector(selectError);
     const codeOperationsStatus = useAppSelector(selectGenerateCodeStatus);
 
     const dispatch = useAppDispatch();
-    const generateCodeRequest = {
-        // TODO refer selected project here
-        projectId: "mahen-first-14510"
-    }
 
     // When clicked, dispatch `generateCode`
     const handleGenerateCodeClick = () => {
+        const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
+        const generateCodeRequest = {
+            projectId: currentProjectContext.projectId
+        }
         if (codeOperationsStatus !== 'loading') {
             dispatch(generateCodeAsync(generateCodeRequest))
         }

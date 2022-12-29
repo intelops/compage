@@ -39,6 +39,7 @@ export const ChangeProject = () => {
 
     useEffect(() => {
         // dispatch listProjects
+        const listProjectsRequest: ListProjectsRequest = {}
         dispatch(listProjectsAsync(listProjectsRequest));
     }, [])
 
@@ -52,6 +53,7 @@ export const ChangeProject = () => {
     }
 
     const handleCreateProjectClick = () => {
+        const createProjectRequest: CreateProjectRequest = prepareCreateProjectRequest()
         dispatch(createProjectAsync(createProjectRequest))
         setData({...data, projectName: "", repositoryBranch: "", repositoryName: "", isOpen: false})
     }
@@ -207,10 +209,6 @@ export const ChangeProject = () => {
         };
         return cPR;
     };
-
-    // TODO refer selected project here
-    const createProjectRequest: CreateProjectRequest = prepareCreateProjectRequest()
-    const listProjectsRequest: ListProjectsRequest = {}
 
     // When clicked, open the dialog
     const handleChangeProjectClick = () => {

@@ -50,3 +50,8 @@ export interface CompageJson {
     nodes: Map<string, CompageNode>
     version: string
 }
+
+export interface CurrentProjectContext {
+    projectId: string,
+    json: CompageJson
+}

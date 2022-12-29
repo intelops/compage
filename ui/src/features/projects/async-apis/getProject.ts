@@ -3,6 +3,7 @@ import {GetProjectError, GetProjectRequest, GetProjectResponse} from "../model";
 import {getProject} from "../api";
 import {toastr} from 'react-redux-toastr';
 import {setCurrentProjectContext} from "../../../utils/localstorage-client";
+import {CurrentProjectContext} from "../../../components/diagram-maker/models";
 
 export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRequest, { rejectValue: GetProjectError }>(
     'projects/getProject',
@@ -22,11 +23,11 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
             toastr.success(`Success`, message);
             const getProjectResponse: GetProjectResponse = response.data
             // update details to localstorage client
-            const currentProjectContext = {
+            const currentProjectContext: CurrentProjectContext = {
                 projectId: getProjectResponse.id,
                 json: getProjectResponse.json
             }
-            setCurrentProjectContext(JSON.stringify(currentProjectContext))
+            setCurrentProjectContext(currentProjectContext)
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;

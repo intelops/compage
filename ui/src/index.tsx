@@ -35,7 +35,7 @@ root.render(
 
 const backup = console.error;
 console.error = function filterWarnings(msg) {
-    const suppressedWarnings = ['Use createRoot instead'];
+    const suppressedWarnings = ['Use createRoot instead', "Legacy context API has been detected within a strict-mode tree"];
 
     if (!suppressedWarnings.some(entry => msg.includes(entry))) {
         backup.apply(console, arguments);

@@ -4,7 +4,6 @@ import {X_USER_NAME_HEADER} from "../util/constants";
 
 export const requireUserNameMiddleware = async (request: Request, response: Response, next: NextFunction) => {
     const unauthorized = (message: string) => response.status(401).json({
-        status: 401,
         message: message
     });
 

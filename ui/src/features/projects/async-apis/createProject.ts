@@ -3,6 +3,7 @@ import {CreateProjectError, CreateProjectRequest, CreateProjectResponse} from ".
 import {createProject} from "../api";
 import {toastr} from 'react-redux-toastr'
 import {setCurrentProjectContext} from "../../../utils/localstorage-client";
+import {CurrentProjectContext} from "../../../components/diagram-maker/models";
 
 export const createProjectAsync = createAsyncThunk<CreateProjectResponse, CreateProjectRequest, { rejectValue: CreateProjectError }>(
     'projects/createProject',
@@ -19,11 +20,11 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
                 });
             }
             // update details to localstorage client
-            const currentProjectContext = {
+            const currentProjectContext: CurrentProjectContext = {
                 projectId: createProjectRequest.id,
                 json: createProjectRequest.json
             }
-            setCurrentProjectContext(JSON.stringify(currentProjectContext))
+            setCurrentProjectContext(currentProjectContext)
             const message = `Successfully created project: ${createProjectRequest.displayName}`;
             console.log(message);
             toastr.success(`Success: ${createProjectRequest.displayName}`, message);

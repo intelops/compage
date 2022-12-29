@@ -12,11 +12,11 @@ export const loginAsync = createAsyncThunk<LoginResponse, LoginRequest, { reject
 
             // Check if status is not okay:
             if (response.status !== 200) {
-                console.log("Failed to login. Received : " + response.status);
-                toastr.error('Failure', "Failed to login. Received : " + response.status);
+                console.log(`Failed to login. Received: ${response.status}`);
+                toastr.error('Failure', `Failed to login. Received: ${response.status}`);
                 // Return the error message:
                 return thunkApi.rejectWithValue({
-                    message: "Failed to login. Received : " + response.status
+                    message: `Failed to login. Received: ${response.status}`
                 });
             }
 
@@ -24,12 +24,12 @@ export const loginAsync = createAsyncThunk<LoginResponse, LoginRequest, { reject
 
             // TODO This is temporary, need to replace with code extracting from localstorage.
             setCurrentUserName(loginResponse.login);
-            console.log("Successfully logged in : " + loginResponse.login);
-            toastr.success('Success : ' + loginResponse.login, "Successfully logged in.");
+            console.log(`Successfully logged in: ${loginResponse.login}`);
+            toastr.success(`Success: ${loginResponse.login}`, "Successfully logged in.");
             return response.data;
         } catch (e) {
             return thunkApi.rejectWithValue({
-                message: "Failed to logged in. Received :" + e
+                message: `Failed to logged in. Received: ${e}`
             });
         }
     }
