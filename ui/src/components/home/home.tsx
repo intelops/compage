@@ -24,6 +24,7 @@ export const Home = () => {
         const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
         let diagramMakerData
         if (currentProjectContext
+            && Object.keys(currentProjectContext).length !== 0
             && currentProjectContext.json
             && Object.keys(currentProjectContext.json).length !== 0
             && Object.keys(currentProjectContext.json.nodes).length !== 0
@@ -36,8 +37,6 @@ export const Home = () => {
         return diagramMakerData;
     }
 
-    const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
-
     const handleClose = async () => {
         setData({...data, isOpen: false})
         // TODO hack to reload after getProject is loaded
@@ -45,7 +44,11 @@ export const Home = () => {
         navigate('/home');
     }
 
-    if (!data.isOpen && (currentProjectContext === null || currentProjectContext === undefined || currentProjectContext.projectId.length === 0)) {
+    const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
+    console.log(currentProjectContext)
+    if (!data.isOpen && (currentProjectContext === null
+        || currentProjectContext === undefined
+        || Object.keys(currentProjectContext).length === 0)) {
         // choose from existing or create a new project
         setData({...data, isOpen: true})
     }

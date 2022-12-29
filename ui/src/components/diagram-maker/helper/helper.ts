@@ -1,4 +1,4 @@
-import {getCurrentConfig, getModifiedState, setModifiedState} from "../../../utils/localstorage-client";
+import {getModifiedState, setModifiedState} from "../../../utils/localstorage-client";
 
 export const cleanse = (state: string) => {
     const stateJson = JSON.parse(state)
@@ -76,9 +76,4 @@ export const getParsedModifiedState = () => {
             edges: {}
         }
     }
-}
-
-export const getBase64EncodedStringForConfig = () => {
-    // Add validation
-    return window.btoa(getCurrentConfig() || "compage sample1");
 }

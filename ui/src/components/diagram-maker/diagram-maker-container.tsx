@@ -23,7 +23,7 @@ import "./scss/CircularNode.css"
 import "./scss/RectangularNode.css"
 import "./scss/Logger.css"
 
-import React, {useRef, useState} from "react";
+import React, {useRef} from "react";
 import {
     createCircularNode,
     createPluginPanel,
@@ -35,10 +35,8 @@ import {useBeforeunload} from 'react-beforeunload';
 import {Action, Dispatch} from "redux";
 import {Grid} from "@mui/material";
 import {
-    getCurrentConfig,
-    getCurrentState,
-    setCurrentConfig,
-    setCurrentState,
+    getCurrentProjectContext,
+    setCurrentProjectContext,
     setReset,
     shouldReset
 } from "../../utils/localstorage-client";
@@ -56,9 +54,6 @@ import {NewNodeProperties} from "./new-properties/new-node-properties";
 import {cleanse} from "./helper/helper";
 import JSONPretty from "react-json-pretty";
 import Button from "@mui/material/Button";
-import {GenerateCode} from "../../features/code-operations/component";
-import {SwitchProject} from "../../features/projects/switch-project";
-import {useNavigate} from "react-router-dom";
 import {ButtonsPanel} from "./buttons-panel";
 
 interface ArgTypes {
@@ -126,9 +121,14 @@ export const DiagramMakerContainer = ({
 
     useBeforeunload((event) => {
         if (shouldReset()) {
-            if ((diagramMaker.state !== "{}" && diagramMaker.state !== getCurrentState()) || (diagramMaker.config !== "{}" && diagramMaker.config !== getCurrentConfig())) {
-                setCurrentState(diagramMaker.state)
-                setCurrentConfig(diagramMaker.config)
+            const currentProjectContext = getCurrentProjectContext();
+            if ((diagramMaker.state !== "{}"
+                    && diagramMaker.state !== currentProjectContext.state)
+                || (diagramMaker.config !== "{}"
+                    && diagramMaker.config !== JSON.stringify(currentProjectContext.json))) {
+                currentProjectContext.state = diagramMaker.state;
+                currentProjectContext.json = JSON.parse(diagramMaker.config);
+                setCurrentProjectContext(currentProjectContext);
                 event.preventDefault();
             }
         } else {
@@ -360,9 +360,9 @@ export const DiagramMakerContainer = ({
         // diagramMakerRef.current.api.dispatch({
         //     type: EdgeActions.EDGE_MOUSE_OVER,
         // });
-        const currentConfig = getCurrentConfig();
-        if (currentConfig) {
-            setData(currentConfig)
+        const currentProjectContext = getCurrentProjectContext();
+        if (currentProjectContext) {
+            setData(JSON.stringify(currentProjectContext.json));
         }
 
         diagramMakerRef.current.store.subscribe(() => {

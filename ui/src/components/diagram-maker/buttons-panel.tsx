@@ -6,8 +6,7 @@ import {SwitchProject} from "../../features/projects/switch-project";
 import Button from "@mui/material/Button";
 import {
     getCurrentProjectContext,
-    removeCurrentConfig,
-    removeCurrentState,
+    removeCurrentProjectContext,
     removeModifiedState,
     setReset
 } from "../../utils/localstorage-client";
@@ -19,10 +18,9 @@ const resetState = () => {
     if (!window.confirm(message)) {
         return;
     }
-    removeCurrentConfig()
-    removeCurrentState()
-    removeModifiedState()
-    setReset(true)
+    removeCurrentProjectContext();
+    removeModifiedState();
+    setReset(true);
     // TODO just reset to last saved state.
     // after resetting, needs to manually reload so, avoiding manual step here.
     window.location.reload();
