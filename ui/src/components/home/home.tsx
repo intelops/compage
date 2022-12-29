@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {Navigate} from "react-router-dom";
 import {getData} from "../diagram-maker/data/BoundaryCircular/data";
 import {
@@ -9,22 +9,12 @@ import {
     removeModifiedState,
     setReset
 } from "../../utils/localstorage-client";
-import {useAppDispatch, useAppSelector} from "../../redux/hooks";
+import {useAppSelector} from "../../redux/hooks";
 import {DiagramMakerContainer} from "../diagram-maker/diagram-maker-container";
 import {selectAuthData} from "../../features/auth/slice";
-import {ListProjectsRequest} from "../../features/projects/model";
-import {listProjectsAsync} from "../../features/projects/async-apis/listProjects";
-import {selectListProjectsStatus} from "../../features/projects/slice";
 
 export const Home = () => {
     const authData = useAppSelector(selectAuthData);
-    const dispatch = useAppDispatch();
-
-    useEffect(() => {
-        // dispatch listProjects
-        const listProjectsRequest: ListProjectsRequest = {}
-        dispatch(listProjectsAsync(listProjectsRequest));
-    }, [dispatch])
 
     if (!authData.login) {
         return <Navigate to="/login"/>;

@@ -6,7 +6,6 @@ import {Home} from "../home/home";
 import Header from "../navbar/header";
 import {Account} from "../account/account";
 import {Grid} from "@mui/material";
-import {Footer} from "../navbar/footer";
 import LoadingOverlay from "react-loading-overlay";
 import {useAppSelector} from "../../redux/hooks";
 import {
