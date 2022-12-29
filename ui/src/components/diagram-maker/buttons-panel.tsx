@@ -4,9 +4,32 @@ import {Grid} from "@mui/material";
 import {GenerateCode} from "../../features/code-operations/component";
 import {SwitchProject} from "../../features/projects/switch-project";
 import Button from "@mui/material/Button";
+import {
+    getCurrentProjectContext,
+    removeCurrentConfig,
+    removeCurrentState,
+    removeModifiedState,
+    setReset
+} from "../../utils/localstorage-client";
+import {CurrentProjectContext} from "./models";
 
-export const Panel = () => {
-    const navigate = useNavigate()
+const resetState = () => {
+    const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
+    const message = `Are you sure you want to reset the project [${currentProjectContext.projectId}]?`;
+    if (!window.confirm(message)) {
+        return;
+    }
+    removeCurrentConfig()
+    removeCurrentState()
+    removeModifiedState()
+    setReset(true)
+    // TODO just reset to last saved state.
+    // after resetting, needs to manually reload so, avoiding manual step here.
+    window.location.reload();
+};
+
+export const ButtonsPanel = () => {
+    const navigate = useNavigate();
 
     const [data, setData] = useState({
         isOpen: false,
@@ -42,6 +65,16 @@ export const Panel = () => {
             }} variant="contained" onClick={handleSwitchProjectClick}>
                 Switch Project
             </Button>
+        </Grid>
+        <hr/>
+        <Grid item style={{
+            alignItems: "center",
+            display: "flex",
+            flexDirection: "column"
+        }}>
+            <Button style={{
+                width: "200px"
+            }} variant="contained" color="error" onClick={resetState}>Reset state</Button>
         </Grid>
     </React.Fragment>;
 }

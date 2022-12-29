@@ -59,10 +59,9 @@ import Button from "@mui/material/Button";
 import {GenerateCode} from "../../features/code-operations/component";
 import {SwitchProject} from "../../features/projects/switch-project";
 import {useNavigate} from "react-router-dom";
-import {Panel} from "./panel";
+import {ButtonsPanel} from "./buttons-panel";
 
 interface ArgTypes {
-    resetState?: (...args: any) => void;
     initialData?: DiagramMakerData<{}, {}>;
     connectorPlacement?: ConnectorPlacementType;
     showArrowhead?: boolean;
@@ -84,7 +83,6 @@ export const DiagramMakerContainer = ({
                                           actionInterceptor,
                                           plugin,
                                           onAction,
-                                          resetState,
                                       }: ArgTypes) => {
     const containerRef = useRef() as any;
     const diagramMakerRef = useRef() as any;
@@ -420,17 +418,7 @@ export const DiagramMakerContainer = ({
                 {diagramMaker.copied ? <span style={{color: 'green'}}> Copied.</span> : null}
             </Grid>
             <hr/>
-            <Panel/>
-            <hr/>
-            <Grid item style={{
-                alignItems: "center",
-                display: "flex",
-                flexDirection: "column"
-            }}>
-                <Button style={{
-                    width: "200px"
-                }} variant="contained" color="error" onClick={resetState}>Reset state</Button>
-            </Grid>
+            <ButtonsPanel/>
             <hr/>
         </Grid>
     </Grid>

@@ -44,7 +44,7 @@ projectsRouter.get("/:id", requireUserNameMiddleware, async (request: Request, r
 projectsRouter.get("/", requireUserNameMiddleware, async (request: Request, response: Response) => {
     const userName = request.header(X_USER_NAME_HEADER);
     // TODO remove it later
-    await new Promise(r => setTimeout(r, 5000));
+    // await new Promise(r => setTimeout(r, 1000));
     return response.status(200).json(await listProjects(<string>userName));
 });
 
