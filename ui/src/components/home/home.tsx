@@ -26,7 +26,7 @@ export const Home = () => {
         if (currentProjectContext
             && Object.keys(currentProjectContext).length !== 0
             && currentProjectContext.json
-            && currentProjectContext.json.length !== 0
+            && currentProjectContext.json !== "{}"
         ) {
             diagramMakerData = currentProjectContext.json;
         } else {
