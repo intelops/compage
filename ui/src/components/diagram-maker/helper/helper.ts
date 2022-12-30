@@ -1,11 +1,11 @@
 import {getModifiedState, setModifiedState} from "../../../utils/localstorage-client";
 
 export const cleanseState = (state: string) => {
-    if (state && state === "{}") {
+    const stateJson = JSON.parse(state)
+    if (stateJson === "{}") {
         // happens at the beginning with value "{}"
         return state;
     }
-    const stateJson = JSON.parse(state)
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state from localstorage with additional properties added from UI (Post node creation)
     const modifiedState = getModifiedState();
