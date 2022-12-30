@@ -1,21 +1,18 @@
 import {CurrentProjectContext} from "../components/diagram-maker/models";
 
-export const CURRENT_STATE = "STATE";
-export const PROJECT_CONTEXT = "CURRENT_PROJECT_CONTEXT";
+export const CURRENT_PROJECT_CONTEXT = "CURRENT_PROJECT_CONTEXT";
 export const RESET = "RESET";
-export const MODIFIED_STATE = "MODIFIED_STATE";
-export const CURRENT_USER_NAME = "CURRENT_USER_NAME";
 
 export const setCurrentProjectContext = (currentProjectContext: CurrentProjectContext) => {
-    localStorage.setItem(PROJECT_CONTEXT, JSON.stringify(currentProjectContext));
+    localStorage.setItem(CURRENT_PROJECT_CONTEXT, JSON.stringify(currentProjectContext));
 };
 
 export const getCurrentProjectContext = (): CurrentProjectContext => {
-    return JSON.parse(localStorage.getItem(PROJECT_CONTEXT));
+    return JSON.parse(localStorage.getItem(CURRENT_PROJECT_CONTEXT));
 };
 
 export const removeCurrentProjectContext = () => {
-    return localStorage.removeItem(PROJECT_CONTEXT);
+    return localStorage.removeItem(CURRENT_PROJECT_CONTEXT);
 };
 
 export const setReset = (value: boolean) => {
@@ -27,21 +24,29 @@ export const shouldReset = () => {
 };
 
 export const setModifiedState = (payload: string) => {
-    localStorage.setItem(MODIFIED_STATE, payload);
+    const currentProjectContext = getCurrentProjectContext();
+    currentProjectContext.modifiedState = payload;
+    setCurrentProjectContext(currentProjectContext);
 };
 
 export const getModifiedState = () => {
-    return localStorage.getItem(MODIFIED_STATE);
-};
-
-export const removeModifiedState = () => {
-    localStorage.removeItem(MODIFIED_STATE);
+    const currentProjectContext = getCurrentProjectContext();
+    return currentProjectContext.modifiedState;
 };
 
 export const retrieveCurrentUserName = () => {
-    return localStorage.getItem(CURRENT_USER_NAME);
+    const currentProjectContext = getCurrentProjectContext();
+    return currentProjectContext?.userName;
 };
 
 export const setCurrentUserName = (userName: string) => {
-    localStorage.setItem(CURRENT_USER_NAME, userName);
+    let currentProjectContext = getCurrentProjectContext();
+    if (!currentProjectContext) {
+        currentProjectContext = {
+            projectId: "",
+            state: "{}"
+        }
+    }
+    currentProjectContext.userName = userName;
+    setCurrentProjectContext(currentProjectContext);
 };

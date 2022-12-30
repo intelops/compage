@@ -2,7 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {CreateProjectError, CreateProjectRequest, CreateProjectResponse} from "../model";
 import {createProject} from "../api";
 import {toastr} from 'react-redux-toastr'
-import {setCurrentProjectContext} from "../../../utils/localstorage-client";
+import {getCurrentProjectContext, setCurrentProjectContext} from "../../../utils/localstorage-client";
 import {CurrentProjectContext} from "../../../components/diagram-maker/models";
 
 export const createProjectAsync = createAsyncThunk<CreateProjectResponse, CreateProjectRequest, { rejectValue: CreateProjectError }>(
@@ -21,11 +21,10 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
             }
             const createProjectResponse: CreateProjectResponse = response.data;
             // update details to localstorage client
-            const currentProjectContext: CurrentProjectContext = {
-                projectId: createProjectResponse.projectId,
-                // TODO pass json as string throughout - trying
-                state: JSON.stringify(createProjectRequest.json)
-            }
+            const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
+            // TODO pass json as string throughout - trying
+            currentProjectContext.projectId = createProjectResponse.projectId;
+            currentProjectContext.state = JSON.stringify(createProjectRequest.json);
             setCurrentProjectContext(currentProjectContext)
             const message = `Successfully created project: ${createProjectRequest.displayName}[${createProjectResponse.projectId}]`;
             console.log(message);

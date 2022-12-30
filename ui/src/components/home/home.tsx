@@ -47,7 +47,8 @@ export const Home = () => {
     console.log(currentProjectContext)
     if (!data.isOpen && (currentProjectContext === null
         || currentProjectContext === undefined
-        || Object.keys(currentProjectContext).length === 0)) {
+        || Object.keys(currentProjectContext).length === 0
+        || currentProjectContext?.projectId.length === 0)) {
         // choose from existing or create a new project
         setData({...data, isOpen: true})
     }

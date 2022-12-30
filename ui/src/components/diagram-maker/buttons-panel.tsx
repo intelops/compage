@@ -4,12 +4,7 @@ import {Grid} from "@mui/material";
 import {GenerateCode} from "../../features/code-operations/component";
 import {SwitchProject} from "../../features/projects/switch-project";
 import Button from "@mui/material/Button";
-import {
-    getCurrentProjectContext,
-    removeCurrentProjectContext,
-    removeModifiedState,
-    setReset
-} from "../../utils/localstorage-client";
+import {getCurrentProjectContext, removeCurrentProjectContext, setReset} from "../../utils/localstorage-client";
 import {CurrentProjectContext} from "./models";
 
 const resetState = () => {
@@ -19,7 +14,6 @@ const resetState = () => {
         return;
     }
     removeCurrentProjectContext();
-    removeModifiedState();
     setReset(true);
     // TODO just reset to last saved state.
     // after resetting, needs to manually reload so, avoiding manual step here.
