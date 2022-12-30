@@ -51,7 +51,7 @@ import {PotentialNode} from "./custom/potential-node";
 import {getNodeTypeConfig} from "./helper/node-type-ui";
 import {NewEdgeProperties} from "./new-properties/new-edge-properties";
 import {NewNodeProperties} from "./new-properties/new-node-properties";
-import {cleanseModifiedState, cleanseState} from "./helper/helper";
+import {cleanseState, removeUnwantedThings} from "./helper/helper";
 import JSONPretty from "react-json-pretty";
 import Button from "@mui/material/Button";
 import {ButtonsPanel} from "./buttons-panel";
@@ -387,14 +387,14 @@ export const DiagramMakerContainer = ({
                             paddingTop: "75px"
                         }}
                         onJSONPrettyError={e => console.error(e)}
-                        data={cleanseModifiedState(diagramMaker.state)}/>
+                        data={removeUnwantedThings(JSON.parse(diagramMaker.state))}/>
             <br/>
             <Grid item style={{
                 alignItems: "center",
                 display: "flex",
                 flexDirection: "column"
             }}>
-                <CopyToClipboard text={cleanseModifiedState(diagramMaker.state)}
+                <CopyToClipboard text={removeUnwantedThings(JSON.parse(diagramMaker.state))}
                                  onCopy={() => setDiagramMaker({
                                      ...diagramMaker,
                                      copied: true

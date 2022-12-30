@@ -45,12 +45,7 @@ export const cleanseState = (state: string) => {
     return JSON.stringify(stateJson);
 }
 
-export const cleanseModifiedState = (state: string) => {
-    if (state && state === "{}") {
-        // happens at the beginning with value "{}"
-        return state;
-    }
-    const stateJson = JSON.parse(cleanseState(state));
+export const removeUnwantedThings = (stateJson) => {
     // delete unwanted stuff from state.
     delete stateJson.panels
     delete stateJson.plugins
@@ -76,6 +71,7 @@ export const cleanseModifiedState = (state: string) => {
     return stateJson;
 }
 
+// TODO refer directly currentProjectContext and get rid of this.
 export const getParsedModifiedState = () => {
     // retrieve current modifiedState
     // logic is to store the dialog-state in localstorage and then refer it in updating state.

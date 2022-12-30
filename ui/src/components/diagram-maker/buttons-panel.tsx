@@ -32,12 +32,29 @@ export const ButtonsPanel = () => {
         setData({...data, isOpen: true})
     };
 
+    // When clicked, save the state of project to backend.
+    const handleUpdateProjectClick = () => {
+        console.log("handleUpdateProjectClick clicked")
+    };
+
     const handleClose = () => {
         setData({...data, isOpen: false})
         navigate('/home');
     }
 
     return <React.Fragment>
+        <Grid item style={{
+            alignItems: "center",
+            display: "flex",
+            flexDirection: "column"
+        }}>
+            <Button style={{
+                width: "200px"
+            }} variant="contained" onClick={handleUpdateProjectClick}>
+                Update Project
+            </Button>
+        </Grid>
+        <hr/>
         <Grid item style={{
             alignItems: "center",
             display: "flex",
