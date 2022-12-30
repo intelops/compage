@@ -25,7 +25,8 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
             // update details to localstorage client
             const currentProjectContext: CurrentProjectContext = {
                 projectId: getProjectResponse.id,
-                json: getProjectResponse.json
+                // TODO pass json as string throughout - trying
+                json: JSON.stringify(getProjectResponse.json)
             }
             setCurrentProjectContext(currentProjectContext)
             return response.data;

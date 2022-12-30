@@ -23,7 +23,8 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
             // update details to localstorage client
             const currentProjectContext: CurrentProjectContext = {
                 projectId: createProjectResponse.projectId,
-                json: createProjectRequest.json
+                // TODO pass json as string throughout - trying
+                json: JSON.stringify(createProjectRequest.json)
             }
             setCurrentProjectContext(currentProjectContext)
             const message = `Successfully created project: ${createProjectRequest.displayName}[${createProjectResponse.projectId}]`;

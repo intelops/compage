@@ -26,10 +26,9 @@ export const Home = () => {
         if (currentProjectContext
             && Object.keys(currentProjectContext).length !== 0
             && currentProjectContext.json
-            && Object.keys(currentProjectContext.json).length !== 0
-            && Object.keys(currentProjectContext.json.nodes).length !== 0
+            && currentProjectContext.json.length !== 0
         ) {
-            diagramMakerData = currentProjectContext;
+            diagramMakerData = currentProjectContext.json;
         } else {
             // TODO below passed parameters aren't being used.
             diagramMakerData = getData(0, 0);
