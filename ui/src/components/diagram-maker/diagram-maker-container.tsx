@@ -51,7 +51,7 @@ import {PotentialNode} from "./custom/potential-node";
 import {getNodeTypeConfig} from "./helper/node-type-ui";
 import {NewEdgeProperties} from "./new-properties/new-edge-properties";
 import {NewNodeProperties} from "./new-properties/new-node-properties";
-import {cleanse} from "./helper/helper";
+import {cleanseModifiedState, cleanseState} from "./helper/helper";
 import JSONPretty from "react-json-pretty";
 import Button from "@mui/material/Button";
 import {ButtonsPanel} from "./buttons-panel";
@@ -84,7 +84,6 @@ export const DiagramMakerContainer = ({
     const [diagramMaker, setDiagramMaker] = React.useState({
         state: "{}",
         copied: false,
-        config: "{}"
     });
 
     const [dialogState, setDialogState] = React.useState({
@@ -95,7 +94,7 @@ export const DiagramMakerContainer = ({
 
     const handleDialogClose = () => {
         setDialogState({isOpen: false, id: "", type: ""})
-        setData(diagramMaker.state, false)
+        setData(diagramMaker.state)
     };
 
     const showDialog = () => {
@@ -122,12 +121,8 @@ export const DiagramMakerContainer = ({
     useBeforeunload((event) => {
         if (shouldReset()) {
             const currentProjectContext = getCurrentProjectContext();
-            if ((diagramMaker.state !== "{}"
-                    && diagramMaker.state !== currentProjectContext.state)
-                || (diagramMaker.config !== "{}"
-                    && diagramMaker.config !== JSON.stringify(currentProjectContext.json))) {
-                currentProjectContext.state = diagramMaker.state;
-                currentProjectContext.json = JSON.parse(diagramMaker.config);
+            if (diagramMaker.state !== "{}" && diagramMaker.state !== JSON.stringify(currentProjectContext.state)) {
+                currentProjectContext.state = JSON.parse(diagramMaker.state);
                 setCurrentProjectContext(currentProjectContext);
                 event.preventDefault();
             }
@@ -136,23 +131,12 @@ export const DiagramMakerContainer = ({
         }
     });
 
-    const setData = (state: string, updateConfig = true) => {
-        const backupState: string = state.slice();
+    const setData = (state: string) => {
         if (state) {
-            const stateJson = cleanse(state);
-            if (updateConfig) {
-                setDiagramMaker({
-                    copied: false,
-                    config: backupState,
-                    state: JSON.stringify(stateJson)
-                })
-            } else {
-                setDiagramMaker({
-                    ...diagramMaker,
-                    copied: false,
-                    state: JSON.stringify(stateJson)
-                })
-            }
+            setDiagramMaker({
+                state: cleanseState(state),
+                copied: false,
+            })
         }
     }
 
@@ -362,7 +346,7 @@ export const DiagramMakerContainer = ({
         // });
         const currentProjectContext = getCurrentProjectContext();
         if (currentProjectContext) {
-            setData(JSON.stringify(currentProjectContext.json));
+            setData(JSON.stringify(currentProjectContext.state));
         }
 
         diagramMakerRef.current.store.subscribe(() => {
@@ -397,14 +381,14 @@ export const DiagramMakerContainer = ({
                             paddingTop: "75px"
                         }}
                         onJSONPrettyError={e => console.error(e)}
-                        data={diagramMaker.state}/>
+                        data={cleanseModifiedState(diagramMaker.state)}/>
             <br/>
             <Grid item style={{
                 alignItems: "center",
                 display: "flex",
                 flexDirection: "column"
             }}>
-                <CopyToClipboard text={diagramMaker.state}
+                <CopyToClipboard text={cleanseModifiedState(diagramMaker.state)}
                                  onCopy={() => setDiagramMaker({
                                      ...diagramMaker,
                                      copied: true

@@ -24,7 +24,7 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
             const currentProjectContext: CurrentProjectContext = {
                 projectId: createProjectResponse.projectId,
                 // TODO pass json as string throughout - trying
-                json: JSON.stringify(createProjectRequest.json)
+                state: JSON.stringify(createProjectRequest.json)
             }
             setCurrentProjectContext(currentProjectContext)
             const message = `Successfully created project: ${createProjectRequest.displayName}[${createProjectResponse.projectId}]`;

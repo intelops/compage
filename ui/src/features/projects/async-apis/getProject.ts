@@ -26,7 +26,7 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
             const currentProjectContext: CurrentProjectContext = {
                 projectId: getProjectResponse.id,
                 // TODO pass json as string throughout - trying
-                json: JSON.stringify(getProjectResponse.json)
+                state: JSON.stringify(getProjectResponse.json)
             }
             setCurrentProjectContext(currentProjectContext)
             return response.data;
