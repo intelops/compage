@@ -133,8 +133,14 @@ export const DiagramMakerContainer = ({
 
     const setData = (state: string) => {
         if (state) {
+            const cleansedState = cleanseState(state);
+            const currentProjectContext = getCurrentProjectContext();
+            if (cleansedState !== "{}" && cleansedState !== JSON.stringify(currentProjectContext.state)) {
+                currentProjectContext.state = JSON.parse(cleansedState);
+                setCurrentProjectContext(currentProjectContext);
+            }
             setDiagramMaker({
-                state: cleanseState(state),
+                state: cleansedState,
                 copied: false,
             })
         }
