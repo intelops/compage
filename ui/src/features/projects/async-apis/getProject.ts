@@ -22,8 +22,8 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
             toastr.success(`getProject [Success]`, message);
             const getProjectResponse: GetProjectResponse = response.data
             // update details to localstorage client
-            // setCurrentConfig(getProjectResponse.json);
-            // setCurrentState(getProjectResponse.json);
+            setCurrentConfig(getProjectResponse.json);
+            setCurrentState(getProjectResponse.json);
             setCurrentProject(getProjectResponse.id);
             return response.data;
         }).catch(e => {

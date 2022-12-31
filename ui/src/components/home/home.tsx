@@ -46,10 +46,7 @@ export const Home = () => {
             if (!currentConfigJson.panels) {
                 return false;
             }
-            if (currentConfigJson.panels === "{}") {
-                return false;
-            }
-            return true;
+            return currentConfigJson.panels !== "{}";
         }
 
         if (loadExisting(currentConfig)) {

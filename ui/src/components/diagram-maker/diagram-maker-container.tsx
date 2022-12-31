@@ -62,7 +62,7 @@ import {updateProjectAsync} from "../../features/projects/async-apis/updateProje
 import {getProjectAsync} from "../../features/projects/async-apis/getProject";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {selectGetProjectData} from "../../features/projects/slice";
-import {cleanse} from "./helper/helper";
+import {cleanse, removeUnwantedKeys} from "./helper/helper";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -388,7 +388,7 @@ export const DiagramMakerContainer = ({
             const prepareUpdateProjectRequest = () => {
                 const uPR: UpdateProjectRequest = {
                     id: currentProject,
-                    json: getCurrentConfig()
+                    json: getCurrentState()
                 };
                 return uPR;
             };
@@ -439,14 +439,14 @@ export const DiagramMakerContainer = ({
                             paddingTop: "75px"
                         }}
                         onJSONPrettyError={e => console.error(e)}
-                        data={diagramMaker.state}/>
+                        data={removeUnwantedKeys(JSON.stringify(cleanse(diagramMaker.state)))}/>
             <br/>
             <Grid item style={{
                 alignItems: "center",
                 display: "flex",
                 flexDirection: "column"
             }}>
-                <CopyToClipboard text={JSON.stringify(cleanse(diagramMaker.config))}
+                <CopyToClipboard text={JSON.stringify(removeUnwantedKeys(JSON.stringify(cleanse(diagramMaker.state))))}
                                  onCopy={() => setDiagramMaker({
                                      ...diagramMaker,
                                      copied: true

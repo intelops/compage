@@ -1,4 +1,4 @@
-import {getCurrentConfig, getModifiedState, setModifiedState} from "../../../utils/localstorage-client";
+import {getModifiedState, setModifiedState} from "../../../utils/localstorage-client";
 
 export const cleanse = (state: string) => {
     if (!state || state === "{}") {
@@ -42,6 +42,15 @@ export const cleanse = (state: string) => {
         // update back to localstorage.
         setModifiedState(JSON.stringify(parsedModifiedState))
     }
+    return stateJson;
+}
+
+export const removeUnwantedKeys = (state: string) => {
+    if (!state || state === "{}") {
+        // happens at the beginning with value "{}"
+        return state;
+    }
+    const stateJson = JSON.parse(state);
     //delete unwanted stuff from state.
     delete stateJson.panels
     delete stateJson.plugins
@@ -55,12 +64,15 @@ export const cleanse = (state: string) => {
         let diagramMakerData = stateJson.nodes[key].diagramMakerData;
         delete diagramMakerData.position
         delete diagramMakerData.size
+        delete stateJson.diagramMakerData
+        delete diagramMakerData.selected
     }
     // edges
     for (let key in stateJson.edges) {
         let diagramMakerData = stateJson.edges[key].diagramMakerData;
         delete diagramMakerData.position
         delete diagramMakerData.size
+        delete diagramMakerData.selected
     }
     return stateJson;
 }

@@ -25,10 +25,9 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
             }
             const createProjectResponse: CreateProjectResponse = response.data;
             // update details to localstorage client
-            // TODO pass json as string throughout - trying
-            // setCurrentProject(createProjectResponse.projectId);
-            // setCurrentConfig(createProjectRequest.json);
-            // setCurrentState(createProjectRequest.json);
+            setCurrentProject(createProjectResponse.projectId);
+            setCurrentConfig(createProjectRequest.json);
+            setCurrentState(createProjectRequest.json);
             const message = `Successfully created project: ${createProjectRequest.displayName}[${createProjectResponse.projectId}]`;
             console.log(message);
             toastr.success(`createProject [Success]`, message);
