@@ -75,7 +75,8 @@ export interface ProjectEntity {
     user: User,
     json: CompageJson,
     repository: Repository,
-    metadata: Map<string, string>
+    // TODO temporary made optional.
+    metadata?: Map<string, string>
 }
 
 export interface User {

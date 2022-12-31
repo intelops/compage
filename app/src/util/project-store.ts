@@ -1,4 +1,4 @@
-import {initializeEmptyProjectEntity, ProjectEntity} from "../routes/models";
+import {initializeEmptyProjectEntity, ProjectEntity, Repository} from "../routes/models";
 
 import {project_group, project_kind, project_version, ProjectResource, ProjectResourceSpec} from "../store/models";
 import {NAMESPACE} from "./constants";
@@ -12,13 +12,20 @@ import {
 
 // convertProjectEntityToProjectResourceSpec creates projectResourceSpec on k8s cluster.
 const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: string, projectEntity: ProjectEntity) => {
+    const repository: Repository = {
+        branch: projectEntity.repository?.branch ? projectEntity.repository.branch : "master",
+        name: projectEntity.displayName,
+        tag: ""
+    }
     const projectResourceSpec: ProjectResourceSpec = {
         id: projectId,
         displayName: projectEntity.displayName,
         metadata: JSON.stringify(projectEntity.metadata),
         user: projectEntity.user,
         json: JSON.stringify(projectEntity.json),
-        repository: projectEntity.repository,
+        repository: (!projectEntity.repository?.name
+            || !projectEntity.repository?.branch)
+            ? repository : projectEntity.repository,
         version: projectEntity.version,
     }
     return projectResourceSpec
@@ -27,7 +34,8 @@ const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: 
 // convertProjectResourceToProjectEntity converts projectResource to projectEntity
 const convertProjectResourceToProjectEntity = (projectResource: ProjectResource) => {
     const projectEntity: ProjectEntity = {
-        metadata: JSON.parse(projectResource.spec.metadata),
+        // TODO Metadata is not yet handled properly, need to check this.
+        // metadata: JSON.parse(JSON.stringify(projectResource?.spec?.metadata)),
         id: projectResource.spec.id,
         displayName: projectResource.spec.displayName,
         repository: projectResource.spec.repository,
@@ -98,16 +106,24 @@ const prepareProjectResource = (projectId: string, userName: string, projectReso
 
 // generateProjectId generates unique id for project.
 const generateProjectId = (userName: string, projectName: string) => {
+    const lengthOfChars = 5;
     // truncate userName if its length is greater than 5
     let sanitizedUserName = userName
-    if (userName.length > 5) {
-        sanitizedUserName = userName.substring(0, 5)
+    if (userName.length > lengthOfChars) {
+        sanitizedUserName = userName.substring(0, lengthOfChars)
     }
 
     // truncate projectResourceSpec.name if its length is greater than 5
-    let sanitizedProjectName = ""
-    if (projectName.length > 5) {
-        sanitizedProjectName = projectName.substring(0, 5)
+    let sanitizedProjectName;
+    if (projectName.length > lengthOfChars) {
+        sanitizedProjectName = projectName.substring(0, lengthOfChars)
+    } else {
+        let appended = "";
+        const count = lengthOfChars - projectName.length;
+        for (let i = 0; i < count; i++) {
+            appended += "x";
+        }
+        sanitizedProjectName = projectName + appended;
     }
 
     return sanitizedUserName.toLowerCase() + "-" + sanitizedProjectName.toLowerCase() + "-" + (Math.floor(Math.random() * 90000) + 10000);
