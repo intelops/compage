@@ -4,8 +4,7 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectGenerateCodeStatus} from './slice';
 import Button from "@mui/material/Button";
 import {generateCodeAsync} from "./async-apis/generateCode";
-import {getCurrentProjectContext} from "../../utils/localstorage-client";
-import {CurrentProjectContext} from "../../components/diagram-maker/models";
+import {getCurrentProject} from "../../utils/localstorage-client";
 import {selectGetProjectData} from "../projects/slice";
 
 export const GenerateCode = () => {
@@ -15,9 +14,9 @@ export const GenerateCode = () => {
 
     // When clicked, dispatch `generateCode`
     const handleGenerateCodeClick = () => {
-        const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
+        const currentProject: string = getCurrentProject();
         const generateCodeRequest = {
-            projectId: currentProjectContext.projectId
+            projectId: currentProject
         }
         if (generateCodeStatus !== 'loading') {
             dispatch(generateCodeAsync(generateCodeRequest))
@@ -26,10 +25,9 @@ export const GenerateCode = () => {
 
     // TODO need to revisit - every change in ui updates state and this will create chaos if checked directly.
     const isDisabled = () => {
-        const currentProjectContext = getCurrentProjectContext();
         // TODO the below check will make sure to not enable/disable button more often.
         // if (getProjectData.json) {
-        //     return removeUnwantedThings(JsonParse(getProjectData.json)) !== removeUnwantedThings(JsonParse(currentProjectContext.state));
+        //     return removeUnwantedThings(JSON.parse(JSON.stringify(getProjectData.json))) !== removeUnwantedThings(JSON.parse(getCurrentState()));
         // }
         return false;
     };

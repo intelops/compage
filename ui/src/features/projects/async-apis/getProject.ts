@@ -2,8 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {GetProjectError, GetProjectRequest, GetProjectResponse} from "../model";
 import {getProject} from "../api";
 import {toastr} from 'react-redux-toastr';
-import {getCurrentProjectContext, setCurrentProjectContext} from "../../../utils/localstorage-client";
-import {CurrentProjectContext} from "../../../components/diagram-maker/models";
+import {setCurrentConfig, setCurrentProject, setCurrentState} from "../../../utils/localstorage-client";
 
 export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRequest, { rejectValue: GetProjectError }>(
     'projects/getProject',
@@ -23,20 +22,9 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
             toastr.success(`getProject [Success]`, message);
             const getProjectResponse: GetProjectResponse = response.data
             // update details to localstorage client
-
-            const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
-            // TODO pass json as string throughout - trying
-            if (currentProjectContext) {
-                currentProjectContext.projectId = getProjectResponse.id;
-                // currentProjectContext.state = getProjectResponse.json
-                setCurrentProjectContext(currentProjectContext)
-            } else {
-                const newCurrentProjectContext: CurrentProjectContext = {
-                    projectId: getProjectResponse.id,
-                    // state: getProjectResponse.json
-                }
-                setCurrentProjectContext(newCurrentProjectContext)
-            }
+            // setCurrentConfig(getProjectResponse.json);
+            // setCurrentState(getProjectResponse.json);
+            setCurrentProject(getProjectResponse.id);
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;

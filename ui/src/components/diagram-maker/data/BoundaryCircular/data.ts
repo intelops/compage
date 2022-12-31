@@ -3,33 +3,33 @@ import {DiagramMakerData, EditorMode, PositionAnchor} from 'diagram-maker';
 export const getData = (parentWidth, parentHeight) => {
     const graph: DiagramMakerData<{}, {}> = {
         nodes: {
-            node1: {
-                id: 'node1',
-                typeId: 'node-type-circle',
-                diagramMakerData: {
-                    position: {x: 200, y: 150},
-                    size: {width: 65, height: 65},
-                },
-                consumerData: {}
-            },
-            node2: {
-                id: 'node2',
-                typeId: 'node-type-rectangle',
-                diagramMakerData: {
-                    position: {x: 400, y: 300},
-                    size: {width: 65, height: 65},
-                },
-                consumerData: {}
-            },
+            // node1: {
+            //     id: 'node1',
+            //     typeId: 'node-type-circle',
+            //     diagramMakerData: {
+            //         position: {x: 200, y: 150},
+            //         size: {width: 65, height: 65},
+            //     },
+            //     consumerData: {}
+            // },
+            // node2: {
+            //     id: 'node2',
+            //     typeId: 'node-type-rectangle',
+            //     diagramMakerData: {
+            //         position: {x: 400, y: 300},
+            //         size: {width: 65, height: 65},
+            //     },
+            //     consumerData: {}
+            // },
         },
         edges: {
-            edge1: {
-                id: 'edge1',
-                src: 'node1',
-                dest: 'node2',
-                diagramMakerData: {},
-                consumerData: {}
-            },
+            // edge1: {
+            //     id: 'edge1',
+            //     src: 'node1',
+            //     dest: 'node2',
+            //     diagramMakerData: {},
+            //     consumerData: {}
+            // },
         },
         panels: {
             library: {

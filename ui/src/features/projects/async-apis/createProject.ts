@@ -2,8 +2,12 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {CreateProjectError, CreateProjectRequest, CreateProjectResponse} from "../model";
 import {createProject} from "../api";
 import {toastr} from 'react-redux-toastr'
-import {CurrentProjectContext} from "../../../components/diagram-maker/models";
-import {getCurrentProjectContext, setCurrentProjectContext} from "../../../utils/localstorage-client";
+import {
+    getCurrentProject,
+    setCurrentConfig,
+    setCurrentProject,
+    setCurrentState
+} from "../../../utils/localstorage-client";
 
 export const createProjectAsync = createAsyncThunk<CreateProjectResponse, CreateProjectRequest, { rejectValue: CreateProjectError }>(
     'projects/createProject',
@@ -21,19 +25,10 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
             }
             const createProjectResponse: CreateProjectResponse = response.data;
             // update details to localstorage client
-            const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
             // TODO pass json as string throughout - trying
-            if (currentProjectContext) {
-                currentProjectContext.projectId = createProjectResponse.projectId;
-                currentProjectContext.state = createProjectRequest.json;
-                setCurrentProjectContext(currentProjectContext)
-            } else {
-                const newCurrentProjectContext = {
-                    projectId: createProjectResponse.projectId,
-                    state: createProjectRequest.json
-                };
-                setCurrentProjectContext(newCurrentProjectContext)
-            }
+            // setCurrentProject(createProjectResponse.projectId);
+            // setCurrentConfig(createProjectRequest.json);
+            // setCurrentState(createProjectRequest.json);
             const message = `Successfully created project: ${createProjectRequest.displayName}[${createProjectResponse.projectId}]`;
             console.log(message);
             toastr.success(`createProject [Success]`, message);

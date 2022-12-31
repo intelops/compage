@@ -5,7 +5,7 @@ import {selectCreateProjectStatus, selectListProjectsData} from './slice';
 import Button from "@mui/material/Button";
 import {CreateProjectRequest, Repository, User} from "./model";
 import {selectAuthData} from "../auth/slice";
-import {Navigate, useNavigate} from "react-router-dom";
+import {Navigate} from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import {Stack} from "@mui/material";
 import {createProjectAsync} from "./async-apis/createProject";
@@ -19,7 +19,6 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
     const createProjectStatus = useAppSelector(selectCreateProjectStatus);
     const authData = useAppSelector(selectAuthData);
     const listProjectsData = useAppSelector(selectListProjectsData);
-    const navigate = useNavigate();
 
     const dispatch = useAppDispatch();
 
@@ -39,7 +38,6 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
         const createProjectRequest: CreateProjectRequest = prepareCreateProjectRequest();
         dispatch(createProjectAsync(createProjectRequest));
         handleClose();
-        navigate('/home');
     }
 
     const handleProjectNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
@@ -131,7 +129,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             repository,
             displayName,
             user: user,
-            json: json
+            json: JSON.stringify(json)
         };
         return cPR;
     };

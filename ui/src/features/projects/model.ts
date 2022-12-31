@@ -15,8 +15,7 @@ export interface CreateProjectRequest {
     displayName: string,
     version: string,
     user: User,
-    // json: CompageJson,
-    json: {},
+    json: string,
     repository: Repository,
     metadata?: Map<string, string>
 }
@@ -39,7 +38,7 @@ export interface ListProjectsResponse {
     displayName: string,
     version: string,
     user: User,
-    json: {},
+    json: string,
     repository: Repository,
     metadata: Map<string, string>
 }
@@ -59,7 +58,7 @@ export interface GetProjectResponse {
     displayName: string,
     version: string,
     user: User,
-    json: {},
+    json: string,
     repository: Repository,
     metadata: Map<string, string>
 }
@@ -86,7 +85,7 @@ export interface UpdateProjectRequest {
     displayName?: string,
     version?: string,
     user?: User,
-    json: {},
+    json: string,
     repository?: Repository,
     metadata?: Map<string, string>
 }

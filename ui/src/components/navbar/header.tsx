@@ -12,7 +12,7 @@ import Logo from "../../logo.png";
 import {useAppSelector} from "../../redux/hooks";
 import {Link, useNavigate} from "react-router-dom";
 import {selectAuthData} from "../../features/auth/slice";
-import {getCurrentProjectContext} from "../../utils/localstorage-client";
+import {getCurrentProject} from "../../utils/localstorage-client";
 
 const settings = ['Account', 'Logout'];
 
@@ -96,12 +96,12 @@ const Header = () => {
     }
 
     const getCurrentProjectSelected = () => {
-        const currentProjectContext = getCurrentProjectContext();
-        if (currentProjectContext && currentProjectContext.projectId) {
+        const currentProject = getCurrentProject();
+        if (currentProject) {
             return <Toolbar>
                 <Box sx={{flexGrow: 0}}>
                     <Typography variant={"h6"}> You have
-                        selected {currentProjectContext.projectId}
+                        selected {currentProject}
                     </Typography>
                 </Box>
             </Toolbar>;

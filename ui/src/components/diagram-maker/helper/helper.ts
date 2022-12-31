@@ -1,5 +1,4 @@
 import {getModifiedState, setModifiedState} from "../../../utils/localstorage-client";
-import {getData} from "../data/BoundaryCircular/data";
 
 export const cleanseState = (state) => {
     if (state === "{}") {
@@ -42,17 +41,15 @@ export const cleanseState = (state) => {
         // update back to localstorage.
         setModifiedState(JSON.stringify(parsedModifiedState))
     }
-    return repopulate(state);
+    return state;
 }
 
-const repopulate = (stateJson: any) => {
-    const json: any = getData(0, 0);
-    json.nodes = stateJson.nodes;
-    json.edges = stateJson.edges;
-    return json;
-}
-
-export const removeUnwantedThings = (stateJson) => {
+export const removeUnwantedThings = (state:string) => {
+    if (!state || state === "{}") {
+        // happens at the beginning with value "{}"
+        return state;
+    }
+    const stateJson = JSON.parse(state);
     // delete unwanted stuff from state.
     delete stateJson.panels
     delete stateJson.plugins
@@ -78,7 +75,6 @@ export const removeUnwantedThings = (stateJson) => {
     return stateJson;
 }
 
-// TODO refer directly currentProjectContext and get rid of this.
 export const getParsedModifiedState = () => {
     // retrieve current modifiedState
     // logic is to store the dialog-state in localstorage and then refer it in updating state.

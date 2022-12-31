@@ -35,8 +35,11 @@ import {useBeforeunload} from 'react-beforeunload';
 import {Action, Dispatch} from "redux";
 import {Grid} from "@mui/material";
 import {
-    getCurrentProjectContext,
-    setCurrentProjectContext,
+    getCurrentConfig,
+    getCurrentProject,
+    getCurrentState,
+    setCurrentConfig,
+    setCurrentState,
     setReset,
     shouldReset
 } from "../../utils/localstorage-client";
@@ -90,8 +93,9 @@ export const DiagramMakerContainer = ({
     const getProjectData = useAppSelector(selectGetProjectData);
 
     const [diagramMaker, setDiagramMaker] = React.useState({
-        state: {},
+        state: "{}",
         copied: false,
+        config: "{}"
     });
 
     const [dialogState, setDialogState] = React.useState({
@@ -102,7 +106,7 @@ export const DiagramMakerContainer = ({
 
     const handleDialogClose = () => {
         setDialogState({isOpen: false, id: "", type: ""})
-        setData(diagramMaker.state)
+        setData(diagramMaker.state, false)
     };
 
     const showDialog = () => {
@@ -128,10 +132,9 @@ export const DiagramMakerContainer = ({
 
     useBeforeunload((event) => {
         if (shouldReset()) {
-            const currentProjectContext = getCurrentProjectContext();
-            if (diagramMaker.state !== "{}" && diagramMaker.state !== currentProjectContext.state) {
-                currentProjectContext.state = diagramMaker.state;
-                setCurrentProjectContext(currentProjectContext);
+            if ((diagramMaker.state !== "{}" && diagramMaker.state !== getCurrentState()) || (diagramMaker.config !== "{}" && diagramMaker.config !== getCurrentConfig())) {
+                setCurrentState(diagramMaker.state)
+                setCurrentConfig(diagramMaker.config)
                 event.preventDefault();
             }
         } else {
@@ -139,15 +142,23 @@ export const DiagramMakerContainer = ({
         }
     });
 
-    const setData = (state) => {
+    const setData = (state: string, updateConfig = true) => {
+        const backupState: string = state.slice();
         if (state) {
             const cleansedState = cleanseState(state);
-            console.log("mmCleansedState : ", cleansedState);
-            setDiagramMaker({
-                state: cleansedState,
-                copied: false,
-            })
-
+            if (updateConfig) {
+                setDiagramMaker({
+                    copied: false,
+                    config: backupState,
+                    state: JSON.stringify(cleansedState),
+                })
+            } else {
+                setDiagramMaker({
+                    ...diagramMaker,
+                    copied: false,
+                    state: JSON.stringify(cleansedState)
+                })
+            }
         }
     }
 
@@ -355,39 +366,29 @@ export const DiagramMakerContainer = ({
         // diagramMakerRef.current.api.dispatch({
         //     type: EdgeActions.EDGE_MOUSE_OVER,
         // });
-
-        // const currentProjectContext = getCurrentProjectContext();
-        // if (currentProjectContext
-        //     && currentProjectContext.state
-        //     && Object.keys(currentProjectContext.state).length !== 0) {
-        //     console.log("mahendra reached.")
-        //     setData(currentProjectContext.state);
-        // }
-
-        console.log("mahendra reached.", initialData)
-        if (initialData) {
-            setData(initialData);
+        const currentConfig = getCurrentConfig();
+        if (currentConfig) {
+            setData(currentConfig)
         }
 
         diagramMakerRef.current.store.subscribe(() => {
             const state = diagramMakerRef.current.store.getState();
-            console.log("state : ", state)
-            setData(state)
+            setData(JSON.stringify(state))
         });
 
     }, [plugin, initialData]);
 
     // When clicked, save the state of project to backend.
     const handleSaveProjectClick = () => {
-        const currentProjectContext = getCurrentProjectContext();
-        if (currentProjectContext && currentProjectContext.projectId) {
-            currentProjectContext.state = diagramMaker.state;
+        const currentProject: string = getCurrentProject();
+        if (currentProject) {
             // save in localstorage
-            setCurrentProjectContext(currentProjectContext);
+            setCurrentConfig(diagramMaker.config);
+            setCurrentState(diagramMaker.state);
             const prepareUpdateProjectRequest = () => {
                 const uPR: UpdateProjectRequest = {
-                    id: currentProjectContext.projectId,
-                    json: currentProjectContext.state
+                    id: currentProject,
+                    json: getCurrentConfig()
                 };
                 return uPR;
             };
@@ -404,6 +405,14 @@ export const DiagramMakerContainer = ({
             dispatch(getProjectAsync(getProjectRequest));
         }
     };
+
+    function getJSONData(state: string) {
+        if (!state || state === "{}") {
+            // happens at the beginning with value "{}"
+            return JSON.parse("{}");
+        }
+        return JSON.parse(state);
+    }
 
     return <Grid container spacing={1} sx={{height: '100%'}}>
         <Grid item xs={10} md={10} style={{
@@ -430,15 +439,14 @@ export const DiagramMakerContainer = ({
                             paddingTop: "75px"
                         }}
                         onJSONPrettyError={e => console.error(e)}
-                // data={removeUnwantedThings(JsonParse(diagramMaker.state))}/>
-                        data={JSON.stringify(diagramMaker.state)}/>
+                        data={getJSONData(diagramMaker.state)}/>
             <br/>
             <Grid item style={{
                 alignItems: "center",
                 display: "flex",
                 flexDirection: "column"
             }}>
-                <CopyToClipboard text={JSON.stringify(removeUnwantedThings(diagramMaker.state))}
+                <CopyToClipboard text={removeUnwantedThings(diagramMaker.state)}
                                  onCopy={() => setDiagramMaker({
                                      ...diagramMaker,
                                      copied: true
