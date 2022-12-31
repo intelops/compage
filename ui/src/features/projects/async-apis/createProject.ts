@@ -2,9 +2,8 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {CreateProjectError, CreateProjectRequest, CreateProjectResponse} from "../model";
 import {createProject} from "../api";
 import {toastr} from 'react-redux-toastr'
-import {getCurrentProjectContext, setCurrentProjectContext} from "../../../utils/localstorage-client";
 import {CurrentProjectContext} from "../../../components/diagram-maker/models";
-import {JsonParse, JsonStringify} from "../../../utils/json-helper";
+import {getCurrentProjectContext, setCurrentProjectContext} from "../../../utils/localstorage-client";
 
 export const createProjectAsync = createAsyncThunk<CreateProjectResponse, CreateProjectRequest, { rejectValue: CreateProjectError }>(
     'projects/createProject',
@@ -24,16 +23,24 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
             // update details to localstorage client
             const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
             // TODO pass json as string throughout - trying
-            currentProjectContext.projectId = createProjectResponse.projectId;
-            currentProjectContext.state = JsonStringify(createProjectRequest.json);
-            setCurrentProjectContext(currentProjectContext)
+            if (currentProjectContext) {
+                currentProjectContext.projectId = createProjectResponse.projectId;
+                currentProjectContext.state = createProjectRequest.json;
+                setCurrentProjectContext(currentProjectContext)
+            } else {
+                const newCurrentProjectContext = {
+                    projectId: createProjectResponse.projectId,
+                    state: createProjectRequest.json
+                };
+                setCurrentProjectContext(newCurrentProjectContext)
+            }
             const message = `Successfully created project: ${createProjectRequest.displayName}[${createProjectResponse.projectId}]`;
             console.log(message);
             toastr.success(`createProject [Success]`, message);
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;
-            const message = JsonParse(e.response.data).message;
+            const message = e.response.data.message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;
             console.log(errorMessage);
             toastr.error(`createProject [Failure]`, errorMessage);

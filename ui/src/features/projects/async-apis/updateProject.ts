@@ -2,7 +2,6 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {UpdateProjectError, UpdateProjectRequest, UpdateProjectResponse} from "../model";
 import {updateProject} from "../api";
 import {toastr} from 'react-redux-toastr';
-import {JsonParse} from "../../../utils/json-helper";
 
 export const updateProjectAsync = createAsyncThunk<UpdateProjectResponse, UpdateProjectRequest, { rejectValue: UpdateProjectError }>(
     'projects/updateProject',
@@ -18,13 +17,13 @@ export const updateProjectAsync = createAsyncThunk<UpdateProjectResponse, Update
                 });
             }
             const message = `Successfully update project.`;
-            console.log(`${message}`);
+            console.log(message);
             toastr.success(`updateProject [Success]`, message);
             // no need to save state in localstorage for this type of request.
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;
-            const message = JsonParse(e.response.data).message;
+            const message = e.response.data.message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;
             console.log(errorMessage);
             toastr.error(`updateProject [Failure]`, errorMessage);

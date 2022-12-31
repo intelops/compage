@@ -10,7 +10,6 @@ import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import {Stack} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
-import {JsonStringify} from "../../../utils/json-helper";
 
 interface NewEdgePropertiesProps {
     isOpen: boolean,
@@ -52,7 +51,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             }
         }
         // update modifiedState in the localstorage
-        setModifiedState(JsonStringify(parsedModifiedState))
+        setModifiedState(JSON.stringify(parsedModifiedState))
         setPayload({
             name: "",
             type: "",

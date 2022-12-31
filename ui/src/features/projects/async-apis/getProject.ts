@@ -4,7 +4,6 @@ import {getProject} from "../api";
 import {toastr} from 'react-redux-toastr';
 import {getCurrentProjectContext, setCurrentProjectContext} from "../../../utils/localstorage-client";
 import {CurrentProjectContext} from "../../../components/diagram-maker/models";
-import {JsonParse, JsonStringify} from "../../../utils/json-helper";
 
 export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRequest, { rejectValue: GetProjectError }>(
     'projects/getProject',
@@ -20,20 +19,28 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
                 });
             }
             const message = `Successfully retrieved project.`;
-            console.log(`${message}`);
+            console.log(message);
             toastr.success(`getProject [Success]`, message);
             const getProjectResponse: GetProjectResponse = response.data
             // update details to localstorage client
 
             const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
             // TODO pass json as string throughout - trying
-            currentProjectContext.projectId = getProjectResponse.id;
-            currentProjectContext.state = JsonStringify(getProjectResponse.json)
-            setCurrentProjectContext(currentProjectContext)
+            if (currentProjectContext) {
+                currentProjectContext.projectId = getProjectResponse.id;
+                // currentProjectContext.state = getProjectResponse.json
+                setCurrentProjectContext(currentProjectContext)
+            } else {
+                const newCurrentProjectContext: CurrentProjectContext = {
+                    projectId: getProjectResponse.id,
+                    // state: getProjectResponse.json
+                }
+                setCurrentProjectContext(newCurrentProjectContext)
+            }
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;
-            const message = JsonParse(e.response.data).message;
+            const message = e.response.data.message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;
             console.log(errorMessage);
             toastr.error(`getProject [Failure]`, errorMessage);

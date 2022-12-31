@@ -2,7 +2,6 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {ListProjectsError, ListProjectsRequest, ListProjectsResponse} from "../model";
 import {listProjects} from "../api";
 import {toastr} from 'react-redux-toastr';
-import {JsonParse} from "../../../utils/json-helper";
 
 export const listProjectsAsync = createAsyncThunk<ListProjectsResponse, ListProjectsRequest, { rejectValue: ListProjectsError }>(
     'projects/listProjects',
@@ -21,7 +20,7 @@ export const listProjectsAsync = createAsyncThunk<ListProjectsResponse, ListProj
                 });
             }
             const message = `Successfully listed projects.`;
-            console.log(`${message}`);
+            console.log(message);
             toastr.success(`listProjects [Success]`, message);
             return response.data;
         }).catch(e => {
@@ -33,7 +32,7 @@ export const listProjectsAsync = createAsyncThunk<ListProjectsResponse, ListProj
                 console.log("reached2")
                 sessionStorage.clear();
             }
-            const message = JsonParse(e.response.data).message;
+            const message = e.response.data.message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;
             console.log(errorMessage);
             toastr.error(`listProjects [Failure]`, errorMessage);

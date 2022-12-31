@@ -1,5 +1,3 @@
-import {CompageJson} from "../../components/diagram-maker/models";
-
 export interface CreateProjectResponse {
     projectId: string,
     userName: string,
@@ -17,7 +15,8 @@ export interface CreateProjectRequest {
     displayName: string,
     version: string,
     user: User,
-    json: CompageJson,
+    // json: CompageJson,
+    json: {},
     repository: Repository,
     metadata?: Map<string, string>
 }
@@ -40,7 +39,7 @@ export interface ListProjectsResponse {
     displayName: string,
     version: string,
     user: User,
-    json: CompageJson,
+    json: {},
     repository: Repository,
     metadata: Map<string, string>
 }
@@ -60,7 +59,7 @@ export interface GetProjectResponse {
     displayName: string,
     version: string,
     user: User,
-    json: CompageJson,
+    json: {},
     repository: Repository,
     metadata: Map<string, string>
 }
@@ -84,11 +83,11 @@ export interface UpdateProjectResponse {
 
 export interface UpdateProjectRequest {
     id: string,
-    displayName: string,
-    version: string,
-    user: User,
-    json: CompageJson,
-    repository: Repository,
+    displayName?: string,
+    version?: string,
+    user?: User,
+    json: {},
+    repository?: Repository,
     metadata?: Map<string, string>
 }
 

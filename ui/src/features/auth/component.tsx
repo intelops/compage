@@ -13,10 +13,11 @@ import Box from "@mui/material/Box";
 import Logo from "../../logo.png";
 import {LoginRequest} from "./model";
 import {loginAsync} from "./async-apis/login";
-import {selectAuthData} from "./slice";
+import {selectAuthData, selectAuthStatus} from "./slice";
 
 export const Login = () => {
     const dispatch = useAppDispatch();
+    const authStatus = useAppSelector(selectAuthStatus);
     const authData = useAppSelector(selectAuthData);
     const {client_id, redirect_uri} = config;
     const stateString = uuidv4();
@@ -61,6 +62,7 @@ export const Login = () => {
                 justifyContent="center"
             >
                 <Button variant="contained"
+                        disabled={authStatus === 'loading'}
                         href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&state=${stateString}`}
                         startIcon={<GitHubIcon/>}>
                     Login with Github

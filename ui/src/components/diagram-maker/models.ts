@@ -53,7 +53,6 @@ export interface CompageJson {
 
 export interface CurrentProjectContext {
     projectId: string,
-    userName?: string,
-    state: string,
+    state?: {},
     modifiedState?: string
 }

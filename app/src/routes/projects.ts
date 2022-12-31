@@ -72,7 +72,9 @@ projectsRouter.put("/:id", requireUserNameMiddleware, async (request: Request, r
         // update github with .compage/config.json
         return await updateToGithub(updatedProjectEntity, response);
     }
-    const message = `${projectEntity.displayName}[${projectEntity.id}] project couldn't be updated.`;
+    // TODO this is coming null [not a compulsory field]
+    // const message = `${projectEntity.displayName}[${projectEntity.id}] project couldn't be updated.`;
+    const message = `[${projectEntity.id}] project couldn't be updated.`;
     console.log(message);
     return response.status(500).json(getUpdateProjectError(message));
 });

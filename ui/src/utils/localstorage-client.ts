@@ -1,15 +1,16 @@
 import {CurrentProjectContext} from "../components/diagram-maker/models";
-import {JsonParse, JsonStringify} from "./json-helper";
 
 export const CURRENT_PROJECT_CONTEXT = "CURRENT_PROJECT_CONTEXT";
 export const RESET = "RESET";
+export const MODIFIED_STATE = "MODIFIED_STATE";
 
 export const setCurrentProjectContext = (currentProjectContext: CurrentProjectContext) => {
-    localStorage.setItem(CURRENT_PROJECT_CONTEXT, JsonStringify(currentProjectContext));
+    console.log("saving setCurrentProjectContext")
+    localStorage.setItem(CURRENT_PROJECT_CONTEXT, JSON.stringify(currentProjectContext));
 };
 
 export const getCurrentProjectContext = (): CurrentProjectContext => {
-    return JsonParse(localStorage.getItem(CURRENT_PROJECT_CONTEXT));
+    return JSON.parse(localStorage.getItem(CURRENT_PROJECT_CONTEXT));
 };
 
 export const removeCurrentProjectContext = () => {
@@ -25,29 +26,13 @@ export const shouldReset = () => {
 };
 
 export const setModifiedState = (payload: string) => {
-    const currentProjectContext = getCurrentProjectContext();
-    currentProjectContext.modifiedState = payload;
-    setCurrentProjectContext(currentProjectContext);
+    localStorage.setItem(MODIFIED_STATE, payload);
 };
 
 export const getModifiedState = () => {
-    const currentProjectContext = getCurrentProjectContext();
-    return currentProjectContext.modifiedState;
+    return localStorage.getItem(MODIFIED_STATE);
 };
 
-export const retrieveCurrentUserName = () => {
-    const currentProjectContext = getCurrentProjectContext();
-    return currentProjectContext?.userName;
-};
-
-export const setCurrentUserName = (userName: string) => {
-    let currentProjectContext = getCurrentProjectContext();
-    if (!currentProjectContext) {
-        currentProjectContext = {
-            projectId: "",
-            state: "{}"
-        }
-    }
-    currentProjectContext.userName = userName;
-    setCurrentProjectContext(currentProjectContext);
+export const removeModifiedState = () => {
+    localStorage.removeItem(MODIFIED_STATE);
 };

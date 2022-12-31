@@ -7,9 +7,12 @@ import {DiagramMakerContainer} from "../diagram-maker/diagram-maker-container";
 import {selectAuthData} from "../../features/auth/slice";
 import {CurrentProjectContext} from "../diagram-maker/models";
 import {SwitchProject} from "../../features/projects/switch-project";
+import {selectGetProjectData} from "../../features/projects/slice";
 
 export const Home = () => {
     const authData = useAppSelector(selectAuthData);
+    const getProjectData = useAppSelector(selectGetProjectData);
+
     const navigate = useNavigate();
 
     const [data, setData] = useState({
@@ -21,7 +24,7 @@ export const Home = () => {
     }
 
     const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
-    console.log(currentProjectContext)
+    console.log("currentProjectContext in home :", JSON.stringify(currentProjectContext));
     if (!data.isOpen && (currentProjectContext === null
         || currentProjectContext === undefined
         || Object.keys(currentProjectContext).length === 0
@@ -31,14 +34,25 @@ export const Home = () => {
     }
 
     const getDiagramData = () => {
-        const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
+        // const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
+        // let diagramMakerData
+        // if (currentProjectContext
+        //     && Object.keys(currentProjectContext).length !== 0
+        //     && currentProjectContext.state
+        //     && currentProjectContext.state !== "{}") {
+        //     diagramMakerData = currentProjectContext.state;
+        // } else {
+        //     // TODO below passed parameters aren't being used.
+        //     diagramMakerData = getData(0, 0);
+        // }
+        console.log("initializing home")
         let diagramMakerData
-        if (currentProjectContext
-            && Object.keys(currentProjectContext).length !== 0
-            && currentProjectContext.state
-            && currentProjectContext.state !== "{}"
-        ) {
-            diagramMakerData = currentProjectContext.state;
+        if (getProjectData
+            && Object.keys(getProjectData).length !== 0
+            && getProjectData.json
+            && getProjectData.json !== "{}") {
+            console.log("initialized home : ", getProjectData.json)
+            diagramMakerData = getProjectData.json;
         } else {
             // TODO below passed parameters aren't being used.
             diagramMakerData = getData(0, 0);

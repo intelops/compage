@@ -1,7 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {RootState} from '../../redux/store';
 import {loginAsync} from "./async-apis/login";
-import {JsonStringify} from "../../utils/json-helper";
 
 export interface AuthState {
     data: any;
@@ -29,7 +28,7 @@ export const authSlice = createSlice({
             state.data = action.payload;
         }).addCase(loginAsync.rejected, (state, action) => {
             state.status = 'failed';
-            if (action.payload) state.error = JsonStringify(action.payload);
+            if (action.payload) state.error = JSON.stringify(action.payload);
         });
     },
 });

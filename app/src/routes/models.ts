@@ -73,7 +73,7 @@ export interface ProjectEntity {
     displayName: string,
     version: string,
     user: User,
-    json: CompageJson,
+    json: string,
     repository: Repository,
     // TODO temporary made optional.
     metadata?: Map<string, string>
@@ -125,11 +125,12 @@ export interface DeleteProjectError {
 export const initializeEmptyProjectEntity = () => {
     const repository: Repository = {branch: "", name: "", tag: ""};
     const user: User = {email: "", name: ""};
-    const json: CompageJson = {
-        edges: new Map<string, CompageEdge>(),
-        nodes: new Map<string, CompageNode>(),
-        version: ""
-    };
+    // const json: CompageJson = {
+    //     edges: new Map<string, CompageEdge>(),
+    //     nodes: new Map<string, CompageNode>(),
+    //     version: ""
+    // };
+    const json: string = "";
     const projectEntity: ProjectEntity = {
         displayName: "",
         id: "",

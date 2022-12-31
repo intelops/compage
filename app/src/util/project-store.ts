@@ -145,11 +145,17 @@ export const updateProject = async (projectId: string, userName: string, project
     }
     // for non-existent resources apiVersion is empty.
     if (existingProjectResource.apiVersion) {
+        if (projectEntity.displayName) {
+            existingProjectResource.spec.displayName = projectEntity.displayName;
+        }
+        if (projectEntity.metadata) {
+            existingProjectResource.spec.metadata = JSON.stringify(projectEntity.metadata);
+        }
+        if (projectEntity.version) {
+            existingProjectResource.spec.version = projectEntity.version;
+        }
         existingProjectResource.spec.id = projectId;
-        existingProjectResource.spec.displayName = projectEntity.displayName;
-        existingProjectResource.spec.metadata = JSON.stringify(projectEntity.metadata);
-        existingProjectResource.spec.json = JSON.stringify(projectEntity.json);
-        existingProjectResource.spec.version = projectEntity.version;
+        existingProjectResource.spec.json = projectEntity.json;
 
         // send spec only as the called method considers updating specs only.
         // existingProjectResource.metadata.name = projectId here

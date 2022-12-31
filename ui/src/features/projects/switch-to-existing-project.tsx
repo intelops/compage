@@ -5,7 +5,7 @@ import {selectListProjectsData, selectListProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
 import {GetProjectRequest, ListProjectsRequest, ListProjectsResponse} from "./model";
 import {selectAuthData} from "../auth/slice";
-import {Navigate} from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import {Stack} from "@mui/material";
@@ -21,7 +21,7 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
     const listProjectsStatus = useAppSelector(selectListProjectsStatus);
     const authData = useAppSelector(selectAuthData);
     const listProjectsData = useAppSelector(selectListProjectsData);
-
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -51,6 +51,7 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
         };
         dispatch(getProjectAsync(getProjectRequest));
         handleClose();
+        navigate('/home');
     }
 
     const getActionButtons = (): React.ReactNode => {

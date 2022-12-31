@@ -55,7 +55,6 @@ import {cleanseState, removeUnwantedThings} from "./helper/helper";
 import JSONPretty from "react-json-pretty";
 import Button from "@mui/material/Button";
 import {ButtonsPanel} from "./buttons-panel";
-import {JsonParse, JsonStringify} from "../../utils/json-helper";
 import {GetProjectRequest, UpdateProjectRequest} from "../../features/projects/model";
 import {updateProjectAsync} from "../../features/projects/async-apis/updateProject";
 import {getProjectAsync} from "../../features/projects/async-apis/getProject";
@@ -130,8 +129,8 @@ export const DiagramMakerContainer = ({
     useBeforeunload((event) => {
         if (shouldReset()) {
             const currentProjectContext = getCurrentProjectContext();
-            if (diagramMaker.state !== "{}" && diagramMaker.state !== JsonStringify(currentProjectContext.state)) {
-                currentProjectContext.state = JsonParse(diagramMaker.state);
+            if (diagramMaker.state !== "{}" && diagramMaker.state !== currentProjectContext.state) {
+                currentProjectContext.state = diagramMaker.state;
                 setCurrentProjectContext(currentProjectContext);
                 event.preventDefault();
             }
@@ -140,20 +139,15 @@ export const DiagramMakerContainer = ({
         }
     });
 
-    const setData = (state: {}) => {
+    const setData = (state) => {
         if (state) {
             const cleansedState = cleanseState(state);
-            // https://stackoverflow.com/questions/23977690/setting-the-value-of-dataurl-exceeded-the-quota
-            // const currentProjectContext = getCurrentProjectContext();
-            // if (cleansedState !== "{}" && cleansedState !== JsonStringify(currentProjectContext.state)) {
-            //     currentProjectContext.state = JsonParse(cleansedState);
-            //     setCurrentProjectContext(currentProjectContext);
-            // }
+            console.log("mmCleansedState : ", cleansedState);
             setDiagramMaker({
                 state: cleansedState,
-                // state: state,
                 copied: false,
             })
+
         }
     }
 
@@ -361,15 +355,24 @@ export const DiagramMakerContainer = ({
         // diagramMakerRef.current.api.dispatch({
         //     type: EdgeActions.EDGE_MOUSE_OVER,
         // });
-        const currentProjectContext = getCurrentProjectContext();
-        if (currentProjectContext) {
-            setData(JsonStringify(currentProjectContext.state));
+
+        // const currentProjectContext = getCurrentProjectContext();
+        // if (currentProjectContext
+        //     && currentProjectContext.state
+        //     && Object.keys(currentProjectContext.state).length !== 0) {
+        //     console.log("mahendra reached.")
+        //     setData(currentProjectContext.state);
+        // }
+
+        console.log("mahendra reached.", initialData)
+        if (initialData) {
+            setData(initialData);
         }
 
         diagramMakerRef.current.store.subscribe(() => {
             const state = diagramMakerRef.current.store.getState();
             console.log("state : ", state)
-            setData(JsonStringify(state))
+            setData(state)
         });
 
     }, [plugin, initialData]);
@@ -377,20 +380,18 @@ export const DiagramMakerContainer = ({
     // When clicked, save the state of project to backend.
     const handleSaveProjectClick = () => {
         const currentProjectContext = getCurrentProjectContext();
-        currentProjectContext.state = JsonStringify(diagramMaker.state);
-        setCurrentProjectContext(currentProjectContext);
-        if (currentProjectContext && getProjectData.id && getProjectData.id === currentProjectContext.projectId) {
+        if (currentProjectContext && currentProjectContext.projectId) {
+            currentProjectContext.state = diagramMaker.state;
+            // save in localstorage
+            setCurrentProjectContext(currentProjectContext);
             const prepareUpdateProjectRequest = () => {
                 const uPR: UpdateProjectRequest = {
                     id: currentProjectContext.projectId,
-                    version: getProjectData.version,
-                    repository: getProjectData.repository,
-                    displayName: getProjectData.displayName,
-                    user: getProjectData.user,
-                    json: JsonParse(currentProjectContext.state)
+                    json: currentProjectContext.state
                 };
                 return uPR;
             };
+            // save in backend
             const updateProjectRequest: UpdateProjectRequest = prepareUpdateProjectRequest();
             dispatch(updateProjectAsync(updateProjectRequest));
         }
@@ -430,14 +431,14 @@ export const DiagramMakerContainer = ({
                         }}
                         onJSONPrettyError={e => console.error(e)}
                 // data={removeUnwantedThings(JsonParse(diagramMaker.state))}/>
-                        data={JsonParse(diagramMaker.state)}/>
+                        data={JSON.stringify(diagramMaker.state)}/>
             <br/>
             <Grid item style={{
                 alignItems: "center",
                 display: "flex",
                 flexDirection: "column"
             }}>
-                <CopyToClipboard text={removeUnwantedThings(JsonParse(diagramMaker.state))}
+                <CopyToClipboard text={JSON.stringify(removeUnwantedThings(diagramMaker.state))}
                                  onCopy={() => setDiagramMaker({
                                      ...diagramMaker,
                                      copied: true

@@ -45,7 +45,7 @@ export const App = () => {
                 alignItems="center"
                 style={{
                     // TODO removes the scrollbar in the main screen
-                    // overflow: "auto",
+                    overflow: "auto",
                     width: "100%",
                     // TODO added 100% to take the whole webpage
                     // height: window.innerHeight - 150,

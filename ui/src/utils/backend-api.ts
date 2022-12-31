@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {config} from "./constants";
-import {retrieveCurrentUserName} from "./localstorage-client";
+import {retrieveCurrentUserName} from "./sessionstorage-client";
 
 export const X_USER_NAME_HEADER = "X-User-Name";
 

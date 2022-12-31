@@ -1,10 +1,8 @@
 import {getModifiedState, setModifiedState} from "../../../utils/localstorage-client";
-import {JsonParse, JsonStringify} from "../../../utils/json-helper";
 import {getData} from "../data/BoundaryCircular/data";
 
-export const cleanseState = (state: {}) => {
-    const stateJson = JsonParse(state)
-    if (stateJson === "{}") {
+export const cleanseState = (state) => {
+    if (state === "{}") {
         // happens at the beginning with value "{}"
         return state;
     }
@@ -12,12 +10,12 @@ export const cleanseState = (state: {}) => {
     // update state from localstorage with additional properties added from UI (Post node creation)
     const modifiedState = getModifiedState();
     if (modifiedState && modifiedState !== "{}") {
-        const parsedModifiedState = JsonParse(modifiedState);
+        const parsedModifiedState = JSON.parse(modifiedState);
         // sometimes it may happen that the user removes node from the diagram but modifiedState had no knowledge of it. In that case, we can check for the keys presence in the state and if not found, get the node removed from state.
         const toBeRemovedNodes = []
         for (const key of Object.keys(parsedModifiedState.nodes)) {
-            if (key in stateJson.nodes) {
-                stateJson.nodes[key].consumerData = {...stateJson.nodes[key].consumerData, ...parsedModifiedState.nodes[key].consumerData}
+            if (key in state.nodes) {
+                state.nodes[key].consumerData = {...state.nodes[key].consumerData, ...parsedModifiedState.nodes[key].consumerData}
             } else {
                 // node has been deleted but modifiedState still has the reference, we have to explicitly remove the node
                 toBeRemovedNodes.push(key)
@@ -26,8 +24,8 @@ export const cleanseState = (state: {}) => {
         // sometimes it may happen that the user removes edge from the diagram but modifiedState had no knowledge of it. In that case, we can check for the keys presence in the state and if not found, get the edge removed from state.
         const toBeRemovedEdges = []
         for (const key of Object.keys(parsedModifiedState.edges)) {
-            if (key in stateJson.edges) {
-                stateJson.edges[key].consumerData = {...stateJson.edges[key].consumerData, ...parsedModifiedState.edges[key].consumerData}
+            if (key in state.edges) {
+                state.edges[key].consumerData = {...state.edges[key].consumerData, ...parsedModifiedState.edges[key].consumerData}
             } else {
                 // edge has been deleted but modifiedState still has the reference, we have to explicitly remove the edge
                 toBeRemovedEdges.push(key)
@@ -42,42 +40,41 @@ export const cleanseState = (state: {}) => {
             delete parsedModifiedState.edges[element]
         }
         // update back to localstorage.
-        setModifiedState(JsonStringify(parsedModifiedState))
+        setModifiedState(JSON.stringify(parsedModifiedState))
     }
-    return JsonStringify(repopulate(stateJson));
+    return repopulate(state);
 }
 
 const repopulate = (stateJson: any) => {
     const json: any = getData(0, 0);
-    console.log("json : ", json)
     json.nodes = stateJson.nodes;
     json.edges = stateJson.edges;
     return json;
 }
 
 export const removeUnwantedThings = (stateJson) => {
-    // // delete unwanted stuff from state.
-    // delete stateJson.panels
-    // delete stateJson.plugins
-    // delete stateJson.potentialEdge
-    // delete stateJson.potentialNode
-    // delete stateJson.editor
-    // delete stateJson.undoHistory
-    // delete stateJson.workspace
-    // // nodes
-    // for (const key in stateJson.nodes) {
-    //     if (stateJson.nodes[key]) {
-    //         const diagramMakerData = stateJson.nodes[key].diagramMakerData;
-    //         delete diagramMakerData.position
-    //         delete diagramMakerData.size
-    //     }
-    // }
-    // // edges
-    // for (const key in stateJson.edges) {
-    //     const diagramMakerData = stateJson.edges[key].diagramMakerData;
-    //     delete diagramMakerData.position
-    //     delete diagramMakerData.size
-    // }
+    // delete unwanted stuff from state.
+    delete stateJson.panels
+    delete stateJson.plugins
+    delete stateJson.potentialEdge
+    delete stateJson.potentialNode
+    delete stateJson.editor
+    delete stateJson.undoHistory
+    delete stateJson.workspace
+    // nodes
+    for (const key in stateJson.nodes) {
+        if (stateJson.nodes[key]) {
+            const diagramMakerData = stateJson.nodes[key].diagramMakerData;
+            delete diagramMakerData.position
+            delete diagramMakerData.size
+        }
+    }
+    // edges
+    for (const key in stateJson.edges) {
+        const diagramMakerData = stateJson.edges[key].diagramMakerData;
+        delete diagramMakerData.position
+        delete diagramMakerData.size
+    }
     return stateJson;
 }
 
@@ -88,7 +85,7 @@ export const getParsedModifiedState = () => {
     const modifiedState = getModifiedState();
 
     if (modifiedState && modifiedState !== "{}") {
-        return JsonParse(modifiedState);
+        return JSON.parse(modifiedState);
     } else {
         return {
             nodes: {},

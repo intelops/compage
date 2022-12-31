@@ -4,7 +4,6 @@ import {createProjectAsync} from "./async-apis/createProject";
 import {listProjectsAsync} from "./async-apis/listProjects";
 import {getProjectAsync} from "./async-apis/getProject";
 import {updateProjectAsync} from './async-apis/updateProject';
-import {JsonStringify} from "../../utils/json-helper";
 
 export interface ProjectState {
     createProject: {
@@ -66,7 +65,7 @@ export const projectsSlice = createSlice({
             state.createProject.data = action.payload;
         }).addCase(createProjectAsync.rejected, (state, action) => {
             state.createProject.status = 'failed';
-            if (action.payload) state.createProject.error = JsonStringify(action.payload);
+            if (action.payload) state.createProject.error = JSON.stringify(action.payload);
         }).addCase(listProjectsAsync.pending, (state) => {
             state.listProjects.status = 'loading';
             state.listProjects.error = null;
@@ -76,7 +75,7 @@ export const projectsSlice = createSlice({
             state.listProjects.data = action.payload;
         }).addCase(listProjectsAsync.rejected, (state, action) => {
             state.listProjects.status = 'failed';
-            if (action.payload) state.listProjects.error = JsonStringify(action.payload);
+            if (action.payload) state.listProjects.error = JSON.stringify(action.payload);
         }).addCase(getProjectAsync.pending, (state) => {
             state.getProject.status = 'loading';
             state.getProject.error = null;
@@ -86,7 +85,7 @@ export const projectsSlice = createSlice({
             state.getProject.data = action.payload;
         }).addCase(getProjectAsync.rejected, (state, action) => {
             state.getProject.status = 'failed';
-            if (action.payload) state.getProject.error = JsonStringify(action.payload);
+            if (action.payload) state.getProject.error = JSON.stringify(action.payload);
         }).addCase(updateProjectAsync.pending, (state) => {
             state.updateProject.status = 'loading';
             state.updateProject.error = null;
@@ -96,7 +95,7 @@ export const projectsSlice = createSlice({
             state.updateProject.data = action.payload;
         }).addCase(updateProjectAsync.rejected, (state, action) => {
             state.updateProject.status = 'failed';
-            if (action.payload) state.updateProject.error = JsonStringify(action.payload);
+            if (action.payload) state.updateProject.error = JSON.stringify(action.payload);
         });
     },
 });
