@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Navigate, useNavigate} from "react-router-dom";
 import {getData} from "../diagram-maker/data/BoundaryCircular/data";
-import {getCurrentConfig, getCurrentProject, setCurrentConfig} from "../../utils/localstorage-client";
+import {getCurrentConfig, getCurrentProject, setCurrentConfig, setCurrentState} from "../../utils/localstorage-client";
 import {useAppSelector} from "../../redux/hooks";
 import {DiagramMakerContainer} from "../diagram-maker/diagram-maker-container";
 import {selectAuthData} from "../../features/auth/slice";
@@ -58,6 +58,7 @@ export const Home = () => {
             // TODO below passed parameters aren't being used.
             diagramMakerData = getData(0, 0);
             setCurrentConfig(JSON.stringify(diagramMakerData));
+            setCurrentState(JSON.stringify(diagramMakerData));
         }
         return diagramMakerData;
     };

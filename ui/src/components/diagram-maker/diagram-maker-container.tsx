@@ -54,7 +54,6 @@ import {PotentialNode} from "./custom/potential-node";
 import {getNodeTypeConfig} from "./helper/node-type-ui";
 import {NewEdgeProperties} from "./new-properties/new-edge-properties";
 import {NewNodeProperties} from "./new-properties/new-node-properties";
-import {cleanseState, removeUnwantedThings} from "./helper/helper";
 import JSONPretty from "react-json-pretty";
 import Button from "@mui/material/Button";
 import {ButtonsPanel} from "./buttons-panel";
@@ -63,6 +62,7 @@ import {updateProjectAsync} from "../../features/projects/async-apis/updateProje
 import {getProjectAsync} from "../../features/projects/async-apis/getProject";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {selectGetProjectData} from "../../features/projects/slice";
+import {cleanse} from "./helper/helper";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -145,7 +145,7 @@ export const DiagramMakerContainer = ({
     const setData = (state: string, updateConfig = true) => {
         const backupState: string = state.slice();
         if (state) {
-            const cleansedState = cleanseState(state);
+            const cleansedState = cleanse(state);
             if (updateConfig) {
                 setDiagramMaker({
                     copied: false,
@@ -167,10 +167,10 @@ export const DiagramMakerContainer = ({
         let plugin, connectorPlacement
         // let initialData = BoundaryRectangularData
         // let connectorPlacement = ConnectorPlacementType.BOUNDARY
-        const showArrowhead = true
-        const shape = Shape.CIRCLE
-        const edgeBadge = true
-        const actionInterceptor = true
+        let showArrowhead = true
+        let shape = Shape.CIRCLE
+        let edgeBadge = true
+        let actionInterceptor = true
         // let onAction: {
         //     action: 'action',
         // }
@@ -435,18 +435,18 @@ export const DiagramMakerContainer = ({
                         style={{
                             width: "100%",
                             overflowY: "scroll",
-                            height: "600px",
+                            height: "400px",
                             paddingTop: "75px"
                         }}
                         onJSONPrettyError={e => console.error(e)}
-                        data={getJSONData(diagramMaker.state)}/>
+                        data={diagramMaker.state}/>
             <br/>
             <Grid item style={{
                 alignItems: "center",
                 display: "flex",
                 flexDirection: "column"
             }}>
-                <CopyToClipboard text={removeUnwantedThings(diagramMaker.state)}
+                <CopyToClipboard text={JSON.stringify(cleanse(diagramMaker.config))}
                                  onCopy={() => setDiagramMaker({
                                      ...diagramMaker,
                                      copied: true
