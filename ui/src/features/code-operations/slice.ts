@@ -1,6 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {RootState} from '../../redux/store';
 import {generateCodeAsync} from "./async-apis/generateCode";
+import {JsonStringify} from "../../utils/json-helper";
 
 export interface CodeOperationsState {
     generateCode: {
@@ -32,7 +33,7 @@ export const codeOperationsSlice = createSlice({
             state.generateCode.data = action.payload;
         }).addCase(generateCodeAsync.rejected, (state, action) => {
             state.generateCode.status = 'failed';
-            if (action.payload) state.generateCode.error = JSON.stringify(action.payload);
+            if (action.payload) state.generateCode.error = JsonStringify(action.payload);
         });
     },
 });

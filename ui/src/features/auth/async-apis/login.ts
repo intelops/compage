@@ -3,6 +3,7 @@ import {LoginError, LoginRequest, LoginResponse} from "../model";
 import {toastr} from 'react-redux-toastr'
 import {login} from "../api";
 import {setCurrentUserName} from "../../../utils/localstorage-client";
+import {JsonParse} from "../../../utils/json-helper";
 
 export const loginAsync = createAsyncThunk<LoginResponse, LoginRequest, { rejectValue: LoginError }>(
     'auth/login',
@@ -29,7 +30,7 @@ export const loginAsync = createAsyncThunk<LoginResponse, LoginRequest, { reject
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;
-            const message = JSON.parse(JSON.stringify(e.response.data)).message;
+            const message = JsonParse(e.response.data).message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;
             console.log(errorMessage);
             toastr.error(`login [Failure]`, `${errorMessage}`);

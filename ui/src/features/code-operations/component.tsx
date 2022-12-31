@@ -7,7 +7,6 @@ import {generateCodeAsync} from "./async-apis/generateCode";
 import {getCurrentProjectContext} from "../../utils/localstorage-client";
 import {CurrentProjectContext} from "../../components/diagram-maker/models";
 import {selectGetProjectData} from "../projects/slice";
-import {removeUnwantedThings} from "../../components/diagram-maker/helper/helper";
 
 export const GenerateCode = () => {
     const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
@@ -29,7 +28,10 @@ export const GenerateCode = () => {
     const isDisabled = () => {
         const currentProjectContext = getCurrentProjectContext();
         // TODO the below check will make sure to not enable/disable button more often.
-        return removeUnwantedThings(JSON.parse(JSON.stringify(getProjectData.json))) !== removeUnwantedThings(JSON.parse(JSON.stringify(currentProjectContext.state)));
+        // if (getProjectData.json) {
+        //     return removeUnwantedThings(JsonParse(getProjectData.json)) !== removeUnwantedThings(JsonParse(currentProjectContext.state));
+        // }
+        return false;
     };
 
     return (

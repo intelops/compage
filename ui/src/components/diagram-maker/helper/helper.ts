@@ -1,7 +1,9 @@
 import {getModifiedState, setModifiedState} from "../../../utils/localstorage-client";
+import {JsonParse, JsonStringify} from "../../../utils/json-helper";
+import {getData} from "../data/BoundaryCircular/data";
 
-export const cleanseState = (state: string) => {
-    const stateJson = JSON.parse(state)
+export const cleanseState = (state: {}) => {
+    const stateJson = JsonParse(state)
     if (stateJson === "{}") {
         // happens at the beginning with value "{}"
         return state;
@@ -10,7 +12,7 @@ export const cleanseState = (state: string) => {
     // update state from localstorage with additional properties added from UI (Post node creation)
     const modifiedState = getModifiedState();
     if (modifiedState && modifiedState !== "{}") {
-        const parsedModifiedState = JSON.parse(modifiedState);
+        const parsedModifiedState = JsonParse(modifiedState);
         // sometimes it may happen that the user removes node from the diagram but modifiedState had no knowledge of it. In that case, we can check for the keys presence in the state and if not found, get the node removed from state.
         const toBeRemovedNodes = []
         for (const key of Object.keys(parsedModifiedState.nodes)) {
@@ -40,34 +42,42 @@ export const cleanseState = (state: string) => {
             delete parsedModifiedState.edges[element]
         }
         // update back to localstorage.
-        setModifiedState(JSON.stringify(parsedModifiedState))
+        setModifiedState(JsonStringify(parsedModifiedState))
     }
-    return JSON.stringify(stateJson);
+    return JsonStringify(repopulate(stateJson));
+}
+
+const repopulate = (stateJson: any) => {
+    const json: any = getData(0, 0);
+    console.log("json : ", json)
+    json.nodes = stateJson.nodes;
+    json.edges = stateJson.edges;
+    return json;
 }
 
 export const removeUnwantedThings = (stateJson) => {
-    // delete unwanted stuff from state.
-    delete stateJson.panels
-    delete stateJson.plugins
-    delete stateJson.potentialEdge
-    delete stateJson.potentialNode
-    delete stateJson.editor
-    delete stateJson.undoHistory
-    delete stateJson.workspace
-    // nodes
-    for (const key in stateJson.nodes) {
-        if (stateJson.nodes[key]) {
-            const diagramMakerData = stateJson.nodes[key].diagramMakerData;
-            delete diagramMakerData.position
-            delete diagramMakerData.size
-        }
-    }
-    // edges
-    for (const key in stateJson.edges) {
-        const diagramMakerData = stateJson.edges[key].diagramMakerData;
-        delete diagramMakerData.position
-        delete diagramMakerData.size
-    }
+    // // delete unwanted stuff from state.
+    // delete stateJson.panels
+    // delete stateJson.plugins
+    // delete stateJson.potentialEdge
+    // delete stateJson.potentialNode
+    // delete stateJson.editor
+    // delete stateJson.undoHistory
+    // delete stateJson.workspace
+    // // nodes
+    // for (const key in stateJson.nodes) {
+    //     if (stateJson.nodes[key]) {
+    //         const diagramMakerData = stateJson.nodes[key].diagramMakerData;
+    //         delete diagramMakerData.position
+    //         delete diagramMakerData.size
+    //     }
+    // }
+    // // edges
+    // for (const key in stateJson.edges) {
+    //     const diagramMakerData = stateJson.edges[key].diagramMakerData;
+    //     delete diagramMakerData.position
+    //     delete diagramMakerData.size
+    // }
     return stateJson;
 }
 
@@ -78,7 +88,7 @@ export const getParsedModifiedState = () => {
     const modifiedState = getModifiedState();
 
     if (modifiedState && modifiedState !== "{}") {
-        return JSON.parse(modifiedState);
+        return JsonParse(modifiedState);
     } else {
         return {
             nodes: {},

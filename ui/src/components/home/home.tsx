@@ -20,6 +20,16 @@ export const Home = () => {
         return <Navigate to="/login"/>;
     }
 
+    const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
+    console.log(currentProjectContext)
+    if (!data.isOpen && (currentProjectContext === null
+        || currentProjectContext === undefined
+        || Object.keys(currentProjectContext).length === 0
+        || currentProjectContext?.projectId.length === 0)) {
+        // choose from existing or create a new project
+        setData({...data, isOpen: true})
+    }
+
     const getDiagramData = () => {
         const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
         let diagramMakerData
@@ -34,24 +44,14 @@ export const Home = () => {
             diagramMakerData = getData(0, 0);
         }
         return diagramMakerData;
-    }
+    };
 
     const handleClose = async () => {
         setData({...data, isOpen: false})
         // TODO hack to reload after getProject is loaded
         await new Promise(r => setTimeout(r, 2000));
         navigate('/home');
-    }
-
-    const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
-    console.log(currentProjectContext)
-    if (!data.isOpen && (currentProjectContext === null
-        || currentProjectContext === undefined
-        || Object.keys(currentProjectContext).length === 0
-        || currentProjectContext?.projectId.length === 0)) {
-        // choose from existing or create a new project
-        setData({...data, isOpen: true})
-    }
+    };
 
     return <React.Fragment>
         <SwitchProject isOpen={data.isOpen} handleClose={handleClose}></SwitchProject>

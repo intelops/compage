@@ -55,6 +55,12 @@ import {cleanseState, removeUnwantedThings} from "./helper/helper";
 import JSONPretty from "react-json-pretty";
 import Button from "@mui/material/Button";
 import {ButtonsPanel} from "./buttons-panel";
+import {JsonParse, JsonStringify} from "../../utils/json-helper";
+import {GetProjectRequest, UpdateProjectRequest} from "../../features/projects/model";
+import {updateProjectAsync} from "../../features/projects/async-apis/updateProject";
+import {getProjectAsync} from "../../features/projects/async-apis/getProject";
+import {useAppDispatch, useAppSelector} from "../../redux/hooks";
+import {selectGetProjectData} from "../../features/projects/slice";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -81,8 +87,11 @@ export const DiagramMakerContainer = ({
                                       }: ArgTypes) => {
     const containerRef = useRef() as any;
     const diagramMakerRef = useRef() as any;
+    const dispatch = useAppDispatch();
+    const getProjectData = useAppSelector(selectGetProjectData);
+
     const [diagramMaker, setDiagramMaker] = React.useState({
-        state: "{}",
+        state: {},
         copied: false,
     });
 
@@ -121,8 +130,8 @@ export const DiagramMakerContainer = ({
     useBeforeunload((event) => {
         if (shouldReset()) {
             const currentProjectContext = getCurrentProjectContext();
-            if (diagramMaker.state !== "{}" && diagramMaker.state !== JSON.stringify(currentProjectContext.state)) {
-                currentProjectContext.state = JSON.parse(diagramMaker.state);
+            if (diagramMaker.state !== "{}" && diagramMaker.state !== JsonStringify(currentProjectContext.state)) {
+                currentProjectContext.state = JsonParse(diagramMaker.state);
                 setCurrentProjectContext(currentProjectContext);
                 event.preventDefault();
             }
@@ -131,16 +140,18 @@ export const DiagramMakerContainer = ({
         }
     });
 
-    const setData = (state: string) => {
+    const setData = (state: {}) => {
         if (state) {
             const cleansedState = cleanseState(state);
-            const currentProjectContext = getCurrentProjectContext();
-            if (cleansedState !== "{}" && cleansedState !== JSON.stringify(currentProjectContext.state)) {
-                currentProjectContext.state = JSON.parse(cleansedState);
-                setCurrentProjectContext(currentProjectContext);
-            }
+            // https://stackoverflow.com/questions/23977690/setting-the-value-of-dataurl-exceeded-the-quota
+            // const currentProjectContext = getCurrentProjectContext();
+            // if (cleansedState !== "{}" && cleansedState !== JsonStringify(currentProjectContext.state)) {
+            //     currentProjectContext.state = JsonParse(cleansedState);
+            //     setCurrentProjectContext(currentProjectContext);
+            // }
             setDiagramMaker({
                 state: cleansedState,
+                // state: state,
                 copied: false,
             })
         }
@@ -352,15 +363,46 @@ export const DiagramMakerContainer = ({
         // });
         const currentProjectContext = getCurrentProjectContext();
         if (currentProjectContext) {
-            setData(JSON.stringify(currentProjectContext.state));
+            setData(JsonStringify(currentProjectContext.state));
         }
 
         diagramMakerRef.current.store.subscribe(() => {
             const state = diagramMakerRef.current.store.getState();
-            setData(JSON.stringify(state))
+            console.log("state : ", state)
+            setData(JsonStringify(state))
         });
 
     }, [plugin, initialData]);
+
+    // When clicked, save the state of project to backend.
+    const handleSaveProjectClick = () => {
+        const currentProjectContext = getCurrentProjectContext();
+        currentProjectContext.state = JsonStringify(diagramMaker.state);
+        setCurrentProjectContext(currentProjectContext);
+        if (currentProjectContext && getProjectData.id && getProjectData.id === currentProjectContext.projectId) {
+            const prepareUpdateProjectRequest = () => {
+                const uPR: UpdateProjectRequest = {
+                    id: currentProjectContext.projectId,
+                    version: getProjectData.version,
+                    repository: getProjectData.repository,
+                    displayName: getProjectData.displayName,
+                    user: getProjectData.user,
+                    json: JsonParse(currentProjectContext.state)
+                };
+                return uPR;
+            };
+            const updateProjectRequest: UpdateProjectRequest = prepareUpdateProjectRequest();
+            dispatch(updateProjectAsync(updateProjectRequest));
+        }
+
+        // TODO the below is needed to update the getProject state.
+        if (getProjectData.projectId) {
+            const getProjectRequest: GetProjectRequest = {
+                id: getProjectData.id
+            };
+            dispatch(getProjectAsync(getProjectRequest));
+        }
+    };
 
     return <Grid container spacing={1} sx={{height: '100%'}}>
         <Grid item xs={10} md={10} style={{
@@ -387,14 +429,15 @@ export const DiagramMakerContainer = ({
                             paddingTop: "75px"
                         }}
                         onJSONPrettyError={e => console.error(e)}
-                        data={removeUnwantedThings(JSON.parse(diagramMaker.state))}/>
+                // data={removeUnwantedThings(JsonParse(diagramMaker.state))}/>
+                        data={JsonParse(diagramMaker.state)}/>
             <br/>
             <Grid item style={{
                 alignItems: "center",
                 display: "flex",
                 flexDirection: "column"
             }}>
-                <CopyToClipboard text={removeUnwantedThings(JSON.parse(diagramMaker.state))}
+                <CopyToClipboard text={removeUnwantedThings(JsonParse(diagramMaker.state))}
                                  onCopy={() => setDiagramMaker({
                                      ...diagramMaker,
                                      copied: true
@@ -406,6 +449,18 @@ export const DiagramMakerContainer = ({
                     </Button>
                 </CopyToClipboard>
                 {diagramMaker.copied ? <span style={{color: 'green'}}> Copied.</span> : null}
+            </Grid>
+            <hr/>
+            <Grid item style={{
+                alignItems: "center",
+                display: "flex",
+                flexDirection: "column"
+            }}>
+                <Button style={{
+                    width: "200px"
+                }} variant="contained" onClick={handleSaveProjectClick}>
+                    Save Project
+                </Button>
             </Grid>
             <hr/>
             <ButtonsPanel/>

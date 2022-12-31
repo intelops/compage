@@ -1,14 +1,15 @@
 import {CurrentProjectContext} from "../components/diagram-maker/models";
+import {JsonParse, JsonStringify} from "./json-helper";
 
 export const CURRENT_PROJECT_CONTEXT = "CURRENT_PROJECT_CONTEXT";
 export const RESET = "RESET";
 
 export const setCurrentProjectContext = (currentProjectContext: CurrentProjectContext) => {
-    localStorage.setItem(CURRENT_PROJECT_CONTEXT, JSON.stringify(currentProjectContext));
+    localStorage.setItem(CURRENT_PROJECT_CONTEXT, JsonStringify(currentProjectContext));
 };
 
 export const getCurrentProjectContext = (): CurrentProjectContext => {
-    return JSON.parse(localStorage.getItem(CURRENT_PROJECT_CONTEXT));
+    return JsonParse(localStorage.getItem(CURRENT_PROJECT_CONTEXT));
 };
 
 export const removeCurrentProjectContext = () => {

@@ -10,6 +10,8 @@ import {Navigate} from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import {Stack} from "@mui/material";
 import {createProjectAsync} from "./async-apis/createProject";
+import {getData} from "../../components/diagram-maker/data/BoundaryCircular/data";
+import {JsonParse} from "../../utils/json-helper";
 
 interface ArgTypes {
     handleClose: (...args: any) => void;
@@ -120,11 +122,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             name: data.repositoryName,
             tag: "v1"
         }
-        const json: CompageJson = {
-            edges: new Map<string, CompageEdge>(),
-            nodes: new Map<string, CompageNode>(),
-            version: "v1"
-        }
+        const json = getData(0, 0);
         const displayName = data.projectName;
         const metadata = data.metadata;
         const cPR: CreateProjectRequest = {
@@ -133,7 +131,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             repository,
             displayName,
             user: user,
-            json: json
+            json: JsonParse(json)
         };
         return cPR;
     };

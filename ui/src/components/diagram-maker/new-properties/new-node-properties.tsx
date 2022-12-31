@@ -10,7 +10,7 @@ import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
-import * as url from "url";
+import {JsonStringify} from "../../../utils/json-helper";
 
 interface NewNodePropertiesProps {
     isOpen: boolean,
@@ -65,7 +65,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         const nodeElement = document.getElementById(props.nodeId);
         nodeElement.style.backgroundImage = `url('${payload.url}')`;
         // update modifiedState in the localstorage
-        setModifiedState(JSON.stringify(parsedModifiedState))
+        setModifiedState(JsonStringify(parsedModifiedState))
         setPayload({
             name: "",
             type: "",

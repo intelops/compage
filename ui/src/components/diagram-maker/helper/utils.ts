@@ -1,5 +1,6 @@
 import {DiagramMakerNode, Event, WorkspaceActions} from 'diagram-maker';
 import {Action, AnyAction} from 'redux';
+import {JsonStringify} from "../../../utils/json-helper";
 
 export function createDivWithText(text: string) {
     const newDiv = document.createElement('div');
@@ -192,7 +193,7 @@ export function updateActionInLogger(action: Action) {
         logger.innerHTML = '';
         logger.appendChild(type);
         if (anyAction.payload) {
-            const payload = createDivWithText(`Payload is ${JSON.stringify(anyAction.payload)}`);
+            const payload = createDivWithText(`Payload is ${JsonStringify(anyAction.payload)}`);
             payload.setAttribute('data-type', 'DiagramMaker.ActionPayload');
             payload.setAttribute('data-id', action.type);
             logger.appendChild(payload);

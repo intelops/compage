@@ -34,10 +34,12 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
         const message = `unable to generate code, no project found for id: ${projectId}`
         return resource.status(500).json(getGenerateCodeError(message));
     }
+    console.log("nodes length :", JSON.parse(projectResource.spec.json).nodes);
     if (!projectResource.spec.json
         || projectResource.spec.json === "{}"
         || projectResource.spec.json.length === 0
-        || JSON.parse(projectResource.spec.json).nodes.length === 0) {
+        || !JSON.parse(projectResource.spec.json).nodes
+        || JSON.parse(projectResource.spec.json).nodes?.length === 0) {
         const message = `unable to generate code, have at least a node added to your project: ${projectResource.spec.displayName}[${projectId}].`
         return resource.status(500).json(getGenerateCodeError(message));
     }

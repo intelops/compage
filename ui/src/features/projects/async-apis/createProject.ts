@@ -4,6 +4,7 @@ import {createProject} from "../api";
 import {toastr} from 'react-redux-toastr'
 import {getCurrentProjectContext, setCurrentProjectContext} from "../../../utils/localstorage-client";
 import {CurrentProjectContext} from "../../../components/diagram-maker/models";
+import {JsonParse, JsonStringify} from "../../../utils/json-helper";
 
 export const createProjectAsync = createAsyncThunk<CreateProjectResponse, CreateProjectRequest, { rejectValue: CreateProjectError }>(
     'projects/createProject',
@@ -24,7 +25,7 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
             const currentProjectContext: CurrentProjectContext = getCurrentProjectContext();
             // TODO pass json as string throughout - trying
             currentProjectContext.projectId = createProjectResponse.projectId;
-            currentProjectContext.state = JSON.stringify(createProjectRequest.json);
+            currentProjectContext.state = JsonStringify(createProjectRequest.json);
             setCurrentProjectContext(currentProjectContext)
             const message = `Successfully created project: ${createProjectRequest.displayName}[${createProjectResponse.projectId}]`;
             console.log(message);
@@ -32,7 +33,7 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;
-            const message = JSON.parse(JSON.stringify(e.response.data)).message;
+            const message = JsonParse(e.response.data).message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;
             console.log(errorMessage);
             toastr.error(`createProject [Failure]`, errorMessage);
