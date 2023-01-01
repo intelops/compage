@@ -16,7 +16,7 @@ const codeOperationsRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
 
 function getFormattedJsonString(formattedJsonString: string) {
-    if (!formattedJsonString){
+    if (!formattedJsonString) {
         return formattedJsonString;
     }
     const formattedJson = JSON.parse(formattedJsonString)
@@ -61,7 +61,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
         return resource.status(500).json(getGenerateCodeError(message));
     }
     // create directory hierarchy here itself as creating it after receiving data will not be proper.
-    const originalProjectPath = `${os.tmpdir()}/${projectResource.metadata.name}`;
+    const originalProjectPath = `${os.tmpdir()}/${projectResource.spec.displayName}`;
     const downloadedProjectPath = `${originalProjectPath}_downloaded`;
     try {
         fs.mkdirSync(downloadedProjectPath, {recursive: true});
@@ -101,6 +101,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
 
     // error while receiving the file from core component
     call.on('error', async (response: any) => {
+        cleanup(downloadedProjectPath);
         const message = `unable to generate code for ${projectResource.spec.displayName}[${projectResource.metadata.name}] => ${response.details}`
         return resource.status(500).json(getGenerateCodeError(message));
     });
@@ -131,6 +132,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
 
             let error: string = await cloneExistingProjectFromGithub(cloneExistingProjectFromGithubRequest)
             if (error.length > 0) {
+                cleanup(downloadedProjectPath);
                 // send status back to ui
                 const message = `unable to generate code for ${projectResource.spec.displayName}[${projectResource.metadata.name}] => ${error}.`
                 return resource.status(500).json(getGenerateCodeError(message));
@@ -138,7 +140,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
 
             // save to GitHub
             const pushToExistingProjectOnGithubRequest: PushToExistingProjectOnGithubRequest = {
-                generatedProjectPath: `${downloadedProjectPath}` +"/"+ `${projectResource.metadata.name}_downloaded`,
+                generatedProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
                 existingProject: cloneExistingProjectFromGithubRequest.clonedProjectPath + "/" + projectResource.spec.repository?.name,
                 userName: projectResource.spec.user.name,
                 email: projectResource.spec.user.email,
@@ -148,6 +150,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
 
             error = await pushToExistingProjectOnGithub(pushToExistingProjectOnGithubRequest)
             if (error.length > 0) {
+                cleanup(downloadedProjectPath);
                 // send status back to ui
                 const message = `unable to generate code for ${projectResource.spec.displayName}[${projectResource.metadata.name}] => ${error}.`
                 return resource.status(500).json(getGenerateCodeError(message));
