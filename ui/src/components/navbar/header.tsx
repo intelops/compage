@@ -18,20 +18,20 @@ const settings = ['Account', 'Logout'];
 
 const Header = () => {
     const authData = useAppSelector(selectAuthData);
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const handleLogout = () => {
         sessionStorage.clear();
         localStorage.clear();
         // TODO Call backend service to invalidate the token
-        handleCloseUserMenu()
+        handleCloseUserMenu();
         window.location.reload();
-    }
+    };
 
     const handleAccount = () => {
-        navigate("/account")
-        handleCloseUserMenu()
-    }
+        navigate("/account");
+        handleCloseUserMenu();
+    };
 
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -96,18 +96,20 @@ const Header = () => {
     }
 
     const getCurrentProjectSelected = () => {
-        const currentProject = getCurrentProject();
-        if (currentProject) {
-            return <Toolbar>
-                <Box sx={{flexGrow: 0}}>
-                    <Typography variant={"h6"}> You have
-                        selected {currentProject}
-                    </Typography>
-                </Box>
-            </Toolbar>;
+        if (authData.login) {
+            const currentProject = getCurrentProject();
+            if (currentProject) {
+                return <Toolbar>
+                    <Box sx={{flexGrow: 0}}>
+                        <Typography variant={"h6"}> You have
+                            selected {currentProject}
+                        </Typography>
+                    </Box>
+                </Toolbar>;
+            }
         }
-        return ""
-    }
+        return "";
+    };
 
     const getLogo = () => {
         if (authData.login) {
