@@ -9,12 +9,11 @@ import {setModifiedState} from "../../../utils/localstorage-client";
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import {Stack} from "@mui/material";
-import MenuItem from "@mui/material/MenuItem";
 
 interface NewEdgePropertiesProps {
-    isOpen: boolean,
-    edgeId: string,
-    onClose: () => void,
+    isOpen: boolean;
+    edgeId: string;
+    onClose: () => void;
 }
 
 export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
@@ -22,8 +21,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
 
     const [payload, setPayload] = React.useState({
         name: parsedModifiedState.edges[props.edgeId]?.consumerData.name !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData.name : "",
-        type: parsedModifiedState.edges[props.edgeId]?.consumerData.type !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData.type : "",
-        protocol: parsedModifiedState.edges[props.edgeId]?.consumerData.protocol !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData.protocol : "",
+        clientTypes: parsedModifiedState.edges[props.edgeId]?.consumerData.clientTypes !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData.clientTypes : [],
     });
 
     // TODO this is a hack as there is no EDGE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
@@ -37,33 +35,30 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             // adding consumerData to new edge in modifiedState
             parsedModifiedState.edges[props.edgeId] = {
                 consumerData: {
-                    type: payload.type + "_edge",
+                    clientTypes: payload.clientTypes,
                     name: payload.name,
-                    protocol: payload.protocol
                 }
-            }
+            };
         } else {
             // adding consumerData to existing edge in modifiedState
             parsedModifiedState.edges[props.edgeId].consumerData = {
-                type: payload.type + "_edge",
+                type: payload.clientTypes,
                 name: payload.name,
-                protocol: payload.protocol
-            }
+            };
         }
         // update modifiedState in the localstorage
-        setModifiedState(JSON.stringify(parsedModifiedState))
+        setModifiedState(JSON.stringify(parsedModifiedState));
         setPayload({
             name: "",
-            type: "",
-            protocol: "",
-        })
-        props.onClose()
-    }
+            clientTypes: [],
+        });
+        props.onClose();
+    };
 
-    const handleTypeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleClientTypesChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setPayload({
             ...payload,
-            type: event.target.value
+            clientTypes: event.target.value
         });
     };
 
@@ -73,15 +68,6 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             name: event.target.value
         });
     };
-
-    const handleProtocolChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setPayload({
-            ...payload,
-            protocol: event.target.value
-        });
-    };
-
-    const protocols = ["http", "websocket", "grpc"]
 
     return <React.Fragment>
         <Dialog open={props.isOpen} onClose={props.onClose}>
@@ -94,7 +80,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                         size="medium"
                         margin="dense"
                         id="name"
-                        label="Name of Component"
+                        label="Name of edge"
                         type="text"
                         value={payload.name}
                         onChange={handleNameChange}
@@ -105,40 +91,20 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                         size="medium"
                         margin="dense"
                         id="type"
-                        label="Type of Component"
+                        label="Client Types"
                         type="text"
-                        value={payload.type}
-                        onChange={handleTypeChange}
+                        value={payload.clientTypes}
+                        onChange={handleClientTypesChange}
                         variant="outlined"
                     />
-                    <TextField
-                        required
-                        size="medium"
-                        select
-                        margin="dense"
-                        id="protocol"
-                        label="Protocol"
-                        type="text"
-                        value={payload.protocol}
-                        onChange={handleProtocolChange}
-                        variant="outlined">
-                        <MenuItem value="">
-                            <em>Create new</em>
-                        </MenuItem>
-                        {protocols.map((protocol: string) => (
-                            <MenuItem key={protocol} value={protocol}>
-                                {protocol}
-                            </MenuItem>
-                        ))}
-                    </TextField>
                 </Stack>
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
                 <Button variant="contained"
                         onClick={handleUpdate}
-                        disabled={payload.type === "" || payload.name === "" || payload.protocol === ""}>Update</Button>
+                        disabled={payload.name === ""}>Update</Button>
             </DialogActions>
         </Dialog>
     </React.Fragment>;
-}
+};

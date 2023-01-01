@@ -20,10 +20,13 @@ function getFormattedJsonString(formattedJsonString: string) {
         return formattedJsonString;
     }
     const formattedJson = JSON.parse(formattedJsonString)
-    console.log(formattedJson.nodes);
     for (let key in formattedJson.nodes) {
         let serverTypes = formattedJson.nodes[key].consumerData.serverTypes;
-        formattedJson.nodes[key].consumerData.serverTypes = JSON.parse(serverTypes);
+        console.log("serverTypes1 : ", serverTypes)
+        if (serverTypes && serverTypes !== "[]"){
+            console.log("serverTypes2 : ", serverTypes)
+            formattedJson.nodes[key].consumerData.serverTypes = JSON.parse(serverTypes);
+        }
     }
     for (let key in formattedJson.edges) {
         let clientTypes = formattedJson.edges[key].consumerData.clientTypes;

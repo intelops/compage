@@ -43,7 +43,7 @@ export const gitOperations = async (git: SimpleGit, repository: Repository): Pro
     }
 
     // Finally push to online repository
-    await git.push('origin', repository.branch)
+    await git.push('origin', repository.branch, { '--force': null })
         .then((success: any) => {
             console.debug('git push succeeded');
         }, (failure: any) => {
