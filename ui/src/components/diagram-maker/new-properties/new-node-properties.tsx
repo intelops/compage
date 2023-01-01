@@ -22,13 +22,11 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
 
     const [payload, setPayload] = React.useState({
         name: parsedModifiedState.nodes[props.nodeId]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.name : "",
-        type: parsedModifiedState.nodes[props.nodeId]?.consumerData.type !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.type : "",
+        template: parsedModifiedState.nodes[props.nodeId]?.consumerData.template !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.template : "compage",
         language: parsedModifiedState.nodes[props.nodeId]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.language : "",
-        isServer: parsedModifiedState.nodes[props.nodeId]?.consumerData.isServer !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.isServer : false,
-        isClient: parsedModifiedState.nodes[props.nodeId]?.consumerData.isClient !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.isClient : false,
-        // api resources to be generated
-        resources: [],
-        url: parsedModifiedState?.nodes[props.nodeId]?.consumerData.url !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.url : "",
+        // isServer: parsedModifiedState.nodes[props.nodeId]?.consumerData.isServer !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.isServer : false,
+        // isClient: parsedModifiedState.nodes[props.nodeId]?.consumerData.isClient !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.isClient : false,
+        serverTypes: parsedModifiedState?.nodes[props.nodeId]?.consumerData.serverTypes !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.serverTypes : [],
     });
 
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
@@ -42,45 +40,45 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             // adding consumerData to new node in modifiedState
             parsedModifiedState.nodes[props.nodeId] = {
                 consumerData: {
-                    type: payload.type,
+                    template: payload.template,
                     name: payload.name,
-                    isServer: payload.isServer,
-                    isClient: payload.isClient,
                     language: payload.language,
-                    url: payload.url
+                    // isServer: payload.isServer,
+                    // isClient: payload.isClient,
+                    serverTypes: payload.serverTypes
                 }
-            }
+            };
         } else {
             // adding consumerData to existing node in modifiedState
             parsedModifiedState.nodes[props.nodeId].consumerData = {
-                type: payload.type,
+                template: payload.template,
                 name: payload.name,
-                isServer: payload.isServer,
-                isClient: payload.isClient,
                 language: payload.language,
-                url: payload.url
-            }
+                // isServer: payload.isServer,
+                // isClient: payload.isClient,
+                serverTypes: payload.serverTypes
+            };
         }
-        const nodeElement = document.getElementById(props.nodeId);
-        nodeElement.style.backgroundImage = `url('${payload.url}')`;
+        // image to node display
+        // const nodeElement = document.getElementById(props.nodeId);
+        // nodeElement.style.backgroundImage = `url('${payload.url}')`;
         // update modifiedState in the localstorage
-        setModifiedState(JSON.stringify(parsedModifiedState))
+        setModifiedState(JSON.stringify(parsedModifiedState));
         setPayload({
             name: "",
-            type: "",
+            template: "",
             language: "",
-            url: "",
-            isClient: false,
-            isServer: false,
-            resources: []
-        })
-        props.onClose()
-    }
+            serverTypes: [],
+            // isClient: false,
+            // isServer: false,
+        });
+        props.onClose();
+    };
 
-    const handleTypeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleTemplateChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setPayload({
             ...payload,
-            type: event.target.value
+            template: event.target.value
         });
     };
 
@@ -98,28 +96,28 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const handleIsClientChange = (event: ChangeEvent<HTMLInputElement>) => {
+    // const handleIsClientChange = (event: ChangeEvent<HTMLInputElement>) => {
+    //     setPayload({
+    //         ...payload,
+    //         isClient: event.target.checked
+    //     });
+    // };
+
+    // const handleIsServerChange = (event: ChangeEvent<HTMLInputElement>) => {
+    //     setPayload({
+    //         ...payload,
+    //         isServer: event.target.checked
+    //     });
+    // };
+
+    const handleServerTypesChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setPayload({
             ...payload,
-            isClient: event.target.checked
+            serverTypes: event.target.value
         });
     };
 
-    const handleIsServerChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setPayload({
-            ...payload,
-            isServer: event.target.checked
-        });
-    };
-
-    const handleUrlChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setPayload({
-            ...payload,
-            url: event.target.value
-        });
-    };
-
-    const languages = ["NodeJs", "Java", "Golang"]
+    const languages = [/*"NodeJs", "Java", */"Golang"];
     return <React.Fragment>
         <Dialog open={props.isOpen} onClose={props.onClose}>
             <DialogTitle>Node Properties : {props.nodeId}</DialogTitle>
@@ -141,11 +139,12 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         required
                         size="medium"
                         margin="dense"
-                        id="type"
-                        label="Type of Component"
+                        id="template"
+                        label="Template for Component"
                         type="text"
-                        value={payload.type}
-                        onChange={handleTypeChange}
+                        disabled
+                        value={payload.template}
+                        onChange={handleTemplateChange}
                         variant="outlined"
                     />
                     <TextField
@@ -159,39 +158,39 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         value={payload.language}
                         onChange={handleLanguageChange}
                         variant="outlined">
-                        <MenuItem value="">
-                            <em>Create new</em>
-                        </MenuItem>
+                        {/*<MenuItem value="">*/}
+                        {/*    <em>Create new</em>*/}
+                        {/*</MenuItem>*/}
                         {languages.map((language: string) => (
                             <MenuItem key={language} value={language}>
                                 {language}
                             </MenuItem>
                         ))}
                     </TextField>
-                    <FormControlLabel
-                        label="Is Server?"
-                        control={<Checkbox
-                            size="medium"
-                            checked={payload.isServer}
-                            onChange={handleIsServerChange}
-                        />}
-                    />
-                    <FormControlLabel
-                        label="Is Client?"
-                        control={<Checkbox
-                            size="medium"
-                            checked={payload.isClient}
-                            onChange={handleIsClientChange}
-                        />}
-                    />
+                    {/*<FormControlLabel*/}
+                    {/*    label="Is Server?"*/}
+                    {/*    control={<Checkbox*/}
+                    {/*        size="medium"*/}
+                    {/*        checked={payload.isServer}*/}
+                    {/*        onChange={handleIsServerChange}*/}
+                    {/*    />}*/}
+                    {/*/>*/}
+                    {/*<FormControlLabel*/}
+                    {/*    label="Is Client?"*/}
+                    {/*    control={<Checkbox*/}
+                    {/*        size="medium"*/}
+                    {/*        checked={payload.isClient}*/}
+                    {/*        onChange={handleIsClientChange}*/}
+                    {/*    />}*/}
+                    {/*/>*/}
                     <TextField
                         size="medium"
                         margin="dense"
-                        id="url"
-                        label="Url"
+                        id="serverTypes"
+                        label="Server Types"
                         type="text"
-                        value={payload.url}
-                        onChange={handleUrlChange}
+                        value={payload.serverTypes}
+                        onChange={handleServerTypesChange}
                         variant="outlined"
                     />
                 </Stack>
@@ -200,8 +199,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
                 <Button variant="contained"
                         onClick={handleUpdate}
-                        disabled={payload.name === "" || payload.type === "" || payload.language === ""}>Update</Button>
+                        disabled={payload.name === "" || payload.language === ""}>Update</Button>
             </DialogActions>
         </Dialog>
     </React.Fragment>;
-}
+};

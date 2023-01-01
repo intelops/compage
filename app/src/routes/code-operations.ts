@@ -15,6 +15,23 @@ const tar = require('tar')
 const codeOperationsRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
 
+function getFormattedJsonString(formattedJsonString: string) {
+    if (!formattedJsonString){
+        return formattedJsonString;
+    }
+    const formattedJson = JSON.parse(formattedJsonString)
+    console.log(formattedJson.nodes);
+    for (let key in formattedJson.nodes) {
+        let serverTypes = formattedJson.nodes[key].consumerData.serverTypes;
+        formattedJson.nodes[key].consumerData.serverTypes = JSON.parse(serverTypes);
+    }
+    for (let key in formattedJson.edges) {
+        let clientTypes = formattedJson.edges[key].consumerData.clientTypes;
+        formattedJson.edges[key].consumerData.clientTypes = JSON.parse(clientTypes);
+    }
+    return JSON.stringify(formattedJson);
+}
+
 // generateCode (grpc calls to core)
 codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (request, resource) => {
     // TODO the below || op is not required, as the check is already done in middleware.
@@ -62,10 +79,11 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
 
     // save project metadata (in compage db or somewhere)
     // need to save project-name, compage-json version, github repo and latest commit to the db
+    const formattedJsonString = getFormattedJsonString(projectResource.spec.json);
     const payload: Project = {
         projectName: projectResource.spec.displayName,
         userName: projectResource.spec.user.name,
-        json: projectResource.spec.json,
+        json: formattedJsonString,
         repositoryName: projectResource.spec.repository.name,
         metadata: projectResource.spec.metadata
     }
@@ -120,7 +138,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
 
             // save to GitHub
             const pushToExistingProjectOnGithubRequest: PushToExistingProjectOnGithubRequest = {
-                generatedProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
+                generatedProjectPath: `${downloadedProjectPath}` +"/"+ `${projectResource.metadata.name}_downloaded`,
                 existingProject: cloneExistingProjectFromGithubRequest.clonedProjectPath + "/" + projectResource.spec.repository?.name,
                 userName: projectResource.spec.user.name,
                 email: projectResource.spec.user.email,
