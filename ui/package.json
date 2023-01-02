@@ -50,7 +50,6 @@
     "start": "HOST=0.0.0.0 PORT=3001 react-scripts start",
     "k8s-start": "PORT=3000 react-scripts start",
     "build": "react-app-env --env-file=.env.development build",
-    "build:staging": "react-app-env --env-file=.env.staging build",
     "build:production": "react-app-env --env-file=.env.production build",
     "test": "react-app-env --env-file=.env.development test",
     "eject": "react-scripts eject",

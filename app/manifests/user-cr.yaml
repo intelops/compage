@@ -1,8 +1,0 @@
-apiVersion: compage.kube-tarian.github.com/v1alpha1
-kind: User
-metadata:
-  name: mahendraintelops
-  namespace: compage
-spec:
-  email: mahendra.b@intelops.dev
-  token: ddaddadaadada
