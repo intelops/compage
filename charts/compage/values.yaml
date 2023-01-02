@@ -1,7 +1,7 @@
 ## Define serviceAccount names for components. Defaults to component's fully qualified name.
 githubApp:
   # update below value cluster's node ip and with port specified here (.Values.ui.service.nodePort)
-  redirectURI: "http://192.168.49.2:32222/login"
+  redirectURI: "http://www.compage.io:32222/login"
   clientId: "NWY4YjgyMDhmZmEwMDAzMTZkMmQ="
   clientSecret: "ZTk2NDNhMmI3MjI0MmUzYjE5YzQyYTM4N2ZhM2Y1YTAyMDVmMzY4YQ=="
 
@@ -18,10 +18,11 @@ app:
     annotations: {}
   image:
     repository: ghcr.io/mahendraintelops/compage/app
-    pullPolicy: Never
+    pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
-  imagePullSecrets: []
+  imagePullSecrets:
+  - name: "compage-pull-secret"
   nameOverride: "app"
   fullnameOverride: ""
   podAnnotations: {}
@@ -68,10 +69,11 @@ core:
     annotations: {}
   image:
     repository: ghcr.io/mahendraintelops/compage/core
-    pullPolicy: Never
+    pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
-  imagePullSecrets: []
+  imagePullSecrets:
+  - name: "compage-pull-secret"
   nameOverride: "core"
   fullnameOverride: ""
 
@@ -118,10 +120,11 @@ ui:
     annotations: {}
   image:
     repository: ghcr.io/mahendraintelops/compage/ui
-    pullPolicy: Never
+    pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
-  imagePullSecrets: []
+  imagePullSecrets:
+  - name: "compage-pull-secret"
   nameOverride: "ui"
   fullnameOverride: ""
   ingress:
@@ -141,7 +144,7 @@ ui:
     #      - chart-example.local
   compageApp:
 #   update below value cluster's node ip and with port specified here (.Values.app.service.nodePort)
-    serverUrl: http://192.168.49.2:31111
+    serverUrl: http://www.compage.io:31111
   podAnnotations: {}
 
   podSecurityContext: {}
