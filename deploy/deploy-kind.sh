@@ -1,3 +1,5 @@
+#!/bin/bash
+
 source ./create-kind-cluster.sh
 source ./build-docker-images.sh
 

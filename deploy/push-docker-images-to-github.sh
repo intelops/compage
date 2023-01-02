@@ -1,4 +1,6 @@
-source ./build-docker-images.sh
+#!/bin/bash
+
+source build-docker-images.sh
 
 # push docker images for core, app and ui
 docker push $CORE_IMAGE
