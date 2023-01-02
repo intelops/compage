@@ -1,7 +1,7 @@
 ## Define serviceAccount names for components. Defaults to component's fully qualified name.
 githubApp:
   # update below value cluster's node ip and with port specified here (.Values.ui.service.nodePort)
-  redirectURI: "http://172.20.0.2:32222/login"
+  redirectURI: "http://192.168.49.2:32222/login"
   clientId: "NWY4YjgyMDhmZmEwMDAzMTZkMmQ="
   clientSecret: "ZTk2NDNhMmI3MjI0MmUzYjE5YzQyYTM4N2ZhM2Y1YTAyMDVmMzY4YQ=="
 
@@ -18,7 +18,7 @@ app:
     annotations: {}
   image:
     repository: ghcr.io/mahendraintelops/compage/app
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
   imagePullSecrets: []
@@ -68,7 +68,7 @@ core:
     annotations: {}
   image:
     repository: ghcr.io/mahendraintelops/compage/core
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
   imagePullSecrets: []
@@ -118,7 +118,7 @@ ui:
     annotations: {}
   image:
     repository: ghcr.io/mahendraintelops/compage/ui
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
   imagePullSecrets: []
@@ -141,7 +141,7 @@ ui:
     #      - chart-example.local
   compageApp:
 #   update below value cluster's node ip and with port specified here (.Values.app.service.nodePort)
-    serverUrl: http://172.20.0.2:31111
+    serverUrl: http://192.168.49.2:31111
   podAnnotations: {}
 
   podSecurityContext: {}
