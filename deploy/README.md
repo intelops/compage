@@ -39,3 +39,75 @@ kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-core
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-app
 ```
 9. Go to  http://www.compage.io:32222 
+
+
+10. Use below format for serverTypes and clientTypes
+
+```text
+======================================
+node1
+server1
+serverTypes
+======================================
+[
+  {
+    "protocol": "REST",
+    "port": "9999",
+    "framework": "net/http",
+    "resources": [
+      {
+        "Name": "User",
+        "Fields": {
+          "id": "string",
+          "name": "string",
+          "city": "string",
+          "mobileNumber": "string"
+        }
+      },
+      {
+        "Name": "Account",
+        "Fields": {
+          "id": "string",
+          "branch": "string",
+          "city": "string"
+        }
+      }
+    ]
+  }
+]
+
+======================================
+node2
+server2
+serverTypes
+======================================
+[
+  {
+    "protocol": "REST",
+    "port": "9990",
+    "framework": "net/http",
+    "resources": [
+      {
+        "Name": "Device",
+        "Fields": {
+          "id": "string",
+          "name": "string",
+          "network": "string"
+        }
+      }
+    ]
+  }
+]
+======================================
+server1<= server2
+edge
+clientTypes
+======================================
+[
+  {
+    "port": "9999",
+    "protocol": "REST"
+  }
+]
+======================================
+```
