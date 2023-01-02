@@ -116,7 +116,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             name: authData.login
         }
         const repository: Repository = {
-            branch: data.repositoryBranch || 'main',
+            branch: data.repositoryBranch || 'compage',
             name: data.repositoryName,
             tag: "v1"
         }

@@ -13,7 +13,7 @@ import {
 // convertProjectEntityToProjectResourceSpec creates projectResourceSpec on k8s cluster.
 const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: string, projectEntity: ProjectEntity) => {
     const repository: Repository = {
-        branch: projectEntity.repository?.branch ? projectEntity.repository.branch : "master",
+        branch: projectEntity.repository?.branch ? projectEntity.repository.branch : "compage",
         name: projectEntity.displayName,
         tag: ""
     }

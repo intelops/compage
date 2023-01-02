@@ -15,7 +15,7 @@ const tar = require('tar')
 const codeOperationsRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
 
-function getFormattedJsonString(formattedJsonString: string) {
+const getFormattedJsonString = (formattedJsonString: string) => {
     if (!formattedJsonString) {
         return formattedJsonString;
     }
@@ -23,7 +23,7 @@ function getFormattedJsonString(formattedJsonString: string) {
     for (let key in formattedJson.nodes) {
         let serverTypes = formattedJson.nodes[key].consumerData.serverTypes;
         console.log("serverTypes1 : ", serverTypes)
-        if (serverTypes && serverTypes !== "[]"){
+        if (serverTypes && serverTypes !== "[]") {
             console.log("serverTypes2 : ", serverTypes)
             formattedJson.nodes[key].consumerData.serverTypes = JSON.parse(serverTypes);
         }
