@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kube-tarian/compage/core/internal/core"
+	"github.com/kube-tarian/compage/core/internal/core/node"
 	"github.com/kube-tarian/compage/core/internal/languages"
 	"golang.org/x/exp/maps"
 )
@@ -72,26 +73,49 @@ func GetCompageJson(jsonString string) (*core.CompageJson, error) {
 // validate validates edges and nodes in compage json.
 func validate(compageJson *core.CompageJson) error {
 	// validations on node fields and setting default values.
-	for _, node := range compageJson.Nodes {
+	compageJson = populateExternalNodeInEdges(compageJson)
+	for _, n := range compageJson.Nodes {
 		// name can't be empty for node
-		if node.ConsumerData.Name == "" {
+		if n.ConsumerData.Name == "" {
 			return fmt.Errorf("name should not be empty")
 		}
 		// set default language as go
-		if node.ConsumerData.Language == "" {
-			node.ConsumerData.Language = languages.Go
+		if n.ConsumerData.Language == "" {
+			n.ConsumerData.Language = languages.Go
 		}
 		// set default template as compage
-		if node.ConsumerData.Template == "" {
-			node.ConsumerData.Template = languages.Compage
+		if n.ConsumerData.Template == "" {
+			n.ConsumerData.Template = languages.Compage
 		}
 	}
-
+	for _, e := range compageJson.Edges {
+		if e.ConsumerData.ExternalNodeName == "" {
+			return fmt.Errorf("externalNodeName should not be empty")
+		}
+	}
 	// no need to populate port in individual edge as we need to have that validation on ui itself.
 	// Reasons 1. user may use grpc protocol when the src node doesn't have one. We need to show the protocols in
 	// edge dropdown based on the server configs on src node :D
 
 	return nil
+}
+
+func populateExternalNodeInEdges(compageJson *core.CompageJson) *core.CompageJson {
+	for _, edge := range compageJson.Edges {
+		if edge.ConsumerData.ExternalNodeName == "" {
+			edge.ConsumerData.ExternalNodeName = getExternalNodeForEdge(edge.Src, compageJson.Nodes)
+		}
+	}
+	return compageJson
+}
+
+func getExternalNodeForEdge(src string, nodes []*node.Node) string {
+	for _, n := range nodes {
+		if src == n.ID {
+			return n.ConsumerData.Name
+		}
+	}
+	return ""
 }
 
 // GetMetadata converts string to map
