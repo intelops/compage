@@ -99,8 +99,7 @@ export interface GenerateCodeError {
 }
 
 export interface CreateProjectResponse {
-    projectId: string,
-    userName: string,
+    project: ProjectEntity,
     message: string,
 }
 
@@ -109,8 +108,7 @@ export interface CreateProjectError {
 }
 
 export interface UpdateProjectResponse {
-    projectId: string,
-    userName: string,
+    project: ProjectEntity,
     message: string,
 }
 

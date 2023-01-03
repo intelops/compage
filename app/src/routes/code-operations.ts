@@ -22,9 +22,7 @@ const getFormattedJsonString = (formattedJsonString: string) => {
     const formattedJson = JSON.parse(formattedJsonString)
     for (let key in formattedJson.nodes) {
         let serverTypes = formattedJson.nodes[key].consumerData.serverTypes;
-        console.log("serverTypes1 : ", serverTypes)
         if (serverTypes && serverTypes !== "[]") {
-            console.log("serverTypes2 : ", serverTypes)
             formattedJson.nodes[key].consumerData.serverTypes = JSON.parse(serverTypes);
         }
     }
@@ -54,7 +52,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
         const message = `unable to generate code, no project found for id: ${projectId}`
         return resource.status(500).json(getGenerateCodeError(message));
     }
-    console.log("nodes length :", JSON.parse(projectResource.spec.json).nodes);
+
     if (!projectResource.spec.json
         || projectResource.spec.json === "{}"
         || projectResource.spec.json.length === 0

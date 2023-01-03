@@ -4,7 +4,8 @@ import {createProject, deleteProject, getProject, listProjects, updateProject} f
 import {X_USER_NAME_HEADER} from "../util/constants";
 import {
     CreateProjectError,
-    CreateProjectResponse, DeleteProjectError,
+    CreateProjectResponse,
+    DeleteProjectError,
     ProjectEntity,
     UpdateProjectError,
     UpdateProjectResponse
@@ -96,7 +97,7 @@ const addToGithub = (projectEntity: ProjectEntity, response: Response) => {
         // console.log("commitCompageJson Response: ", resp.data);
         const message = `The .compage/config.json in Repository for '${projectEntity.displayName}' is committed, ${projectEntity.displayName}[${projectEntity.id}] project is created successfully.`;
         console.log(message);
-        return response.status(200).json(getCreateProjectResponse(projectEntity.user.name, projectEntity.id, message));
+        return response.status(200).json(getCreateProjectResponse(projectEntity, message));
     }).catch(error => {
         const errorObject = JSON.parse(JSON.stringify(error));
         const message = `The .compage/config.json in Repository for '${projectEntity.displayName}' couldn't be committed. Received error code while committing .compage/config.json in Github Repository: ${errorObject.status}`
@@ -126,7 +127,7 @@ const updateToGithub = (projectEntity: ProjectEntity, response: Response) => {
                 console.log("commitCompageJson Response: ", resp.data);
                 const message = `An update to .compage/config.json in Repository for '${projectEntity.displayName}' is committed, '${projectEntity.displayName}' is updated successfully`;
                 console.log(message);
-                return response.status(200).json(getUpdateProjectResponse(projectEntity.user.name, projectEntity.id, message));
+                return response.status(200).json(getUpdateProjectResponse(projectEntity, message));
             }).catch(error => {
                 const errorObject = JSON.parse(JSON.stringify(error));
                 const message = `An update to .compage/config.json in Repository for '${projectEntity.displayName}' couldn't be committed. Received error code while committing .compage/config.json in Github Repository: ${errorObject.status}`
@@ -192,10 +193,9 @@ const createOnGithub = (projectEntity: ProjectEntity, response: Response) => {
         });
 }
 
-const getCreateProjectResponse = (userName: string, projectId: string, message: string) => {
+const getCreateProjectResponse = (projectEntity: ProjectEntity, message: string) => {
     const createProjectResponse: CreateProjectResponse = {
-        userName: userName,
-        projectId: projectId,
+        project: projectEntity,
         message: message,
     }
     return createProjectResponse;
@@ -208,10 +208,9 @@ const getCreateProjectError = (message: string) => {
     return createProjectError;
 }
 
-const getUpdateProjectResponse = (userName: string, projectId: string, message: string) => {
+const getUpdateProjectResponse = (projectEntity: ProjectEntity, message: string) => {
     const updateProjectResponse: UpdateProjectResponse = {
-        userName: userName,
-        projectId: projectId,
+        project: projectEntity,
         message: message,
     }
     return updateProjectResponse;
