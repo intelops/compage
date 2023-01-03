@@ -28,14 +28,20 @@ export const GenerateCode = () => {
     };
 
     const isDisabled = () => {
-        const removeUnwantedKeyUpdateProject = removeUnwantedKeys(JSON.parse(JSON.stringify(updateProjectData.project.json)));
-        const removeUnwantedKeyGetProject = removeUnwantedKeys(JSON.parse(JSON.stringify(getProjectData.json)));
         const removeUnwantedKeysGetCurrentState = removeUnwantedKeys(getCurrentState());
-        if (_.isEqual(removeUnwantedKeyUpdateProject, removeUnwantedKeysGetCurrentState)) {
-            return false;
+
+        if (updateProjectData?.project?.json) {
+            const removeUnwantedKeyUpdateProject = removeUnwantedKeys(JSON.parse(JSON.stringify(updateProjectData.project.json)));
+            if (_.isEqual(removeUnwantedKeyUpdateProject, removeUnwantedKeysGetCurrentState)) {
+                return false;
+            }
         }
-        if (_.isEqual(removeUnwantedKeyGetProject, removeUnwantedKeysGetCurrentState)) {
-            return false;
+
+        if (getProjectData?.json) {
+            const removeUnwantedKeyGetProject = removeUnwantedKeys(JSON.parse(JSON.stringify(getProjectData.json)));
+            if (_.isEqual(removeUnwantedKeyGetProject, removeUnwantedKeysGetCurrentState)) {
+                return false;
+            }
         }
         return true;
     };
