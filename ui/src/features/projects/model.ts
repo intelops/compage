@@ -1,6 +1,17 @@
+// ProjectEntity is for transferring info about projects from client to server
+export interface ProjectEntity {
+    id: string,
+    displayName: string,
+    version: string,
+    user: User,
+    json: string,
+    repository: Repository,
+    // TODO temporary made optional.
+    metadata?: Map<string, string>
+}
+
 export interface CreateProjectResponse {
-    projectId: string,
-    userName: string,
+    project: ProjectEntity,
     message: string,
 }
 
@@ -10,14 +21,7 @@ export type CreateProjectError = {
 };
 
 // create project models
-export interface CreateProjectRequest {
-    id?: string,
-    displayName: string,
-    version: string,
-    user: User,
-    json: string,
-    repository: Repository,
-    metadata?: Map<string, string>
+export interface CreateProjectRequest extends ProjectEntity {
 }
 
 export interface Repository {
@@ -33,14 +37,7 @@ export interface User {
 
 // listProjects models (the structure matches as of now with CreateProjectRequest but have kept it
 // separate for future customizations)
-export interface ListProjectsResponse {
-    id: string,
-    displayName: string,
-    version: string,
-    user: User,
-    json: string,
-    repository: Repository,
-    metadata: Map<string, string>
+export interface ListProjectsResponse extends ProjectEntity {
 }
 
 export interface ListProjectsRequest {
@@ -53,14 +50,7 @@ export type ListProjectsError = {
 
 // getProject models (the structure matches as of now with CreateProjectRequest but have kept it
 // separate for future customizations)
-export interface GetProjectResponse {
-    id: string,
-    displayName: string,
-    version: string,
-    user: User,
-    json: string,
-    repository: Repository,
-    metadata: Map<string, string>
+export interface GetProjectResponse extends ProjectEntity {
 }
 
 export interface GetProjectRequest {
@@ -75,19 +65,11 @@ export type GetProjectError = {
 // updateProject models (the structure matches as of now with UpdateProjectRequest but have kept it
 // separate for future customizations)
 export interface UpdateProjectResponse {
-    projectId: string,
-    userName: string,
+    project: ProjectEntity,
     message: string,
 }
 
-export interface UpdateProjectRequest {
-    id: string,
-    displayName?: string,
-    version?: string,
-    user?: User,
-    json: string,
-    repository?: Repository,
-    metadata?: Map<string, string>
+export interface UpdateProjectRequest extends ProjectEntity {
 }
 
 // This type describes the error object structure:

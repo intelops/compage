@@ -124,6 +124,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
         const displayName = data.projectName;
         const metadata = data.metadata;
         const cPR: CreateProjectRequest = {
+            id: "",
             metadata,
             version: "v1",
             repository,

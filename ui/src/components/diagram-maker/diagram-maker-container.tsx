@@ -57,9 +57,8 @@ import {NewNodeProperties} from "./new-properties/new-node-properties";
 import JSONPretty from "react-json-pretty";
 import Button from "@mui/material/Button";
 import {ButtonsPanel} from "./buttons-panel";
-import {GetProjectRequest, UpdateProjectRequest} from "../../features/projects/model";
+import {UpdateProjectRequest} from "../../features/projects/model";
 import {updateProjectAsync} from "../../features/projects/async-apis/updateProject";
-import {getProjectAsync} from "../../features/projects/async-apis/getProject";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {selectGetProjectData} from "../../features/projects/slice";
 import {cleanse, removeUnwantedKeys} from "./helper/helper";
@@ -91,6 +90,17 @@ export const DiagramMakerContainer = ({
     const diagramMakerRef = useRef() as any;
     const dispatch = useAppDispatch();
     const getProjectData = useAppSelector(selectGetProjectData);
+
+    // handle ctrl+s in window
+    const handleKeyDown = (event) => {
+        event.preventDefault();
+        let charCode = String.fromCharCode(event.which).toLowerCase();
+        if ((event.ctrlKey || event.metaKey) && (charCode === 's' || charCode === 'S')) {
+            // update details to localstorage client
+            setCurrentConfig(diagramMaker.config);
+            setCurrentState(JSON.stringify(cleanse(diagramMaker.state)));
+        }
+    }
 
     const [diagramMaker, setDiagramMaker] = React.useState({
         state: "{}",
@@ -387,6 +397,10 @@ export const DiagramMakerContainer = ({
             setCurrentState(diagramMaker.state);
             const prepareUpdateProjectRequest = () => {
                 const uPR: UpdateProjectRequest = {
+                    displayName: getProjectData.displayName,
+                    repository: getProjectData.repository,
+                    user: getProjectData.user,
+                    version: getProjectData.version,
                     id: currentProject,
                     json: getCurrentState()
                 };
@@ -396,23 +410,7 @@ export const DiagramMakerContainer = ({
             const updateProjectRequest: UpdateProjectRequest = prepareUpdateProjectRequest();
             dispatch(updateProjectAsync(updateProjectRequest));
         }
-
-        // TODO the below is needed to update the getProject state.
-        if (getProjectData.projectId) {
-            const getProjectRequest: GetProjectRequest = {
-                id: getProjectData.id
-            };
-            dispatch(getProjectAsync(getProjectRequest));
-        }
     };
-
-    function getJSONData(state: string) {
-        if (!state || state === "{}") {
-            // happens at the beginning with value "{}"
-            return JSON.parse("{}");
-        }
-        return JSON.parse(state);
-    }
 
     return <Grid container spacing={1} sx={{height: '100%'}}>
         <Grid item xs={10} md={10} style={{
@@ -423,7 +421,7 @@ export const DiagramMakerContainer = ({
             paddingLeft: "8px",
         }}>
             {showDialog()}
-            <div style={{
+            <div onKeyDown={handleKeyDown} contentEditable={false} style={{
                 width: "100%",
                 height: "100%",
                 overflow: "auto",

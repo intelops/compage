@@ -45,7 +45,7 @@ export const cleanse = (state: string) => {
     return stateJson;
 }
 
-export const removeUnwantedKeys = (state: string) => {
+export const removeUnwantedKeys = (state: any) => {
     if (!state || state === "{}") {
         // happens at the beginning with value "{}"
         return state;
