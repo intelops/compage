@@ -111,3 +111,41 @@ clientTypes
 ]
 ======================================
 ```
+
+
+## Release new helm version [for developers only]
+```shell
+cd charts
+#update chart version by updating Chart.yaml
+helm package compage
+helm repo index .
+git add .
+git commit -m "new chart version"
+git push
+```
+
+## Install from published chart
+```shell
+minikube start
+kubectl create ns compage
+kubectl config set-context --current --namespace=compage
+kubectl create secret docker-registry compage-pull-secret --docker-server=ghcr.io --docker-username=mahendraintelops --docker-password=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 --docker-email=mahendra.b@intelops.dev
+minikube ip
+```
+
+### update minikube ip in /etc/hosts. minikube_ip (retrieved by minikube ip command) www.compage.io
+
+## Install latest version from github helm repo
+```shell
+GITHUB_TOKEN="" # ask Mahendra for token
+helm repo remove kube-tarian
+helm repo add "kube-tarian" --username $GITHUB_TOKEN --password $GITHUB_TOKEN "https://raw.githubusercontent.com/kube-tarian/compage/main/charts"
+helm pull kube-tarian/compage --username $GITHUB_TOKEN --password $GITHUB_TOKEN
+helm install compage kube-tarian/compage --values charts/compage/values.yaml
+kubectl get pods -n compage
+
+kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-ui
+kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-core
+kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-app
+```
+### Go to http://www.compage.io:32222
