@@ -3,6 +3,7 @@ import {GetProjectError, GetProjectRequest, GetProjectResponse} from "../model";
 import {getProject} from "../api";
 import {toastr} from 'react-redux-toastr';
 import {setCurrentConfig, setCurrentProject, setCurrentState} from "../../../utils/localstorage-client";
+import {updateModifiedState} from "./populateModifiedState";
 
 export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRequest, { rejectValue: GetProjectError }>(
     'projects/getProject',
@@ -25,6 +26,10 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
             setCurrentConfig(getProjectResponse.json);
             setCurrentState(getProjectResponse.json);
             setCurrentProject(getProjectResponse.id);
+            // set the modified state when the project is fetched. This is required when user logged out after adding
+            // properties to nodes and edges. After re-login, the modified state is lost and user can't see props
+            // added to nodes and edges.
+            updateModifiedState(getProjectResponse);
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;

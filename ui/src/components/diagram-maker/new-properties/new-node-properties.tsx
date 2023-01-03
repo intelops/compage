@@ -9,7 +9,7 @@ import {setModifiedState} from "../../../utils/localstorage-client";
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
-import {Checkbox, FormControlLabel, Stack} from "@mui/material";
+import {Stack} from "@mui/material";
 
 interface NewNodePropertiesProps {
     isOpen: boolean,
