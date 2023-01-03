@@ -34,14 +34,14 @@ export const getData = (parentWidth, parentHeight) => {
         panels: {
             library: {
                 id: 'library',
-                position: {x: 0, y: 0},
+                position: {x: 0, y: window.innerHeight/4},
                 size: {width: 35, height: 310},
                 positionAnchor: PositionAnchor.TOP_LEFT,
             },
             tools: {
                 id: 'tools',
-                position: {x: 0, y: 0},
-                size: {width: 35, height: 290},
+                position: {x: 0, y: window.innerHeight/4},
+                size: {width: 35, height: 310},
                 positionAnchor: PositionAnchor.TOP_RIGHT,
             },
         },

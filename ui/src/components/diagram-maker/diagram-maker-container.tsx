@@ -418,13 +418,15 @@ export const DiagramMakerContainer = ({
         <Grid item xs={10} md={10} style={{
             width: "100%",
             // TODO added 100% to take the whole webpage
-            // height: window.innerHeight - 150
-            height: "100%"
+            height: "100%",
+            paddingTop: "72px",
+            paddingLeft: "8px",
         }}>
             {showDialog()}
             <div style={{
+                width: "100%",
+                height: "100%",
                 overflow: "auto",
-                paddingTop: "75px"
             }} id="diagramMakerContainer" ref={containerRef}></div>
         </Grid>
         <Grid item xs={2} md={2} style={{
@@ -433,10 +435,10 @@ export const DiagramMakerContainer = ({
         }}>
             <JSONPretty id="jsonPretty"
                         style={{
-                            width: "100%",
-                            overflowY: "scroll",
-                            height: "400px",
-                            paddingTop: "75px"
+                            width: "98%",
+                            overflowY: "auto",
+                            height: window.innerHeight / 2,
+                            paddingTop: "72px"
                         }}
                         onJSONPrettyError={e => console.error(e)}
                         data={removeUnwantedKeys(JSON.stringify(cleanse(diagramMaker.state)))}/>
