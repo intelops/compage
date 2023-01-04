@@ -4,6 +4,7 @@ import {Router} from "express";
 import {getToken, setToken} from "../util/user-store";
 import config from "../util/constants";
 import {requireUserNameMiddleware} from "../middlewares/auth";
+import {LoginError} from "./models";
 
 const authRouter = Router();
 
@@ -35,14 +36,20 @@ authRouter.post("/authenticate", async (req, res) => {
                 Authorization: `token ${access_token}`,
             },
         }).then((response) => {
-            setToken(response.data.login, response.data.email, <string>access_token)
-            console.log("User token retrieved")
-            return res.status(200).json(response.data);
+            setToken(response.data.login, response.data.email, <string>access_token).then(userResource => {
+                if (userResource.apiVersion) {
+                    console.log(userResource.metadata.name + " user updated")
+                    return res.status(200).json(response.data);
+                } else {
+                    console.log(response.data.login + " user couldn't be updated")
+                    return res.status(400).json(getLoginError("error occurred while updating user to k8s resource"));
+                }
+            });
         }).catch((error) => {
-            return res.status(400).json(error);
+            return res.status(400).json(getLoginError(JSON.stringify(error)));
         });
     }).catch((error) => {
-        return res.status(500).json(error);
+        return res.status(500).json(getLoginError(JSON.stringify(error)));
     });
 });
 
@@ -96,3 +103,7 @@ authRouter.get("/check_token", requireUserNameMiddleware, async (req, res) => {
 });
 
 export default authRouter;
+
+const getLoginError = (error: string): LoginError => {
+    return {message: error};
+}

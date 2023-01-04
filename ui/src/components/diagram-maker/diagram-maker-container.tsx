@@ -100,6 +100,9 @@ export const DiagramMakerContainer = ({
             setCurrentConfig(diagramMaker.config);
             setCurrentState(JSON.stringify(cleanse(diagramMaker.state)));
         }
+        if ((event.ctrlKey || event.metaKey) && (charCode === 'r' || charCode === 'R')) {
+            window.location.reload();
+        }
     }
 
     const [diagramMaker, setDiagramMaker] = React.useState({

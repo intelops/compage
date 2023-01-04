@@ -40,13 +40,7 @@ export const setToken = async (login: string, email: string, token: string) => {
         // we shouldn't change name as it will result in new user resource.
 
         // send spec only as the called method considers updating specs only.
-        const createdUserResource = await patchUserResource(NAMESPACE, existingUserResource.metadata.name, JSON.stringify(existingUserResource.spec));
-        if (createdUserResource.apiVersion) {
-            console.log(createdUserResource.metadata.name + " user updated")
-        } else {
-            console.log(existingUserResource.metadata.name + " user couldn't be updated")
-        }
-        return
+        return await patchUserResource(NAMESPACE, existingUserResource.metadata.name, JSON.stringify(existingUserResource.spec));
     }
 
     if (!email) {
@@ -54,12 +48,7 @@ export const setToken = async (login: string, email: string, token: string) => {
     }
     const newUserResourceSpec = convertStringsToUserResourceSpec(email, token);
     const newUserResource = prepareUserResource(login, newUserResourceSpec);
-    const createdUserResource = await createUserResource(NAMESPACE, JSON.stringify(newUserResource));
-    if (createdUserResource.apiVersion) {
-        console.log(createdUserResource.metadata.name + " user added")
-    } else {
-        console.log(newUserResource.metadata.name + " user couldn't be added")
-    }
+    return await createUserResource(NAMESPACE, JSON.stringify(newUserResource));
 }
 
 // getToken returns tokens

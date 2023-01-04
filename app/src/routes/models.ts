@@ -98,6 +98,10 @@ export interface GenerateCodeError {
     message: string,
 }
 
+export interface LoginError {
+    message: string,
+}
+
 export interface CreateProjectResponse {
     project: ProjectEntity,
     message: string,
