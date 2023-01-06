@@ -34,11 +34,19 @@ export const GenerateCode = () => {
             if (!name) {
                 return true;
             }
+            const serverTypes = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData.serverTypes
+            if (!serverTypes || serverTypes === "" || serverTypes === "[]") {
+                return true;
+            }
         }
         // edges
         for (let key in removeUnwantedKeysGetCurrentState.edges) {
             const name = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData.name
             if (!name) {
+                return true;
+            }
+            const clientTypes = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData.serverTypes
+            if (!clientTypes || clientTypes === "" || clientTypes === "[]") {
                 return true;
             }
         }
@@ -59,6 +67,7 @@ export const GenerateCode = () => {
             }
         }
 
+        //TODO this fails as there is no getProjectData call happening again since the beginning.
         if (getProjectData?.json) {
             const removeUnwantedKeyGetProject = removeUnwantedKeys(JSON.parse(JSON.stringify(getProjectData.json)));
             if (_.isEqual(removeUnwantedKeyGetProject, removeUnwantedKeysGetCurrentState)) {

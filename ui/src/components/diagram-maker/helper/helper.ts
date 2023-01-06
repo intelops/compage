@@ -66,6 +66,7 @@ export const removeUnwantedKeys = (state: any) => {
         delete diagramMakerData.size
         delete stateJson.diagramMakerData
         delete diagramMakerData.selected
+        delete diagramMakerData.dragging
     }
     // edges
     for (let key in stateJson.edges) {
@@ -73,6 +74,7 @@ export const removeUnwantedKeys = (state: any) => {
         delete diagramMakerData.position
         delete diagramMakerData.size
         delete diagramMakerData.selected
+        delete diagramMakerData.dragging
     }
     return stateJson;
 }
