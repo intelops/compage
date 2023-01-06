@@ -184,6 +184,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     {/*    />}*/}
                     {/*/>*/}
                     <TextField
+                        required
                         size="medium"
                         margin="dense"
                         id="serverTypes"
@@ -199,7 +200,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
                 <Button variant="contained"
                         onClick={handleUpdate}
-                        disabled={payload.name === "" || payload.language === ""}>Update</Button>
+                        disabled={payload.name === "" || payload.language === "" || payload.serverTypes === ""}>Update</Button>
             </DialogActions>
         </Dialog>
     </React.Fragment>;

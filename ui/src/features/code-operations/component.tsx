@@ -27,8 +27,30 @@ export const GenerateCode = () => {
         }
     };
 
+    const IsAnyRequiredValueMissingInOneOfNodes = (removeUnwantedKeysGetCurrentState: any) => {
+        //nodes
+        for (let key in removeUnwantedKeysGetCurrentState.nodes) {
+            const name = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData.name
+            if (!name) {
+                return true;
+            }
+        }
+        // edges
+        for (let key in removeUnwantedKeysGetCurrentState.edges) {
+            const name = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData.name
+            if (!name) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     const isDisabled = () => {
         const removeUnwantedKeysGetCurrentState = removeUnwantedKeys(getCurrentState());
+        if (IsAnyRequiredValueMissingInOneOfNodes(removeUnwantedKeysGetCurrentState)) {
+            //disable as required values are missing
+            return true;
+        }
 
         if (updateProjectData?.project?.json) {
             const removeUnwantedKeyUpdateProject = removeUnwantedKeys(JSON.parse(JSON.stringify(updateProjectData.project.json)));

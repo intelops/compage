@@ -20,7 +20,7 @@ minikube ip
 ```
 
 5. Update minikube ip in `/etc/hosts`.
-minikube_ip (retrieved by `minikube ip` command) www.compage.io
+minikube_ip (retrieved by `minikube ip` command) www.compage.dev
 
 6. Fire below command in root directory.
 ```shell
@@ -38,7 +38,7 @@ kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-ui
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-core
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-app
 ```
-9. Go to  http://www.compage.io:32222 
+9. Go to  http://www.compage.dev:32222 
 
 
 10. Use below format for serverTypes and clientTypes
@@ -133,7 +133,7 @@ kubectl create secret docker-registry compage-pull-secret --docker-server=ghcr.i
 minikube ip
 ```
 
-### update minikube ip in /etc/hosts. minikube_ip (retrieved by minikube ip command) www.compage.io
+### update minikube ip in /etc/hosts. minikube_ip (retrieved by minikube ip command) www.compage.dev
 
 ## Install latest version from github helm repo
 ```shell
@@ -148,4 +148,4 @@ kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-ui
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-core
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-app
 ```
-### Go to http://www.compage.io:32222
+### Go to http://www.compage.dev:32222

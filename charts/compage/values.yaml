@@ -1,9 +1,9 @@
 ## Define serviceAccount names for components. Defaults to component's fully qualified name.
 githubApp:
   # update below value cluster's node ip and with port specified here (.Values.ui.service.nodePort)
-  redirectURI: "http://www.compage.io:32222/login"
+  redirectURI: "http://www.compage.dev:32222/login"
   clientId: "NWY4YjgyMDhmZmEwMDAzMTZkMmQ="
-  clientSecret: "ZTk2NDNhMmI3MjI0MmUzYjE5YzQyYTM4N2ZhM2Y1YTAyMDVmMzY4YQ=="
+  clientSecret: "YmI0MTg5YmM5MjQ2MWY4YjZhM2UzNWZjMzFhYzFhMjVmYWUwMTE0Ngo="
 
 # TODO the below is not yet configurable. Code has direct references so, any change in below value will break the application.
 systemNamespace: compage
@@ -144,7 +144,7 @@ ui:
     #      - chart-example.local
   compageApp:
 #   update below value cluster's node ip and with port specified here (.Values.app.service.nodePort)
-    serverUrl: http://www.compage.io:31111
+    serverUrl: http://www.compage.dev:31111
   podAnnotations: {}
 
   podSecurityContext: {}

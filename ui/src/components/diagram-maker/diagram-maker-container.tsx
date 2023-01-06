@@ -62,6 +62,7 @@ import {updateProjectAsync} from "../../features/projects/async-apis/updateProje
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {selectGetProjectData} from "../../features/projects/slice";
 import {cleanse, removeUnwantedKeys} from "./helper/helper";
+import * as _ from "lodash";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -108,6 +109,7 @@ export const DiagramMakerContainer = ({
     const [diagramMaker, setDiagramMaker] = React.useState({
         state: "{}",
         copied: false,
+        saved: false,
         config: "{}"
     });
 
@@ -155,6 +157,12 @@ export const DiagramMakerContainer = ({
         }
     });
 
+    const isSaved = (cleansedState: any) => {
+        const removeUnwantedKeysGetCurrentState = removeUnwantedKeys(getCurrentState());
+        const removeUnwantedKeyCleansedState = removeUnwantedKeys(JSON.stringify(cleansedState));
+        return _.isEqual(removeUnwantedKeyCleansedState, removeUnwantedKeysGetCurrentState);
+    };
+
     const setData = (state: string, updateConfig = true) => {
         const backupState: string = state.slice();
         if (state) {
@@ -163,12 +171,14 @@ export const DiagramMakerContainer = ({
                 setDiagramMaker({
                     copied: false,
                     config: backupState,
+                    saved: isSaved(cleansedState),
                     state: JSON.stringify(cleansedState),
                 })
             } else {
                 setDiagramMaker({
                     ...diagramMaker,
                     copied: false,
+                    saved: isSaved(cleansedState),
                     state: JSON.stringify(cleansedState)
                 })
             }
