@@ -118,6 +118,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const languages = [/*"NodeJs", "Java", */"Golang"];
+    const handleAddPropertiesClick = () => {
+        console.log("clicked");
+    };
     return <React.Fragment>
         <Dialog open={props.isOpen} onClose={props.onClose}>
             <DialogTitle>Node Properties : {props.nodeId}</DialogTitle>
@@ -194,6 +197,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         onChange={handleServerTypesChange}
                         variant="outlined"
                     />
+                    <Button variant="outlined" color="secondary" onClick={handleAddPropertiesClick}>Add
+                        Properties</Button>
                 </Stack>
             </DialogContent>
             <DialogActions>
