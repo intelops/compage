@@ -218,6 +218,53 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
+    const handleIsGrpcServerChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setPayload({
+            ...payload,
+            isGrpcServer: event.target.checked
+        });
+    };
+
+    const getGrpcServerConfig = () => {
+        if (payload.isGrpcServer) {
+            return <React.Fragment>
+                <TextField
+                    required
+                    size="medium"
+                    margin="dense"
+                    id="grpcServerConfigPort"
+                    label="Port"
+                    type="text"
+                    value={payload.grpcServerConfig.port}
+                    onChange={handleGrpcServerConfigPortChange}
+                    variant="outlined"
+                />
+            </React.Fragment>;
+        }
+        return "";
+    };
+
+    const getGrpcServerCheck = () => {
+        return <React.Fragment>
+            <FormControlLabel
+                label="Grpc Server"
+                control={<Checkbox
+                    size="medium" checked={payload.isGrpcServer}
+                    onChange={handleIsGrpcServerChange}
+                />}
+            />
+        </React.Fragment>
+    };
+
+    const handleGrpcServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const grpcServerConfig = payload.grpcServerConfig;
+        grpcServerConfig.port = event.target.value;
+        setPayload({
+            ...payload,
+            grpcServerConfig
+        });
+    };
+
     const languages = [/*"NodeJs", "Java", */"Golang"];
     const handleAddPropertiesClick = () => {
         console.log("clicked");
@@ -273,7 +320,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     </TextField>
                     {getRestServerCheck()}
                     {getRestServerConfig()}
-
+                    {getGrpcServerCheck()}
+                    {getGrpcServerConfig()}
                     {/*<Button variant="outlined" color="secondary" onClick={handleAddPropertiesClick}>Add*/}
                     {/*    Properties</Button>*/}
                 </Stack>
