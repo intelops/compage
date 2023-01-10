@@ -26,7 +26,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         restServerPort: "",
         wsServerPort: "",
         grpcServerPort: "",
-        isWSServer: false,
+        isWsServer: false,
         isGrpcServer: false,
     });
 
@@ -47,7 +47,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             grpcConfig["port"] = payload.grpcServerPort;
             clientTypes.push(grpcConfig);
         }
-        if (payload.isWSServer) {
+        if (payload.isWsServer) {
             const wsConfig = {};
             wsConfig["protocol"] = "WS";
             wsConfig["port"] = payload.wsServerPort;
@@ -79,7 +79,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             restServerPort: "",
             isGrpcServer: false,
             grpcServerPort: "",
-            isWSServer: false,
+            isWsServer: false,
             wsServerPort: ""
         });
         props.onClose();
@@ -135,7 +135,6 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         return "";
     };
 
-
     const handleGrpcServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setPayload({
             ...payload,
@@ -179,6 +178,49 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         return "";
     };
 
+    const handleWsServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setPayload({
+            ...payload,
+            wsServerPort: event.target.value
+        });
+    };
+
+    const handleIsWsServerChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setPayload({
+            ...payload,
+            isWsServer: event.target.checked
+        });
+    };
+
+    const getWsServerCheck = () => {
+        return <React.Fragment>
+            <FormControlLabel
+                label="Ws Server"
+                control={<Checkbox
+                    size="medium" checked={payload.isWsServer}
+                    onChange={handleIsWsServerChange}
+                />}
+            />
+        </React.Fragment>
+    };
+
+    const getWsServerPort = () => {
+        if (payload.isWsServer) {
+            return <TextField
+                required
+                size="medium"
+                margin="dense"
+                id="wsServerPort"
+                label="WS Server Port"
+                type="text"
+                value={payload.wsServerPort}
+                onChange={handleWsServerPortChange}
+                variant="outlined"
+            />;
+        }
+        return "";
+    };
+
     return <React.Fragment>
         <Dialog open={props.isOpen} onClose={props.onClose}>
             <DialogTitle>Edge properties : {props.edgeId}</DialogTitle>
@@ -200,6 +242,8 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                     {getRestServerPort()}
                     {getGrpcServerCheck()}
                     {getGrpcServerPort()}
+                    {getWsServerCheck()}
+                    {getWsServerPort()}
                 </Stack>
             </DialogContent>
             <DialogActions>
