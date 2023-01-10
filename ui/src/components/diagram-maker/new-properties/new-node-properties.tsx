@@ -320,7 +320,10 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         <Dialog open={props.isOpen} onClose={props.onClose}>
             <DialogTitle>Node Properties : {props.nodeId}</DialogTitle>
             <Divider/>
-            <DialogContent>
+            <DialogContent style={{
+                height: "500px",
+                width: "450px"
+            }}>
                 <Stack direction="column" spacing={2}>
                     <TextField
                         required
@@ -369,8 +372,18 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     {getRestServerConfig()}
                     {getGrpcServerCheck()}
                     {getGrpcServerConfig()}
-                    {getWsServerCheck()}
-                    {getWsServerConfig()}
+                    <div style={{
+                        padding: "5px",
+                        borderRadius: "15px",
+                        border: payload.isWsServer ? '1px solid gray' : ''
+                    }}>
+                        {getWsServerCheck()}
+                        {getWsServerConfig()}
+                        {getWsServerConfig()}
+
+                        {getWsServerConfig()}
+
+                    </div>
                     {/*<Button variant="outlined" color="secondary" onClick={handleAddPropertiesClick}>Add*/}
                     {/*    Properties</Button>*/}
                 </Stack>
