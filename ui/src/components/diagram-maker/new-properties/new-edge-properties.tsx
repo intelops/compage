@@ -16,18 +16,48 @@ interface NewEdgePropertiesProps {
     onClose: () => void;
 }
 
+interface ClientTypesConfig {
+    isRestServer?: boolean;
+    restServerPort?: string;
+    isGrpcServer?: boolean;
+    grpcServerPort?: string;
+    isWsServer?: boolean;
+    wsServerPort?: string;
+}
+
+const getClientTypesConfig = (parsedModifiedState, edgeId): ClientTypesConfig => {
+    const clientTypes = parsedModifiedState.edges[edgeId]?.consumerData.clientTypes;
+    const clientTypesConfig = {};
+    if (clientTypes || clientTypes !== "[]") {
+        for (let i = 0; i < clientTypes.length; i++) {
+            if (clientTypes[i]["protocol"] === "REST") {
+                clientTypesConfig["isRestServer"] = true;
+                clientTypesConfig["restServerPort"] = clientTypes[i]["port"];
+            } else if (clientTypes[i]["protocol"] === "GRPC") {
+                clientTypesConfig["isGrpcServer"] = true;
+                clientTypesConfig["grpcServerPort"] = clientTypes[i]["port"];
+            } else if (clientTypes[i]["protocol"] === "WS") {
+                clientTypesConfig["isWsServer"] = true;
+                clientTypesConfig["wsServerPort"] = clientTypes[i]["port"];
+            }
+        }
+    }
+    return clientTypesConfig;
+};
+
 export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     const parsedModifiedState = getParsedModifiedState();
+    const clientTypesConfig: ClientTypesConfig = getClientTypesConfig(parsedModifiedState, props.edgeId);
 
     const [payload, setPayload] = React.useState({
         name: parsedModifiedState.edges[props.edgeId]?.consumerData.name !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData.name : "",
         // clientTypes: parsedModifiedState.edges[props.edgeId]?.consumerData.clientTypes !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData.clientTypes : [],
-        isRestServer: false,
-        restServerPort: "",
-        wsServerPort: "",
-        grpcServerPort: "",
-        isWsServer: false,
-        isGrpcServer: false,
+        isRestServer: clientTypesConfig.isRestServer,
+        restServerPort: clientTypesConfig.restServerPort,
+        isGrpcServer: clientTypesConfig.isGrpcServer,
+        grpcServerPort: clientTypesConfig.grpcServerPort,
+        isWsServer: clientTypesConfig.isWsServer,
+        wsServerPort: clientTypesConfig.wsServerPort,
     });
 
     // TODO this is a hack as there is no EDGE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
