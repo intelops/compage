@@ -25,8 +25,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         name: parsedModifiedState.nodes[props.nodeId]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.name : "",
         template: parsedModifiedState.nodes[props.nodeId]?.consumerData.template !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.template : "compage",
         language: parsedModifiedState.nodes[props.nodeId]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.language : "",
-        // isServer: parsedModifiedState.nodes[props.nodeId]?.consumerData.isServer !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.isServer : false,
-        // isClient: parsedModifiedState.nodes[props.nodeId]?.consumerData.isClient !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.isClient : false,
         serverTypes: parsedModifiedState?.nodes[props.nodeId]?.consumerData.serverTypes !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.serverTypes : [],
     });
 
@@ -44,8 +42,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     template: payload.template,
                     name: payload.name,
                     language: payload.language,
-                    // isServer: payload.isServer,
-                    // isClient: payload.isClient,
                     serverTypes: payload.serverTypes
                 }
             };
@@ -55,8 +51,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 template: payload.template,
                 name: payload.name,
                 language: payload.language,
-                // isServer: payload.isServer,
-                // isClient: payload.isClient,
                 serverTypes: payload.serverTypes
             };
         }
@@ -70,8 +64,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             template: "",
             language: "",
             serverTypes: [],
-            // isClient: false,
-            // isServer: false,
         });
         props.onClose();
     };
@@ -96,20 +88,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             language: event.target.value
         });
     };
-
-    // const handleIsClientChange = (event: ChangeEvent<HTMLInputElement>) => {
-    //     setPayload({
-    //         ...payload,
-    //         isClient: event.target.checked
-    //     });
-    // };
-
-    // const handleIsServerChange = (event: ChangeEvent<HTMLInputElement>) => {
-    //     setPayload({
-    //         ...payload,
-    //         isServer: event.target.checked
-    //     });
-    // };
 
     const handleServerTypesChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setPayload({
@@ -171,22 +149,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                             </MenuItem>
                         ))}
                     </TextField>
-                    {/*<FormControlLabel*/}
-                    {/*    label="Is Server?"*/}
-                    {/*    control={<Checkbox*/}
-                    {/*        size="medium"*/}
-                    {/*        checked={payload.isServer}*/}
-                    {/*        onChange={handleIsServerChange}*/}
-                    {/*    />}*/}
-                    {/*/>*/}
-                    {/*<FormControlLabel*/}
-                    {/*    label="Is Client?"*/}
-                    {/*    control={<Checkbox*/}
-                    {/*        size="medium"*/}
-                    {/*        checked={payload.isClient}*/}
-                    {/*        onChange={handleIsClientChange}*/}
-                    {/*    />}*/}
-                    {/*/>*/}
                     <TextField
                         required
                         size="medium"

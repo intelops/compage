@@ -8,8 +8,7 @@ import Button from "@mui/material/Button";
 import {setModifiedState} from "../../../utils/localstorage-client";
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
-import {Stack} from "@mui/material";
-import {isJsonString} from "../helper/utils";
+import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 
 interface NewEdgePropertiesProps {
     isOpen: boolean;
@@ -22,13 +21,38 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
 
     const [payload, setPayload] = React.useState({
         name: parsedModifiedState.edges[props.edgeId]?.consumerData.name !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData.name : "",
-        clientTypes: parsedModifiedState.edges[props.edgeId]?.consumerData.clientTypes !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData.clientTypes : [],
+        // clientTypes: parsedModifiedState.edges[props.edgeId]?.consumerData.clientTypes !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData.clientTypes : [],
+        isRestServer: false,
+        restServerPort: "",
+        wsServerPort: "",
+        grpcServerPort: "",
+        isWSServer: false,
+        isGrpcServer: false,
     });
 
     // TODO this is a hack as there is no EDGE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state with additional properties added from UI (Post edge creation)
     const handleUpdate = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
+        const clientTypes = [];
+        if (payload.isRestServer) {
+            const restConfig = {};
+            restConfig["protocol"] = "REST";
+            restConfig["port"] = payload.restServerPort;
+            clientTypes.push(restConfig);
+        }
+        if (payload.isGrpcServer) {
+            const grpcConfig = {};
+            grpcConfig["protocol"] = "GRPC";
+            grpcConfig["port"] = payload.grpcServerPort;
+            clientTypes.push(grpcConfig);
+        }
+        if (payload.isWSServer) {
+            const wsConfig = {};
+            wsConfig["protocol"] = "WS";
+            wsConfig["port"] = payload.wsServerPort;
+            clientTypes.push(wsConfig);
+        }
         const parsedModifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
         // P.S. - We will have the fields in consumerData which are on dialogBox, so we can assign them directly. We also refer the older values when payload state is initialized, so the older values will be persisted as they are if not changed.
@@ -36,14 +60,14 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             // adding consumerData to new edge in modifiedState
             parsedModifiedState.edges[props.edgeId] = {
                 consumerData: {
-                    clientTypes: payload.clientTypes,
+                    clientTypes: clientTypes,
                     name: payload.name,
                 }
             };
         } else {
             // adding consumerData to existing edge in modifiedState
             parsedModifiedState.edges[props.edgeId].consumerData = {
-                type: payload.clientTypes,
+                clientTypes: clientTypes,
                 name: payload.name,
             };
         }
@@ -51,16 +75,14 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         setModifiedState(JSON.stringify(parsedModifiedState));
         setPayload({
             name: "",
-            clientTypes: [],
+            isRestServer: false,
+            restServerPort: "",
+            isGrpcServer: false,
+            grpcServerPort: "",
+            isWSServer: false,
+            wsServerPort: ""
         });
         props.onClose();
-    };
-
-    const handleClientTypesChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setPayload({
-            ...payload,
-            clientTypes: event.target.value
-        });
     };
 
     const handleNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
@@ -68,6 +90,49 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             ...payload,
             name: event.target.value
         });
+    };
+
+    const handleRestServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setPayload({
+            ...payload,
+            restServerPort: event.target.value
+        });
+    };
+
+    const handleIsRestServerChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setPayload({
+            ...payload,
+            isRestServer: event.target.checked
+        });
+    };
+
+    const getRestServerCheck = () => {
+        return <React.Fragment>
+            <FormControlLabel
+                label="Rest Server"
+                control={<Checkbox
+                    size="medium" checked={payload.isRestServer}
+                    onChange={handleIsRestServerChange}
+                />}
+            />
+        </React.Fragment>
+    };
+
+    const getRestServerPort = () => {
+        if (payload.isRestServer) {
+            return <TextField
+                required
+                size="medium"
+                margin="dense"
+                id="restServerPort"
+                label="Rest Server Port"
+                type="text"
+                value={payload.restServerPort}
+                onChange={handleRestServerPortChange}
+                variant="outlined"
+            />;
+        }
+        return "";
     };
 
     return <React.Fragment>
@@ -87,25 +152,15 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                         onChange={handleNameChange}
                         variant="outlined"
                     />
-                    <TextField
-                        required
-                        size="medium"
-                        margin="dense"
-                        id="type"
-                        label="Client Types"
-                        type="text"
-                        error={!isJsonString(payload.clientTypes)}
-                        value={payload.clientTypes}
-                        onChange={handleClientTypesChange}
-                        variant="outlined"
-                    />
+                    {getRestServerCheck()}
+                    {getRestServerPort()}
                 </Stack>
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
                 <Button variant="contained"
                         onClick={handleUpdate}
-                        disabled={payload.name === "" && !isJsonString(payload.clientTypes)}>Update</Button>
+                        disabled={payload.name === ""}>Update</Button>
             </DialogActions>
         </Dialog>
     </React.Fragment>;
