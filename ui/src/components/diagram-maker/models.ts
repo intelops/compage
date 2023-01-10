@@ -50,3 +50,13 @@ export interface CompageJson {
     nodes: Map<string, CompageNode>;
     version: string;
 }
+
+
+// Rest Protocol
+export const Rest = "REST"
+
+// Grpc Protocol
+export const Grpc = "GRPC"
+
+// Ws Protocol
+export const Ws = "WS"

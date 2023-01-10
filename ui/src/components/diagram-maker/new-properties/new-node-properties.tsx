@@ -9,8 +9,8 @@ import {setModifiedState} from "../../../utils/localstorage-client";
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
-import {Stack} from "@mui/material";
-import {isJsonString} from "../helper/utils";
+import {Checkbox, FormControlLabel, Stack} from "@mui/material";
+import {Grpc, Rest, Ws} from "../models";
 
 interface NewNodePropertiesProps {
     isOpen: boolean,
@@ -18,20 +18,97 @@ interface NewNodePropertiesProps {
     onClose: () => void,
 }
 
+interface Resource {
+    name?: string;
+    fields?: any;
+}
+
+interface ServerConfig {
+    protocol?: string;
+    port?: string;
+    framework?: string;
+    resources?: Resource[];
+}
+
+interface ServerTypesConfig {
+    isRestServer?: boolean;
+    restServerConfig?: ServerConfig;
+    isGrpcServer?: boolean;
+    grpcServerConfig?: ServerConfig;
+    isWsServer?: boolean;
+    wsServerConfig?: ServerConfig;
+}
+
+//TODO incomplete impl below
+const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig => {
+    const serverTypes = parsedModifiedState.nodes[nodeId]?.consumerData.serverTypes;
+    const serverTypesConfig: ServerTypesConfig = {};
+    if (serverTypes || serverTypes !== undefined || serverTypes !== "[]") {
+        for (let i = 0; i < serverTypes?.length; i++) {
+            if (serverTypes[i]["protocol"] === Rest) {
+                serverTypesConfig.isRestServer = true;
+                serverTypesConfig.restServerConfig = {}
+                serverTypesConfig.restServerConfig.port = serverTypes[i]["port"];
+            } else if (serverTypes[i]["protocol"] === Grpc) {
+                serverTypesConfig.isGrpcServer = true;
+                serverTypesConfig.grpcServerConfig = {}
+                serverTypesConfig.grpcServerConfig.port = serverTypes[i]["port"];
+            } else if (serverTypes[i]["protocol"] === Ws) {
+                serverTypesConfig.isWsServer = true;
+                serverTypesConfig.wsServerConfig = {}
+                serverTypesConfig.wsServerConfig.port = serverTypes[i]["port"];
+            }
+        }
+    }
+    return serverTypesConfig;
+};
+
+
 export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const parsedModifiedState = getParsedModifiedState();
-
+    const serverTypesConfig: ServerTypesConfig = getServerTypesConfig(parsedModifiedState, props.nodeId);
+    const emptyConfig: ServerConfig = {
+        framework: "", port: "", protocol: "", resources: []
+    }
     const [payload, setPayload] = React.useState({
         name: parsedModifiedState.nodes[props.nodeId]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.name : "",
         template: parsedModifiedState.nodes[props.nodeId]?.consumerData.template !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.template : "compage",
         language: parsedModifiedState.nodes[props.nodeId]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.language : "",
-        serverTypes: parsedModifiedState?.nodes[props.nodeId]?.consumerData.serverTypes !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.serverTypes : [],
+        isRestServer: serverTypesConfig.isRestServer || false,
+        restServerConfig: serverTypesConfig.restServerConfig || emptyConfig,
+        isGrpcServer: serverTypesConfig.isGrpcServer || false,
+        grpcServerConfig: serverTypesConfig.grpcServerConfig || emptyConfig,
+        isWsServer: serverTypesConfig.isWsServer || false,
+        wsServerConfig: serverTypesConfig.wsServerConfig || emptyConfig,
     });
 
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state with additional properties added from UI (Post node creation)
     const handleUpdate = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
+        const serverTypes = [];
+        if (payload.isRestServer) {
+            const restServerConfig: ServerConfig = {
+                framework: "", port: payload.restServerConfig.port, protocol: Rest, resources: []
+            };
+            serverTypes.push(restServerConfig);
+        }
+        if (payload.isGrpcServer) {
+            const grpcServerConfig: ServerConfig = {
+                framework: payload.grpcServerConfig.framework,
+                port: payload.grpcServerConfig.port,
+                protocol: Grpc,
+                resources: []
+            };
+            serverTypes.push(grpcServerConfig);
+        }
+        if (payload.isWsServer) {
+            const wsServerConfig: ServerConfig = {
+                framework: "", port: payload.wsServerConfig.port, protocol: Ws, resources: []
+            };
+            serverTypes.push(wsServerConfig);
+        }
+
         const parsedModifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
         // P.S. - We will have the fields in consumerData which are on dialogBox, so we can assign them directly. We also refer the older values when payload state is initialized, so the older values will be persisted as they are if not changed.
@@ -42,7 +119,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     template: payload.template,
                     name: payload.name,
                     language: payload.language,
-                    serverTypes: payload.serverTypes
+                    serverTypes: serverTypes
                 }
             };
         } else {
@@ -51,7 +128,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 template: payload.template,
                 name: payload.name,
                 language: payload.language,
-                serverTypes: payload.serverTypes
+                serverTypes: serverTypes
             };
         }
         // image to node display
@@ -63,7 +140,12 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             name: "",
             template: "",
             language: "",
-            serverTypes: [],
+            isGrpcServer: false,
+            isRestServer: false,
+            isWsServer: false,
+            grpcServerConfig: emptyConfig,
+            restServerConfig: emptyConfig,
+            wsServerConfig: emptyConfig
         });
         props.onClose();
     };
@@ -89,10 +171,50 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const handleServerTypesChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleIsRestServerChange = (event: ChangeEvent<HTMLInputElement>) => {
         setPayload({
             ...payload,
-            serverTypes: event.target.value
+            isRestServer: event.target.checked
+        });
+    };
+
+    const getRestServerConfig = () => {
+        if (payload.isRestServer) {
+            return <React.Fragment>
+                <TextField
+                    required
+                    size="medium"
+                    margin="dense"
+                    id="restServerConfigPort"
+                    label="Port"
+                    type="text"
+                    value={payload.restServerConfig.port}
+                    onChange={handleRestServerConfigPortChange}
+                    variant="outlined"
+                />
+            </React.Fragment>;
+        }
+        return "";
+    };
+
+    const getRestServerCheck = () => {
+        return <React.Fragment>
+            <FormControlLabel
+                label="Rest Server"
+                control={<Checkbox
+                    size="medium" checked={payload.isRestServer}
+                    onChange={handleIsRestServerChange}
+                />}
+            />
+        </React.Fragment>
+    };
+
+    const handleRestServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const restServerConfig = payload.restServerConfig;
+        restServerConfig.port = event.target.value;
+        setPayload({
+            ...payload,
+            restServerConfig
         });
     };
 
@@ -149,27 +271,18 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                             </MenuItem>
                         ))}
                     </TextField>
-                    <TextField
-                        required
-                        size="medium"
-                        margin="dense"
-                        id="serverTypes"
-                        label="Server Types"
-                        type="text"
-                        error={!isJsonString(payload.serverTypes)}
-                        value={payload.serverTypes}
-                        onChange={handleServerTypesChange}
-                        variant="outlined"
-                    />
-                    <Button variant="outlined" color="secondary" onClick={handleAddPropertiesClick}>Add
-                        Properties</Button>
+                    {getRestServerCheck()}
+                    {getRestServerConfig()}
+
+                    {/*<Button variant="outlined" color="secondary" onClick={handleAddPropertiesClick}>Add*/}
+                    {/*    Properties</Button>*/}
                 </Stack>
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
                 <Button variant="contained"
                         onClick={handleUpdate}
-                        disabled={!isJsonString(payload.serverTypes) || payload.name === "" || payload.language === ""}>Update</Button>
+                        disabled={payload.name === "" || payload.language === ""}>Update</Button>
             </DialogActions>
         </Dialog>
     </React.Fragment>;
