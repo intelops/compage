@@ -45,7 +45,7 @@ export const GenerateCode = () => {
             if (!name) {
                 return true;
             }
-            const clientTypes = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData.serverTypes
+            const clientTypes = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData.clientTypes
             if (!clientTypes || clientTypes === "" || clientTypes === "[]") {
                 return true;
             }
