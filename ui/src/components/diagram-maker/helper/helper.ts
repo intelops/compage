@@ -5,7 +5,7 @@ export const cleanse = (state: string) => {
         // happens at the beginning with value "{}"
         return state;
     }
-    const stateJson = JSON.parse(state)
+    const stateJson = JSON.parse(state);
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state from localstorage with additional properties added from UI (Post node creation)
     let modifiedState = getModifiedState();
@@ -15,35 +15,35 @@ export const cleanse = (state: string) => {
         const toBeRemovedNodes = []
         for (const key of Object.keys(parsedModifiedState.nodes)) {
             if (key in stateJson.nodes) {
-                stateJson.nodes[key].consumerData = {...stateJson.nodes[key].consumerData, ...parsedModifiedState.nodes[key].consumerData}
+                stateJson.nodes[key].consumerData = {...stateJson.nodes[key].consumerData, ...parsedModifiedState.nodes[key].consumerData};
             } else {
-                //node has been deleted but modifiedState still has the reference, we have to explicitly remove the node
-                toBeRemovedNodes.push(key)
+                // node has been deleted but modifiedState still has the reference, we have to explicitly remove the node
+                toBeRemovedNodes.push(key);
             }
         }
-        //sometimes it may happen that the user removes edge from the diagram but modifiedState had no knowledge of it. In that case, we can check for the keys presence in the state and if not found, get the edge removed from state.
-        const toBeRemovedEdges = []
+        // sometimes it may happen that the user removes edge from the diagram but modifiedState had no knowledge of it. In that case, we can check for the keys presence in the state and if not found, get the edge removed from state.
+        const toBeRemovedEdges = [];
         for (const key of Object.keys(parsedModifiedState.edges)) {
             if (key in stateJson.edges) {
-                stateJson.edges[key].consumerData = {...stateJson.edges[key].consumerData, ...parsedModifiedState.edges[key].consumerData}
+                stateJson.edges[key].consumerData = {...stateJson.edges[key].consumerData, ...parsedModifiedState.edges[key].consumerData};
             } else {
-                //edge has been deleted but modifiedState still has the reference, we have to explicitly remove the edge
-                toBeRemovedEdges.push(key)
+                // edge has been deleted but modifiedState still has the reference, we have to explicitly remove the edge
+                toBeRemovedEdges.push(key);
             }
         }
         // remove the nodes which aren't in the state anymore.
         for (const element of toBeRemovedNodes) {
-            delete parsedModifiedState.nodes[element]
+            delete parsedModifiedState.nodes[element];
         }
         // remove the edges which aren't in the state anymore.
         for (const element of toBeRemovedEdges) {
-            delete parsedModifiedState.edges[element]
+            delete parsedModifiedState.edges[element];
         }
         // update back to localstorage.
-        setModifiedState(JSON.stringify(parsedModifiedState))
+        setModifiedState(JSON.stringify(parsedModifiedState));
     }
     return stateJson;
-}
+};
 
 export const removeUnwantedKeys = (state: any) => {
     if (!state || state === "{}") {
@@ -51,14 +51,14 @@ export const removeUnwantedKeys = (state: any) => {
         return state;
     }
     const stateJson = JSON.parse(state);
-    //delete unwanted stuff from state.
-    delete stateJson.panels
-    delete stateJson.plugins
-    delete stateJson.potentialEdge
-    delete stateJson.potentialNode
-    delete stateJson.editor
-    delete stateJson.undoHistory
-    delete stateJson.workspace
+    // delete unwanted stuff from state.
+    delete stateJson.panels;
+    delete stateJson.plugins;
+    delete stateJson.potentialEdge;
+    delete stateJson.potentialNode;
+    delete stateJson.editor;
+    delete stateJson.undoHistory;
+    delete stateJson.workspace;
     // nodes
     for (let key in stateJson.nodes) {
         let diagramMakerData = stateJson.nodes[key].diagramMakerData;
@@ -77,12 +77,12 @@ export const removeUnwantedKeys = (state: any) => {
         delete diagramMakerData.dragging
     }
     return stateJson;
-}
+};
 
 export const getParsedModifiedState = () => {
     // retrieve current modifiedState
     // logic is to store the dialog-state in localstorage and then refer it in updating state.
-    let modifiedState = getModifiedState();
+    const modifiedState = getModifiedState();
 
     if (modifiedState && modifiedState !== "{}") {
         return JSON.parse(modifiedState);
@@ -90,6 +90,6 @@ export const getParsedModifiedState = () => {
         return {
             nodes: {},
             edges: {}
-        }
+        };
     }
-}
+};

@@ -38,7 +38,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
         const createProjectRequest: CreateProjectRequest = prepareCreateProjectRequest();
         dispatch(createProjectAsync(createProjectRequest));
         handleClose();
-    }
+    };
 
     const handleProjectNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setData({
@@ -64,11 +64,11 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
     const isValid = () => {
         for (const project of listProjectsData) {
             if (data.projectName === project.id) {
-                return false
+                return false;
             }
         }
         return true;
-    }
+    };
 
     const getRepositoryName = (): React.ReactNode => {
         return <TextField
@@ -81,7 +81,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             onChange={handleRepositoryNameChange}
             variant="outlined"
         />;
-    }
+    };
 
     const getRepositoryBranch = (): React.ReactNode => {
         return <TextField
@@ -94,7 +94,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             onChange={handleRepositoryBranchChange}
             variant="outlined"
         />;
-    }
+    };
 
     const getProjectName = (): React.ReactNode => {
         return <TextField
@@ -108,18 +108,18 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             onChange={handleProjectNameChange}
             variant="outlined"
         />;
-    }
+    };
 
     const prepareCreateProjectRequest = () => {
         const user: User = {
             email: authData.email || authData.login,
             name: authData.login
-        }
+        };
         const repository: Repository = {
             branch: data.repositoryBranch || 'compage',
             name: data.repositoryName,
             tag: "v1"
-        }
+        };
         const json = getData(0, 0);
         const displayName = data.projectName;
         const metadata = data.metadata;
@@ -129,7 +129,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             version: "v1",
             repository,
             displayName,
-            user: user,
+            user,
             json: JSON.stringify(json)
         };
         return cPR;
@@ -140,8 +140,8 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
                        onClick={handleCreateProjectClick}
                        disabled={createProjectStatus === 'loading' || data.projectName === "" || !isValid()}>
             Create Project
-        </Button>
-    }
+        </Button>;
+    };
 
     return <React.Fragment>
         <Stack direction="column" spacing={2}>
@@ -150,5 +150,5 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             {getRepositoryBranch()}
             {getActionButtons()}
         </Stack>
-    </React.Fragment>
-}
+    </React.Fragment>;
+};

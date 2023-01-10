@@ -10,6 +10,7 @@ import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
 import {Stack} from "@mui/material";
+import {isJsonString} from "../helper/utils";
 
 interface NewNodePropertiesProps {
     isOpen: boolean,
@@ -193,6 +194,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         id="serverTypes"
                         label="Server Types"
                         type="text"
+                        error={!isJsonString(payload.serverTypes)}
                         value={payload.serverTypes}
                         onChange={handleServerTypesChange}
                         variant="outlined"
@@ -205,7 +207,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
                 <Button variant="contained"
                         onClick={handleUpdate}
-                        disabled={payload.name === "" || payload.language === "" || payload.serverTypes === ""}>Update</Button>
+                        disabled={!isJsonString(payload.serverTypes) || payload.name === "" || payload.language === ""}>Update</Button>
             </DialogActions>
         </Dialog>
     </React.Fragment>;

@@ -95,7 +95,7 @@ export const DiagramMakerContainer = ({
     // handle ctrl+s in window
     const handleKeyDown = (event) => {
         event.preventDefault();
-        let charCode = String.fromCharCode(event.which).toLowerCase();
+        const charCode = String.fromCharCode(event.which).toLowerCase();
         if ((event.ctrlKey || event.metaKey) && (charCode === 's' || charCode === 'S')) {
             // update details to localstorage client
             setCurrentConfig(diagramMaker.config);
@@ -104,7 +104,7 @@ export const DiagramMakerContainer = ({
         if ((event.ctrlKey || event.metaKey) && (charCode === 'r' || charCode === 'R')) {
             window.location.reload();
         }
-    }
+    };
 
     const [diagramMaker, setDiagramMaker] = React.useState({
         state: "{}",
@@ -120,8 +120,8 @@ export const DiagramMakerContainer = ({
     });
 
     const handleDialogClose = () => {
-        setDialogState({isOpen: false, id: "", type: ""})
-        setData(diagramMaker.state, false)
+        setDialogState({isOpen: false, id: "", type: ""});
+        setData(diagramMaker.state, false);
     };
 
     const showDialog = () => {
@@ -129,15 +129,15 @@ export const DiagramMakerContainer = ({
             if (dialogState.type === 'node') {
                 return <NewNodeProperties isOpen={dialogState.isOpen}
                                           nodeId={dialogState.id}
-                                          onClose={handleDialogClose}/>
+                                          onClose={handleDialogClose}/>;
             } else if (dialogState.type === 'edge') {
                 return <NewEdgeProperties isOpen={dialogState.isOpen}
                                           edgeId={dialogState.id}
-                                          onClose={handleDialogClose}/>
+                                          onClose={handleDialogClose}/>;
             }
         }
         return "";
-    }
+    };
 
     if (darkTheme) {
         document.body.classList.add('dm-dark-theme');
@@ -148,12 +148,12 @@ export const DiagramMakerContainer = ({
     useBeforeunload((event) => {
         if (shouldReset()) {
             if ((diagramMaker.state !== "{}" && diagramMaker.state !== getCurrentState()) || (diagramMaker.config !== "{}" && diagramMaker.config !== getCurrentConfig())) {
-                setCurrentState(diagramMaker.state)
-                setCurrentConfig(diagramMaker.config)
+                setCurrentState(diagramMaker.state);
+                setCurrentConfig(diagramMaker.config);
                 event.preventDefault();
             }
         } else {
-            setReset(false)
+            setReset(false);
         }
     });
 
@@ -173,27 +173,27 @@ export const DiagramMakerContainer = ({
                     config: backupState,
                     saved: isSaved(cleansedState),
                     state: JSON.stringify(cleansedState),
-                })
+                });
             } else {
                 setDiagramMaker({
                     ...diagramMaker,
                     copied: false,
                     saved: isSaved(cleansedState),
                     state: JSON.stringify(cleansedState)
-                })
+                });
             }
         }
-    }
+    };
 
     React.useEffect(() => {
         // let shape, connectorPlacement, showArrowhead, plugin, edgeBadge
-        let plugin, connectorPlacement
+        let plugin, connectorPlacement;
         // let initialData = BoundaryRectangularData
         // let connectorPlacement = ConnectorPlacementType.BOUNDARY
-        let showArrowhead = true
-        let shape = Shape.CIRCLE
-        let edgeBadge = true
-        let actionInterceptor = true
+        let showArrowhead = true;
+        let shape = Shape.CIRCLE;
+        let edgeBadge = true;
+        let actionInterceptor = true;
         // let onAction: {
         //     action: 'action',
         // }
@@ -227,21 +227,21 @@ export const DiagramMakerContainer = ({
                     if (connectorPlacement === ConnectorPlacement.BOUNDARY) {
                         if (shape === Shape.CIRCLE) {
                             return createCircularNode(node, container, () => {
-                                    setDialogState({isOpen: true, id: node.id, type: "node"})
+                                    setDialogState({isOpen: true, id: node.id, type: "node"});
                                 }
                             );
                         }
                         return createRectangularConnectorNode(node, container, () => {
-                            setDialogState({isOpen: true, id: node.id, type: "node"})
+                            setDialogState({isOpen: true, id: node.id, type: "node"});
                         });
                     }
                     return createRectangularNode(node, container, () => {
-                        setDialogState({isOpen: true, id: node.id, type: "node"})
+                        setDialogState({isOpen: true, id: node.id, type: "node"});
                     });
                 },
                 edge: edgeBadge ? (edge: DiagramMakerEdge<{}>, container: HTMLElement) => {
                     return ReactDOM.render(<EdgeBadge id={edge.id} handleDblClick={() => {
-                        setDialogState({isOpen: true, id: edge.id, type: "edge"})
+                        setDialogState({isOpen: true, id: edge.id, type: "edge"});
                     }}/>, container);
                 } : undefined,
                 potentialNode: (node: DiagramMakerPotentialNode, container: HTMLElement) => {
@@ -269,7 +269,7 @@ export const DiagramMakerContainer = ({
                         },
                     }),
                 },
-                //This is the place to identify which element has been clicked
+                // This is the place to identify which element has been clicked
                 contextMenu: {
                     node: (id: string | undefined, container: HTMLElement) => {
                         return ReactDOM.render(<ContextNode id={id}/>, container);
@@ -312,14 +312,14 @@ export const DiagramMakerContainer = ({
                             result = "Deleting node(s) : [" + diagramMakerAction.payload.nodeIds + "]"
                         } else if (diagramMakerAction.payload.edgeIds.length > 0) {
                             message = "Are you sure you want to delete the edge(s) : [" + diagramMakerAction.payload.edgeIds + "]";
-                            result = "Deleting edge(s) : [" + diagramMakerAction.payload.edgeIds + "]"
+                            result = "Deleting edge(s) : [" + diagramMakerAction.payload.edgeIds + "]";
                         }
                         if (diagramMakerAction.payload.nodeIds.length > 0 || diagramMakerAction.payload.edgeIds.length > 0) {
                             if (!window.confirm(message)) {
                                 return;
                             }
                         }
-                        console.log(result)
+                        console.log(result);
                     }
                     if (diagramMakerAction.type === DiagramMakerActions.NODE_SELECT && "payload" in diagramMakerAction) {
                         // console.log("Select node action : ", diagramMakerAction.payload)
@@ -391,12 +391,12 @@ export const DiagramMakerContainer = ({
         // });
         const currentConfig = getCurrentConfig();
         if (currentConfig) {
-            setData(currentConfig)
+            setData(currentConfig);
         }
 
         diagramMakerRef.current.store.subscribe(() => {
             const state = diagramMakerRef.current.store.getState();
-            setData(JSON.stringify(state))
+            setData(JSON.stringify(state));
         });
 
     }, [plugin, initialData]);
@@ -488,8 +488,8 @@ export const DiagramMakerContainer = ({
             <ButtonsPanel/>
             <hr/>
         </Grid>
-    </Grid>
-}
+    </Grid>;
+};
 
 export function addDevTools() {
     if (process.env.NODE_ENV === 'development') {
@@ -502,7 +502,7 @@ export function addDevTools() {
 
 
 export function handleTestPluginEvent(event: any, diagramMaker: any) {
-    console.log("%%%%%%%%%%%%%%%%%%%%%%", event)
+    console.log("%%%%%%%%%%%%%%%%%%%%%%", event);
     if (event.type === Event.LEFT_CLICK && event.target.type === 'testPlugin') {
         const state = diagramMaker.store.getState();
         if (!state.plugins) return;

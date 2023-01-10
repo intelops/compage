@@ -54,6 +54,6 @@ export const getNodeTypeConfig = (connectorPlacement, shape: ShapeType.CIRCLE) =
             connectorPlacementOverride: ConnectorPlacement.TOP_BOTTOM,
         },
     };
-}
+};
 
 

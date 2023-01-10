@@ -21,9 +21,9 @@ export const GenerateCode = () => {
         const currentProject: string = getCurrentProject();
         const generateCodeRequest = {
             projectId: currentProject
-        }
+        };
         if (generateCodeStatus !== 'loading') {
-            dispatch(generateCodeAsync(generateCodeRequest))
+            dispatch(generateCodeAsync(generateCodeRequest));
         }
     };
 
@@ -55,8 +55,9 @@ export const GenerateCode = () => {
 
     const isDisabled = () => {
         const removeUnwantedKeysGetCurrentState = removeUnwantedKeys(getCurrentState());
+        // check if the updated project data has been modified.
         if (IsAnyRequiredValueMissingInOneOfNodes(removeUnwantedKeysGetCurrentState)) {
-            //disable as required values are missing
+            // disable as required values are missing
             return true;
         }
 
@@ -66,8 +67,7 @@ export const GenerateCode = () => {
                 return false;
             }
         }
-
-        //TODO this fails as there is no getProjectData call happening again since the beginning.
+        // check if the get project data is different.
         if (getProjectData?.json) {
             const removeUnwantedKeyGetProject = removeUnwantedKeys(JSON.parse(JSON.stringify(getProjectData.json)));
             if (_.isEqual(removeUnwantedKeyGetProject, removeUnwantedKeysGetCurrentState)) {
@@ -88,4 +88,4 @@ export const GenerateCode = () => {
             </Button>
         </>
     );
-}
+};

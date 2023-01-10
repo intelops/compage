@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import {Navigate, useNavigate} from "react-router-dom";
+import React from "react";
+import {Navigate} from "react-router-dom";
 import {getData} from "../diagram-maker/data/BoundaryCircular/data";
 import {getCurrentConfig, getCurrentProject, setCurrentConfig, setCurrentState} from "../../utils/localstorage-client";
 import {useAppSelector} from "../../redux/hooks";
@@ -12,44 +12,32 @@ export const Home = () => {
     const authData = useAppSelector(selectAuthData);
     const getProjectData = useAppSelector(selectGetProjectData);
 
-    const navigate = useNavigate();
-
-    const [data, setData] = useState({
-        isOpen: false,
-    });
-
     if (!authData.login) {
         return <Navigate to="/login"/>;
     }
 
     const currentProject: string = getCurrentProject();
     console.log("currentProject in home :", currentProject);
-    if (!data.isOpen && (currentProject === null
-        || currentProject === undefined
-        || currentProject.length === 0)) {
-        // choose from existing or create a new project
-        setData({...data, isOpen: true})
-    }
 
     const getDiagramData = () => {
         let diagramMakerData;
         const currentConfig = getCurrentConfig();
 
-        const loadExisting = (currentConfig: string) => {
-            if (!currentConfig) {
+        const loadExisting = (currentCnf: string) => {
+            if (currentCnf === undefined || currentCnf === "undefined") {
                 return false;
             }
-            if (currentConfig === "{}") {
+            if (currentCnf === "{}") {
                 return false;
             }
-            const currentConfigJson = JSON.parse(currentConfig);
+            const currentConfigJson = JSON.parse(currentCnf);
             if (!currentConfigJson.panels) {
                 return false;
             }
             return currentConfigJson.panels !== "{}";
-        }
+        };
 
-        if (loadExisting(currentConfig)) {
+        if (currentConfig && loadExisting(currentConfig)) {
             diagramMakerData = JSON.parse(currentConfig);
         } else {
             // TODO below passed parameters aren't being used.
@@ -60,15 +48,20 @@ export const Home = () => {
         return diagramMakerData;
     };
 
-    const handleClose = async () => {
-        setData({...data, isOpen: false})
-        // TODO hack to reload after getProject is loaded
-        await new Promise(r => setTimeout(r, 2000));
-        navigate('/home');
+    const getContent = (): React.ReactNode => {
+        if (
+            currentProject === null
+            || currentProject === undefined
+            || currentProject.length === 0
+        ) {
+            // choose from existing or create a new project
+            return <SwitchProject isOpen={true}></SwitchProject>;
+        }
+        return <SwitchProject isOpen={false}></SwitchProject>;
     };
 
     return <React.Fragment>
-        <SwitchProject isOpen={data.isOpen} handleClose={handleClose}></SwitchProject>
+        {getContent()}
         <DiagramMakerContainer initialData={getDiagramData()} darkTheme={false}/>
     </React.Fragment>;
-}
+};

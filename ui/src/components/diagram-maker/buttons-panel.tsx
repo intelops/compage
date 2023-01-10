@@ -36,13 +36,13 @@ export const ButtonsPanel = () => {
 
     // When clicked, open the dialog
     const handleSwitchProjectClick = () => {
-        setData({...data, isOpen: true})
+        setData({...data, isOpen: true});
     };
 
     const handleClose = () => {
-        setData({...data, isOpen: false})
+        setData({...data, isOpen: false});
         navigate('/home');
-    }
+    };
 
     return <React.Fragment>
         <Grid item style={{
@@ -76,4 +76,4 @@ export const ButtonsPanel = () => {
             }} variant="contained" color="error" onClick={resetState}>Reset state</Button>
         </Grid>
     </React.Fragment>;
-}
+};

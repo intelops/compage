@@ -31,9 +31,9 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
 
     useEffect(() => {
         // dispatch listProjects
-        const listProjectsRequest: ListProjectsRequest = {}
+        const listProjectsRequest: ListProjectsRequest = {};
         dispatch(listProjectsAsync(listProjectsRequest));
-    }, [dispatch])
+    }, [dispatch]);
 
     const [data, setData] = useState({
         projectName: "",
@@ -56,7 +56,7 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
         };
         dispatch(getProjectAsync(getProjectRequest));
         handleClose();
-    }
+    };
 
     const getActionButtons = (): React.ReactNode => {
         return <Button variant="contained"
@@ -64,7 +64,7 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
                        onClick={handleChooseProjectClick}>
             Choose Project
         </Button>;
-    }
+    };
 
     const getExistingProjects = (): React.ReactNode => {
         return <TextField
@@ -89,7 +89,7 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
                 )
             }
         </TextField>;
-    }
+    };
 
     const getLoadingIcon = () => {
         if (listProjectsStatus === 'loading') {
@@ -104,5 +104,5 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
         </Stack>
         {getExistingProjects()}
         {getActionButtons()}
-    </React.Fragment>
-}
+    </React.Fragment>;
+};

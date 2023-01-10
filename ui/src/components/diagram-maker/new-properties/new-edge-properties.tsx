@@ -9,6 +9,7 @@ import {setModifiedState} from "../../../utils/localstorage-client";
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import {Stack} from "@mui/material";
+import {isJsonString} from "../helper/utils";
 
 interface NewEdgePropertiesProps {
     isOpen: boolean;
@@ -93,6 +94,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                         id="type"
                         label="Client Types"
                         type="text"
+                        error={!isJsonString(payload.clientTypes)}
                         value={payload.clientTypes}
                         onChange={handleClientTypesChange}
                         variant="outlined"
@@ -103,7 +105,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                 <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
                 <Button variant="contained"
                         onClick={handleUpdate}
-                        disabled={payload.name === ""}>Update</Button>
+                        disabled={payload.name === "" && !isJsonString(payload.clientTypes)}>Update</Button>
             </DialogActions>
         </Dialog>
     </React.Fragment>;
