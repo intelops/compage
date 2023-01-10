@@ -200,7 +200,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const getRestServerCheck = () => {
         return <React.Fragment>
             <FormControlLabel
-                label="Rest Server"
+                label="REST Server"
                 control={<Checkbox
                     size="medium" checked={payload.isRestServer}
                     onChange={handleIsRestServerChange}
@@ -247,7 +247,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const getGrpcServerCheck = () => {
         return <React.Fragment>
             <FormControlLabel
-                label="Grpc Server"
+                label="gRPC Server"
                 control={<Checkbox
                     size="medium" checked={payload.isGrpcServer}
                     onChange={handleIsGrpcServerChange}
@@ -262,6 +262,53 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         setPayload({
             ...payload,
             grpcServerConfig
+        });
+    };
+
+    const handleIsWsServerChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setPayload({
+            ...payload,
+            isWsServer: event.target.checked
+        });
+    };
+
+    const getWsServerConfig = () => {
+        if (payload.isWsServer) {
+            return <React.Fragment>
+                <TextField
+                    required
+                    size="medium"
+                    margin="dense"
+                    id="wsServerConfigPort"
+                    label="Port"
+                    type="text"
+                    value={payload.wsServerConfig.port}
+                    onChange={handleWsServerConfigPortChange}
+                    variant="outlined"
+                />
+            </React.Fragment>;
+        }
+        return "";
+    };
+
+    const getWsServerCheck = () => {
+        return <React.Fragment>
+            <FormControlLabel
+                label="WS Server"
+                control={<Checkbox
+                    size="medium" checked={payload.isWsServer}
+                    onChange={handleIsWsServerChange}
+                />}
+            />
+        </React.Fragment>
+    };
+
+    const handleWsServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const wsServerConfig = payload.wsServerConfig;
+        wsServerConfig.port = event.target.value;
+        setPayload({
+            ...payload,
+            wsServerConfig
         });
     };
 
@@ -322,6 +369,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     {getRestServerConfig()}
                     {getGrpcServerCheck()}
                     {getGrpcServerConfig()}
+                    {getWsServerCheck()}
+                    {getWsServerConfig()}
                     {/*<Button variant="outlined" color="secondary" onClick={handleAddPropertiesClick}>Add*/}
                     {/*    Properties</Button>*/}
                 </Stack>
