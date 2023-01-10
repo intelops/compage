@@ -135,6 +135,50 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         return "";
     };
 
+
+    const handleGrpcServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setPayload({
+            ...payload,
+            grpcServerPort: event.target.value
+        });
+    };
+
+    const handleIsGrpcServerChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setPayload({
+            ...payload,
+            isGrpcServer: event.target.checked
+        });
+    };
+
+    const getGrpcServerCheck = () => {
+        return <React.Fragment>
+            <FormControlLabel
+                label="Grpc Server"
+                control={<Checkbox
+                    size="medium" checked={payload.isGrpcServer}
+                    onChange={handleIsGrpcServerChange}
+                />}
+            />
+        </React.Fragment>
+    };
+
+    const getGrpcServerPort = () => {
+        if (payload.isGrpcServer) {
+            return <TextField
+                required
+                size="medium"
+                margin="dense"
+                id="grpcServerPort"
+                label="Grpc Server Port"
+                type="text"
+                value={payload.grpcServerPort}
+                onChange={handleGrpcServerPortChange}
+                variant="outlined"
+            />;
+        }
+        return "";
+    };
+
     return <React.Fragment>
         <Dialog open={props.isOpen} onClose={props.onClose}>
             <DialogTitle>Edge properties : {props.edgeId}</DialogTitle>
@@ -154,6 +198,8 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                     />
                     {getRestServerCheck()}
                     {getRestServerPort()}
+                    {getGrpcServerCheck()}
+                    {getGrpcServerPort()}
                 </Stack>
             </DialogContent>
             <DialogActions>
