@@ -63,7 +63,6 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
     return serverTypesConfig;
 };
 
-
 export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const parsedModifiedState = getParsedModifiedState();
     const serverTypesConfig: ServerTypesConfig = getServerTypesConfig(parsedModifiedState, props.nodeId);
@@ -184,6 +183,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
+    const frameworks = ["net/http"];
     const getRestServerConfig = () => {
         if (payload.isRestServer) {
             return <React.Fragment>
@@ -198,6 +198,23 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     onChange={handleRestServerConfigPortChange}
                     variant="outlined"
                 />
+                <TextField
+                    required
+                    size="medium"
+                    select
+                    margin="dense"
+                    id="restFramework"
+                    label="Framework"
+                    type="text"
+                    value={payload.restServerConfig.framework}
+                    onChange={handleRestServerConfigFrameworkChange}
+                    variant="outlined">
+                    {frameworks.map((framework: string) => (
+                        <MenuItem key={framework} value={framework}>
+                            {framework}
+                        </MenuItem>
+                    ))}
+                </TextField>
             </React.Fragment>;
         }
         return "";
@@ -213,6 +230,15 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 />}
             />
         </React.Fragment>
+    };
+
+    const handleRestServerConfigFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const restServerConfig = payload.restServerConfig;
+        restServerConfig.framework = event.target.value;
+        setPayload({
+            ...payload,
+            restServerConfig
+        });
     };
 
     const handleRestServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
