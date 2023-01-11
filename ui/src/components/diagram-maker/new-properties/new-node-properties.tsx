@@ -11,6 +11,7 @@ import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import {Grpc, Rest, Ws} from "../models";
+import {AddResources} from "./add-resources";
 
 interface NewNodePropertiesProps {
     isOpen: boolean,
@@ -49,6 +50,7 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
                 serverTypesConfig.isRestServer = true;
                 serverTypesConfig.restServerConfig = {}
                 serverTypesConfig.restServerConfig.port = serverTypes[i]["port"];
+                serverTypesConfig.restServerConfig.framework = serverTypes[i]["framework"];
             } else if (serverTypes[i]["protocol"] === Grpc) {
                 serverTypesConfig.isGrpcServer = true;
                 serverTypesConfig.grpcServerConfig = {}
@@ -79,6 +81,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         grpcServerConfig: serverTypesConfig.grpcServerConfig || emptyConfig,
         isWsServer: serverTypesConfig.isWsServer || false,
         wsServerConfig: serverTypesConfig.wsServerConfig || emptyConfig,
+        isRestServerAddResourcesOpen: false
     });
 
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
@@ -147,6 +150,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             language: "",
             isGrpcServer: false,
             isRestServer: false,
+            isRestServerAddResourcesOpen: false,
             isWsServer: false,
             grpcServerConfig: emptyConfig,
             restServerConfig: emptyConfig,
@@ -183,6 +187,13 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
+    const handleAddPropertiesClick = () => {
+        setPayload({
+            ...payload,
+            isRestServerAddResourcesOpen: !payload.isRestServerAddResourcesOpen
+        });
+    };
+
     const frameworks = ["net/http"];
     const getRestServerConfig = () => {
         if (payload.isRestServer) {
@@ -215,6 +226,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         </MenuItem>
                     ))}
                 </TextField>
+                <Button variant="outlined" color="secondary" onClick={handleAddPropertiesClick}>Add Resources</Button>
             </React.Fragment>;
         }
         return "";
@@ -280,6 +292,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return <React.Fragment>
             <FormControlLabel
                 label="gRPC Server"
+                // remove below when grpc is supported.
+                disabled
                 control={<Checkbox
                     size="medium" checked={payload.isGrpcServer}
                     onChange={handleIsGrpcServerChange}
@@ -327,6 +341,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return <React.Fragment>
             <FormControlLabel
                 label="WS Server"
+                // remove below when grpc is supported.
+                disabled
                 control={<Checkbox
                     size="medium" checked={payload.isWsServer}
                     onChange={handleIsWsServerChange}
@@ -345,10 +361,24 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const languages = [/*"NodeJs", "Java", */"Golang"];
-    const handleAddPropertiesClick = () => {
-        console.log("clicked");
+    const handleUpdateInAddPropertiesClick = () => {
+        console.log("handleUpdateInAddPropertiesClick clicked")
     };
+
+    const onRestServerAddResourcesClose = () => {
+        console.log("clicked")
+        setPayload({
+            ...payload,
+            isRestServerAddResourcesOpen: !payload.isRestServerAddResourcesOpen
+        });
+    };
+
     return <React.Fragment>
+        <AddResources isRestServerAddResourcesOpen={payload.isRestServerAddResourcesOpen}
+                      onRestServerAddResourcesClose={onRestServerAddResourcesClose}
+                      nodeId={props.nodeId}
+                      handleUpdateInAddPropertiesClick={handleUpdateInAddPropertiesClick}/>
+
         <Dialog open={props.isOpen} onClose={props.onClose}>
             <DialogTitle>Node Properties : {props.nodeId}</DialogTitle>
             <Divider/>
@@ -424,8 +454,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         {getWsServerCheck()}
                         {getWsServerConfig()}
                     </Stack>
-                    {/*<Button variant="outlined" color="secondary" onClick={handleAddPropertiesClick}>Add*/}
-                    {/*    Properties</Button>*/}
                 </Stack>
             </DialogContent>
             <DialogActions>
