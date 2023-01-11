@@ -89,7 +89,10 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         const serverTypes = [];
         if (payload.isRestServer) {
             const restServerConfig: ServerConfig = {
-                framework: "", port: payload.restServerConfig.port, protocol: Rest, resources: []
+                framework: payload.restServerConfig.framework,
+                port: payload.restServerConfig.port,
+                protocol: Rest,
+                resources: []
             };
             serverTypes.push(restServerConfig);
         }
@@ -104,7 +107,10 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         }
         if (payload.isWsServer) {
             const wsServerConfig: ServerConfig = {
-                framework: "", port: payload.wsServerConfig.port, protocol: Ws, resources: []
+                framework: payload.wsServerConfig.framework,
+                port: payload.wsServerConfig.port,
+                protocol: Ws,
+                resources: []
             };
             serverTypes.push(wsServerConfig);
         }
@@ -368,22 +374,30 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                             </MenuItem>
                         ))}
                     </TextField>
-                    {getRestServerCheck()}
-                    {getRestServerConfig()}
-                    {getGrpcServerCheck()}
-                    {getGrpcServerConfig()}
-                    <div style={{
-                        padding: "5px",
+                    <Stack style={{
+                        padding: "10px",
                         borderRadius: "15px",
-                        border: payload.isWsServer ? '1px solid gray' : ''
-                    }}>
+                        border: payload.isRestServer ? '1px solid #dadada' : ''
+                    }} direction="column" spacing={2}>
+                        {getRestServerCheck()}
+                        {getRestServerConfig()}
+                    </Stack>
+                    <Stack style={{
+                        padding: "10px",
+                        borderRadius: "15px",
+                        border: payload.isGrpcServer ? '1px solid #dadada' : ''
+                    }} direction="column" spacing={2}>
+                        {getGrpcServerCheck()}
+                        {getGrpcServerConfig()}
+                    </Stack>
+                    <Stack style={{
+                        padding: "10px",
+                        borderRadius: "15px",
+                        border: payload.isWsServer ? '1px solid #dadada' : ''
+                    }} direction="column" spacing={2}>
                         {getWsServerCheck()}
                         {getWsServerConfig()}
-                        {getWsServerConfig()}
-
-                        {getWsServerConfig()}
-
-                    </div>
+                    </Stack>
                     {/*<Button variant="outlined" color="secondary" onClick={handleAddPropertiesClick}>Add*/}
                     {/*    Properties</Button>*/}
                 </Stack>
