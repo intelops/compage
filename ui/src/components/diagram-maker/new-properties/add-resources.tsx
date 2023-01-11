@@ -6,15 +6,36 @@ import {Stack} from "@mui/material";
 import TextField from "@mui/material/TextField";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import React from "react";
+import React, {ChangeEvent} from "react";
+import {Resource} from "../models";
 
-export const AddResources = (props: {
-    isRestServerAddResourcesOpen: boolean,
-    nodeId: string,
-    onRestServerAddResourcesClose: () => void,
-    handleUpdateInAddPropertiesClick: () => void
-}) => {
-    return <Dialog open={props.isRestServerAddResourcesOpen} onClose={props.onRestServerAddResourcesClose}>
+interface AddResourcesProperties {
+    isOpen: boolean;
+    nodeId: string;
+    onRestServerAddResourcesClose: () => void;
+    handleUpdateInAddPropertiesClick: (resources: Resource[]) => void;
+    resources: Resource[]
+}
+
+export const AddResources = (props: AddResourcesProperties) => {
+    const [data, setData] = React.useState({
+        name: "",
+        fields: new Map<string, string>()
+    });
+
+    const handleNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setData({
+            ...data,
+            name: event.target.value
+        });
+    };
+
+    const handleUpdateInAddPropertiesClick = () => {
+        const resource: Resource = {fields: {}, name: data.name}
+        props.handleUpdateInAddPropertiesClick([resource]);
+    };
+
+    return <Dialog open={props.isOpen} onClose={props.onRestServerAddResourcesClose}>
         <DialogTitle>Add resources [REST Server] : {props.nodeId}</DialogTitle>
         <Divider/>
         <DialogContent style={{
@@ -27,17 +48,17 @@ export const AddResources = (props: {
                     size="medium"
                     margin="dense"
                     id="name"
-                    label="Name of Component"
+                    label="Name of Resource"
                     type="text"
-                    value={""}
-                    onChange={props.handleUpdateInAddPropertiesClick}
+                    value={data.name}
+                    onChange={handleNameChange}
                     variant="outlined"
                 />
             </Stack>
         </DialogContent>
         <DialogActions>
             <Button variant="outlined" color="secondary" onClick={props.onRestServerAddResourcesClose}>Cancel</Button>
-            <Button variant="contained" onClick={props.handleUpdateInAddPropertiesClick}>Save Resources</Button>
+            <Button variant="contained" onClick={handleUpdateInAddPropertiesClick}>Save Resources</Button>
         </DialogActions>
     </Dialog>;
 }

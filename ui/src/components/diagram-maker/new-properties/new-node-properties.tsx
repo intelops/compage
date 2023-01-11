@@ -10,18 +10,14 @@ import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
-import {Grpc, Rest, Ws} from "../models";
+import {Grpc, Resource, Rest, Ws} from "../models";
 import {AddResources} from "./add-resources";
+import Typography from "@mui/material/Typography";
 
 interface NewNodePropertiesProps {
     isOpen: boolean,
     nodeId: string,
     onClose: () => void,
-}
-
-interface Resource {
-    name?: string;
-    fields?: any;
 }
 
 interface ServerConfig {
@@ -51,6 +47,7 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
                 serverTypesConfig.restServerConfig = {}
                 serverTypesConfig.restServerConfig.port = serverTypes[i]["port"];
                 serverTypesConfig.restServerConfig.framework = serverTypes[i]["framework"];
+                serverTypesConfig.restServerConfig.resources = serverTypes[i]["resources"];
             } else if (serverTypes[i]["protocol"] === Grpc) {
                 serverTypesConfig.isGrpcServer = true;
                 serverTypesConfig.grpcServerConfig = {}
@@ -94,7 +91,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 framework: payload.restServerConfig.framework,
                 port: payload.restServerConfig.port,
                 protocol: Rest,
-                resources: []
+                resources: payload.restServerConfig.resources
             };
             serverTypes.push(restServerConfig);
         }
@@ -194,6 +191,24 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
+    const getExistingResources = () => {
+        if (payload.restServerConfig.resources?.length > 0) {
+            const getResources = () => {
+                const resourceNames = []
+                payload.restServerConfig.resources.forEach(resource => {
+                    resourceNames.push(resource.name);
+                });
+                return resourceNames;
+            }
+
+            return <Typography>
+                Existing resources : {getResources().join(", ")}
+            </Typography>;
+        }
+
+        return ""
+    };
+
     const frameworks = ["net/http"];
     const getRestServerConfig = () => {
         if (payload.isRestServer) {
@@ -226,7 +241,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         </MenuItem>
                     ))}
                 </TextField>
-                <Button variant="outlined" color="secondary" onClick={handleAddPropertiesClick}>Add Resources</Button>
+                <Button variant="outlined" color="secondary" onClick={handleAddPropertiesClick}>Add/Modify
+                    Resources</Button>
+                {getExistingResources()}
             </React.Fragment>;
         }
         return "";
@@ -361,8 +378,17 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const languages = [/*"NodeJs", "Java", */"Golang"];
-    const handleUpdateInAddPropertiesClick = () => {
-        console.log("handleUpdateInAddPropertiesClick clicked")
+    const handleUpdateInAddPropertiesClick = (resources: Resource[]) => {
+        console.log(resources);
+        const restServerConfig = payload.restServerConfig;
+        resources.forEach(resource => {
+            restServerConfig.resources.push(resource);
+        })
+        setPayload({
+            ...payload,
+            restServerConfig,
+            isRestServerAddResourcesOpen: !payload.isRestServerAddResourcesOpen
+        });
     };
 
     const onRestServerAddResourcesClose = () => {
@@ -374,7 +400,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     return <React.Fragment>
-        <AddResources isRestServerAddResourcesOpen={payload.isRestServerAddResourcesOpen}
+        <AddResources isOpen={payload.isRestServerAddResourcesOpen}
+                      resources={payload.restServerConfig.resources}
                       onRestServerAddResourcesClose={onRestServerAddResourcesClose}
                       nodeId={props.nodeId}
                       handleUpdateInAddPropertiesClick={handleUpdateInAddPropertiesClick}/>
