@@ -1,7 +1,7 @@
 export interface Resource {
     name: string;
     // the below map can contain metadata about the field.
-    fields: any//Map<string, Map<string, string>>;
+    fields: Map<string, Map<string, string>>;
 }
 
 export interface ServerType {

@@ -11,8 +11,8 @@ import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import {Grpc, Resource, Rest, Ws} from "../models";
-import {AddResources} from "./add-resources";
 import Typography from "@mui/material/Typography";
+import {ModifyRestResource} from "./modify-rest-resource";
 
 interface NewNodePropertiesProps {
     isOpen: boolean,
@@ -78,7 +78,11 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         grpcServerConfig: serverTypesConfig.grpcServerConfig || emptyConfig,
         isWsServer: serverTypesConfig.isWsServer || false,
         wsServerConfig: serverTypesConfig.wsServerConfig || emptyConfig,
-        isRestServerAddResourcesOpen: false
+        isModifyRestResourceOpen: false,
+        currentRestResource: {
+            name: "",
+            fields: new Map<string, Map<string, string>>()
+        }
     });
 
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
@@ -147,11 +151,15 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             language: "",
             isGrpcServer: false,
             isRestServer: false,
-            isRestServerAddResourcesOpen: false,
             isWsServer: false,
             grpcServerConfig: emptyConfig,
             restServerConfig: emptyConfig,
-            wsServerConfig: emptyConfig
+            wsServerConfig: emptyConfig,
+            isModifyRestResourceOpen: false,
+            currentRestResource: {
+                name: "",
+                fields: new Map<string, Map<string, string>>()
+            }
         });
         props.onClose();
     };
@@ -184,10 +192,10 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const handleAddPropertiesClick = () => {
+    const handleAddRestResourceClick = () => {
         setPayload({
             ...payload,
-            isRestServerAddResourcesOpen: !payload.isRestServerAddResourcesOpen
+            isModifyRestResourceOpen: !payload.isModifyRestResourceOpen
         });
     };
 
@@ -241,8 +249,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         </MenuItem>
                     ))}
                 </TextField>
-                <Button variant="outlined" color="secondary" onClick={handleAddPropertiesClick}>Add/Modify
-                    Resources</Button>
+                <Button variant="outlined" color="secondary" onClick={handleAddRestResourceClick}>Add Resource</Button>
                 {getExistingResources()}
             </React.Fragment>;
         }
@@ -377,34 +384,32 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const languages = [/*"NodeJs", "Java", */"Golang"];
-    const handleUpdateInAddPropertiesClick = (resources: Resource[]) => {
-        console.log(resources);
+    const languages = ["Golang"];
+    const handleModifyRestResourceClick = (resource: Resource) => {
+        console.log(resource.fields);
         const restServerConfig = payload.restServerConfig;
-        resources.forEach(resource => {
-            restServerConfig.resources.push(resource);
-        })
+        restServerConfig.resources.push(resource);
         setPayload({
             ...payload,
             restServerConfig,
-            isRestServerAddResourcesOpen: !payload.isRestServerAddResourcesOpen
+            isModifyRestResourceOpen: !payload.isModifyRestResourceOpen
         });
     };
 
-    const onRestServerAddResourcesClose = () => {
-        console.log("clicked")
+    const onModifyRestResourceClose = () => {
+        console.log("onModifyRestResourceClose clicked")
         setPayload({
             ...payload,
-            isRestServerAddResourcesOpen: !payload.isRestServerAddResourcesOpen
+            isModifyRestResourceOpen: !payload.isModifyRestResourceOpen
         });
     };
 
     return <React.Fragment>
-        <AddResources isOpen={payload.isRestServerAddResourcesOpen}
-                      resources={payload.restServerConfig.resources}
-                      onRestServerAddResourcesClose={onRestServerAddResourcesClose}
-                      nodeId={props.nodeId}
-                      handleUpdateInAddPropertiesClick={handleUpdateInAddPropertiesClick}/>
+        <ModifyRestResource isOpen={payload.isModifyRestResourceOpen}
+                            resource={payload.currentRestResource}
+                            onModifyRestResourceClose={onModifyRestResourceClose}
+                            nodeId={props.nodeId}
+                            handleModifyRestResourceClick={handleModifyRestResourceClick}/>
 
         <Dialog open={props.isOpen} onClose={props.onClose}>
             <DialogTitle>Node Properties : {props.nodeId}</DialogTitle>
