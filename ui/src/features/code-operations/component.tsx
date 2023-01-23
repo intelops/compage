@@ -28,24 +28,24 @@ export const GenerateCode = () => {
     };
 
     const IsAnyRequiredValueMissingInOneOfNodes = (removeUnwantedKeysGetCurrentState: any) => {
-        //nodes
+        // nodes
         for (let key in removeUnwantedKeysGetCurrentState.nodes) {
-            const name = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData.name
+            const name = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.name
             if (!name) {
                 return true;
             }
-            const serverTypes = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData.serverTypes
+            const serverTypes = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.serverTypes
             if (!serverTypes || serverTypes === "" || serverTypes === "[]") {
                 return true;
             }
         }
         // edges
         for (let key in removeUnwantedKeysGetCurrentState.edges) {
-            const name = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData.name
+            const name = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData?.name
             if (!name) {
                 return true;
             }
-            const clientTypes = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData.clientTypes
+            const clientTypes = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData?.clientTypes
             if (!clientTypes || clientTypes === "" || clientTypes === "[]") {
                 return true;
             }
@@ -63,7 +63,7 @@ export const GenerateCode = () => {
 
         if (updateProjectData?.project?.json) {
             const removeUnwantedKeyUpdateProject = removeUnwantedKeys(JSON.parse(JSON.stringify(updateProjectData.project.json)));
-            if (_.isEqual(removeUnwantedKeyUpdateProject, removeUnwantedKeysGetCurrentState)) {
+            if (_.isEqual(removeUnwantedKeyUpdateProject, removeUnwantedKeysGetCurrentState) && Object.keys(JSON.parse(updateProjectData.project.json).nodes).length !== 0) {
                 return false;
             }
         }
