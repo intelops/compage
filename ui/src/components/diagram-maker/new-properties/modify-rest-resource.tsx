@@ -14,8 +14,8 @@ interface ModifyRestResourceProperties {
     isOpen: boolean;
     onModifyRestResourceClose: () => void;
     handleModifyRestResourceClick: (resource: Resource) => void;
-    resource: Resource
-    nodeId: string
+    resource: Resource;
+    nodeId: string;
 }
 
 export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
@@ -75,7 +75,7 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
                         minRows={5}
                         required
                         id="fields"
-                        value={JSON.stringify(data.fields)}
+                        value={data.fields}
                         onChange={handleFieldsChange}
                     />
                 </Stack>

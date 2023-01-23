@@ -27,10 +27,10 @@ interface ClientTypesConfig {
 }
 
 const getClientTypesConfig = (parsedModifiedState, edgeId): ClientTypesConfig => {
-    const clientTypes = parsedModifiedState.edges[edgeId]?.consumerData.clientTypes;
+    const clientTypes = parsedModifiedState.edges[edgeId]?.consumerData?.clientTypes;
     const clientTypesConfig = {};
-    if (clientTypes || clientTypes !== "[]") {
-        for (let i = 0; i < clientTypes.length; i++) {
+    if (clientTypes  || clientTypes !== undefined || clientTypes !== "[]") {
+        for (let i = 0; i < clientTypes?.length; i++) {
             if (clientTypes[i]["protocol"] === Rest) {
                 clientTypesConfig["isRestServer"] = true;
                 clientTypesConfig["restServerPort"] = clientTypes[i]["port"];

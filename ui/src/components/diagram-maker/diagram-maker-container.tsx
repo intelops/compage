@@ -346,6 +346,10 @@ export const DiagramMakerContainer = ({
 
                     if (diagramMakerAction.type === DiagramMakerActions.EDGE_CREATE
                         && "payload" in diagramMakerAction) {
+                        // prevent creation of edge where src and dest are same.
+                        if (diagramMakerAction.payload["src"] === diagramMakerAction.payload["dest"]){
+                            return;
+                        }
                         diagramMakerAction.payload["id"] = diagramMakerAction.payload["id"].substring(3, 10)
                         next(diagramMakerAction);
                         // the below creates reverse edge
