@@ -172,7 +172,9 @@ const updateFromGithub = (projectEntity: ProjectEntity, response: Response) => {
 
 // creates repository on github and commits first version of yaml
 const createOnGithub = (projectEntity: ProjectEntity, response: Response) => {
-    return createRepository(projectEntity.user.name, projectEntity.repository.name, projectEntity.repository.name)
+    // TODO change description
+    // repository name is now project's id.
+    return createRepository(projectEntity.user.name, projectEntity.id, projectEntity.repository.name)
         .then(resp => {
             // TODO remove below later
             // console.log("createRepository Response: ", JSON.stringify(resp.data))

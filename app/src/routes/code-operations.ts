@@ -15,24 +15,6 @@ const tar = require('tar')
 const codeOperationsRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
 
-const getFormattedJsonString = (formattedJsonString: string) => {
-    if (!formattedJsonString) {
-        return formattedJsonString;
-    }
-    const formattedJson = JSON.parse(formattedJsonString)
-    for (let key in formattedJson.nodes) {
-        let serverTypes = formattedJson.nodes[key].consumerData.serverTypes;
-        if (serverTypes && serverTypes !== "[]") {
-            formattedJson.nodes[key].consumerData.serverTypes = JSON.parse(serverTypes);
-        }
-    }
-    for (let key in formattedJson.edges) {
-        let clientTypes = formattedJson.edges[key].consumerData.clientTypes;
-        formattedJson.edges[key].consumerData.clientTypes = JSON.parse(clientTypes);
-    }
-    return JSON.stringify(formattedJson);
-}
-
 // generateCode (grpc calls to core)
 codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (request, resource) => {
     // TODO the below || op is not required, as the check is already done in middleware.
@@ -80,11 +62,10 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
 
     // save project metadata (in compage db or somewhere)
     // need to save project-name, compage-json version, github repo and latest commit to the db
-    const formattedJsonString = getFormattedJsonString(projectResource.spec.json);
     const payload: Project = {
         projectName: projectResource.spec.displayName,
         userName: projectResource.spec.user.name,
-        json: formattedJsonString,
+        json: projectResource.spec.json,
         repositoryName: projectResource.spec.repository.name,
         metadata: projectResource.spec.metadata
     }
