@@ -99,10 +99,11 @@ const Header = () => {
         if (authData.login) {
             const currentProject = getCurrentProject();
             if (currentProject) {
+                const projectAndVersion = currentProject.split("###");
                 return <Toolbar>
                     <Box sx={{flexGrow: 0}}>
-                        <Typography variant={"h6"}> You have
-                            selected {currentProject}
+                        <Typography variant={"h6"}>
+                            You have selected {projectAndVersion[0]}[{projectAndVersion[1]}]
                         </Typography>
                     </Box>
                 </Toolbar>;

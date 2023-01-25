@@ -24,15 +24,15 @@ export const getCurrentConfig = () => {
     return localStorage.getItem(CURRENT_CONFIG);
 };
 
-export const setCurrentProject = (currentProject: string) => {
-    localStorage.setItem(CURRENT_PROJECT, currentProject);
+export const setCurrentProject = (currentProject: string, version: string) => {
+    localStorage.setItem(CURRENT_PROJECT, currentProject + "###" + version);
 };
 
 export const getCurrentProject = () => {
     return localStorage.getItem(CURRENT_PROJECT);
 };
 
-export const removeCurrentProjectContext = () => {
+export const removeCurrentProject = () => {
     localStorage.removeItem(CURRENT_PROJECT);
 };
 

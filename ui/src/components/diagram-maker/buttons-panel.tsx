@@ -14,17 +14,20 @@ import {
 
 const resetState = () => {
     const currentProject: string = getCurrentProject();
-    const message = `Are you sure you want to reset the project [${currentProject}]?`;
-    if (!window.confirm(message)) {
-        return;
+    if (currentProject){
+        const projectAndVersion = currentProject.split("###");
+        const message = `Are you sure you want to reset the project [${projectAndVersion[0]}]?`;
+        if (!window.confirm(message)) {
+            return;
+        }
+        removeCurrentConfig();
+        removeCurrentState();
+        removeModifiedState();
+        setReset(true);
+        // TODO just reset to last saved state.
+        // after resetting, needs to manually reload so, avoiding manual step here.
+        window.location.reload();
     }
-    removeCurrentConfig();
-    removeCurrentState();
-    removeModifiedState();
-    setReset(true);
-    // TODO just reset to last saved state.
-    // after resetting, needs to manually reload so, avoiding manual step here.
-    window.location.reload();
 };
 
 export const ButtonsPanel = () => {

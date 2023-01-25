@@ -19,11 +19,14 @@ export const GenerateCode = () => {
     // When clicked, dispatch `generateCode`
     const handleGenerateCodeClick = () => {
         const currentProject: string = getCurrentProject();
-        const generateCodeRequest = {
-            projectId: currentProject
-        };
-        if (generateCodeStatus !== 'loading') {
-            dispatch(generateCodeAsync(generateCodeRequest));
+        if (currentProject) {
+            const projectAndVersion = currentProject.split("###");
+            const generateCodeRequest = {
+                projectId: projectAndVersion[0]
+            };
+            if (generateCodeStatus !== 'loading') {
+                dispatch(generateCodeAsync(generateCodeRequest));
+            }
         }
     };
 
