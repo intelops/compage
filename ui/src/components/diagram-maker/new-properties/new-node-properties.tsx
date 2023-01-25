@@ -11,13 +11,13 @@ import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import {Grpc, Resource, Rest, Ws} from "../models";
-import Typography from "@mui/material/Typography";
 import {ModifyRestResource} from "./modify-rest-resource";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface NewNodePropertiesProps {
-    isOpen: boolean,
-    nodeId: string,
-    onClose: () => void,
+    isOpen: boolean;
+    nodeId: string;
+    onClose: () => void;
 }
 
 interface ServerConfig {
@@ -36,7 +36,7 @@ interface ServerTypesConfig {
     wsServerConfig?: ServerConfig;
 }
 
-//TODO incomplete impl below
+// TODO incomplete impl below
 const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig => {
     const serverTypes = parsedModifiedState.nodes[nodeId]?.consumerData.serverTypes;
     const serverTypesConfig: ServerTypesConfig = {};
@@ -44,17 +44,17 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
         for (let i = 0; i < serverTypes?.length; i++) {
             if (serverTypes[i]["protocol"] === Rest) {
                 serverTypesConfig.isRestServer = true;
-                serverTypesConfig.restServerConfig = {}
+                serverTypesConfig.restServerConfig = {};
                 serverTypesConfig.restServerConfig.port = serverTypes[i]["port"];
                 serverTypesConfig.restServerConfig.framework = serverTypes[i]["framework"];
                 serverTypesConfig.restServerConfig.resources = serverTypes[i]["resources"];
             } else if (serverTypes[i]["protocol"] === Grpc) {
                 serverTypesConfig.isGrpcServer = true;
-                serverTypesConfig.grpcServerConfig = {}
+                serverTypesConfig.grpcServerConfig = {};
                 serverTypesConfig.grpcServerConfig.port = serverTypes[i]["port"];
             } else if (serverTypes[i]["protocol"] === Ws) {
                 serverTypesConfig.isWsServer = true;
-                serverTypesConfig.wsServerConfig = {}
+                serverTypesConfig.wsServerConfig = {};
                 serverTypesConfig.wsServerConfig.port = serverTypes[i]["port"];
             }
         }
@@ -67,7 +67,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const serverTypesConfig: ServerTypesConfig = getServerTypesConfig(parsedModifiedState, props.nodeId);
     const emptyConfig: ServerConfig = {
         framework: "", port: "", protocol: "", resources: []
-    }
+    };
     const [payload, setPayload] = React.useState({
         name: parsedModifiedState.nodes[props.nodeId]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.name : "",
         template: parsedModifiedState.nodes[props.nodeId]?.consumerData.template !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.template : "compage",
@@ -128,7 +128,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     template: payload.template,
                     name: payload.name,
                     language: payload.language,
-                    serverTypes: serverTypes
+                    serverTypes
                 }
             };
         } else {
@@ -137,7 +137,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 template: payload.template,
                 name: payload.name,
                 language: payload.language,
-                serverTypes: serverTypes
+                serverTypes
             };
         }
         // image to node display
@@ -199,22 +199,40 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
+    const handleDeleteRestResourceClick = (d) => {
+        payload.restServerConfig.resources = payload.restServerConfig.resources.filter(item => item.name !== d);
+        setPayload({
+            ...payload,
+            restServerConfig: payload.restServerConfig
+        });
+    };
+
     const getExistingResources = () => {
         if (payload.restServerConfig.resources?.length > 0) {
             const getResources = () => {
-                const resourceNames = []
+                const resourceNames = [];
                 payload.restServerConfig.resources.forEach(resource => {
                     resourceNames.push(resource.name);
                 });
                 return resourceNames;
-            }
+            };
+            const listItems = getResources().map((d) =>
+                <li key={d}>
+                    {d}<DeleteIcon onClick={() => {
+                    handleDeleteRestResourceClick(d);
+                }} fontSize="small"/>
+                </li>
+            );
 
-            return <Typography>
-                Existing resources : {getResources().join(", ")}
-            </Typography>;
+            return <div>
+                Existing resources :
+                <ul>
+                    {listItems}
+                </ul>
+            </div>;
         }
 
-        return ""
+        return "";
     };
 
     const frameworks = ["net/http"];
@@ -265,7 +283,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     onChange={handleIsRestServerChange}
                 />}
             />
-        </React.Fragment>
+        </React.Fragment>;
     };
 
     const handleRestServerConfigFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
@@ -323,7 +341,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     onChange={handleIsGrpcServerChange}
                 />}
             />
-        </React.Fragment>
+        </React.Fragment>;
     };
 
     const handleGrpcServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
@@ -372,7 +390,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     onChange={handleIsWsServerChange}
                 />}
             />
-        </React.Fragment>
+        </React.Fragment>;
     };
 
     const handleWsServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
@@ -397,7 +415,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const onModifyRestResourceClose = () => {
-        console.log("onModifyRestResourceClose clicked")
+        console.log("onModifyRestResourceClose clicked");
         setPayload({
             ...payload,
             isModifyRestResourceOpen: !payload.isModifyRestResourceOpen
