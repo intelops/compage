@@ -26,7 +26,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
         projectName: "",
         repositoryName: "",
         repositoryBranch: "",
-        //TODO ui for this yet to be added.
+        // TODO ui for this yet to be added.
         metadata: new Map<string, string>()
     });
 
