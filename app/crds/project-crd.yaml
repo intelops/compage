@@ -53,6 +53,15 @@ spec:
                       type: string
                     branch:
                       type: string
+                oldVersions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      version:
+                        type: string
+                      json:
+                        type: string
                 metadata:
                   type: string
                 version:

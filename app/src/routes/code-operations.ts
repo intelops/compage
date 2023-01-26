@@ -9,6 +9,7 @@ import {GenerateCodeError, GenerateCodeRequest, GenerateCodeResponse, Project} f
 import {requireUserNameMiddleware} from "../middlewares/auth";
 import {getProjectResource, patchProjectResource} from "../store/project-client";
 import {NAMESPACE, X_USER_NAME_HEADER} from "../util/constants";
+import {OldVersion} from "../store/models";
 
 const rimraf = require("rimraf");
 const tar = require('tar')
@@ -147,6 +148,19 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
             metadata.version = projectResource.spec.version;
             // add metadata back to projectResource.spec
             projectResource.spec.metadata = JSON.stringify(metadata)
+            const nextVersion = (version: string): string => {
+                const number = parseInt(version.substring(1, version.length)) + 1;
+                return "v" + number;
+            };
+            // change version now
+            if (projectResource.spec.oldVersions) {
+                const oldVersion: OldVersion = {
+                    version: projectResource.spec.version,
+                    json: projectResource.spec.json
+                };
+                projectResource.spec.version = nextVersion(projectResource.spec.version);
+                projectResource.spec.oldVersions.push(oldVersion);
+            }
             const patchedProjectResource = await patchProjectResource(NAMESPACE, projectId, JSON.stringify(projectResource.spec))
             if (patchedProjectResource.apiVersion) {
                 // send status back to ui

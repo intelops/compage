@@ -27,6 +27,7 @@ const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: 
             || !projectEntity.repository?.branch)
             ? repository : projectEntity.repository,
         version: projectEntity.version,
+        oldVersions: []
     }
     return projectResourceSpec
 }
