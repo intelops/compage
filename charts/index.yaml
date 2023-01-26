@@ -2,8 +2,19 @@ apiVersion: v1
 entries:
   compage:
   - apiVersion: v2
+    appVersion: 0.0.3
+    created: "2023-01-26T16:53:10.195216262+05:30"
+    description: A Helm chart for Kubernetes
+    digest: a9706e89c8b8b808c141388eddea7123392f5f35389844a4baf2182dc155ef4b
+    icon: https://github.com/kube-tarian/compage/raw/main/compage-logo2-0.png
+    name: compage
+    type: application
+    urls:
+    - compage-0.0.3.tgz
+    version: 0.0.3
+  - apiVersion: v2
     appVersion: 0.0.2
-    created: "2023-01-13T13:42:04.842243448+05:30"
+    created: "2023-01-26T16:53:10.193960799+05:30"
     description: A Helm chart for Kubernetes
     digest: 27a75ab81e60915c7e7268ebfe4fcd53e124eaedb390a46d021d09b083d3253f
     icon: https://github.com/kube-tarian/compage/raw/main/compage-logo2-0.png
@@ -14,7 +25,7 @@ entries:
     version: 0.0.2
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2023-01-13T13:42:04.841381414+05:30"
+    created: "2023-01-26T16:53:10.193107145+05:30"
     description: A Helm chart for Kubernetes
     digest: a0f03b6a71c8d1ad89ea5fadf1a7d2f5f52253987022770216ff84b567b26043
     icon: https://github.com/kube-tarian/compage/raw/main/compage-logo2-0.png
@@ -23,4 +34,4 @@ entries:
     urls:
     - compage-0.0.1.tgz
     version: 0.0.1
-generated: "2023-01-13T13:42:04.840326967+05:30"
+generated: "2023-01-26T16:53:10.192087289+05:30"
