@@ -123,6 +123,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
 
             // save to GitHub
             const pushToExistingProjectOnGithubRequest: PushToExistingProjectOnGithubRequest = {
+                projectVersion: projectResource.spec.version,
                 generatedProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
                 existingProject: cloneExistingProjectFromGithubRequest.clonedProjectPath + "/" + projectResource.spec.repository?.name,
                 userName: projectResource.spec.user.name,

@@ -4,12 +4,13 @@ import {gitOperations} from "./common";
 import {Repository} from "../../routes/models";
 
 export interface PushToExistingProjectOnGithubRequest {
-    generatedProjectPath: string,
-    repository: Repository,
-    existingProject: string,
-    userName: string,
-    password: string,
-    email: string
+    projectVersion: string;
+    generatedProjectPath: string;
+    repository: Repository;
+    existingProject: string;
+    userName: string;
+    password: string;
+    email: string;
 }
 
 export const pushToExistingProjectOnGithub = async (pushToExistingProjectOnGithubRequest: PushToExistingProjectOnGithubRequest): Promise<string> => {
@@ -32,5 +33,5 @@ export const pushToExistingProjectOnGithub = async (pushToExistingProjectOnGithu
     console.log(`${pushToExistingProjectOnGithubRequest.generatedProjectPath} files copied to ${pushToExistingProjectOnGithubRequest.existingProject}`)
 
     // add, commit and push
-    return await gitOperations(git, pushToExistingProjectOnGithubRequest.repository)
+    return await gitOperations(git, pushToExistingProjectOnGithubRequest.repository, pushToExistingProjectOnGithubRequest.projectVersion)
 }

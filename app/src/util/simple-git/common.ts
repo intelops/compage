@@ -1,7 +1,7 @@
 import {SimpleGit} from "simple-git";
 import {Repository} from "../../routes/models";
 
-export const gitOperations = async (git: SimpleGit, repository: Repository): Promise<string> => {
+export const gitOperations = async (git: SimpleGit, repository: Repository, projectVersion: string): Promise<string> => {
     // Add all files for commit
     let error: string = ""
     await git.add('.')
@@ -17,7 +17,7 @@ export const gitOperations = async (git: SimpleGit, repository: Repository): Pro
     }
 
     // Commit files as Initial Commit
-    await git.commit('commit by compage : generated files through compage')
+    await git.commit(`commit by compage : generated files through compage for version: ${projectVersion}`)
         .then(
             (success: any) => {
                 console.debug('git commit succeeded');
@@ -30,7 +30,7 @@ export const gitOperations = async (git: SimpleGit, repository: Repository): Pro
     }
 
     //  checkoutLocalBranch checks out local branch with name supplied
-    await git.checkoutLocalBranch(repository.branch)
+    await git.checkoutLocalBranch(repository.branch + "-" + projectVersion)
         .then(
             (success: any) => {
                 console.debug('git checkoutLocalBranch succeeded');
@@ -43,7 +43,7 @@ export const gitOperations = async (git: SimpleGit, repository: Repository): Pro
     }
 
     // Finally push to online repository
-    await git.push('origin', repository.branch, { '--force': null })
+    await git.push('origin', repository.branch + "-" + projectVersion, {'--force': null})
         .then((success: any) => {
             console.debug('git push succeeded');
         }, (failure: any) => {

@@ -3,11 +3,12 @@ import {gitOperations} from "./common";
 import {Repository} from "../../routes/models";
 
 export interface PushNewProjectToGithubRequest {
-    generatedProjectPath: string,
-    repository: Repository,
-    userName: string,
-    password: string,
-    email: string
+    projectVersion: string;
+    generatedProjectPath: string;
+    repository: Repository;
+    userName: string;
+    password: string;
+    email: string;
 }
 
 export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: PushNewProjectToGithubRequest): Promise<string> => {
@@ -54,5 +55,5 @@ export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: Push
     }
 
     // add, commit and push
-    return await gitOperations(git, pushNewProjectToGithubRequest.repository)
+    return await gitOperations(git, pushNewProjectToGithubRequest.repository, pushNewProjectToGithubRequest.projectVersion)
 }
