@@ -59,8 +59,14 @@ spec:
                   type: string
                 version:
                   type: string
-                replicas:
-                  type: integer
-                  minimum: 1
+                oldVersions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      version:
+                        type: string
+                      json:
+                        type: string
               required: [ "id", "displayName", "version" ]
           required: [ "spec" ]

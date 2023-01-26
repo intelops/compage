@@ -37,7 +37,4 @@ spec:
                   type: string
                 email:
                   type: string
-                replicas:
-                  type: integer
-                  minimum: 1
           required: ["spec"]

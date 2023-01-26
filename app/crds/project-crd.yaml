@@ -66,8 +66,5 @@ spec:
                   type: string
                 version:
                   type: string
-                replicas:
-                  type: integer
-                  minimum: 1
               required: [ "id", "displayName", "version" ]
           required: [ "spec" ]
