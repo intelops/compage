@@ -183,6 +183,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         return <React.Fragment>
             <FormControlLabel
                 label="Grpc Server"
+                disabled
                 control={<Checkbox
                     size="medium" checked={payload.isGrpcServer}
                     onChange={handleIsGrpcServerChange}
@@ -226,6 +227,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         return <React.Fragment>
             <FormControlLabel
                 label="Ws Server"
+                disabled
                 control={<Checkbox
                     size="medium" checked={payload.isWsServer}
                     onChange={handleIsWsServerChange}
