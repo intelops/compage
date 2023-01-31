@@ -2,7 +2,7 @@
 # Build stage will be used:
 # - for building the application for production
 # - as target for development (see devspace.yaml)
-FROM golang:1.19.4-alpine3.17 as build
+FROM golang:1.19.4-alpine3.17 as builder
 
 # Create project directory (workdir)
 WORKDIR /app
@@ -20,12 +20,9 @@ CMD ["go", "run", "main.go"]
 
 
 ################ Production ################
-# Creates a minimal image for production using distroless base image
-# More info here: https://github.com/GoogleContainerTools/distroless
-FROM gcr.io/distroless/base-debian10 as production
-
-# Copy application binary from build/dev stage to the distroless container
-COPY --from=build /app/main /
+FROM node:18.12-alpine
+RUN npm install @openapitools/openapi-generator-cli -g
+COPY --from=builder /app/main /
 ADD templates /app/templates
 # Application port (optional)
 EXPOSE 8080
