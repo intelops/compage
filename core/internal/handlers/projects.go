@@ -11,6 +11,16 @@ import (
 	"net/http"
 )
 
+// CallOpenApiGenerator calls OpenApiGenerator
+func CallOpenApiGenerator(context *gin.Context) {
+	go func() {
+		_ = generator.OpenApiGeneratorRunner("generate", "-i", "https://raw.githubusercontent.com/openapitools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml", "-g", "ruby", "-o", "/tmp/test-project/")
+	}()
+	context.JSON(http.StatusOK, gin.H{
+		"message": "called OpenApiGeneratorRunner",
+	})
+}
+
 // Ping ping endpoint
 func Ping(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{

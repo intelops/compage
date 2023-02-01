@@ -14,5 +14,6 @@ func StartRestServer() error {
 	router.GET("/ping", handlers.Ping)
 	router.POST("/generate_code", handlers.GenerateCode)
 	router.PUT("/regenerate_code", handlers.RegenerateCode)
+	router.GET("/call_openapi_generator", handlers.CallOpenApiGenerator)
 	return router.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
