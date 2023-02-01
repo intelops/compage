@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProjectServiceClient interface {
 	GenerateCode(ctx context.Context, in *GenerateCodeRequest, opts ...grpc.CallOption) (ProjectService_GenerateCodeClient, error)
+	GenerateCodeWithOpenApi(ctx context.Context, in *GenerateCodeWithOpenApiRequest, opts ...grpc.CallOption) (ProjectService_GenerateCodeWithOpenApiClient, error)
 	RegenerateCode(ctx context.Context, in *GenerateCodeRequest, opts ...grpc.CallOption) (ProjectService_RegenerateCodeClient, error)
 }
 
@@ -66,8 +67,40 @@ func (x *projectServiceGenerateCodeClient) Recv() (*GenerateCodeResponse, error)
 	return m, nil
 }
 
+func (c *projectServiceClient) GenerateCodeWithOpenApi(ctx context.Context, in *GenerateCodeWithOpenApiRequest, opts ...grpc.CallOption) (ProjectService_GenerateCodeWithOpenApiClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ProjectService_ServiceDesc.Streams[1], "/api.v1.ProjectService/GenerateCodeWithOpenApi", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &projectServiceGenerateCodeWithOpenApiClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type ProjectService_GenerateCodeWithOpenApiClient interface {
+	Recv() (*GenerateCodeWithOpenApiResponse, error)
+	grpc.ClientStream
+}
+
+type projectServiceGenerateCodeWithOpenApiClient struct {
+	grpc.ClientStream
+}
+
+func (x *projectServiceGenerateCodeWithOpenApiClient) Recv() (*GenerateCodeWithOpenApiResponse, error) {
+	m := new(GenerateCodeWithOpenApiResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *projectServiceClient) RegenerateCode(ctx context.Context, in *GenerateCodeRequest, opts ...grpc.CallOption) (ProjectService_RegenerateCodeClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ProjectService_ServiceDesc.Streams[1], "/api.v1.ProjectService/RegenerateCode", opts...)
+	stream, err := c.cc.NewStream(ctx, &ProjectService_ServiceDesc.Streams[2], "/api.v1.ProjectService/RegenerateCode", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -103,6 +136,7 @@ func (x *projectServiceRegenerateCodeClient) Recv() (*GenerateCodeResponse, erro
 // for forward compatibility
 type ProjectServiceServer interface {
 	GenerateCode(*GenerateCodeRequest, ProjectService_GenerateCodeServer) error
+	GenerateCodeWithOpenApi(*GenerateCodeWithOpenApiRequest, ProjectService_GenerateCodeWithOpenApiServer) error
 	RegenerateCode(*GenerateCodeRequest, ProjectService_RegenerateCodeServer) error
 }
 
@@ -112,6 +146,9 @@ type UnimplementedProjectServiceServer struct {
 
 func (UnimplementedProjectServiceServer) GenerateCode(*GenerateCodeRequest, ProjectService_GenerateCodeServer) error {
 	return status.Errorf(codes.Unimplemented, "method GenerateCode not implemented")
+}
+func (UnimplementedProjectServiceServer) GenerateCodeWithOpenApi(*GenerateCodeWithOpenApiRequest, ProjectService_GenerateCodeWithOpenApiServer) error {
+	return status.Errorf(codes.Unimplemented, "method GenerateCodeWithOpenApi not implemented")
 }
 func (UnimplementedProjectServiceServer) RegenerateCode(*GenerateCodeRequest, ProjectService_RegenerateCodeServer) error {
 	return status.Errorf(codes.Unimplemented, "method RegenerateCode not implemented")
@@ -149,6 +186,27 @@ func (x *projectServiceGenerateCodeServer) Send(m *GenerateCodeResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _ProjectService_GenerateCodeWithOpenApi_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GenerateCodeWithOpenApiRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ProjectServiceServer).GenerateCodeWithOpenApi(m, &projectServiceGenerateCodeWithOpenApiServer{stream})
+}
+
+type ProjectService_GenerateCodeWithOpenApiServer interface {
+	Send(*GenerateCodeWithOpenApiResponse) error
+	grpc.ServerStream
+}
+
+type projectServiceGenerateCodeWithOpenApiServer struct {
+	grpc.ServerStream
+}
+
+func (x *projectServiceGenerateCodeWithOpenApiServer) Send(m *GenerateCodeWithOpenApiResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 func _ProjectService_RegenerateCode_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(GenerateCodeRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -181,6 +239,11 @@ var ProjectService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "GenerateCode",
 			Handler:       _ProjectService_GenerateCode_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "GenerateCodeWithOpenApi",
+			Handler:       _ProjectService_GenerateCodeWithOpenApi_Handler,
 			ServerStreams: true,
 		},
 		{
