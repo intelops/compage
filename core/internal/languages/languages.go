@@ -10,6 +10,7 @@ import (
 const Go = "Golang"
 const NodeJs = "NodeJs"
 const Compage string = "compage"
+const OpenApi string = "openApi"
 
 type LanguageNode struct {
 	ID          string                 `json:"ID"`
@@ -31,6 +32,8 @@ type RestServer struct {
 	Framework string          `json:"framework"`
 	Port      string          `json:"port"`
 	Resources []node.Resource `json:"resources"`
+	// OpenApiFileYamlContent holds openApiFileYamlContent
+	OpenApiFileYamlContent string `json:"openApiFileYamlContent,omitempty"`
 }
 
 // RestClient holds information about edge between nodeA and nodeB.
@@ -39,6 +42,8 @@ type RestClient struct {
 	Port         string `json:"port"`
 	Framework    string `json:"framework"`
 	ExternalNode string `json:"externalNode"`
+	// OpenApiFileYamlContent holds openApiFileYamlContent
+	OpenApiFileYamlContent string `json:"openApiFileYamlContent,omitempty"`
 }
 
 // RestConfig rest configs
@@ -146,6 +151,7 @@ func GetServersForNode(nodeP *node.Node) (*Servers, error) {
 					Resources: serverType.Resources,
 				}
 				(*servers)[core.Rest] = restServer
+				//TODO add code to extract openapi config
 				return servers, nil
 			} else if serverProtocol == core.Grpc {
 				return nil, fmt.Errorf("unsupported serverProtocol %s for language : %s", serverProtocol,

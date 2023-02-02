@@ -64,7 +64,7 @@ func (s *server) GenerateCode(projectRequest *project.GenerateCodeRequest, serve
 	}(taroperations.GetProjectTarFilePath(projectRequest.GetProjectName()))
 
 	// stream file to grpc client
-	return sendFile(projectRequest, server)
+	return sendFile(projectRequest.ProjectName, server)
 }
 
 // RegenerateCode implements api.v1.RegGenerateCode
@@ -81,11 +81,11 @@ func (s *server) RegenerateCode(generateCodeRequest *project.GenerateCodeRequest
 		return status.Errorf(codes.InvalidArgument,
 			"error while creating a tar file ["+err.Error()+"]")
 	}
-	return sendFile(generateCodeRequest, server)
+	return sendFile(generateCodeRequest.ProjectName, server)
 }
 
-func sendFile(generateCodeRequest *project.GenerateCodeRequest, server project.ProjectService_GenerateCodeServer) error {
-	f, ok := taroperations.GetFile(taroperations.GetProjectTarFilePath(generateCodeRequest.ProjectName))
+func sendFile(projectName string, server project.ProjectService_GenerateCodeServer) error {
+	f, ok := taroperations.GetFile(taroperations.GetProjectTarFilePath(projectName))
 	if !ok {
 		return status.Error(codes.NotFound, "file is not found")
 	}

@@ -3,6 +3,8 @@ package golang
 import (
 	"context"
 	"errors"
+	"fmt"
+	"github.com/kube-tarian/compage/core/internal/generator"
 	"github.com/kube-tarian/compage/core/internal/languages"
 	"github.com/kube-tarian/compage/core/internal/utils"
 )
@@ -44,9 +46,32 @@ func Generator(ctx context.Context) error {
 		} else {
 			return errors.New("at least rest-config needs to be provided")
 		}
+	} else if goNode.Template == languages.OpenApi {
+		// TODO take consider template first and then language (the impl is reversed as of now)
+		// create node directory in projectDirectory depicting a subproject
+		if err := utils.CreateDirectories(nodeDirectoryName); err != nil {
+			return err
+		}
+		// copy relevant files from templates based on config received, if the node is server
+		if goNode.RestConfig != nil && len(goNode.RestConfig.Server.OpenApiFileYamlContent) > 0 {
+			// create golang specific copier
+			//copier := NewCopier(ctx)
+			// TODO call openapi-generator
+			err := generator.OpenApiGeneratorRunner("generate", "-i", "https://raw.githubusercontent.com/openapitools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml", "-g", "ruby", "-o", "/tmp/tes1/")
+			if err != nil {
+				return errors.New("something happened while running openApi generator")
+			}
+			// copy kubernetes yaml's
+			//err := copier.CreateKubernetesFiles(utils.GetProjectRootPath())
+			//if err != nil {
+			//	return err
+			//}
+		} else {
+			return errors.New("at least rest-config needs to be provided")
+		}
 	} else {
 		// frameworks cli tools
-		return errors.New("unsupported template for language : " + languages.Go)
+		return errors.New(fmt.Sprintf("unsupported template for language : %s", languages.Go))
 	}
 	return nil
 }

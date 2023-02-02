@@ -103,19 +103,19 @@ func validate(compageJson *core.CompageJson) error {
 func populateExternalNodeInEdges(compageJson *core.CompageJson) *core.CompageJson {
 	for _, edge := range compageJson.Edges {
 		if edge.ConsumerData.ExternalNodeName == "" {
-			edge.ConsumerData.ExternalNodeName = getExternalNodeForEdge(edge.Src, compageJson.Nodes)
+			edge.ConsumerData.ExternalNodeName, edge.ConsumerData.OpenApiFileYamlContent = getExternalNodeAndOpenApiFileYamlContentForEdge(edge.Src, compageJson.Nodes)
 		}
 	}
 	return compageJson
 }
 
-func getExternalNodeForEdge(src string, nodes []*node.Node) string {
+func getExternalNodeAndOpenApiFileYamlContentForEdge(src string, nodes []*node.Node) (string, string) {
 	for _, n := range nodes {
 		if src == n.ID {
-			return n.ConsumerData.Name
+			return n.ConsumerData.Name, n.ConsumerData.OpenApiFileYamlContent
 		}
 	}
-	return ""
+	return "", ""
 }
 
 // GetMetadata converts string to map

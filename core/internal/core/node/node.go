@@ -17,6 +17,8 @@ type ConsumerData struct {
 	Name string `json:"name"`
 	// ServerTypes holds all config related to server. If nil, it means that the node is just client and not server.
 	ServerTypes []ServerType `json:"serverTypes,omitempty"`
+	// OpenApiFileYamlContent holds openApiFileYamlContent
+	OpenApiFileYamlContent string `json:"openApiFileYamlContent,omitempty"`
 	// Metadata holds misc information about the node.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Annotations holds annotations for the node.

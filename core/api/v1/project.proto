@@ -5,21 +5,7 @@ option go_package = "github.com/kube-tarian/compage/core/gen/api/v1;project";
 
 service ProjectService {
   rpc GenerateCode (GenerateCodeRequest) returns (stream GenerateCodeResponse) {}
-  rpc GenerateCodeWithOpenApi (GenerateCodeWithOpenApiRequest) returns (stream GenerateCodeWithOpenApiResponse) {}
   rpc RegenerateCode (GenerateCodeRequest) returns (stream GenerateCodeResponse) {}
-}
-
-message GenerateCodeWithOpenApiRequest {
-  string json = 1;
-  string userName = 2;
-  string projectName = 3;
-  string repositoryName = 4;
-  string metadata = 5;
-  string openApiYaml = 6;
-}
-
-message GenerateCodeWithOpenApiResponse{
-  bytes fileChunk = 1;
 }
 
 message GenerateCodeRequest {
