@@ -199,6 +199,10 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
+    const handleUploadOpenApiYamlClick = () => {
+        console.log("handleUploadOpenApiYamlClick clicked");
+    };
+
     const handleDeleteRestResourceClick = (d) => {
         payload.restServerConfig.resources = payload.restServerConfig.resources.filter(item => item.name !== d);
         setPayload({
@@ -238,6 +242,23 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const frameworks = ["net/http"];
     const getRestServerConfig = () => {
         if (payload.isRestServer) {
+            const getContent = () => {
+                if (payload.template === 'compage') {
+                    return <React.Fragment>
+                        <Button variant="outlined" color="secondary" onClick={handleAddRestResourceClick}>Add
+                            Resource</Button>
+                        {
+                            getExistingResources()
+                        }
+                    </React.Fragment>
+                } else {
+                    return <React.Fragment>
+                        <Button variant="outlined" color="secondary"
+                                onClick={handleUploadOpenApiYamlClick}>Upload OpenApi Yaml</Button>
+                    </React.Fragment>
+                }
+            }
+
             return <React.Fragment>
                 <TextField
                     required
@@ -267,8 +288,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         </MenuItem>
                     ))}
                 </TextField>
-                <Button variant="outlined" color="secondary" onClick={handleAddRestResourceClick}>Add Resource</Button>
-                {getExistingResources()}
+                {getContent()}
             </React.Fragment>;
         }
         return "";
