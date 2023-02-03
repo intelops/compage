@@ -112,7 +112,8 @@ func populateExternalNodeInEdges(compageJson *core.CompageJson) *core.CompageJso
 func getExternalNodeAndOpenApiFileYamlContentForEdge(src string, nodes []*node.Node) (string, string) {
 	for _, n := range nodes {
 		if src == n.ID {
-			return n.ConsumerData.Name, n.ConsumerData.OpenApiFileYamlContent
+			//TODO below need to be replaced (n.ConsumerData.OpenApiFileYamlContent)
+			return n.ConsumerData.Name, ""
 		}
 	}
 	return "", ""

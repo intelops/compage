@@ -25,6 +25,7 @@ interface ServerConfig {
     port?: string;
     framework?: string;
     resources?: Resource[];
+    openApiFileYamlContent?: string
 }
 
 interface ServerTypesConfig {
@@ -48,6 +49,7 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
                 serverTypesConfig.restServerConfig.port = serverTypes[i]["port"];
                 serverTypesConfig.restServerConfig.framework = serverTypes[i]["framework"];
                 serverTypesConfig.restServerConfig.resources = serverTypes[i]["resources"];
+                serverTypesConfig.restServerConfig.openApiFileYamlContent = serverTypes[i]["openApiFileYamlContent"];
             } else if (serverTypes[i]["protocol"] === Grpc) {
                 serverTypesConfig.isGrpcServer = true;
                 serverTypesConfig.grpcServerConfig = {};
@@ -95,7 +97,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 framework: payload.restServerConfig.framework,
                 port: payload.restServerConfig.port,
                 protocol: Rest,
-                resources: payload.restServerConfig.resources
+                resources: payload.restServerConfig.resources,
+                openApiFileYamlContent: payload.restServerConfig.openApiFileYamlContent
             };
             serverTypes.push(restServerConfig);
         }
@@ -253,8 +256,19 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     </React.Fragment>
                 } else {
                     return <React.Fragment>
-                        <Button variant="outlined" color="secondary"
-                                onClick={handleUploadOpenApiYamlClick}>Upload OpenApi Yaml</Button>
+                        {/*<Button variant="outlined" color="secondary"*/}
+                        {/*        onClick={handleUploadOpenApiYamlClick}>Upload OpenApi Yaml</Button>*/}
+                        <TextField
+                            required
+                            size="medium"
+                            margin="dense"
+                            id="openApiFileYamlContent"
+                            label="OpenApi File Yaml Content"
+                            type="text"
+                            value={payload.restServerConfig.openApiFileYamlContent}
+                            onChange={handleRestServerConfigOpenApiFileYamlContentChange}
+                            variant="outlined"
+                        />
                     </React.Fragment>
                 }
             }
@@ -309,6 +323,15 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const handleRestServerConfigFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const restServerConfig = payload.restServerConfig;
         restServerConfig.framework = event.target.value;
+        setPayload({
+            ...payload,
+            restServerConfig
+        });
+    };
+
+    const handleRestServerConfigOpenApiFileYamlContentChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const restServerConfig = payload.restServerConfig;
+        restServerConfig.openApiFileYamlContent = event.target.value;
         setPayload({
             ...payload,
             restServerConfig
@@ -423,7 +446,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const templates = ["compage", "openApi"];
-    const languages = ["Golang"];
+    const languages = ["go"];
     const handleModifyRestResourceClick = (resource: Resource) => {
         console.log(resource.fields);
         const restServerConfig = payload.restServerConfig;

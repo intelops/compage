@@ -7,7 +7,7 @@ import (
 	"github.com/kube-tarian/compage/core/internal/core/node"
 )
 
-const Go = "Golang"
+const Go = "Go"
 const NodeJs = "NodeJs"
 const Compage string = "compage"
 const OpenApi string = "openApi"
@@ -152,8 +152,8 @@ func GetServersForNode(nodeP *node.Node) (*Servers, error) {
 				// set resources or openApiFileYamlContent based on availability.
 				if serverType.Resources != nil && len(serverType.Resources) > 0 {
 					restServer.Resources = serverType.Resources
-				} else if len(nodeP.ConsumerData.OpenApiFileYamlContent) > 0 {
-					restServer.OpenApiFileYamlContent = nodeP.ConsumerData.OpenApiFileYamlContent
+				} else if len(serverType.OpenApiFileYamlContent) > 0 {
+					restServer.OpenApiFileYamlContent = serverType.OpenApiFileYamlContent
 				}
 				(*servers)[core.Rest] = restServer
 				return servers, nil

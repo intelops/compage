@@ -10,6 +10,7 @@ import (
 	"github.com/kube-tarian/compage/core/internal/utils"
 	log "github.com/sirupsen/logrus"
 	"os"
+	"strings"
 )
 
 // Generator called from rest as well as gRPC
@@ -62,7 +63,7 @@ func Generator(coreProject *core.Project) error {
 				if err != nil {
 					return err
 				}
-				err = OpenApiGeneratorRunner("generate", "-i", fileName, "-g", languageNode.Language, "-o", nodeDirectoryName)
+				err = OpenApiGeneratorRunner("generate", "-i", fileName, "-g", strings.ToLower(languageNode.Language), "-o", nodeDirectoryName)
 				if err != nil {
 					return errors.New("something happened while running openApi generator")
 				}
