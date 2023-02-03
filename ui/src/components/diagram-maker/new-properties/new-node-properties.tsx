@@ -402,6 +402,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
+    const templates = ["compage", "openApi"];
     const languages = ["Golang"];
     const handleModifyRestResourceClick = (resource: Resource) => {
         console.log(resource.fields);
@@ -451,15 +452,20 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     <TextField
                         required
                         size="medium"
+                        select
                         margin="dense"
                         id="template"
                         label="Template for Component"
                         type="text"
-                        disabled
                         value={payload.template}
                         onChange={handleTemplateChange}
-                        variant="outlined"
-                    />
+                        variant="outlined">
+                        {templates.map((template: string) => (
+                            <MenuItem key={template} value={template}>
+                                {template}
+                            </MenuItem>
+                        ))}
+                    </TextField>
                     <TextField
                         required
                         size="medium"
