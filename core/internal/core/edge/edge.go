@@ -21,6 +21,6 @@ type ConsumerData struct {
 type ClientType struct {
 	Protocol string `json:"protocol"`
 	Port     string `json:"port"`
-	// Framework will be the same as client's rest server framework
+	// Framework will be the same as client's rest server framework.
 	// Framework string `json:"framework"`
 }

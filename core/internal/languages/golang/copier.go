@@ -41,10 +41,10 @@ type Copier struct {
 }
 
 func NewCopier(ctx context.Context) *Copier {
-	values := ctx.Value(ContextVars).(Values)
-	repositoryName := values.Get(RepositoryName)
-	nodeName := values.Get(NodeName)
-	userName := values.Get(UserName)
+	values := ctx.Value(languages.ContextVars).(languages.Values)
+	repositoryName := values.Get(languages.RepositoryName)
+	nodeName := values.Get(languages.NodeName)
+	userName := values.Get(languages.UserName)
 
 	//populate map to replace templates
 	data := map[string]interface{}{
@@ -54,26 +54,26 @@ func NewCopier(ctx context.Context) *Copier {
 	}
 
 	//set all resources for main.go.tmpl
-	if values.GoNode.RestConfig.Server != nil {
+	if values.LanguageNode.RestConfig.Server != nil {
 		type resourceData struct {
 			ResourceNamePlural string
 			ResourceName       string
 		}
 
 		var resourcesData []resourceData
-		resources := values.GoNode.RestConfig.Server.Resources
+		resources := values.LanguageNode.RestConfig.Server.Resources
 		for _, r := range resources {
 			resourcesData = append(resourcesData, resourceData{ResourceName: r.Name, ResourceNamePlural: strings.ToLower(r.Name) + "s"})
 		}
 		data["Resources"] = resourcesData
-		data["ServerPort"] = values.GoNode.LanguageNode.RestConfig.Server.Port
+		data["ServerPort"] = values.LanguageNode.RestConfig.Server.Port
 		data["IsServer"] = true
 	}
 
 	return &Copier{
 		Ctx:               ctx,
 		NodeDirectoryName: values.NodeDirectoryName,
-		GoNode:            values.GoNode,
+		GoNode:            &GoNode{LanguageNode: *values.LanguageNode},
 		Data:              data,
 	}
 }

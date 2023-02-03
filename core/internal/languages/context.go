@@ -1,4 +1,4 @@
-package golang
+package languages
 
 import (
 	"context"
@@ -20,30 +20,30 @@ type Values struct {
 	TemplateVars      map[TemplateVarKey]string
 	ProjectName       string
 	NodeDirectoryName string
-	GoNode            *GoNode
+	LanguageNode      *LanguageNode
 }
 
 func (v Values) Get(key TemplateVarKey) string {
 	return v.TemplateVars[key]
 }
 
-func AddValuesToContext(ctx context.Context, project *core.Project, goNode *GoNode) context.Context {
+func AddValuesToContext(ctx context.Context, project *core.Project, languageNode *LanguageNode) context.Context {
 
 	// retrieve project named directory
 	projectDirectory := utils.GetProjectDirectoryName(project.Name)
 
 	// create node directory in projectDirectory depicting a subproject
-	nodeDirectoryName := projectDirectory + "/" + goNode.Name
+	nodeDirectoryName := projectDirectory + "/" + languageNode.Name
 
 	v := Values{
 		TemplateVars: map[TemplateVarKey]string{
 			RepositoryName: project.RepositoryName,
-			NodeName:       goNode.Name,
+			NodeName:       languageNode.Name,
 			UserName:       project.UserName,
 		},
 		NodeDirectoryName: nodeDirectoryName,
 		ProjectName:       project.Name,
-		GoNode:            goNode,
+		LanguageNode:      languageNode,
 	}
 
 	return context.WithValue(ctx, ContextVars, v)

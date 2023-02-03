@@ -83,7 +83,7 @@ type Servers map[string]interface{}
 
 // NewLanguageNode converts node to LanguageNode struct
 func NewLanguageNode(compageJson *core.CompageJson, node *node.Node) (*LanguageNode, error) {
-	goNode := &LanguageNode{
+	languageNode := &LanguageNode{
 		ID:          node.ID,
 		Name:        node.ConsumerData.Name,
 		Metadata:    node.ConsumerData.Metadata,
@@ -105,25 +105,25 @@ func NewLanguageNode(compageJson *core.CompageJson, node *node.Node) (*LanguageN
 	// check if the servers has rest entry (if node is not server or node is not REST server)
 	if restServer, ok := (*servers)[core.Rest]; ok {
 		// one node, one rest server
-		goNode.RestConfig = &RestConfig{
+		languageNode.RestConfig = &RestConfig{
 			Server: restServer.(*RestServer),
 		}
 	}
 	// check if any rest client needs to be created
 	if restClients, ok := (*clients)[core.Rest]; ok {
-		// if the component is just client and not server, goNode.RestConfig will be nil in that case.
-		if goNode.RestConfig == nil {
-			goNode.RestConfig = &RestConfig{
+		// if the component is just client and not server, languageNode.RestConfig will be nil in that case.
+		if languageNode.RestConfig == nil {
+			languageNode.RestConfig = &RestConfig{
 				Clients: restClients.([]RestClient),
 			}
 		} else {
-			goNode.RestConfig.Clients = restClients.([]RestClient)
+			languageNode.RestConfig.Clients = restClients.([]RestClient)
 		}
 		// set framework to all clients for this node as it's set for server.
-		for _, client := range goNode.RestConfig.Clients {
+		for _, client := range languageNode.RestConfig.Clients {
 			// if server is nil, assign default framework i.e. http client
-			if goNode.RestConfig.Server != nil {
-				client.Framework = goNode.RestConfig.Server.Framework
+			if languageNode.RestConfig.Server != nil {
+				client.Framework = languageNode.RestConfig.Server.Framework
 			} else {
 				// default rest client code based on below framework.
 				client.Framework = "net/http"
@@ -131,7 +131,7 @@ func NewLanguageNode(compageJson *core.CompageJson, node *node.Node) (*LanguageN
 		}
 	}
 
-	return goNode, nil
+	return languageNode, nil
 }
 
 // GetServersForNode retrieves all servers for given node
@@ -148,10 +148,14 @@ func GetServersForNode(nodeP *node.Node) (*Servers, error) {
 				restServer = &RestServer{
 					Framework: serverType.Framework,
 					Port:      serverType.Port,
-					Resources: serverType.Resources,
+				}
+				// set resources or openApiFileYamlContent based on availability.
+				if serverType.Resources != nil && len(serverType.Resources) > 0 {
+					restServer.Resources = serverType.Resources
+				} else if len(nodeP.ConsumerData.OpenApiFileYamlContent) > 0 {
+					restServer.OpenApiFileYamlContent = nodeP.ConsumerData.OpenApiFileYamlContent
 				}
 				(*servers)[core.Rest] = restServer
-				//TODO add code to extract openapi config
 				return servers, nil
 			} else if serverProtocol == core.Grpc {
 				return nil, fmt.Errorf("unsupported serverProtocol %s for language : %s", serverProtocol,

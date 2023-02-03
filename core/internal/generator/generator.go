@@ -3,11 +3,13 @@ package generator
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/kube-tarian/compage/core/internal/core"
 	"github.com/kube-tarian/compage/core/internal/languages"
 	"github.com/kube-tarian/compage/core/internal/languages/golang"
 	"github.com/kube-tarian/compage/core/internal/utils"
 	log "github.com/sirupsen/logrus"
+	"os"
 )
 
 // Generator called from rest as well as gRPC
@@ -28,30 +30,64 @@ func Generator(coreProject *core.Project) error {
 			// return errors like certain protocols aren't yet supported
 			return err1
 		}
-
-		// if language is not set, consider that the node is go project
-		if compageNode.ConsumerData.Language == "" || compageNode.ConsumerData.Language == languages.Go {
-			goNode := golang.GoNode{LanguageNode: *languageNode}
-			// currently below func does nothing.
-			if err2 := goNode.FillDefaults(); err2 != nil {
-				return err2
+		// add values to context.
+		ctx := languages.AddValuesToContext(context.Background(), coreProject, languageNode)
+		// check for the templates
+		if compageNode.ConsumerData.Template == languages.Compage {
+			// if language is not set, consider that the node is go project
+			if compageNode.ConsumerData.Language == "" || compageNode.ConsumerData.Language == languages.Go {
+				// generate golang project using custom template.
+				if err2 := golang.Generator(ctx); err2 != nil {
+					return err2
+				}
+				// trigger template runner
+				// create data map with values from LanguageNode and project to replace placeholders  - this is required as the
+				// names may be conflicting in nature
+				// TODO
+			} else if compageNode.ConsumerData.Language == languages.NodeJs {
+				return errors.New("unsupported language : " + languages.NodeJs)
+			} else {
+				return errors.New("unsupported language : " + compageNode.ConsumerData.Language)
 			}
-
-			ctx := golang.AddValuesToContext(context.Background(), coreProject, &goNode)
-
-			if err2 := golang.Generator(ctx); err2 != nil {
-				return err2
+		} else if compageNode.ConsumerData.Template == languages.OpenApi {
+			values := ctx.Value(languages.ContextVars).(languages.Values)
+			nodeDirectoryName := values.NodeDirectoryName
+			// create node directory in projectDirectory depicting a subproject
+			if err := utils.CreateDirectories(nodeDirectoryName); err != nil {
+				return err
 			}
-			// trigger template runner
-			// create data map with values from GoNode and project to replace placeholders  - this is required as the
-			// names may be conflicting in nature
-			// TODO
-		} else if compageNode.ConsumerData.Language == languages.NodeJs {
-			return errors.New("unsupported language : " + languages.NodeJs)
+			// copy relevant files from templates based on config received, if the node is server
+			if languageNode.RestConfig != nil && len(languageNode.RestConfig.Server.OpenApiFileYamlContent) > 0 {
+				fileName, err := writeFile(languageNode.RestConfig.Server.OpenApiFileYamlContent)
+				if err != nil {
+					return err
+				}
+				err = OpenApiGeneratorRunner("generate", "-i", fileName, "-g", languageNode.Language, "-o", nodeDirectoryName)
+				if err != nil {
+					return errors.New("something happened while running openApi generator")
+				}
+				// copy kubernetes yaml's
+			} else {
+				return errors.New("at least rest-config needs to be provided, OpenApiFileYamlContent is empty")
+			}
 		} else {
-			return errors.New("unsupported language : " + compageNode.ConsumerData.Language)
+			// frameworks cli tools
+			return errors.New(fmt.Sprintf("unsupported template for language : %s", languages.Go))
 		}
 	}
 
 	return nil
+}
+
+func writeFile(content string) (string, error) {
+	file, err := os.CreateTemp("/tmp", "openapi")
+	if err != nil {
+		return "", err
+	}
+
+	defer func(f *os.File) {
+		_ = f.Close()
+	}(file)
+	_, err = file.WriteString(content)
+	return file.Name(), err
 }
