@@ -65,14 +65,14 @@ export const GenerateCode = () => {
         }
 
         if (updateProjectData?.project?.json) {
-            const removeUnwantedKeyUpdateProject = removeUnwantedKeys(JSON.parse(JSON.stringify(updateProjectData.project.json)));
-            if (_.isEqual(removeUnwantedKeyUpdateProject, removeUnwantedKeysGetCurrentState) && Object.keys(JSON.parse(updateProjectData.project.json).nodes).length !== 0) {
+            const removeUnwantedKeyUpdateProject = removeUnwantedKeys(JSON.stringify(updateProjectData.project.json));
+            if (_.isEqual(removeUnwantedKeyUpdateProject, removeUnwantedKeysGetCurrentState) && Object.keys(updateProjectData.project.json?.nodes).length !== 0) {
                 return false;
             }
         }
         // check if the get project data is different.
         if (getProjectData?.json) {
-            const removeUnwantedKeyGetProject = removeUnwantedKeys(JSON.parse(JSON.stringify(getProjectData.json)));
+            const removeUnwantedKeyGetProject = removeUnwantedKeys(JSON.stringify(getProjectData?.json));
             if (_.isEqual(removeUnwantedKeyGetProject, removeUnwantedKeysGetCurrentState)) {
                 return false;
             }

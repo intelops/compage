@@ -8,6 +8,7 @@ import config from "./util/constants";
 import projectsRouter from "./routes/projects";
 import {initializeKubeClient} from "./store/kube-client";
 import "@kubernetes/client-node"
+import openApiYamlRouter from "./routes/open-api-yaml";
 
 export const client = initializeKubeClient()
 
@@ -35,6 +36,7 @@ const routes = Router();
 routes.use('/projects', projectsRouter)
 routes.use('/code_operations', codeOperationsRouter);
 routes.use('/auth', authRouter);
+routes.use('/openApiYaml', openApiYamlRouter);
 app.use(routes)
 
 app.get("*", (req, res) => {

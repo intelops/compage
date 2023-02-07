@@ -46,37 +46,51 @@ export const cleanse = (state: string) => {
 };
 
 export const removeUnwantedKeys = (state: any) => {
+    const remove = (stateJson: any) => {
+        // delete unwanted stuff from state.
+        delete stateJson.panels;
+        delete stateJson.plugins;
+        delete stateJson.potentialEdge;
+        delete stateJson.potentialNode;
+        delete stateJson.editor;
+        delete stateJson.undoHistory;
+        delete stateJson.workspace;
+        delete stateJson.diagramMakerData;
+        // nodes
+        for (let key in stateJson.nodes) {
+            let diagramMakerData = stateJson.nodes[key].diagramMakerData;
+            delete diagramMakerData?.position
+            delete diagramMakerData?.size
+            delete diagramMakerData?.selected
+            delete diagramMakerData?.dragging
+            // removes the not required diagramMakerData
+            delete stateJson.nodes[key].diagramMakerData;
+        }
+        // edges
+        for (let key in stateJson.edges) {
+            let diagramMakerData = stateJson.edges[key].diagramMakerData;
+            delete diagramMakerData?.position
+            delete diagramMakerData?.size
+            delete diagramMakerData?.selected
+            delete diagramMakerData?.dragging
+        }
+        return stateJson;
+    }
+
     if (!state || state === "{}") {
         // happens at the beginning with value "{}"
         return state;
     }
+    try {
+        if (JSON.parse(state) === "{}") {
+            return state;
+        }
+    } catch (e) {
+        return remove(state);
+    }
     const stateJson = JSON.parse(state);
-    // delete unwanted stuff from state.
-    delete stateJson.panels;
-    delete stateJson.plugins;
-    delete stateJson.potentialEdge;
-    delete stateJson.potentialNode;
-    delete stateJson.editor;
-    delete stateJson.undoHistory;
-    delete stateJson.workspace;
-    // nodes
-    for (let key in stateJson.nodes) {
-        let diagramMakerData = stateJson.nodes[key].diagramMakerData;
-        delete diagramMakerData.position
-        delete diagramMakerData.size
-        delete stateJson.diagramMakerData
-        delete diagramMakerData.selected
-        delete diagramMakerData.dragging
-    }
-    // edges
-    for (let key in stateJson.edges) {
-        let diagramMakerData = stateJson.edges[key].diagramMakerData;
-        delete diagramMakerData.position
-        delete diagramMakerData.size
-        delete diagramMakerData.selected
-        delete diagramMakerData.dragging
-    }
-    return stateJson;
+
+    return remove(stateJson);
 };
 
 export const getParsedModifiedState = () => {

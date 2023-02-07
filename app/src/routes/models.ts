@@ -1,23 +1,24 @@
 export interface Resource {
-    name: string,
+    name: string;
     // the below map can contain metadata about the field.
-    fields: Map<string, Map<string, string>>
+    fields: Map<string, Map<string, string>>;
 }
 
 export interface ServerType {
-    protocol: string,
-    port: string,
-    framework: string,
-    resources: Resource[]
+    protocol: string;
+    port: string;
+    framework: string
+    resources: Resource[];
+    OpenApiFileYamlContent: string;
 }
 
 export interface NodeConsumerData {
-    name: string,
-    template: string,
-    serverTypes: ServerType[],
-    language: string,
-    metadata?: Map<string, string>,
-    annotations?: Map<string, string>
+    name: string;
+    template: string;
+    serverTypes: ServerType[];
+    language: string;
+    metadata?: Map<string, string>;
+    annotations?: Map<string, string>;
 }
 
 export interface CompageNode {
@@ -27,112 +28,111 @@ export interface CompageNode {
 }
 
 export interface ClientType {
-    port: string,
-    protocol: string
+    port: string;
+    protocol: string;
 }
 
 export interface EdgeConsumerData {
-    externalNodeName: string,
-    clientTypes: ClientType[],
-    metadata?: Map<string, string>,
-    annotations?: Map<string, string>
+    externalNodeName: string;
+    clientTypes: ClientType[];
+    metadata?: Map<string, string>;
+    annotations?: Map<string, string>;
 }
 
 export interface CompageEdge {
-    id: string,
-    src: string,
-    dest: string,
-    consumerData: EdgeConsumerData
+    id: string;
+    src: string;
+    dest: string;
+    consumerData: EdgeConsumerData;
 }
 
 export interface CompageJson {
-    edges: Map<string, CompageEdge>,
-    nodes: Map<string, CompageNode>
-    version: string
+    edges: Map<string, CompageEdge>;
+    nodes: Map<string, CompageNode>;
+    version: string;
 }
 
 export interface Repository {
-    name: string,
-    tag: string,
-    branch: string
+    name: string;
+    tag: string;
+    branch: string;
 }
 
 // all keys are of string format
 // grpc client request
 export interface Project {
-    projectName: string,
-    userName: string,
-    json: string,
-    repositoryName: string,
-    metadata: string
+    projectName: string;
+    userName: string;
+    json: CompageJson;
+    repositoryName: string;
+    metadata: string;
 }
 
 // ProjectEntity is for transferring info about projects from client to server
 export interface ProjectEntity {
-    id: string,
-    displayName: string,
-    version: string,
-    user: User,
-    json: string,
-    repository: Repository,
+    id: string;
+    displayName: string;
+    version: string;
+    user: User;
+    json: CompageJson;
+    repository: Repository;
     // TODO temporary made optional.
-    metadata?: Map<string, string>
+    metadata?: Map<string, string>;
 }
 
 export interface User {
-    name: string,
-    email: string
+    name: string;
+    email: string;
 }
 
 export interface GenerateCodeRequest {
-    projectId: string,
+    projectId: string;
 }
 
 export interface GenerateCodeResponse {
-    projectId: string,
-    userName: string,
-    message: string,
+    projectId: string;
+    userName: string;
+    message: string;
 }
 
 export interface GenerateCodeError {
-    message: string,
+    message: string;
 }
 
 export interface LoginError {
-    message: string,
+    message: string;
 }
 
 export interface CreateProjectResponse {
-    project: ProjectEntity,
-    message: string,
+    project: ProjectEntity;
+    message: string;
 }
 
 export interface CreateProjectError {
-    message: string,
+    message: string;
 }
 
 export interface UpdateProjectResponse {
-    project: ProjectEntity,
-    message: string,
+    project: ProjectEntity;
+    message: string;
 }
 
 export interface UpdateProjectError {
-    message: string,
+    message: string;
 }
 
 export interface DeleteProjectError {
-    message: string,
+    message: string;
 }
 
 export const initializeEmptyProjectEntity = () => {
     const repository: Repository = {branch: "", name: "", tag: ""};
     const user: User = {email: "", name: ""};
-    // const json: CompageJson = {
-    //     edges: new Map<string, CompageEdge>(),
-    //     nodes: new Map<string, CompageNode>(),
-    //     version: ""
-    // };
-    const json: string = "";
+    const json: CompageJson = {
+        edges: new Map<string, CompageEdge>(),
+        nodes: new Map<string, CompageNode>(),
+        version: ""
+    };
     const projectEntity: ProjectEntity = {
         displayName: "",
         id: "",

@@ -42,7 +42,7 @@ const convertProjectResourceToProjectEntity = (projectResource: ProjectResource)
         repository: projectResource.spec.repository,
         user: projectResource.spec.user,
         version: projectResource.spec.version,
-        json: JSON.parse(JSON.stringify(projectResource.spec.json || {}))
+        json: JSON.parse(projectResource.spec.json) || {}
     }
     return projectEntity
 }
@@ -156,7 +156,7 @@ export const updateProject = async (projectId: string, userName: string, project
             existingProjectResource.spec.version = projectEntity.version;
         }
         existingProjectResource.spec.id = projectId;
-        existingProjectResource.spec.json = projectEntity.json;
+        existingProjectResource.spec.json = JSON.stringify(projectEntity.json);
 
         // send spec only as the called method considers updating specs only.
         // existingProjectResource.metadata.name = projectId here

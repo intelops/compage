@@ -27,7 +27,7 @@ export const updateModifiedState = (getProjectResponse: GetProjectResponse) => {
             nodes: {},
             edges: {}
         };
-        const parsedState = JSON.parse(getProjectResponse.json);
+        const parsedState = getProjectResponse.json;
         // state has nodes
         console.log("parsedState : ", parsedState)
         if (Object.keys(parsedState.nodes).length !== 0) {

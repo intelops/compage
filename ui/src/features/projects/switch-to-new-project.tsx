@@ -130,7 +130,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             repository,
             displayName,
             user,
-            json: JSON.stringify(json)
+            json: JSON.parse(JSON.stringify(json))
         };
         return cPR;
     };

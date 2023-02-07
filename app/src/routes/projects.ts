@@ -107,7 +107,7 @@ const addToGithub = (projectEntity: ProjectEntity, response: Response) => {
 }
 
 // commits new changes to .compage/config.json in github repository.
-const updateToGithub = (projectEntity: ProjectEntity, response: Response) => {
+export const updateToGithub = (projectEntity: ProjectEntity, response: Response) => {
     // update github repo and save json to github (project's json to github repo)
     return pullCompageJson(projectEntity.user.name, projectEntity.repository.name)
         .then(resp => {

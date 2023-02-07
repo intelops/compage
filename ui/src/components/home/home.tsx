@@ -42,8 +42,8 @@ export const Home = () => {
         } else {
             // TODO below passed parameters aren't being used.
             diagramMakerData = getData(0, 0);
-            setCurrentConfig(JSON.stringify(diagramMakerData));
-            setCurrentState(JSON.stringify(diagramMakerData));
+            setCurrentConfig(diagramMakerData);
+            setCurrentState(diagramMakerData);
         }
         return diagramMakerData;
     };

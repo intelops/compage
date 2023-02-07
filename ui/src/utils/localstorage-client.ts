@@ -1,11 +1,13 @@
+import {CompageJson} from "../components/diagram-maker/models";
+
 export const CURRENT_STATE = "STATE";
 export const CURRENT_CONFIG = "CONFIG";
 export const CURRENT_PROJECT = "CURRENT_PROJECT";
 export const RESET = "RESET";
 export const MODIFIED_STATE = "MODIFIED_STATE";
 
-export const setCurrentState = (state: string) => {
-    localStorage.setItem(CURRENT_STATE, state);
+export const setCurrentState = (state: CompageJson) => {
+    localStorage.setItem(CURRENT_STATE, JSON.stringify(state));
 };
 
 export const getCurrentState = () => {
@@ -16,8 +18,8 @@ export const removeCurrentState = () => {
     return localStorage.removeItem(CURRENT_STATE);
 };
 
-export const setCurrentConfig = (config: string) => {
-    localStorage.setItem(CURRENT_CONFIG, config);
+export const setCurrentConfig = (config: CompageJson) => {
+    localStorage.setItem(CURRENT_CONFIG, JSON.stringify(config));
 };
 
 export const getCurrentConfig = () => {

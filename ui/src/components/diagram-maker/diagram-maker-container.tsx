@@ -98,8 +98,8 @@ export const DiagramMakerContainer = ({
         let charCode = String.fromCharCode(event.which).toLowerCase();
         if ((event.ctrlKey || event.metaKey) && (charCode === 's' || charCode === 'S')) {
             // update details to localstorage client
-            setCurrentConfig(diagramMaker.config);
-            setCurrentState(JSON.stringify(cleanse(diagramMaker.state)));
+            setCurrentConfig(JSON.parse(diagramMaker.config));
+            setCurrentState(cleanse(diagramMaker.state));
         }
         if ((event.ctrlKey || event.metaKey) && (charCode === 'r' || charCode === 'R')) {
             window.location.reload();
@@ -148,8 +148,8 @@ export const DiagramMakerContainer = ({
     useBeforeunload((event) => {
         if (shouldReset()) {
             if ((diagramMaker.state !== "{}" && diagramMaker.state !== getCurrentState()) || (diagramMaker.config !== "{}" && diagramMaker.config !== getCurrentConfig())) {
-                setCurrentState(diagramMaker.state)
-                setCurrentConfig(diagramMaker.config)
+                setCurrentState(JSON.parse(diagramMaker.state))
+                setCurrentConfig(JSON.parse(diagramMaker.config))
                 event.preventDefault();
             }
         } else {
@@ -159,7 +159,7 @@ export const DiagramMakerContainer = ({
 
     const isSaved = (cleansedState: any) => {
         const removeUnwantedKeysGetCurrentState = removeUnwantedKeys(getCurrentState());
-        const removeUnwantedKeyCleansedState = removeUnwantedKeys(JSON.stringify(cleansedState));
+        const removeUnwantedKeyCleansedState = removeUnwantedKeys(cleansedState);
         return _.isEqual(removeUnwantedKeyCleansedState, removeUnwantedKeysGetCurrentState);
     };
 
@@ -410,8 +410,8 @@ export const DiagramMakerContainer = ({
         const currentProject: string = getCurrentProject();
         if (currentProject) {
             // save in localstorage
-            setCurrentConfig(diagramMaker.config);
-            setCurrentState(diagramMaker.state);
+            setCurrentConfig(JSON.parse(diagramMaker.config));
+            setCurrentState(JSON.parse(diagramMaker.state));
             const prepareUpdateProjectRequest = () => {
                 const uPR: UpdateProjectRequest = {
                     displayName: getProjectData.displayName,
@@ -419,7 +419,7 @@ export const DiagramMakerContainer = ({
                     user: getProjectData.user,
                     version: getProjectData.version,
                     id: currentProject,
-                    json: getCurrentState()
+                    json: JSON.parse(getCurrentState())
                 };
                 return uPR;
             };
@@ -463,7 +463,7 @@ export const DiagramMakerContainer = ({
                 display: "flex",
                 flexDirection: "column"
             }}>
-                <CopyToClipboard text={JSON.stringify(removeUnwantedKeys(JSON.stringify(cleanse(diagramMaker.state))))}
+                <CopyToClipboard text={JSON.stringify(removeUnwantedKeys(cleanse(diagramMaker.state)))}
                                  onCopy={() => setDiagramMaker({
                                      ...diagramMaker,
                                      copied: true

@@ -1,10 +1,12 @@
 // ProjectEntity is for transferring info about projects from client to server
+import {CompageJson} from "../../components/diagram-maker/models";
+
 export interface ProjectEntity {
     id: string,
     displayName: string,
     version: string,
     user: User,
-    json: string,
+    json: CompageJson,
     repository: Repository,
     // TODO temporary made optional.
     metadata?: Map<string, string>
