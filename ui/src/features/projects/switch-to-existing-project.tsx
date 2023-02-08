@@ -1,16 +1,11 @@
 import React, {ChangeEvent, useEffect, useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
-import {
-    selectCreateProjectStatus,
-    selectGetProjectStatus,
-    selectListProjectsData,
-    selectListProjectsStatus
-} from './slice';
+import {selectGetProjectStatus, selectListProjectsData, selectListProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
 import {GetProjectRequest, ListProjectsRequest, ListProjectsResponse} from "./model";
 import {selectAuthData} from "../auth/slice";
-import {Navigate, useNavigate} from "react-router-dom";
+import {Navigate} from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import {Stack} from "@mui/material";
@@ -55,12 +50,14 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
             id: data.projectName
         };
         dispatch(getProjectAsync(getProjectRequest));
-        handleClose();
+        if (handleClose) {
+            handleClose();
+        }
     };
 
     const getActionButtons = (): React.ReactNode => {
         return <Button variant="contained"
-                       disabled={listProjectsStatus === 'loading' || getProjectStatus ==='loading'}
+                       disabled={listProjectsStatus === 'loading' || getProjectStatus === 'loading'}
                        onClick={handleChooseProjectClick}>
             Choose Project
         </Button>;

@@ -21,8 +21,8 @@ export const updateModifiedState = (getProjectResponse: GetProjectResponse) => {
     const modifiedState = getModifiedState();
     if (!modifiedState
         || modifiedState === "{}"
-        || Object.keys(JSON.parse(modifiedState).nodes).length === 0
-        || Object.keys(JSON.parse(modifiedState).edges).length === 0) {
+        || Object.keys(JSON.parse(modifiedState)?.nodes).length === 0
+        || Object.keys(JSON.parse(modifiedState)?.edges).length === 0) {
         const resultState = {
             nodes: {},
             edges: {}
@@ -30,10 +30,10 @@ export const updateModifiedState = (getProjectResponse: GetProjectResponse) => {
         const parsedState = getProjectResponse.json;
         // state has nodes
         console.log("parsedState : ", parsedState)
-        if (Object.keys(parsedState.nodes).length !== 0) {
+        if (Object.keys(parsedState?.nodes).length !== 0) {
             // iterate over nodes and check if they have any consumerData attached to them.
             for (let key in parsedState.nodes) {
-                const consumerData = parsedState.nodes[key].consumerData;
+                const consumerData = parsedState.nodes[key]?.consumerData;
                 console.log("parsedState 2 : ", consumerData)
                 if (Object.keys(consumerData).length > 1) {
                     // add this node to modifiedState
@@ -41,7 +41,7 @@ export const updateModifiedState = (getProjectResponse: GetProjectResponse) => {
                 }
             }
         }
-        if (Object.keys(parsedState.edges).length !== 0) {
+        if (Object.keys(parsedState?.edges).length !== 0) {
             // iterate over edges and check if they have any consumerData attached to them.
             for (let key in parsedState.edges) {
                 const consumerData = parsedState.edges[key]?.consumerData;
@@ -51,8 +51,8 @@ export const updateModifiedState = (getProjectResponse: GetProjectResponse) => {
                 }
             }
         }
-        if (Object.keys(resultState.nodes).length !== 0
-            || Object.keys(resultState.edges).length !== 0) {
+        if (Object.keys(resultState?.nodes).length !== 0
+            || Object.keys(resultState?.edges).length !== 0) {
             setModifiedState(JSON.stringify(resultState));
         }
     }

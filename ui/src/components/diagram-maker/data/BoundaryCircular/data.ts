@@ -1,46 +1,29 @@
 import {DiagramMakerData, EditorMode, PositionAnchor} from 'diagram-maker';
 
-export const getData = (parentWidth, parentHeight) => {
+export const getData = (parentWidth, parentHeight, currentConfig: string) => {
+    const currentConfigJson = JSON.parse(currentConfig);
+    let nodes = {};
+    let edges = {};
+    debugger
+    if (currentConfigJson && Object.keys(currentConfigJson.nodes).length > 0) {
+        nodes = currentConfigJson.nodes;
+    }
+    if (currentConfigJson && Object.keys(currentConfigJson.edges).length > 0) {
+        edges = currentConfigJson.edges;
+    }
     const graph: DiagramMakerData<{}, {}> = {
-        nodes: {
-            // node1: {
-            //     id: 'node1',
-            //     typeId: 'node-type-circle',
-            //     diagramMakerData: {
-            //         position: {x: 200, y: 150},
-            //         size: {width: 65, height: 65},
-            //     },
-            //     consumerData: {}
-            // },
-            // node2: {
-            //     id: 'node2',
-            //     typeId: 'node-type-rectangle',
-            //     diagramMakerData: {
-            //         position: {x: 400, y: 300},
-            //         size: {width: 65, height: 65},
-            //     },
-            //     consumerData: {}
-            // },
-        },
-        edges: {
-            // edge1: {
-            //     id: 'edge1',
-            //     src: 'node1',
-            //     dest: 'node2',
-            //     diagramMakerData: {},
-            //     consumerData: {}
-            // },
-        },
+        nodes: nodes,
+        edges: edges,
         panels: {
             library: {
                 id: 'library',
-                position: {x: 0, y: window.innerHeight/4},
+                position: {x: 0, y: window.innerHeight / 4},
                 size: {width: 35, height: 310},
                 positionAnchor: PositionAnchor.TOP_LEFT,
             },
             tools: {
                 id: 'tools',
-                position: {x: 0, y: window.innerHeight/4},
+                position: {x: 0, y: window.innerHeight / 4},
                 size: {width: 35, height: 310},
                 positionAnchor: PositionAnchor.TOP_RIGHT,
             },

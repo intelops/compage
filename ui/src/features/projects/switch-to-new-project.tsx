@@ -10,6 +10,7 @@ import TextField from "@mui/material/TextField";
 import {Stack} from "@mui/material";
 import {createProjectAsync} from "./async-apis/createProject";
 import {getData} from "../../components/diagram-maker/data/BoundaryCircular/data";
+import {getCurrentConfig} from "../../utils/localstorage-client";
 
 interface ArgTypes {
     handleClose: (...args: any) => void;
@@ -37,7 +38,9 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
     const handleCreateProjectClick = () => {
         const createProjectRequest: CreateProjectRequest = prepareCreateProjectRequest();
         dispatch(createProjectAsync(createProjectRequest));
-        handleClose();
+        if (handleClose) {
+            handleClose();
+        }
     };
 
     const handleProjectNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
@@ -120,7 +123,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             name: data.repositoryName,
             tag: "v1"
         };
-        const json = getData(0, 0);
+        const json = getData(0, 0, getCurrentConfig());
         const displayName = data.projectName;
         const metadata = data.metadata;
         const cPR: CreateProjectRequest = {

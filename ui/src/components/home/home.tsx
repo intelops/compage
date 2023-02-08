@@ -19,29 +19,29 @@ export const Home = () => {
     const currentProject: string = getCurrentProject();
     console.log("currentProject in home :", currentProject);
 
+    const loadExisting = (currentCnf: string) => {
+        if (currentCnf === undefined || currentCnf === "undefined") {
+            return false;
+        }
+        if (currentCnf === "{}") {
+            return false;
+        }
+        const currentConfigJson = JSON.parse(currentCnf);
+        if (!currentConfigJson.panels) {
+            return false;
+        }
+        return currentConfigJson.panels !== "{}";
+    };
+
     const getDiagramData = () => {
         let diagramMakerData;
         const currentConfig = getCurrentConfig();
-
-        const loadExisting = (currentCnf: string) => {
-            if (currentCnf === undefined || currentCnf === "undefined") {
-                return false;
-            }
-            if (currentCnf === "{}") {
-                return false;
-            }
-            const currentConfigJson = JSON.parse(currentCnf);
-            if (!currentConfigJson.panels) {
-                return false;
-            }
-            return currentConfigJson.panels !== "{}";
-        };
 
         if (currentConfig && loadExisting(currentConfig)) {
             diagramMakerData = JSON.parse(currentConfig);
         } else {
             // TODO below passed parameters aren't being used.
-            diagramMakerData = getData(0, 0);
+            diagramMakerData = getData(0, 0, currentConfig);
             setCurrentConfig(diagramMakerData);
             setCurrentState(diagramMakerData);
         }

@@ -157,7 +157,7 @@ export const DiagramMakerContainer = ({
         }
     });
 
-    const isSaved = (cleansedState: any) => {
+    const isSaved = (cleansedState: string) => {
         const removeUnwantedKeysGetCurrentState = removeUnwantedKeys(getCurrentState());
         const removeUnwantedKeyCleansedState = removeUnwantedKeys(cleansedState);
         return _.isEqual(removeUnwantedKeyCleansedState, removeUnwantedKeysGetCurrentState);
@@ -171,14 +171,14 @@ export const DiagramMakerContainer = ({
                 setDiagramMaker({
                     copied: false,
                     config: backupState,
-                    saved: isSaved(cleansedState),
+                    saved: isSaved(JSON.stringify(cleansedState)),
                     state: JSON.stringify(cleansedState),
                 })
             } else {
                 setDiagramMaker({
                     ...diagramMaker,
                     copied: false,
-                    saved: isSaved(cleansedState),
+                    saved: isSaved(JSON.stringify(cleansedState)),
                     state: JSON.stringify(cleansedState)
                 })
             }

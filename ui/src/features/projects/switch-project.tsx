@@ -33,7 +33,9 @@ export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
     }
 
     const handleDialogClose = async (e) => {
-        handleClose();
+        if (handleClose){
+            handleClose();
+        }
         setData({...data, toggle: false});
         // TODO hack to reload after getProject is loaded
         await new Promise(r => setTimeout(r, 2000));
