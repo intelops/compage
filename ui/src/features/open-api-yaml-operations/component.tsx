@@ -37,12 +37,16 @@ export const UploadYaml = ({nodeId}: ArgTypes) => {
         setOpenApiYamlFile(e.target.files[0]);
     };
 
+    const isDisabled = () => {
+        return !openApiYamlFile || openApiYamlFile.length < 1;
+    };
+
     return (
         <>
-            <input type="file" onChange={handleFileChange}/>
-            <Button style={{
-                width: "200px"
-            }} variant="contained" onClick={handleUploadYamlClick}>
+            <input type="file"
+                   onChange={handleFileChange}
+                   accept=".yaml,.yml"/>
+            <Button variant="contained" disabled={isDisabled()} onClick={handleUploadYamlClick}>
                 {uploadYamlStatus === "loading"
                     ? "Uploading file"
                     : "Upload file"}
