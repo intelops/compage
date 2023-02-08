@@ -7,7 +7,11 @@ import {uploadYamlAsync} from "./async-apis/uploadYaml";
 import {getCurrentProject} from "../../utils/localstorage-client";
 import {UploadYamlRequest} from "./model";
 
-export const UploadYaml = () => {
+interface ArgTypes {
+    nodeId: string;
+}
+
+export const UploadYaml = ({nodeId}: ArgTypes) => {
     const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
     const uploadYamlData = useAppSelector(selectUploadYamlData);
 
@@ -20,7 +24,7 @@ export const UploadYaml = () => {
             const projectAndVersion = currentProject.split("###");
             const uploadYamlRequest: UploadYamlRequest = {
                 projectId: projectAndVersion[0],
-                nodeId: ""
+                nodeId: nodeId
             };
             if (uploadYamlStatus !== 'loading') {
                 dispatch(uploadYamlAsync(uploadYamlRequest));

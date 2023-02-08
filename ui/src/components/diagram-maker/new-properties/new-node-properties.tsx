@@ -13,6 +13,7 @@ import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import {Grpc, Resource, Rest, Ws} from "../models";
 import {ModifyRestResource} from "./modify-rest-resource";
 import DeleteIcon from '@mui/icons-material/Delete';
+import {UploadYaml} from "../../../features/open-api-yaml-operations/component";
 
 interface NewNodePropertiesProps {
     isOpen: boolean;
@@ -256,9 +257,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     </React.Fragment>
                 } else {
                     return <React.Fragment>
-                        {/*<Button variant="outlined" color="secondary"*/}
-                        {/*        onClick={handleUploadOpenApiYamlClick}>Upload OpenApi Yaml</Button>*/}
-                        <Button onClick={handleUploadOpenApiYamlClick} variant="outlined" color="secondary">Upload</Button>
+                        <UploadYaml nodeId={props.nodeId}/>
                     </React.Fragment>
                 }
             }

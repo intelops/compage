@@ -29,12 +29,10 @@ export const updateModifiedState = (getProjectResponse: GetProjectResponse) => {
         };
         const parsedState = getProjectResponse.json;
         // state has nodes
-        console.log("parsedState : ", parsedState)
         if (Object.keys(parsedState?.nodes).length !== 0) {
             // iterate over nodes and check if they have any consumerData attached to them.
             for (let key in parsedState.nodes) {
                 const consumerData = parsedState.nodes[key]?.consumerData;
-                console.log("parsedState 2 : ", consumerData)
                 if (Object.keys(consumerData).length > 1) {
                     // add this node to modifiedState
                     resultState.nodes[key] = getNodeConsumerData(parsedState.nodes[key]);
