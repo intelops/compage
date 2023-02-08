@@ -258,17 +258,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     return <React.Fragment>
                         {/*<Button variant="outlined" color="secondary"*/}
                         {/*        onClick={handleUploadOpenApiYamlClick}>Upload OpenApi Yaml</Button>*/}
-                        <TextField
-                            required
-                            size="medium"
-                            margin="dense"
-                            id="openApiFileYamlContent"
-                            label="OpenApi File Yaml Content"
-                            type="text"
-                            value={payload.restServerConfig.openApiFileYamlContent}
-                            onChange={handleRestServerConfigOpenApiFileYamlContentChange}
-                            variant="outlined"
-                        />
+                        <Button onClick={handleUploadOpenApiYamlClick} variant="outlined" color="secondary">Upload</Button>
                     </React.Fragment>
                 }
             }

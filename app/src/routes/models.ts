@@ -63,7 +63,7 @@ export interface Repository {
 export interface Project {
     projectName: string;
     userName: string;
-    json: CompageJson;
+    json: string;
     repositoryName: string;
     metadata: string;
 }

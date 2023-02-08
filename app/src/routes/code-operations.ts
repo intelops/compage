@@ -66,7 +66,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
     const payload: Project = {
         projectName: projectResource.spec.displayName,
         userName: projectResource.spec.user.name,
-        json: JSON.parse(projectResource.spec.json),
+        json: projectResource.spec.json,
         repositoryName: projectResource.spec.repository.name,
         metadata: projectResource.spec.metadata
     }

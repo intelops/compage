@@ -27,6 +27,14 @@ export const CodeOperationsBackendApi = () => {
     },)
 }
 
+export const OpenApiYamlOperationsBackendApi = () => {
+    const path = "/open_api_yaml_operations"
+    return axios.create({
+        baseURL: config.backend_base_url + path,
+        headers: getHeaders()
+    },)
+}
+
 export const ProjectsBackendApi = () => {
     const path = "/projects"
     return axios.create({

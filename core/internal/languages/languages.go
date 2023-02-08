@@ -7,8 +7,8 @@ import (
 	"github.com/kube-tarian/compage/core/internal/core/node"
 )
 
-const Go = "Go"
-const NodeJs = "NodeJs"
+const Go = "go"
+const NodeJs = "nodejs"
 const Compage string = "compage"
 const OpenApi string = "openApi"
 

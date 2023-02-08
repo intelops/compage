@@ -36,7 +36,7 @@ const routes = Router();
 routes.use('/projects', projectsRouter)
 routes.use('/code_operations', codeOperationsRouter);
 routes.use('/auth', authRouter);
-routes.use('/openApiYaml', openApiYamlRouter);
+routes.use('/open_api_yaml_operations', openApiYamlRouter);
 app.use(routes)
 
 app.get("*", (req, res) => {
