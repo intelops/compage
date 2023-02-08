@@ -4,8 +4,7 @@ import {X_USER_NAME_HEADER} from "../util/constants";
 import multer from "../middlewares/multer";
 import * as fs from "fs";
 import {ProjectEntity, UploadYamlError, UploadYamlRequest, UploadYamlResponse} from "./models";
-import {getProject, updateProject} from "../util/project-store";
-import {updateToGithub} from "./projects";
+import {getProject} from "../util/project-store";
 
 const openApiYamlRouter = Router();
 
@@ -21,22 +20,23 @@ openApiYamlRouter.post("/upload", requireUserNameMiddleware, multer.single('file
         const readFileSync = fs.readFileSync(request.file.path, 'utf8');
         // delete file once content is extracted
         fs.rmSync(request.file.path);
-        console.log("json : ", projectEntity.json?.nodes)
-        const compageNode = projectEntity.json?.nodes.get(uploadYamlRequest.nodeId);
-        if (compageNode) {
-            for (let i = 0; i < compageNode.consumerData.serverTypes.length; i++) {
-                if (compageNode.consumerData.serverTypes[i].protocol === "REST") {
-                    compageNode.consumerData.serverTypes[i].openApiFileYamlContent = readFileSync;
-                    break;
-                }
-            }
-        }
-        const updatedProjectEntity = await updateProject(uploadYamlRequest.projectId, <string>userName, projectEntity);
-        if (updatedProjectEntity.id.length !== 0) {
-            // update github with .compage/config.json
-            await updateToGithub(updatedProjectEntity, response);
-            return getUploadYamlResponse(updatedProjectEntity, "File got uploaded.")
-        }
+        console.log("json : ", projectEntity.json?.nodes);
+        console.log("readFileSync : ", readFileSync);
+        // const compageNode = projectEntity.json?.nodes.get(uploadYamlRequest.nodeId);
+        // if (compageNode) {
+        //     for (let i = 0; i < compageNode.consumerData.serverTypes.length; i++) {
+        //         if (compageNode.consumerData.serverTypes[i].protocol === "REST") {
+        //             compageNode.consumerData.serverTypes[i].openApiFileYamlContent = readFileSync;
+        //             break;
+        //         }
+        //     }
+        // }
+        // const updatedProjectEntity = await updateProject(uploadYamlRequest.projectId, <string>userName, projectEntity);
+        // if (updatedProjectEntity.id.length !== 0) {
+        //     // update github with .compage/config.json
+        //     await updateToGithub(updatedProjectEntity, response);
+        //     return getUploadYamlResponse(updatedProjectEntity, "File got uploaded.")
+        // }
     }
     const message = `File couldn't be uploaded.`;
     console.log(message);

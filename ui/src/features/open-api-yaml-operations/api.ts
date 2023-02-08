@@ -1,7 +1,11 @@
 import {UploadYamlRequest} from "./model";
-import {CodeOperationsBackendApi, OpenApiYamlOperationsBackendApi} from "../../utils/backend-api";
+import {OpenApiYamlOperationsBackendApi} from "../../utils/backend-api";
 
 // Sync apis (async apis are in thunk)
 export const uploadYaml = (uploadYamlRequest: UploadYamlRequest) => {
-    return OpenApiYamlOperationsBackendApi().post('/upload', uploadYamlRequest)
+    const formData = new FormData();
+    formData.append('file', uploadYamlRequest.file);
+    formData.append('nodeId', uploadYamlRequest.nodeId);
+    formData.append('projectId', uploadYamlRequest.projectId);
+    return OpenApiYamlOperationsBackendApi().post('/upload', formData, {})
 }

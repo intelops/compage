@@ -15,4 +15,5 @@ export type UploadYamlError = {
 export interface UploadYamlRequest {
     projectId: string
     nodeId: string;
+    file: any;
 }

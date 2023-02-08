@@ -14,7 +14,7 @@ interface ArgTypes {
 export const UploadYaml = ({nodeId}: ArgTypes) => {
     const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
     const uploadYamlData = useAppSelector(selectUploadYamlData);
-
+    const [openApiYamlFile, setOpenApiYamlFile] = React.useState("");
     const dispatch = useAppDispatch();
 
     // When clicked, dispatch `uploadYaml`
@@ -24,7 +24,8 @@ export const UploadYaml = ({nodeId}: ArgTypes) => {
             const projectAndVersion = currentProject.split("###");
             const uploadYamlRequest: UploadYamlRequest = {
                 projectId: projectAndVersion[0],
-                nodeId: nodeId
+                nodeId: nodeId,
+                file: openApiYamlFile
             };
             if (uploadYamlStatus !== 'loading') {
                 dispatch(uploadYamlAsync(uploadYamlRequest));
@@ -32,14 +33,19 @@ export const UploadYaml = ({nodeId}: ArgTypes) => {
         }
     };
 
+    const handleFileChange = (e) => {
+        setOpenApiYamlFile(e.target.files[0]);
+    };
+
     return (
         <>
+            <input type="file" onChange={handleFileChange}/>
             <Button style={{
                 width: "200px"
             }} variant="contained" onClick={handleUploadYamlClick}>
                 {uploadYamlStatus === "loading"
-                    ? "Uploading Code"
-                    : "Upload Code"}
+                    ? "Uploading file"
+                    : "Upload file"}
             </Button>
         </>
     );

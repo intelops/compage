@@ -71,6 +71,7 @@ export interface Project {
 export interface UploadYamlRequest {
     nodeId: string;
     projectId: string;
+    file: any;
 }
 
 // This type describes the response object structure:
