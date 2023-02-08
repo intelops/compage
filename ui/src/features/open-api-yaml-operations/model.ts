@@ -1,7 +1,9 @@
+import {ProjectEntity} from "../projects/model";
+
+// This type describes the response object structure:
 export interface UploadYamlResponse {
-    projectId: string,
-    userName: string,
-    message: string,
+    project: ProjectEntity;
+    message: string;
 }
 
 // This type describes the error object structure:
@@ -11,5 +13,6 @@ export type UploadYamlError = {
 
 // upload code models
 export interface UploadYamlRequest {
-    projectId: string,
+    projectId: string
+    nodeId: string;
 }

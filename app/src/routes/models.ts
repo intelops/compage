@@ -9,7 +9,7 @@ export interface ServerType {
     port: string;
     framework: string
     resources: Resource[];
-    OpenApiFileYamlContent: string;
+    openApiFileYamlContent: string;
 }
 
 export interface NodeConsumerData {
@@ -66,6 +66,22 @@ export interface Project {
     json: string;
     repositoryName: string;
     metadata: string;
+}
+
+export interface UploadYamlRequest {
+    nodeId: string;
+    projectId: string;
+}
+
+// This type describes the response object structure:
+export interface UploadYamlResponse {
+    project: ProjectEntity;
+    message: string;
+}
+
+// This type describes the error object structure:
+export interface UploadYamlError {
+    message: string;
 }
 
 // ProjectEntity is for transferring info about projects from client to server

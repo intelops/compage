@@ -11,7 +11,7 @@ export const uploadYamlAsync = createAsyncThunk<UploadYamlResponse, UploadYamlRe
             if (response.status !== 200) {
                 const message = `Failed to upload for '${uploadYamlRequest.projectId}'. Received: ${response.status}`;
                 console.log(message);
-                toastr.error(`generateCode [Failure]`, message);
+                toastr.error(`uploadYaml [Failure]`, message);
                 // Return the error message:
                 return thunkApi.rejectWithValue({
                     message: message
