@@ -15,6 +15,7 @@ import {
     selectUpdateProjectStatus
 } from "../../features/projects/slice";
 import {selectGenerateCodeStatus} from "../../features/code-operations/slice";
+import {selectUploadYamlStatus} from "../../features/open-api-yaml-operations/slice";
 
 export const App = () => {
     const createProjectStatus = useAppSelector(selectCreateProjectStatus);
@@ -22,12 +23,14 @@ export const App = () => {
     const listProjectsStatus = useAppSelector(selectListProjectsStatus);
     const updateProjectStatus = useAppSelector(selectUpdateProjectStatus);
     const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
+    const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
 
     const isActive = () => {
         return createProjectStatus === 'loading'
             || getProjectStatus === 'loading'
             || listProjectsStatus === 'loading'
             || updateProjectStatus === 'loading'
+            || uploadYamlStatus === 'loading'
             || generateCodeStatus === 'loading';
     }
 

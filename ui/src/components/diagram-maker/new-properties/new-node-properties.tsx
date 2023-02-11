@@ -14,6 +14,8 @@ import {Grpc, Resource, Rest, Ws} from "../models";
 import {ModifyRestResource} from "./modify-rest-resource";
 import DeleteIcon from '@mui/icons-material/Delete';
 import {UploadYaml} from "../../../features/open-api-yaml-operations/component";
+import {useAppSelector} from "../../../redux/hooks";
+import {selectUploadYamlStatus} from "../../../features/open-api-yaml-operations/slice";
 
 interface NewNodePropertiesProps {
     isOpen: boolean;
@@ -66,6 +68,7 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
 };
 
 export const NewNodeProperties = (props: NewNodePropertiesProps) => {
+    const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
     const parsedModifiedState = getParsedModifiedState();
     const serverTypesConfig: ServerTypesConfig = getServerTypesConfig(parsedModifiedState, props.nodeId);
     const emptyConfig: ServerConfig = {
@@ -243,7 +246,15 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return "";
     };
 
-    const frameworks = ["net/http"];
+    const languageFrameworks = {
+        "go": ["net/http", "go"],
+        "javascript": ["javascript"],
+        "java": ["java"],
+        "ruby": ["ruby"],
+        "python": ["python"],
+    };
+    const map = new Map(Object.entries(languageFrameworks));
+    const frameworks = map.get(payload.language);
     const getRestServerConfig = () => {
         if (payload.isRestServer) {
             const getContent = () => {
@@ -435,7 +446,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const templates = ["compage", "openApi"];
-    const languages = ["go"];
+    const languages = ["go", "javascript", "java", "ruby", "python"];
     const handleModifyRestResourceClick = (resource: Resource) => {
         console.log(resource.fields);
         const restServerConfig = payload.restServerConfig;
@@ -548,7 +559,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
                 <Button variant="contained"
                         onClick={handleUpdate}
-                        disabled={payload.name === "" || payload.language === ""}>Update</Button>
+                        disabled={payload.name === "" || payload.language === "" || uploadYamlStatus === 'loading'}>Update</Button>
             </DialogActions>
         </Dialog>
     </React.Fragment>;
