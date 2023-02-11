@@ -1,11 +1,11 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {GetProjectError, GetProjectRequest, GetProjectResponse} from "../model";
+import {GetProjectError, GetProjectRequest, UploadYamlResponse} from "../model";
 import {getProject} from "../api";
 import {toastr} from 'react-redux-toastr';
 import {setCurrentConfig, setCurrentProject, setCurrentState} from "../../../utils/localstorage-client";
-import {updateModifiedState} from "./populateModifiedState";
+import {updateModifiedState} from "../populateModifiedState";
 
-export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRequest, { rejectValue: GetProjectError }>(
+export const getProjectAsync = createAsyncThunk<UploadYamlResponse, GetProjectRequest, { rejectValue: GetProjectError }>(
     'projects/getProject',
     async (getProjectRequest: GetProjectRequest, thunkApi) => {
         return getProject(getProjectRequest).then(response => {
@@ -21,7 +21,7 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
             const message = `Successfully retrieved project.`;
             console.log(message);
             toastr.success(`getProject [Success]`, message);
-            const getProjectResponse: GetProjectResponse = response.data;
+            const getProjectResponse: UploadYamlResponse = response.data;
             // update details to localstorage client
             setCurrentConfig(getProjectResponse.json);
             setCurrentState(getProjectResponse.json);

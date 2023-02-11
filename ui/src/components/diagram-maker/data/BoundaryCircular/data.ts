@@ -4,7 +4,6 @@ export const getData = (parentWidth, parentHeight, currentConfig: string) => {
     const currentConfigJson = JSON.parse(currentConfig);
     let nodes = {};
     let edges = {};
-    debugger
     if (currentConfigJson && Object.keys(currentConfigJson.nodes).length > 0) {
         nodes = currentConfigJson.nodes;
     }

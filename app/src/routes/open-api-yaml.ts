@@ -27,6 +27,7 @@ openApiYamlRouter.post("/upload", requireUserNameMiddleware, multer.single('file
             for (let i = 0; i < compageNode.consumerData.serverTypes.length; i++) {
                 if (compageNode.consumerData.serverTypes[i].protocol === "REST") {
                     compageNode.consumerData.serverTypes[i].openApiFileYamlContent = readFileSync;
+                    compageNode.consumerData.serverTypes[i].resources = [];
                     break;
                 }
             }
@@ -34,7 +35,7 @@ openApiYamlRouter.post("/upload", requireUserNameMiddleware, multer.single('file
         const updatedProjectEntity = await updateProject(uploadYamlRequest.projectId, <string>userName, projectEntity);
         if (updatedProjectEntity.id.length !== 0) {
             // update github with .compage/config.json
-            await updateToGithub(updatedProjectEntity, response);
+            return await updateToGithub(updatedProjectEntity, response);
             // todo below line doesnt get executed as the response was sent in last line only.
             // return getUploadYamlResponse(updatedProjectEntity, "File got uploaded.")
         }

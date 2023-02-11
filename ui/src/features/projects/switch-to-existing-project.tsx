@@ -68,7 +68,7 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
             required
             fullWidth
             select
-            disabled={listProjectsStatus === 'loading'}
+            disabled={listProjectsStatus === 'loading' || (listProjectsData && listProjectsData.length === 0)}
             margin="dense"
             id="projectName"
             label="Existing Projects"
