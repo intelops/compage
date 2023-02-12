@@ -103,7 +103,7 @@ const Header = () => {
                 return <Toolbar>
                     <Box sx={{flexGrow: 0}}>
                         <Typography variant={"h6"}>
-                            You have selected {projectAndVersion[0]}[{projectAndVersion[1]}]
+                            You have selected {projectAndVersion[0]}
                         </Typography>
                     </Box>
                 </Toolbar>;

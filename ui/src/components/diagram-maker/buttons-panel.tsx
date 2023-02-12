@@ -14,7 +14,7 @@ import {
 
 const resetState = () => {
     const currentProject: string = getCurrentProject();
-    if (currentProject){
+    if (currentProject) {
         const projectAndVersion = currentProject.split("###");
         const message = `Are you sure you want to reset the project [${projectAndVersion[0]}]?`;
         if (!window.confirm(message)) {
@@ -68,15 +68,15 @@ export const ButtonsPanel = () => {
                 Switch Project
             </Button>
         </Grid>
-        <hr/>
-        <Grid item style={{
-            alignItems: "center",
-            display: "flex",
-            flexDirection: "column"
-        }}>
-            <Button style={{
-                width: "200px"
-            }} variant="contained" color="error" onClick={resetState}>Reset state</Button>
-        </Grid>
+        {/*<hr/>*/}
+        {/*<Grid item style={{*/}
+        {/*    alignItems: "center",*/}
+        {/*    display: "flex",*/}
+        {/*    flexDirection: "column"*/}
+        {/*}}>*/}
+        {/*<Button style={{*/}
+        {/*    width: "200px"*/}
+        {/*}} variant="contained" color="error" onClick={resetState}>Reset state</Button>*/}
+        {/*</Grid>*/}
     </React.Fragment>;
 };

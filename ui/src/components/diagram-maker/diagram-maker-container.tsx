@@ -63,6 +63,8 @@ import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {selectGetProjectData} from "../../features/projects/slice";
 import {cleanse, removeUnwantedKeys} from "./helper/helper";
 import * as _ from "lodash";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -350,7 +352,7 @@ export const DiagramMakerContainer = ({
                     if (diagramMakerAction.type === DiagramMakerActions.EDGE_CREATE
                         && "payload" in diagramMakerAction) {
                         // prevent creation of edge where src and dest are same.
-                        if (diagramMakerAction.payload["src"] === diagramMakerAction.payload["dest"]){
+                        if (diagramMakerAction.payload["src"] === diagramMakerAction.payload["dest"]) {
                             return;
                         }
                         diagramMakerAction.payload["id"] = diagramMakerAction.payload["id"].substring(3, 10)
@@ -432,6 +434,18 @@ export const DiagramMakerContainer = ({
         }
     };
 
+    function getProjectAndVersion(): React.ReactNode {
+        const currentProject = getCurrentProject();
+        if (currentProject) {
+            const projectAndVersion = currentProject.split("###");
+            return <Box sx={{flexGrow: 0}}>
+                <Typography variant={"subtitle1"}>
+                    {projectAndVersion[0]}[{projectAndVersion[1]}]
+                </Typography>
+            </Box>
+        }
+    }
+
     return <Grid container spacing={1} sx={{height: '100%'}}>
         <Grid item xs={10} md={10} style={{
             width: "100%",
@@ -477,6 +491,7 @@ export const DiagramMakerContainer = ({
                         Copy to clipboard
                     </Button>
                 </CopyToClipboard>
+                {getProjectAndVersion()}
                 {diagramMaker.copied ? <span style={{color: 'green'}}> Copied.</span> : null}
             </Grid>
             <hr/>

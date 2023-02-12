@@ -1,5 +1,5 @@
-import {UploadYamlResponse} from "./model";
 import {getModifiedState, setModifiedState} from "../../utils/localstorage-client";
+import {GetProjectResponse} from "./model";
 
 export const getNodeConsumerData = (node: any) => {
     delete node.id;
@@ -17,7 +17,7 @@ export const getEdgeConsumerData = (edge: any) => {
 };
 
 
-export const updateModifiedState = (getProjectResponse: UploadYamlResponse) => {
+export const updateModifiedState = (getProjectResponse: GetProjectResponse) => {
     const modifiedState = getModifiedState();
     if (!modifiedState
         || modifiedState === "{}"

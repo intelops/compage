@@ -52,7 +52,7 @@ export type ListProjectsError = {
 
 // getProject models (the structure matches as of now with CreateProjectRequest but have kept it
 // separate for future customizations)
-export interface UploadYamlResponse extends ProjectEntity {
+export interface GetProjectResponse extends ProjectEntity {
 }
 
 export interface GetProjectRequest {

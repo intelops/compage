@@ -23,7 +23,7 @@ root.render(
                 timeOut={3000}
                 newestOnTop={false}
                 preventDuplicates
-                position="bottom-right"
+                position="bottom-left"
                 getState={(state) => state.toastr} // This is the default
                 transitionIn="fadeIn"
                 transitionOut="fadeOut"
