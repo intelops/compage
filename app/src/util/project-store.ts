@@ -141,6 +141,7 @@ export const createProject = async (userName: string, projectEntity: ProjectEnti
 // updateProject updates projectResource on k8s cluster.
 export const updateProject = async (projectId: string, userName: string, projectEntity: ProjectEntity) => {
     const existingProjectResource = await getProjectResource(NAMESPACE, projectId);
+    // if some user is trying to modify the project not owned by him, reject it.
     if (existingProjectResource?.metadata?.labels?.userName !== userName) {
         return initializeEmptyProjectEntity();
     }

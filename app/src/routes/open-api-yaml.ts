@@ -13,9 +13,13 @@ const openApiYamlRouter = Router();
 openApiYamlRouter.post("/upload", requireUserNameMiddleware, multer.single('file'), async (request: Request, response: Response) => {
     const userName = request.header(X_USER_NAME_HEADER);
     const uploadYamlRequest: UploadYamlRequest = request.body;
-    const projectEntity: ProjectEntity = await getProject(<string>userName, uploadYamlRequest.projectId);
+    let projectEntity: ProjectEntity = await getProject(<string>userName, uploadYamlRequest.projectId);
     if (projectEntity.id.length === 0) {
-        return response.status(404).json();
+        if (uploadYamlRequest.projectEntity || uploadYamlRequest.projectEntity.length !== 0) {
+            projectEntity = JSON.parse(uploadYamlRequest.projectEntity)
+        } else {
+            return response.status(404).json();
+        }
     }
     if (request.file) {
         const readFileSync = fs.readFileSync(request.file.path, 'utf8');
@@ -26,13 +30,18 @@ openApiYamlRouter.post("/upload", requireUserNameMiddleware, multer.single('file
         if (compageNode) {
             for (let i = 0; i < compageNode.consumerData.serverTypes.length; i++) {
                 if (compageNode.consumerData.serverTypes[i].protocol === "REST") {
+                    const parsedProjectEntityInRequest = JSON.parse(uploadYamlRequest.projectEntity);
                     compageNode.consumerData.serverTypes[i].openApiFileYamlContent = readFileSync;
                     compageNode.consumerData.serverTypes[i].resources = [];
-                    compageNode.consumerData.template = uploadYamlRequest.template;
-                    compageNode.consumerData.framework = uploadYamlRequest.framework;
+                    compageNode.consumerData.template = parsedProjectEntityInRequest.template;
+                    compageNode.consumerData.framework = parsedProjectEntityInRequest.framework;
                     break;
                 }
             }
+        } else {
+            const message = `File couldn't be uploaded, nodeId not found.`;
+            console.log(message);
+            return response.status(404).json(getUploadYamlError(message));
         }
         const updatedProjectEntity = await updateProject(uploadYamlRequest.projectId, <string>userName, projectEntity);
         if (updatedProjectEntity.id.length !== 0) {
