@@ -126,6 +126,9 @@ export const DiagramMakerContainer = ({
 
     const showDialog = () => {
         if (dialogState.isOpen) {
+            // this is required when file is uploaded and the nodes are not present in localstorage.
+            setCurrentConfig(JSON.parse(diagramMaker.config));
+            setCurrentState(JSON.parse(diagramMaker.state));
             if (dialogState.type === 'node') {
                 return <NewNodeProperties isOpen={dialogState.isOpen}
                                           nodeId={dialogState.id}

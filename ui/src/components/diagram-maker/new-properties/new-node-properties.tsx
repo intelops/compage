@@ -269,9 +269,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     </React.Fragment>
                 } else {
                     return <React.Fragment>
-                        <UploadYaml nodeId={props.nodeId}
-                                    framework={payload.restServerConfig.framework}
-                                    template={payload.template}/>
+                        <UploadYaml nodeId={props.nodeId}/>
                     </React.Fragment>
                 }
             }
@@ -283,7 +281,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     margin="dense"
                     id="restServerConfigPort"
                     label="Port"
-                    type="text"
+                    type="number"
                     value={payload.restServerConfig.port}
                     onChange={handleRestServerConfigPortChange}
                     variant="outlined"

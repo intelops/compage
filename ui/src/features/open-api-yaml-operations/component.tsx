@@ -9,11 +9,9 @@ import {UploadYamlRequest} from "./model";
 
 interface ArgTypes {
     nodeId: string;
-    template: string;
-    framework: string;
 }
 
-export const UploadYaml = ({nodeId, framework, template}: ArgTypes) => {
+export const UploadYaml = ({nodeId}: ArgTypes) => {
     const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
     const uploadYamlData = useAppSelector(selectUploadYamlData);
     const [openApiYamlFile, setOpenApiYamlFile] = React.useState("");
