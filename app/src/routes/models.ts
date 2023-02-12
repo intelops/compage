@@ -71,13 +71,14 @@ export interface Project {
 export interface UploadYamlRequest {
     nodeId: string;
     projectId: string;
-    projectEntity: string;
     file: any;
 }
 
 // This type describes the response object structure:
 export interface UploadYamlResponse {
-    project: ProjectEntity;
+    nodeId: string;
+    projectId: string;
+    content: string;
     message: string;
 }
 

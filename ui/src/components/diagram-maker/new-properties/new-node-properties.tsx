@@ -15,7 +15,7 @@ import {ModifyRestResource} from "./modify-rest-resource";
 import DeleteIcon from '@mui/icons-material/Delete';
 import {UploadYaml} from "../../../features/open-api-yaml-operations/component";
 import {useAppSelector} from "../../../redux/hooks";
-import {selectUploadYamlStatus} from "../../../features/open-api-yaml-operations/slice";
+import {selectUploadYamlData, selectUploadYamlStatus} from "../../../features/open-api-yaml-operations/slice";
 
 interface NewNodePropertiesProps {
     isOpen: boolean;
@@ -69,6 +69,7 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
 
 export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
+    const uploadYamlData = useAppSelector(selectUploadYamlData);
     const parsedModifiedState = getParsedModifiedState();
     const serverTypesConfig: ServerTypesConfig = getServerTypesConfig(parsedModifiedState, props.nodeId);
     const emptyConfig: ServerConfig = {
@@ -103,8 +104,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 protocol: Rest,
             };
             if (payload.template !== "compage") {
-                restServerConfig.resources = []
-                restServerConfig.openApiFileYamlContent = payload.restServerConfig.openApiFileYamlContent;
+                restServerConfig.resources = [];
+                restServerConfig.openApiFileYamlContent = uploadYamlData.content;
             } else {
                 restServerConfig.resources = payload.restServerConfig.resources;
             }
@@ -208,10 +209,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             ...payload,
             isModifyRestResourceOpen: !payload.isModifyRestResourceOpen
         });
-    };
-
-    const handleUploadOpenApiYamlClick = () => {
-        console.log("handleUploadOpenApiYamlClick clicked");
     };
 
     const handleDeleteRestResourceClick = (d) => {

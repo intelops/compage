@@ -28,12 +28,11 @@ export const UploadYaml = ({nodeId, framework, template}: ArgTypes) => {
                 projectId: projectAndVersion[0],
                 nodeId: nodeId,
                 file: openApiYamlFile,
-                framework: framework,
-                template: template
             };
             if (uploadYamlStatus !== 'loading') {
                 dispatch(uploadYamlAsync(uploadYamlRequest));
             }
+            setOpenApiYamlFile("");
         }
     };
 
@@ -42,14 +41,12 @@ export const UploadYaml = ({nodeId, framework, template}: ArgTypes) => {
     };
 
     const isDisabled = () => {
-        return !openApiYamlFile || openApiYamlFile.length < 1;
+        return !openApiYamlFile || openApiYamlFile.length < 1 || uploadYamlStatus === "loading";
     };
 
     return (
         <>
-            <input type="file"
-                   onChange={handleFileChange}
-                   accept=".yaml,.yml"/>
+            <input type="file" onChange={handleFileChange} accept=".yaml,.yml"/>
             <Button variant="contained" disabled={isDisabled()} onClick={handleUploadYamlClick}>
                 {uploadYamlStatus === "loading"
                     ? "Uploading file"
