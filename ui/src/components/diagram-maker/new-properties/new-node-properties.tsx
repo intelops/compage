@@ -101,9 +101,13 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 framework: payload.restServerConfig.framework,
                 port: payload.restServerConfig.port,
                 protocol: Rest,
-                resources: payload.restServerConfig.resources,
-                openApiFileYamlContent: payload.restServerConfig.openApiFileYamlContent
             };
+            if (payload.template !== "compage") {
+                restServerConfig.resources = []
+                restServerConfig.openApiFileYamlContent = payload.restServerConfig.openApiFileYamlContent;
+            } else {
+                restServerConfig.resources = payload.restServerConfig.resources;
+            }
             serverTypes.push(restServerConfig);
         }
         if (payload.isGrpcServer) {
@@ -268,7 +272,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     </React.Fragment>
                 } else {
                     return <React.Fragment>
-                        <UploadYaml nodeId={props.nodeId}/>
+                        <UploadYaml nodeId={props.nodeId}
+                                    framework={payload.restServerConfig.framework}
+                                    template={payload.template}/>
                     </React.Fragment>
                 }
             }

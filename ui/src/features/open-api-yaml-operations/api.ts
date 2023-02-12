@@ -7,5 +7,7 @@ export const uploadYaml = (uploadYamlRequest: UploadYamlRequest) => {
     formData.append('file', uploadYamlRequest.file);
     formData.append('nodeId', uploadYamlRequest.nodeId);
     formData.append('projectId', uploadYamlRequest.projectId);
+    formData.append('template', uploadYamlRequest.template);
+    formData.append('framework', uploadYamlRequest.framework);
     return OpenApiYamlOperationsBackendApi().post('/upload', formData, {})
 }

@@ -16,4 +16,6 @@ export interface UploadYamlRequest {
     projectId: string
     nodeId: string;
     file: any;
+    template: string;
+    framework: string;
 }

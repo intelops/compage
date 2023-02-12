@@ -28,6 +28,8 @@ openApiYamlRouter.post("/upload", requireUserNameMiddleware, multer.single('file
                 if (compageNode.consumerData.serverTypes[i].protocol === "REST") {
                     compageNode.consumerData.serverTypes[i].openApiFileYamlContent = readFileSync;
                     compageNode.consumerData.serverTypes[i].resources = [];
+                    compageNode.consumerData.template = uploadYamlRequest.template;
+                    compageNode.consumerData.framework = uploadYamlRequest.framework;
                     break;
                 }
             }

@@ -9,9 +9,11 @@ import {UploadYamlRequest} from "./model";
 
 interface ArgTypes {
     nodeId: string;
+    template: string;
+    framework: string;
 }
 
-export const UploadYaml = ({nodeId}: ArgTypes) => {
+export const UploadYaml = ({nodeId, framework, template}: ArgTypes) => {
     const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
     const uploadYamlData = useAppSelector(selectUploadYamlData);
     const [openApiYamlFile, setOpenApiYamlFile] = React.useState("");
@@ -25,7 +27,9 @@ export const UploadYaml = ({nodeId}: ArgTypes) => {
             const uploadYamlRequest: UploadYamlRequest = {
                 projectId: projectAndVersion[0],
                 nodeId: nodeId,
-                file: openApiYamlFile
+                file: openApiYamlFile,
+                framework: framework,
+                template: template
             };
             if (uploadYamlStatus !== 'loading') {
                 dispatch(uploadYamlAsync(uploadYamlRequest));
