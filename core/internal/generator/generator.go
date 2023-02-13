@@ -63,7 +63,7 @@ func Generator(coreProject *core.Project) error {
 				if err != nil {
 					return err
 				}
-				err = OpenApiGeneratorRunner("generate", "-i", fileName, "-g", strings.ToLower(languageNode.Language), "-o", nodeDirectoryName)
+				err = OpenApiGeneratorRunner("generate", "-i", fileName, "-g", strings.ToLower(languageNode.Language), "-o", nodeDirectoryName, "--git-user-id", coreProject.UserName, "--git-repo-id", coreProject.RepositoryName)
 				if err != nil {
 					return errors.New("something happened while running openApi generator")
 				}
