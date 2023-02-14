@@ -247,15 +247,24 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return "";
     };
 
-    const languageFrameworks = {
-        "go": ["net/http", "go"],
-        "javascript": ["javascript"],
-        "java": ["java"],
-        "ruby": ["ruby"],
-        "python": ["python"],
+    const compageLanguageFrameworks = {
+        "go": ["net/http"],
     };
-    const map = new Map(Object.entries(languageFrameworks));
-    const frameworks = map.get(payload.language);
+    const openApiLanguageFrameworks = {
+        "go": ["go-server", "go-gin-server", "go-echo-server"],
+        "javascript": ["nodejs-express-server"],
+        "typescript": ["typescript-node", "typescript-axios"],
+        "java": ["java-play-framework", "java-micronaut-server", "java-undertow-server"],
+        "ruby": ["ruby-on-rails", "ruby-sinatra"],
+        "python": ["python-flask"],
+    };
+    let map;
+    if (payload.template === "compage") {
+        map = new Map(Object.entries(compageLanguageFrameworks));
+    } else {
+        map = new Map(Object.entries(openApiLanguageFrameworks));
+    }
+    const frameworks = map.get(payload.language) || [];
     const getRestServerConfig = () => {
         if (payload.isRestServer) {
             const getContent = () => {
@@ -282,6 +291,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     id="restServerConfigPort"
                     label="Port"
                     type="number"
+                    disabled={payload.template !== "compage"}
                     value={payload.restServerConfig.port}
                     onChange={handleRestServerConfigPortChange}
                     variant="outlined"
@@ -447,7 +457,12 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const templates = ["compage", "openApi"];
-    const languages = ["go", "javascript", "java", "ruby", "python"];
+    let languages;
+    if (payload.template === "compage") {
+        languages = ["go"];
+    } else {
+        languages = ["go", "javascript", "java", "ruby", "python"];
+    }
     const handleModifyRestResourceClick = (resource: Resource) => {
         console.log(resource.fields);
         const restServerConfig = payload.restServerConfig;
