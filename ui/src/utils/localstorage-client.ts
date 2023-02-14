@@ -27,8 +27,8 @@ export const getCurrentConfig = () => {
     return localStorage.getItem(CURRENT_CONFIG);
 };
 
-export const setCurrentProjectDetails = (currentProject: string, version: string) => {
-    localStorage.setItem(CURRENT_PROJECT, getCurrentUserName() + "###" + currentProject + "###" + version);
+export const setCurrentProjectDetails = (currentProject: string, version: string, repository: string) => {
+    localStorage.setItem(CURRENT_PROJECT, getCurrentUserName() + "###" + currentProject + "###" + version + "###" + repository);
 };
 
 export const getCurrentProjectDetails = () => {

@@ -20,7 +20,7 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
             }
             const createProjectResponse: CreateProjectResponse = response.data;
             // update details to localstorage client
-            setCurrentProjectDetails(createProjectResponse.project.id, createProjectResponse.project.version);
+            setCurrentProjectDetails(createProjectResponse.project.id, createProjectResponse.project.version, createProjectResponse.project.repository.name);
             setCurrentConfig(createProjectResponse.project.json);
             setCurrentState(createProjectResponse.project.json);
             const message = `Successfully created project: ${createProjectRequest.displayName}[${createProjectResponse.project.id}]`;

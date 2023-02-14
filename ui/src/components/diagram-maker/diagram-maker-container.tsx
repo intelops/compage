@@ -65,6 +65,7 @@ import {cleanse, removeUnwantedKeys} from "./helper/helper";
 import * as _ from "lodash";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import {getCurrentUserName} from "../../utils/sessionstorage-client";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -439,11 +440,14 @@ export const DiagramMakerContainer = ({
         const currentProjectDetails = getCurrentProjectDetails();
         if (currentProjectDetails) {
             const userNameAndProjectAndVersion = currentProjectDetails.split("###");
-            return <Box sx={{flexGrow: 0}}>
-                <Typography variant={"subtitle1"}>
-                    {userNameAndProjectAndVersion[1]}[{userNameAndProjectAndVersion[2]}]
-                </Typography>
-            </Box>
+            return <a target="_blank"
+                      href={"https://github1s.com/" + getCurrentUserName() + "/" + userNameAndProjectAndVersion[3]}>
+                <Box sx={{flexGrow: 0}}>
+                    <Typography variant={"subtitle1"}>
+                        {userNameAndProjectAndVersion[1]}[{userNameAndProjectAndVersion[2]}]
+                    </Typography>
+                </Box>
+            </a>
         }
     }
 
