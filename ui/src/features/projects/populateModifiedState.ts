@@ -1,5 +1,5 @@
 import {getModifiedState, setModifiedState} from "../../utils/localstorage-client";
-import {GetProjectResponse} from "./model";
+import {CompageJson} from "../../components/diagram-maker/models";
 
 export const getNodeConsumerData = (node: any) => {
     delete node.id;
@@ -17,7 +17,7 @@ export const getEdgeConsumerData = (edge: any) => {
 };
 
 
-export const updateModifiedState = (getProjectResponse: GetProjectResponse) => {
+export const updateModifiedState = (json: CompageJson) => {
     const modifiedState = getModifiedState();
     if (!modifiedState
         || modifiedState === "{}"
@@ -27,7 +27,7 @@ export const updateModifiedState = (getProjectResponse: GetProjectResponse) => {
             nodes: {},
             edges: {}
         };
-        const parsedState = getProjectResponse.json;
+        const parsedState = json;
         // state has nodes
         if (Object.keys(parsedState?.nodes).length !== 0) {
             // iterate over nodes and check if they have any consumerData attached to them.

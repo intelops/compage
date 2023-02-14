@@ -35,7 +35,7 @@ export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, Generate
                 // set the modified state when the project is fetched. This is required when user logged out after adding
                 // properties to nodes and edges. After re-login, the modified state is lost and user can't see props
                 // added to nodes and edges.
-                updateModifiedState(getProjectResponse);
+                updateModifiedState(getProjectResponse.json);
             }).catch(e => {
                 const statusCode = e.response.status;
                 const message = e.response.data.message;

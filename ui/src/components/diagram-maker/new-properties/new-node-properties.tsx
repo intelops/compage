@@ -5,7 +5,7 @@ import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import {setModifiedState} from "../../../utils/localstorage-client";
+import {getCurrentConfig, setModifiedState} from "../../../utils/localstorage-client";
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
@@ -16,6 +16,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import {UploadYaml} from "../../../features/open-api-yaml-operations/component";
 import {useAppSelector} from "../../../redux/hooks";
 import {selectUploadYamlData, selectUploadYamlStatus} from "../../../features/open-api-yaml-operations/slice";
+import {updateModifiedState} from "../../../features/projects/populateModifiedState";
 
 interface NewNodePropertiesProps {
     isOpen: boolean;
@@ -70,7 +71,12 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
 export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
     const uploadYamlData = useAppSelector(selectUploadYamlData);
-    const parsedModifiedState = getParsedModifiedState();
+    let parsedModifiedState = getParsedModifiedState();
+    // sometimes the parsedModifiedState is empty so, recreate it.
+    if (Object.keys(parsedModifiedState.nodes).length < 1) {
+        updateModifiedState(JSON.parse(getCurrentConfig()))
+        parsedModifiedState = getParsedModifiedState();
+    }
     const serverTypesConfig: ServerTypesConfig = getServerTypesConfig(parsedModifiedState, props.nodeId);
     const emptyConfig: ServerConfig = {
         framework: "", port: "", protocol: "", resources: []
