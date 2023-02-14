@@ -1,14 +1,21 @@
 import {DiagramMakerData, EditorMode, PositionAnchor} from 'diagram-maker';
 
 export const getData = (parentWidth, parentHeight, currentConfig: string) => {
-    const currentConfigJson = JSON.parse(currentConfig);
     let nodes = {};
     let edges = {};
-    if (currentConfigJson && Object.keys(currentConfigJson.nodes).length > 0) {
-        nodes = currentConfigJson.nodes;
-    }
-    if (currentConfigJson && Object.keys(currentConfigJson.edges).length > 0) {
-        edges = currentConfigJson.edges;
+    if (currentConfig === undefined
+        || currentConfig === "undefined"
+        || currentConfig === null
+        || currentConfig === ""
+        || (!currentConfig || currentConfig === "{}")) {
+    } else {
+        const currentConfigJson = JSON.parse(currentConfig);
+        if (currentConfigJson && currentConfigJson?.nodes && Object.keys(currentConfigJson.nodes).length > 0) {
+            nodes = currentConfigJson.nodes;
+        }
+        if (currentConfigJson && currentConfigJson?.nodes && Object.keys(currentConfigJson.edges).length > 0) {
+            edges = currentConfigJson.edges;
+        }
     }
     const graph: DiagramMakerData<{}, {}> = {
         nodes: nodes,

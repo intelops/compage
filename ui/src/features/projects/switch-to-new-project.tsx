@@ -123,7 +123,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             name: data.repositoryName,
             tag: "v1"
         };
-        const json = getData(0, 0, getCurrentConfig());
+        const json = getData(0, 0, "");
         const displayName = data.projectName;
         const metadata = data.metadata;
         const cPR: CreateProjectRequest = {
