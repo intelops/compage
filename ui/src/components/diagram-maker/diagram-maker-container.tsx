@@ -36,7 +36,7 @@ import {Action, Dispatch} from "redux";
 import {Grid} from "@mui/material";
 import {
     getCurrentConfig,
-    getCurrentProject,
+    getCurrentProjectDetails,
     getCurrentState,
     setCurrentConfig,
     setCurrentState,
@@ -412,8 +412,9 @@ export const DiagramMakerContainer = ({
 
     // When clicked, save the state of project to backend.
     const handleSaveProjectClick = () => {
-        const currentProject: string = getCurrentProject();
-        if (currentProject) {
+        const currentProjectDetails: string = getCurrentProjectDetails();
+        if (currentProjectDetails) {
+            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
             // save in localstorage
             setCurrentConfig(JSON.parse(diagramMaker.config));
             setCurrentState(JSON.parse(diagramMaker.state));
@@ -423,7 +424,7 @@ export const DiagramMakerContainer = ({
                     repository: getProjectData.repository,
                     user: getProjectData.user,
                     version: getProjectData.version,
-                    id: currentProject,
+                    id: userNameAndProjectAndVersion[1],
                     json: JSON.parse(getCurrentState())
                 };
                 return uPR;
@@ -435,12 +436,12 @@ export const DiagramMakerContainer = ({
     };
 
     function getProjectAndVersion(): React.ReactNode {
-        const currentProject = getCurrentProject();
-        if (currentProject) {
-            const projectAndVersion = currentProject.split("###");
+        const currentProjectDetails = getCurrentProjectDetails();
+        if (currentProjectDetails) {
+            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
             return <Box sx={{flexGrow: 0}}>
                 <Typography variant={"subtitle1"}>
-                    {projectAndVersion[0]}[{projectAndVersion[1]}]
+                    {userNameAndProjectAndVersion[1]}[{userNameAndProjectAndVersion[2]}]
                 </Typography>
             </Box>
         }

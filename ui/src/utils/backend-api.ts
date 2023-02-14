@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {config} from "./constants";
-import {retrieveCurrentUserName} from "./sessionstorage-client";
+import {getCurrentUserName} from "./sessionstorage-client";
 
 export const X_USER_NAME_HEADER = "X-User-Name";
 
@@ -46,13 +46,13 @@ export const ProjectsBackendApi = () => {
 const getHeaders = () => {
     return {
         post: {
-            [X_USER_NAME_HEADER]: retrieveCurrentUserName()
+            [X_USER_NAME_HEADER]: getCurrentUserName()
         },
         get: {
-            [X_USER_NAME_HEADER]: retrieveCurrentUserName()
+            [X_USER_NAME_HEADER]: getCurrentUserName()
         },
         put: {
-            [X_USER_NAME_HEADER]: retrieveCurrentUserName()
+            [X_USER_NAME_HEADER]: getCurrentUserName()
         }
     };
 }

@@ -1,6 +1,6 @@
 export const CURRENT_USER = "CURRENT_USER";
 
-export const retrieveCurrentUserName = () => {
+export const getCurrentUserName = () => {
     return sessionStorage.getItem(CURRENT_USER);
 };
 

@@ -2,7 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {CreateProjectError, CreateProjectRequest, CreateProjectResponse} from "../model";
 import {createProject} from "../api";
 import {toastr} from 'react-redux-toastr'
-import {setCurrentConfig, setCurrentProject, setCurrentState} from "../../../utils/localstorage-client";
+import {setCurrentConfig, setCurrentProjectDetails, setCurrentState} from "../../../utils/localstorage-client";
 
 export const createProjectAsync = createAsyncThunk<CreateProjectResponse, CreateProjectRequest, { rejectValue: CreateProjectError }>(
     'projects/createProject',
@@ -20,7 +20,7 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
             }
             const createProjectResponse: CreateProjectResponse = response.data;
             // update details to localstorage client
-            setCurrentProject(createProjectResponse.project.id, createProjectResponse.project.version);
+            setCurrentProjectDetails(createProjectResponse.project.id, createProjectResponse.project.version);
             setCurrentConfig(createProjectResponse.project.json);
             setCurrentState(createProjectResponse.project.json);
             const message = `Successfully created project: ${createProjectRequest.displayName}[${createProjectResponse.project.id}]`;

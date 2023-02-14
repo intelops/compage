@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectUploadYamlData, selectUploadYamlStatus} from './slice';
 import Button from "@mui/material/Button";
 import {uploadYamlAsync} from "./async-apis/uploadYaml";
-import {getCurrentProject} from "../../utils/localstorage-client";
+import {getCurrentProjectDetails} from "../../utils/localstorage-client";
 import {UploadYamlRequest} from "./model";
 
 interface ArgTypes {
@@ -19,11 +19,11 @@ export const UploadYaml = ({nodeId}: ArgTypes) => {
 
     // When clicked, dispatch `uploadYaml`
     const handleUploadYamlClick = () => {
-        const currentProject: string = getCurrentProject();
-        if (currentProject) {
-            const projectAndVersion = currentProject.split("###");
+        const currentProjectDetails: string = getCurrentProjectDetails();
+        if (currentProjectDetails) {
+            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
             const uploadYamlRequest: UploadYamlRequest = {
-                projectId: projectAndVersion[0],
+                projectId: userNameAndProjectAndVersion[1],
                 nodeId: nodeId,
                 file: openApiYamlFile,
             };

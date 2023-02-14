@@ -5,7 +5,7 @@ import {GenerateCode} from "../../features/code-operations/component";
 import {SwitchProject} from "../../features/projects/switch-project";
 import Button from "@mui/material/Button";
 import {
-    getCurrentProject,
+    getCurrentProjectDetails,
     removeCurrentConfig,
     removeCurrentState,
     removeModifiedState,
@@ -13,10 +13,10 @@ import {
 } from "../../utils/localstorage-client";
 
 const resetState = () => {
-    const currentProject: string = getCurrentProject();
-    if (currentProject) {
-        const projectAndVersion = currentProject.split("###");
-        const message = `Are you sure you want to reset the project [${projectAndVersion[0]}]?`;
+    const currentProjectDetails: string = getCurrentProjectDetails();
+    if (currentProjectDetails) {
+        const userNameAndProjectAndVersion = currentProjectDetails.split("###");
+        const message = `Are you sure you want to reset the project [${userNameAndProjectAndVersion[1]}]?`;
         if (!window.confirm(message)) {
             return;
         }

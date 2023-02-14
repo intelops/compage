@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectGenerateCodeStatus} from './slice';
 import Button from "@mui/material/Button";
 import {generateCodeAsync} from "./async-apis/generateCode";
-import {getCurrentProject, getCurrentState} from "../../utils/localstorage-client";
+import {getCurrentProjectDetails, getCurrentState} from "../../utils/localstorage-client";
 import {selectGetProjectData, selectUpdateProjectData} from "../projects/slice";
 import {removeUnwantedKeys} from "../../components/diagram-maker/helper/helper";
 import * as _ from "lodash";
@@ -18,11 +18,11 @@ export const GenerateCode = () => {
 
     // When clicked, dispatch `generateCode`
     const handleGenerateCodeClick = () => {
-        const currentProject: string = getCurrentProject();
-        if (currentProject) {
-            const projectAndVersion = currentProject.split("###");
+        const currentProjectDetails: string = getCurrentProjectDetails();
+        if (currentProjectDetails) {
+            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
             const generateCodeRequest = {
-                projectId: projectAndVersion[0]
+                projectId: userNameAndProjectAndVersion[1]
             };
             if (generateCodeStatus !== 'loading') {
                 dispatch(generateCodeAsync(generateCodeRequest));

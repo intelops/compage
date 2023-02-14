@@ -1,23 +1,31 @@
 import React from "react";
 import {Navigate} from "react-router-dom";
 import {getData} from "../diagram-maker/data/BoundaryCircular/data";
-import {getCurrentConfig, getCurrentProject, setCurrentConfig, setCurrentState} from "../../utils/localstorage-client";
+import {getCurrentConfig, getCurrentProjectDetails, setCurrentConfig, setCurrentState} from "../../utils/localstorage-client";
 import {useAppSelector} from "../../redux/hooks";
 import {DiagramMakerContainer} from "../diagram-maker/diagram-maker-container";
 import {selectAuthData} from "../../features/auth/slice";
 import {SwitchProject} from "../../features/projects/switch-project";
-import {selectGetProjectData} from "../../features/projects/slice";
+import {getCurrentUserName} from "../../utils/sessionstorage-client";
 
 export const Home = () => {
     const authData = useAppSelector(selectAuthData);
-    const getProjectData = useAppSelector(selectGetProjectData);
 
     if (!authData.login) {
         return <Navigate to="/login"/>;
     }
 
-    const currentProject: string = getCurrentProject();
-    console.log("currentProject in home :", currentProject);
+    const currentProjectDetails: string = getCurrentProjectDetails();
+    console.log("currentProjectDetails in home :", currentProjectDetails);
+
+    const isSameUser = () => {
+        const currentProjectDetails = getCurrentProjectDetails();
+        if (currentProjectDetails){
+            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
+            return getCurrentUserName() === userNameAndProjectAndVersion[0];
+        }
+        return false;
+    };
 
     const loadExisting = (currentCnf: string) => {
         if (currentCnf === undefined || currentCnf === "undefined") {
@@ -30,7 +38,7 @@ export const Home = () => {
         if (!currentConfigJson.panels) {
             return false;
         }
-        return currentConfigJson.panels !== "{}";
+        return currentConfigJson.panels !== "{}" && isSameUser();
     };
 
     const getDiagramData = () => {
@@ -50,9 +58,9 @@ export const Home = () => {
 
     const getContent = (): React.ReactNode => {
         if (
-            currentProject === null
-            || currentProject === undefined
-            || currentProject.length === 0
+            currentProjectDetails === null
+            || currentProjectDetails === undefined
+            || currentProjectDetails.length === 0
         ) {
             // choose from existing or create a new project
             return <SwitchProject isOpen={true}></SwitchProject>;

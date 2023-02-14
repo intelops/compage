@@ -1,4 +1,5 @@
 import {CompageJson} from "../components/diagram-maker/models";
+import {getCurrentUserName} from "./sessionstorage-client";
 
 export const CURRENT_STATE = "STATE";
 export const CURRENT_CONFIG = "CONFIG";
@@ -26,11 +27,11 @@ export const getCurrentConfig = () => {
     return localStorage.getItem(CURRENT_CONFIG);
 };
 
-export const setCurrentProject = (currentProject: string, version: string) => {
-    localStorage.setItem(CURRENT_PROJECT, currentProject + "###" + version);
+export const setCurrentProjectDetails = (currentProject: string, version: string) => {
+    localStorage.setItem(CURRENT_PROJECT, getCurrentUserName() + "###" + currentProject + "###" + version);
 };
 
-export const getCurrentProject = () => {
+export const getCurrentProjectDetails = () => {
     return localStorage.getItem(CURRENT_PROJECT);
 };
 

@@ -12,7 +12,7 @@ import Logo from "../../logo.png";
 import {useAppSelector} from "../../redux/hooks";
 import {Link, useNavigate} from "react-router-dom";
 import {selectAuthData} from "../../features/auth/slice";
-import {getCurrentProject} from "../../utils/localstorage-client";
+import {getCurrentProjectDetails} from "../../utils/localstorage-client";
 
 const settings = ['Account', 'Logout'];
 
@@ -97,13 +97,13 @@ const Header = () => {
 
     const getCurrentProjectSelected = () => {
         if (authData.login) {
-            const currentProject = getCurrentProject();
-            if (currentProject) {
-                const projectAndVersion = currentProject.split("###");
+            const currentProjectDetails = getCurrentProjectDetails();
+            if (currentProjectDetails) {
+                const userNameAndProjectAndVersion = currentProjectDetails.split("###");
                 return <Toolbar>
                     <Box sx={{flexGrow: 0}}>
                         <Typography variant={"h6"}>
-                            You have selected {projectAndVersion[0]}
+                            You have selected {userNameAndProjectAndVersion[1]}
                         </Typography>
                     </Box>
                 </Toolbar>;
