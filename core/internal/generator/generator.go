@@ -63,9 +63,15 @@ func Generator(coreProject *core.Project) error {
 				if err != nil {
 					return err
 				}
-				err = OpenApiGeneratorRunner("generate", "-i", fileName, "-g", strings.ToLower(languageNode.Language), "-o", nodeDirectoryName, "--git-user-id", coreProject.UserName, "--git-repo-id", coreProject.RepositoryName)
+				// generate code by openapi.yaml
+				err = OpenApiGeneratorRunner("generate", "-i", fileName, "-g", strings.ToLower(languageNode.RestConfig.Server.Framework), "-o", nodeDirectoryName, "--git-user-id", coreProject.UserName, "--git-repo-id", coreProject.RepositoryName)
 				if err != nil {
 					return errors.New("something happened while running openApi generator")
+				}
+				// generate documentation for the code
+				err = OpenApiGeneratorRunner("generate", "-i", fileName, "-g", "dynamic-html", "-o", nodeDirectoryName+"/gen/docs", "--git-user-id", coreProject.UserName, "--git-repo-id", coreProject.RepositoryName)
+				if err != nil {
+					return errors.New("something happened while running openApi generator for documentation.")
 				}
 				// copy kubernetes yaml's
 			} else {
