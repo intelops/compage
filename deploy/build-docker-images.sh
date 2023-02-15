@@ -1,7 +1,7 @@
 #######################################################################
 # create and push docker images                                       #
 #######################################################################
-TAG_NAME="0.0.2"
+TAG_NAME="0.0.5"
 CORE_IMAGE="ghcr.io/mahendraintelops/compage/core:$TAG_NAME"
 APP_IMAGE="ghcr.io/mahendraintelops/compage/app:$TAG_NAME"
 UI_IMAGE="ghcr.io/mahendraintelops/compage/ui:$TAG_NAME"
