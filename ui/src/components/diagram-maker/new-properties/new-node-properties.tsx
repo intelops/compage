@@ -17,6 +17,7 @@ import {UploadYaml} from "../../../features/open-api-yaml-operations/component";
 import {useAppSelector} from "../../../redux/hooks";
 import {selectUploadYamlData, selectUploadYamlStatus} from "../../../features/open-api-yaml-operations/slice";
 import {updateModifiedState} from "../../../features/projects/populateModifiedState";
+import {sanitizeString} from "../../../utils/backend-api";
 
 interface NewNodePropertiesProps {
     isOpen: boolean;
@@ -192,7 +193,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const handleNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setPayload({
             ...payload,
-            name: event.target.value
+            name: sanitizeString(event.target.value)
         });
     };
 

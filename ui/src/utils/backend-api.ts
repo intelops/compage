@@ -4,6 +4,10 @@ import {getCurrentUserName} from "./sessionstorage-client";
 
 export const X_USER_NAME_HEADER = "X-User-Name";
 
+export const sanitizeString = (input: string) => {
+    return input.split(" ").join("_");
+}
+
 const BackendApi = () => {
     return axios.create({
         baseURL: config.backend_base_url,

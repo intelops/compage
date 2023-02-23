@@ -10,7 +10,7 @@ import TextField from "@mui/material/TextField";
 import {Stack} from "@mui/material";
 import {createProjectAsync} from "./async-apis/createProject";
 import {getData} from "../../components/diagram-maker/data/BoundaryCircular/data";
-import {getCurrentConfig} from "../../utils/localstorage-client";
+import {sanitizeString} from "../../utils/backend-api";
 
 interface ArgTypes {
     handleClose: (...args: any) => void;
@@ -46,21 +46,21 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
     const handleProjectNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setData({
             ...data,
-            projectName: event.target.value
+            projectName: sanitizeString(event.target.value)
         });
     };
 
     const handleRepositoryBranchChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setData({
             ...data,
-            repositoryBranch: event.target.value
+            repositoryBranch: sanitizeString(event.target.value)
         });
     };
 
     const handleRepositoryNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setData({
             ...data,
-            repositoryName: event.target.value
+            repositoryName: sanitizeString(event.target.value)
         });
     };
 
