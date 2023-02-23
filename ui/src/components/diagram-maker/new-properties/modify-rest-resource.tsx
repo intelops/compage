@@ -9,6 +9,7 @@ import React, {ChangeEvent} from "react";
 import {Resource} from "../models";
 import TextField from "@mui/material/TextField";
 import {isJsonString} from "../helper/utils";
+import {sanitizeString} from "../../../utils/backend-api";
 
 interface ModifyRestResourceProperties {
     isOpen: boolean;
@@ -24,10 +25,15 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
         fields: JSON.stringify(props.resource?.fields) || "",
     });
 
+    // first letter of the Resource should always be capital.
+    const capitalizeFirstLetter = (input: string) => {
+        return input.charAt(0).toUpperCase() + input.slice(1);
+    }
+
     const handleNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setData({
             ...data,
-            name: event.target.value
+            name: sanitizeString(capitalizeFirstLetter(event.target.value))
         });
     };
 

@@ -13,11 +13,12 @@ import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import {Grpc, Resource, Rest, Ws} from "../models";
 import {ModifyRestResource} from "./modify-rest-resource";
 import DeleteIcon from '@mui/icons-material/Delete';
-import {UploadYaml} from "../../../features/open-api-yaml-operations/component";
 import {useAppSelector} from "../../../redux/hooks";
 import {selectUploadYamlData, selectUploadYamlStatus} from "../../../features/open-api-yaml-operations/slice";
 import {updateModifiedState} from "../../../features/projects/populateModifiedState";
 import {sanitizeString} from "../../../utils/backend-api";
+import {UploadYaml} from "../../../features/open-api-yaml-operations/component";
+import {COMPAGE, compageLanguageFrameworks, isCompageTemplate, OPENAPI, openApiLanguageFrameworks} from "./utils";
 
 interface NewNodePropertiesProps {
     isOpen: boolean;
@@ -84,7 +85,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
     const [payload, setPayload] = React.useState({
         name: parsedModifiedState.nodes[props.nodeId]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.name : "",
-        template: parsedModifiedState.nodes[props.nodeId]?.consumerData.template !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.template : "compage",
+        template: parsedModifiedState.nodes[props.nodeId]?.consumerData.template !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.template : COMPAGE,
         language: parsedModifiedState.nodes[props.nodeId]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.language : "",
         isRestServer: serverTypesConfig.isRestServer || false,
         restServerConfig: serverTypesConfig.restServerConfig || emptyConfig,
@@ -110,11 +111,11 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 port: payload.restServerConfig.port,
                 protocol: Rest,
             };
-            if (payload.template !== "compage") {
+            if (isCompageTemplate(payload.template)) {
+                restServerConfig.resources = payload.restServerConfig.resources;
+            } else {
                 restServerConfig.resources = [];
                 restServerConfig.openApiFileYamlContent = uploadYamlData.content;
-            } else {
-                restServerConfig.resources = payload.restServerConfig.resources;
             }
             serverTypes.push(restServerConfig);
         }
@@ -254,55 +255,53 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return "";
     };
 
-    const compageLanguageFrameworks = {
-        "go": ["net/http"],
-    };
-    const openApiLanguageFrameworks = {
-        "go": ["go-server", "go-gin-server", "go-echo-server"],
-        "javascript": ["nodejs-express-server"],
-        "typescript": ["typescript-node", "typescript-axios"],
-        "java": ["java-play-framework", "java-micronaut-server", "java-undertow-server"],
-        "ruby": ["ruby-on-rails", "ruby-sinatra"],
-        "python": ["python-flask"],
-    };
+    // create language:frameworks map based on template chosen
     let map;
-    if (payload.template === "compage") {
+    if (isCompageTemplate(payload.template)) {
         map = new Map(Object.entries(compageLanguageFrameworks));
     } else {
         map = new Map(Object.entries(openApiLanguageFrameworks));
     }
+
     const frameworks = map.get(payload.language) || [];
+
+    const getPortContent = () => {
+        if (isCompageTemplate(payload.template)) {
+            return <TextField
+                required
+                size="medium"
+                margin="dense"
+                id="restServerConfigPort"
+                label="Port"
+                type="number"
+                value={payload.restServerConfig.port}
+                onChange={handleRestServerConfigPortChange}
+                variant="outlined"
+            />;
+        }
+        return "";
+    };
+
+    const getResourcesContent = () => {
+        if (isCompageTemplate(payload.template)) {
+            return <React.Fragment>
+                <Button variant="outlined" color="secondary" onClick={handleAddRestResourceClick}>Add
+                    Resource</Button>
+                {
+                    getExistingResources()
+                }
+            </React.Fragment>
+        } else {
+            return <React.Fragment>
+                <UploadYaml nodeId={props.nodeId}/>
+            </React.Fragment>
+        }
+    }
+
     const getRestServerConfig = () => {
         if (payload.isRestServer) {
-            const getContent = () => {
-                if (payload.template === 'compage') {
-                    return <React.Fragment>
-                        <Button variant="outlined" color="secondary" onClick={handleAddRestResourceClick}>Add
-                            Resource</Button>
-                        {
-                            getExistingResources()
-                        }
-                    </React.Fragment>
-                } else {
-                    return <React.Fragment>
-                        <UploadYaml nodeId={props.nodeId}/>
-                    </React.Fragment>
-                }
-            }
-
             return <React.Fragment>
-                <TextField
-                    required
-                    size="medium"
-                    margin="dense"
-                    id="restServerConfigPort"
-                    label="Port"
-                    type="number"
-                    disabled={payload.template !== "compage"}
-                    value={payload.restServerConfig.port}
-                    onChange={handleRestServerConfigPortChange}
-                    variant="outlined"
-                />
+                {getPortContent()}
                 <TextField
                     required
                     size="medium"
@@ -320,7 +319,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         </MenuItem>
                     ))}
                 </TextField>
-                {getContent()}
+                {getResourcesContent()}
             </React.Fragment>;
         }
         return "";
@@ -463,9 +462,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const templates = ["compage", "openApi"];
+    const templates = [COMPAGE, OPENAPI];
     let languages;
-    if (payload.template === "compage") {
+    if (isCompageTemplate(payload.template)) {
         languages = ["go"];
     } else {
         languages = ["go", "javascript", "java", "ruby", "python"];
