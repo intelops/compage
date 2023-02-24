@@ -45,6 +45,13 @@ func Generator(coreProject *core.Project) error {
 				// create data map with values from LanguageNode and project to replace placeholders  - this is required as the
 				// names may be conflicting in nature
 				// TODO
+				// format the go code.
+				values := ctx.Value(languages.ContextVars).(languages.Values)
+				nodeDirectoryName := values.NodeDirectoryName
+				err := RunGoFmt(nodeDirectoryName)
+				if err != nil {
+					return err
+				}
 			} else if compageNode.ConsumerData.Language == languages.NodeJs {
 				return errors.New("unsupported language : " + languages.NodeJs)
 			} else {
@@ -64,12 +71,12 @@ func Generator(coreProject *core.Project) error {
 					return err
 				}
 				// generate code by openapi.yaml
-				err = OpenApiGeneratorRunner("generate", "-i", fileName, "-g", strings.ToLower(languageNode.RestConfig.Server.Framework), "-o", nodeDirectoryName, "--git-user-id", coreProject.UserName, "--git-repo-id", coreProject.RepositoryName)
+				err = RunOpenApiGenerator("generate", "-i", fileName, "-g", strings.ToLower(languageNode.RestConfig.Server.Framework), "-o", nodeDirectoryName, "--git-user-id", coreProject.UserName, "--git-repo-id", coreProject.RepositoryName)
 				if err != nil {
 					return errors.New("something happened while running openApi generator")
 				}
 				// generate documentation for the code
-				err = OpenApiGeneratorRunner("generate", "-i", fileName, "-g", "dynamic-html", "-o", nodeDirectoryName+"/gen/docs", "--git-user-id", coreProject.UserName, "--git-repo-id", coreProject.RepositoryName)
+				err = RunOpenApiGenerator("generate", "-i", fileName, "-g", "dynamic-html", "-o", nodeDirectoryName+"/gen/docs", "--git-user-id", coreProject.UserName, "--git-repo-id", coreProject.RepositoryName)
 				if err != nil {
 					return errors.New("something happened while running openApi generator for documentation.")
 				}

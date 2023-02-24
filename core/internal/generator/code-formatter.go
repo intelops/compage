@@ -5,9 +5,10 @@ import (
 	"os/exec"
 )
 
-// RunOpenApiGenerator runs openapi-generator-cli with args passed.
-func RunOpenApiGenerator(args ...string) error {
-	output, err := exec.Command("openapi-generator-cli", args...).Output()
+// RunGoFmt runs go-fmt with args passed on generated code present in the directory passed.
+func RunGoFmt(directoryName string) error {
+	args := []string{"-s", "-w", directoryName}
+	output, err := exec.Command("gofmt", args...).Output()
 	if err != nil {
 		log.Debugf("Output : %s", string(output))
 		log.Debugf("err : %s", err)
