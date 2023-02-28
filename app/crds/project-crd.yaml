@@ -49,8 +49,6 @@ spec:
                   properties:
                     name:
                       type: string
-                    tag:
-                      type: string
                     branch:
                       type: string
                 oldVersions:

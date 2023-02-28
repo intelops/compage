@@ -12,20 +12,32 @@ import {
 
 // convertProjectEntityToProjectResourceSpec creates projectResourceSpec on k8s cluster.
 const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: string, projectEntity: ProjectEntity) => {
-    const repository: Repository = {
-        branch: projectEntity.repository?.branch ? projectEntity.repository.branch : "compage",
-        name: projectEntity.displayName,
-        tag: ""
+    let repository: Repository = {
+        branch: "",
+        name: "",
     }
+
+    // if repository name is not set, add displayName as repository name.
+    if (!projectEntity.repository?.name) {
+        repository.name = getSanitizedName(projectEntity.displayName);
+    } else {
+        repository.name = getSanitizedName(projectEntity.repository.name);
+    }
+
+    // if branch is not set, add "compage" as default branch.
+    if (!projectEntity.repository?.branch) {
+        repository.branch = "compage";
+    } else {
+        repository.branch = getSanitizedName(projectEntity.repository.branch);
+    }
+
     const projectResourceSpec: ProjectResourceSpec = {
         id: projectId,
         displayName: projectEntity.displayName,
         metadata: JSON.stringify(projectEntity.metadata),
         user: projectEntity.user,
         json: JSON.stringify(projectEntity.json),
-        repository: (!projectEntity.repository?.name
-            || !projectEntity.repository?.branch)
-            ? repository : projectEntity.repository,
+        repository: repository,
         version: projectEntity.version,
         oldVersions: []
     }
@@ -105,26 +117,45 @@ const prepareProjectResource = (projectId: string, userName: string, projectReso
     return projectResource
 }
 
+const lengthOfChars = 5;
+
+const containsSpecialChars = (character: string) => {
+    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+    return specialChars.test(character);
+}
+
+export const getSanitizedName = (name: string) => {
+    const sanitizedName = name.substring(0, lengthOfChars);
+    // check if last char is non-alphanumeric
+    const lastCharacter = sanitizedName.charAt(sanitizedName.length - 1);
+    if (containsSpecialChars(lastCharacter)) {
+        // remove last character in sanitizedUserName.
+        const slicedSanitizedName = name.slice(0, sanitizedName.length - 1);
+        // append x to make it 5 characters string.
+        return slicedSanitizedName + "x";
+    }
+    return sanitizedName;
+};
+
 // generateProjectId generates unique id for project.
 const generateProjectId = (userName: string, projectName: string) => {
-    const lengthOfChars = 5;
     // truncate userName if its length is greater than 5
-    let sanitizedUserName = userName
+    let sanitizedUserName = userName;
     if (userName.length > lengthOfChars) {
-        sanitizedUserName = userName.substring(0, lengthOfChars)
+        sanitizedUserName = getSanitizedName(userName);
     }
 
     // truncate projectResourceSpec.name if its length is greater than 5
     let sanitizedProjectName;
     if (projectName.length > lengthOfChars) {
-        sanitizedProjectName = projectName.substring(0, lengthOfChars)
+        sanitizedProjectName = getSanitizedName(projectName);
     } else {
         let appended = "";
         const count = lengthOfChars - projectName.length;
         for (let i = 0; i < count; i++) {
             appended += "x";
         }
-        sanitizedProjectName = projectName + appended;
+        sanitizedProjectName = getSanitizedName(projectName) + appended;
     }
 
     return sanitizedUserName.toLowerCase() + "-" + sanitizedProjectName.toLowerCase() + "-" + (Math.floor(Math.random() * 90000) + 10000);

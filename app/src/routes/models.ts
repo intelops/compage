@@ -54,7 +54,6 @@ export interface CompageJson {
 
 export interface Repository {
     name: string;
-    tag: string;
     branch: string;
 }
 
@@ -145,7 +144,7 @@ export interface DeleteProjectError {
 }
 
 export const initializeEmptyProjectEntity = () => {
-    const repository: Repository = {branch: "", name: "", tag: ""};
+    const repository: Repository = {branch: "", name: ""};
     const user: User = {email: "", name: ""};
     const json: CompageJson = {
         edges: new Map<string, CompageEdge>(),
