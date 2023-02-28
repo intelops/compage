@@ -28,7 +28,7 @@ const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: 
     if (!projectEntity.repository?.branch) {
         repository.branch = "compage";
     } else {
-        repository.branch = getSanitizedName(projectEntity.repository.branch);
+        repository.branch = projectEntity.repository.branch;
     }
 
     const projectResourceSpec: ProjectResourceSpec = {

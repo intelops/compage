@@ -98,7 +98,7 @@ export const DiagramMakerContainer = ({
     // handle ctrl+s in window
     const handleKeyDown = (event) => {
         event.preventDefault();
-        let charCode = String.fromCharCode(event.which).toLowerCase();
+        const charCode = String.fromCharCode(event.which).toLowerCase();
         if ((event.ctrlKey || event.metaKey) && (charCode === 's' || charCode === 'S')) {
             // update details to localstorage client
             setCurrentConfig(JSON.parse(diagramMaker.config));
@@ -107,7 +107,7 @@ export const DiagramMakerContainer = ({
         if ((event.ctrlKey || event.metaKey) && (charCode === 'r' || charCode === 'R')) {
             window.location.reload();
         }
-    }
+    };
 
     const [diagramMaker, setDiagramMaker] = React.useState({
         state: "{}",

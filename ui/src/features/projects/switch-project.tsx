@@ -33,7 +33,7 @@ export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
     }
 
     const handleDialogClose = async (e) => {
-        if (handleClose){
+        if (handleClose) {
             handleClose();
         }
         setData({...data, toggle: false});

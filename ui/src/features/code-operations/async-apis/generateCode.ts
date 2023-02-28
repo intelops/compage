@@ -1,7 +1,7 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {GenerateCodeError, GenerateCodeRequest, GenerateCodeResponse} from "../model";
 import {generateCode} from "../api";
-import {toastr} from 'react-redux-toastr'
+import {toastr} from 'react-redux-toastr';
 import {GetProjectRequest, GetProjectResponse} from "../../projects/model";
 import {getProject} from "../../projects/api";
 import {setCurrentConfig, setCurrentProjectDetails, setCurrentState} from "../../../utils/localstorage-client";
@@ -10,9 +10,9 @@ import {updateModifiedState} from "../../projects/populateModifiedState";
 export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, GenerateCodeRequest, { rejectValue: GenerateCodeError }>(
     'code-operations/generateCode',
     async (generateCodeRequest: GenerateCodeRequest, thunkApi) => {
-        const retrieveProjectToUpdateState = (generateCodeRequest: GenerateCodeRequest) => {
+        const retrieveProjectToUpdateState = (request: GenerateCodeRequest) => {
             const getProjectRequest: GetProjectRequest = {
-                id: generateCodeRequest.projectId
+                id: request.projectId
             };
             getProject(getProjectRequest).then(getProjectResp => {
                 if (getProjectResp.status !== 200) {
@@ -50,12 +50,12 @@ export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, Generate
         return generateCode(generateCodeRequest).then(response => {
             // Check if status is not okay:
             if (response.status !== 200) {
-                const message = `Failed to generate code for '${generateCodeRequest.projectId}'. Received: ${response.status}`;
-                console.log(message);
-                toastr.error(`generateCode [Failure]`, message);
+                const failureMessage = `Failed to generate code for '${generateCodeRequest.projectId}'. Received: ${response.status}`;
+                console.log(failureMessage);
+                toastr.error(`generateCode [Failure]`, failureMessage);
                 // Return the error message:
                 return thunkApi.rejectWithValue({
-                    message: message
+                    message: failureMessage
                 });
             }
             const message = `Successfully generated code for '${generateCodeRequest.projectId}'`;
@@ -73,6 +73,6 @@ export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, Generate
             return thunkApi.rejectWithValue({
                 message: errorMessage
             });
-        })
+        });
     }
 );

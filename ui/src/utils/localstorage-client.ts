@@ -35,7 +35,7 @@ export const getCurrentProjectDetails = () => {
     return localStorage.getItem(CURRENT_PROJECT);
 };
 
-export const removeCurrentProject = () => {
+export const removeCurrentProjectDetails = () => {
     localStorage.removeItem(CURRENT_PROJECT);
 };
 

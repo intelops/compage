@@ -32,7 +32,7 @@ export const GenerateCode = () => {
 
     const IsAnyRequiredValueMissingInOneOfNodes = (removeUnwantedKeysGetCurrentState: any) => {
         // nodes
-        for (let key in removeUnwantedKeysGetCurrentState.nodes) {
+        for (let key in removeUnwantedKeysGetCurrentState?.nodes) {
             const name = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.name
             if (!name) {
                 return true;
@@ -43,7 +43,7 @@ export const GenerateCode = () => {
             }
         }
         // edges
-        for (let key in removeUnwantedKeysGetCurrentState.edges) {
+        for (let key in removeUnwantedKeysGetCurrentState?.edges) {
             const name = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData?.name
             if (!name) {
                 return true;

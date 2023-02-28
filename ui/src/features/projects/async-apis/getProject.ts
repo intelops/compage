@@ -2,7 +2,12 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {GetProjectError, GetProjectRequest, GetProjectResponse} from "../model";
 import {getProject} from "../api";
 import {toastr} from 'react-redux-toastr';
-import {setCurrentConfig, setCurrentProjectDetails, setCurrentState} from "../../../utils/localstorage-client";
+import {
+    removeCurrentConfig, removeCurrentProjectDetails, removeCurrentState, removeModifiedState,
+    setCurrentConfig,
+    setCurrentProjectDetails,
+    setCurrentState
+} from "../../../utils/localstorage-client";
 import {updateModifiedState} from "../populateModifiedState";
 
 export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRequest, { rejectValue: GetProjectError }>(
@@ -14,6 +19,10 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
                 const errorMessage = `Status: ${response.status}, Message: ${msg}`;
                 console.log(errorMessage);
                 toastr.error(`getProject [Failure]`, errorMessage);
+                removeCurrentConfig();
+                removeCurrentState();
+                removeModifiedState();
+                removeCurrentProjectDetails();
                 return thunkApi.rejectWithValue({
                     message: errorMessage
                 });
@@ -37,6 +46,10 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;
             console.log(errorMessage);
             toastr.error(`getProject [Failure]`, errorMessage);
+            removeCurrentProjectDetails();
+            removeCurrentConfig();
+            removeCurrentState();
+            removeModifiedState();
             return thunkApi.rejectWithValue({
                 message: errorMessage
             });

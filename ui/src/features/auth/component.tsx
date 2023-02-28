@@ -27,15 +27,15 @@ export const Login = () => {
         // After requesting GitHub access, GitHub redirects back to your app with a code parameter
         const url = window.location.href;
         const hasCode = url.includes("?code=");
-        const hasState = url.includes("&state=")
+        const hasState = url.includes("&state=");
         // If GitHub API returns the code parameter
         if (hasCode && hasState) {
             const newUrl = url.split("?code=");
             window.history.pushState({}, null, newUrl[0]);
             const loginRequest: LoginRequest = {
                 code: newUrl[1].substring(0, newUrl[1].indexOf("&"))
-            }
-            dispatch(loginAsync(loginRequest))
+            };
+            dispatch(loginAsync(loginRequest));
         }
     }, [dispatch]);
 
@@ -69,5 +69,5 @@ export const Login = () => {
                 </Button>
             </Box>
         </CardContent>
-    </Card>
-}
+    </Card>;
+};

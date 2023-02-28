@@ -1,45 +1,58 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Navigate} from "react-router-dom";
 import {getData} from "../diagram-maker/data/BoundaryCircular/data";
-import {getCurrentConfig, getCurrentProjectDetails, setCurrentConfig, setCurrentState} from "../../utils/localstorage-client";
-import {useAppSelector} from "../../redux/hooks";
+import {
+    getCurrentConfig,
+    getCurrentProjectDetails,
+    setCurrentConfig,
+    setCurrentState
+} from "../../utils/localstorage-client";
+import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {DiagramMakerContainer} from "../diagram-maker/diagram-maker-container";
 import {selectAuthData} from "../../features/auth/slice";
 import {SwitchProject} from "../../features/projects/switch-project";
 import {getCurrentUserName} from "../../utils/sessionstorage-client";
+import {GetProjectRequest} from "../../features/projects/model";
+import {getProjectAsync} from "../../features/projects/async-apis/getProject";
+
+const isSameUser = () => {
+    const currentProjectDetails = getCurrentProjectDetails();
+    if (currentProjectDetails) {
+        const userNameAndProjectAndVersion = currentProjectDetails.split("###");
+        return getCurrentUserName() === userNameAndProjectAndVersion[0];
+    }
+    return false;
+};
+
+const loadExisting = (currentCnf: string) => {
+    if (currentCnf === undefined || currentCnf === "undefined" || currentCnf === "{}") {
+        return false;
+    }
+    const currentConfigJson = JSON.parse(currentCnf);
+    if (!currentConfigJson.panels) {
+        return false;
+    }
+    return currentConfigJson.panels !== "{}" && isSameUser();
+};
 
 export const Home = () => {
     const authData = useAppSelector(selectAuthData);
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        const currentProjectDetails: string = getCurrentProjectDetails();
+        if (currentProjectDetails) {
+            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
+            const getProjectRequest: GetProjectRequest = {
+                id: userNameAndProjectAndVersion[1]
+            };
+            dispatch(getProjectAsync(getProjectRequest));
+        }
+    }, [dispatch]);
 
     if (!authData.login) {
         return <Navigate to="/login"/>;
     }
-
-    const currentProjectDetails: string = getCurrentProjectDetails();
-    console.log("currentProjectDetails in home :", currentProjectDetails);
-
-    const isSameUser = () => {
-        const currentProjectDetails = getCurrentProjectDetails();
-        if (currentProjectDetails){
-            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
-            return getCurrentUserName() === userNameAndProjectAndVersion[0];
-        }
-        return false;
-    };
-
-    const loadExisting = (currentCnf: string) => {
-        if (currentCnf === undefined || currentCnf === "undefined") {
-            return false;
-        }
-        if (currentCnf === "{}") {
-            return false;
-        }
-        const currentConfigJson = JSON.parse(currentCnf);
-        if (!currentConfigJson.panels) {
-            return false;
-        }
-        return currentConfigJson.panels !== "{}" && isSameUser();
-    };
 
     const getDiagramData = () => {
         let diagramMakerData;
@@ -56,12 +69,14 @@ export const Home = () => {
         return diagramMakerData;
     };
 
+    const isProjectNotValid = () => {
+        const currentProjectDetails: string = getCurrentProjectDetails();
+        return (currentProjectDetails === null || currentProjectDetails === undefined
+            || currentProjectDetails.length === 0);
+    };
+
     const getContent = (): React.ReactNode => {
-        if (
-            currentProjectDetails === null
-            || currentProjectDetails === undefined
-            || currentProjectDetails.length === 0
-        ) {
+        if (isProjectNotValid()) {
             // choose from existing or create a new project
             return <SwitchProject isOpen={true}></SwitchProject>;
         }

@@ -40,6 +40,7 @@ export const ButtonsPanel = () => {
     // When clicked, open the dialog
     const handleSwitchProjectClick = () => {
         setData({...data, isOpen: true});
+        navigate('/home');
     };
 
     const handleClose = () => {
