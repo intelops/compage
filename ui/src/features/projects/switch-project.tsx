@@ -32,7 +32,11 @@ export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
         return <Navigate to="/login"/>;
     }
 
-    const handleDialogClose = async (e) => {
+    const handleDialogClose = async (e: any, reason: "backdropClick" | "escapeKeyDown") => {
+        // this prevents dialog box from closing.
+        if (reason === "backdropClick") {
+            return;
+        }
         if (handleClose) {
             handleClose();
         }
@@ -58,7 +62,9 @@ export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
     };
 
     return <React.Fragment>
-        <Dialog open={isOpen && data.toggle} onClose={handleDialogClose}>
+        <Dialog disableEscapeKeyDown
+                open={isOpen && data.toggle}
+                onClose={handleDialogClose}>
             <DialogTitle>Switch Project [Create or Choose]</DialogTitle>
             <Divider/>
             <DialogContent>
