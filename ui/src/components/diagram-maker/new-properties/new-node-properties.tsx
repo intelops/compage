@@ -31,7 +31,7 @@ interface ServerConfig {
     port?: string;
     framework?: string;
     resources?: Resource[];
-    openApiFileYamlContent?: string
+    openApiFileYamlContent?: string;
 }
 
 interface ServerTypesConfig {
@@ -76,7 +76,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     let parsedModifiedState = getParsedModifiedState();
     // sometimes the parsedModifiedState is empty so, recreate it.
     if (Object.keys(parsedModifiedState.nodes).length < 1) {
-        updateModifiedState(JSON.parse(getCurrentConfig()))
+        updateModifiedState(JSON.parse(getCurrentConfig()));
         parsedModifiedState = getParsedModifiedState();
     }
     const serverTypesConfig: ServerTypesConfig = getServerTypesConfig(parsedModifiedState, props.nodeId);
@@ -138,12 +138,12 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             serverTypes.push(wsServerConfig);
         }
 
-        const parsedModifiedState = getParsedModifiedState();
+        const modifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
         // P.S. - We will have the fields in consumerData which are on dialogBox, so we can assign them directly. We also refer the older values when payload state is initialized, so the older values will be persisted as they are if not changed.
-        if (!(props.nodeId in parsedModifiedState.nodes)) {
+        if (!(props.nodeId in modifiedState.nodes)) {
             // adding consumerData to new node in modifiedState
-            parsedModifiedState.nodes[props.nodeId] = {
+            modifiedState.nodes[props.nodeId] = {
                 consumerData: {
                     template: payload.template,
                     name: payload.name,
@@ -153,7 +153,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             };
         } else {
             // adding consumerData to existing node in modifiedState
-            parsedModifiedState.nodes[props.nodeId].consumerData = {
+            modifiedState.nodes[props.nodeId].consumerData = {
                 template: payload.template,
                 name: payload.name,
                 language: payload.language,
@@ -164,7 +164,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         // const nodeElement = document.getElementById(props.nodeId);
         // nodeElement.style.backgroundImage = `url('${payload.url}')`;
         // update modifiedState in the localstorage
-        setModifiedState(JSON.stringify(parsedModifiedState));
+        setModifiedState(JSON.stringify(modifiedState));
         setPayload({
             name: "",
             template: "",
@@ -290,13 +290,13 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 {
                     getExistingResources()
                 }
-            </React.Fragment>
+            </React.Fragment>;
         } else {
             return <React.Fragment>
                 <UploadYaml nodeId={props.nodeId}/>
-            </React.Fragment>
+            </React.Fragment>;
         }
-    }
+    };
 
     const getRestServerConfig = () => {
         if (payload.isRestServer) {
@@ -340,15 +340,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const handleRestServerConfigFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const restServerConfig = payload.restServerConfig;
         restServerConfig.framework = event.target.value;
-        setPayload({
-            ...payload,
-            restServerConfig
-        });
-    };
-
-    const handleRestServerConfigOpenApiFileYamlContentChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const restServerConfig = payload.restServerConfig;
-        restServerConfig.openApiFileYamlContent = event.target.value;
         setPayload({
             ...payload,
             restServerConfig
@@ -488,6 +479,14 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
+    const onClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
+        // this prevents dialog box from closing.
+        if (reason === "backdropClick") {
+            return;
+        }
+        props.onClose();
+    };
+
     return <React.Fragment>
         <ModifyRestResource isOpen={payload.isModifyRestResourceOpen}
                             resource={payload.currentRestResource}
@@ -495,7 +494,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                             nodeId={props.nodeId}
                             handleModifyRestResourceClick={handleModifyRestResourceClick}/>
 
-        <Dialog open={props.isOpen} onClose={props.onClose}>
+        <Dialog open={props.isOpen} onClose={onClose}>
             <DialogTitle>Node Properties : {props.nodeId}</DialogTitle>
             <Divider/>
             <DialogContent style={{

@@ -191,6 +191,7 @@ export const DiagramMakerContainer = ({
         }
     }
 
+    // eslint-disable-next-line
     React.useEffect(() => {
         // let shape, connectorPlacement, showArrowhead, plugin, edgeBadge
         let plugin, connectorPlacement
@@ -440,7 +441,7 @@ export const DiagramMakerContainer = ({
         const currentProjectDetails = getCurrentProjectDetails();
         if (currentProjectDetails) {
             const userNameAndProjectAndVersion = currentProjectDetails.split("###");
-            return <a target="_blank"
+            return <a target="_blank" rel="noreferrer"
                       href={"https://github1s.com/" + getCurrentUserName() + "/" + userNameAndProjectAndVersion[3]}>
                 <Box sx={{flexGrow: 0}}>
                     <Typography variant={"subtitle1"}>

@@ -10,6 +10,7 @@ import LoadingOverlay from "react-loading-overlay";
 import {useAppSelector} from "../../redux/hooks";
 import {
     selectCreateProjectStatus,
+    selectExistsProjectStatus,
     selectGetProjectStatus,
     selectListProjectsStatus,
     selectUpdateProjectStatus
@@ -20,6 +21,7 @@ import {selectUploadYamlStatus} from "../../features/open-api-yaml-operations/sl
 export const App = () => {
     const createProjectStatus = useAppSelector(selectCreateProjectStatus);
     const getProjectStatus = useAppSelector(selectGetProjectStatus);
+    const existsProjectStatus = useAppSelector(selectExistsProjectStatus);
     const listProjectsStatus = useAppSelector(selectListProjectsStatus);
     const updateProjectStatus = useAppSelector(selectUpdateProjectStatus);
     const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
@@ -31,8 +33,9 @@ export const App = () => {
             || listProjectsStatus === 'loading'
             || updateProjectStatus === 'loading'
             || uploadYamlStatus === 'loading'
-            || generateCodeStatus === 'loading';
-    }
+            || generateCodeStatus === 'loading'
+            || existsProjectStatus === 'loading';
+    };
 
     return <LoadingOverlay
         className="loading"
@@ -68,5 +71,5 @@ export const App = () => {
                 {/*<Footer/>*/}
             </Grid>
         </BrowserRouter>
-    </LoadingOverlay>
-}
+    </LoadingOverlay>;
+};

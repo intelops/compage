@@ -83,26 +83,26 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             wsConfig["port"] = payload.wsServerPort;
             clientTypes.push(wsConfig);
         }
-        const parsedModifiedState = getParsedModifiedState();
+        const modifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
         // P.S. - We will have the fields in consumerData which are on dialogBox, so we can assign them directly. We also refer the older values when payload state is initialized, so the older values will be persisted as they are if not changed.
-        if (!(props.edgeId in parsedModifiedState.edges)) {
+        if (!(props.edgeId in modifiedState.edges)) {
             // adding consumerData to new edge in modifiedState
-            parsedModifiedState.edges[props.edgeId] = {
+            modifiedState.edges[props.edgeId] = {
                 consumerData: {
-                    clientTypes: clientTypes,
+                    clientTypes,
                     name: payload.name,
                 }
             };
         } else {
             // adding consumerData to existing edge in modifiedState
-            parsedModifiedState.edges[props.edgeId].consumerData = {
-                clientTypes: clientTypes,
+            modifiedState.edges[props.edgeId].consumerData = {
+                clientTypes,
                 name: payload.name,
             };
         }
         // update modifiedState in the localstorage
-        setModifiedState(JSON.stringify(parsedModifiedState));
+        setModifiedState(JSON.stringify(modifiedState));
         setPayload({
             name: "",
             isRestServer: false,
@@ -112,6 +112,14 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             isWsServer: false,
             wsServerPort: ""
         });
+        props.onClose();
+    };
+
+    const onClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
+        // this prevents dialog box from closing.
+        if (reason === "backdropClick") {
+            return;
+        }
         props.onClose();
     };
 
@@ -145,7 +153,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                     onChange={handleIsRestServerChange}
                 />}
             />
-        </React.Fragment>
+        </React.Fragment>;
     };
 
     const getRestServerPort = () => {
@@ -189,7 +197,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                     onChange={handleIsGrpcServerChange}
                 />}
             />
-        </React.Fragment>
+        </React.Fragment>;
     };
 
     const getGrpcServerPort = () => {
@@ -233,7 +241,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                     onChange={handleIsWsServerChange}
                 />}
             />
-        </React.Fragment>
+        </React.Fragment>;
     };
 
     const getWsServerPort = () => {
@@ -254,7 +262,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     };
 
     return <React.Fragment>
-        <Dialog open={props.isOpen} onClose={props.onClose}>
+        <Dialog open={props.isOpen} onClose={onClose}>
             <DialogTitle>Edge properties : {props.edgeId}</DialogTitle>
             <Divider/>
             <DialogContent>

@@ -8,11 +8,11 @@ export const cleanse = (state: string) => {
     const stateJson = JSON.parse(state);
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state from localstorage with additional properties added from UI (Post node creation)
-    let modifiedState = getModifiedState();
+    const modifiedState = getModifiedState();
     if (modifiedState && modifiedState !== "{}") {
-        let parsedModifiedState = JSON.parse(modifiedState);
-        //sometimes it may happen that the user removes node from the diagram but modifiedState had no knowledge of it. In that case, we can check for the keys presence in the state and if not found, get the node removed from state.
-        const toBeRemovedNodes = []
+        const parsedModifiedState = JSON.parse(modifiedState);
+        // sometimes it may happen that the user removes node from the diagram but modifiedState had no knowledge of it. In that case, we can check for the keys presence in the state and if not found, get the node removed from state.
+        const toBeRemovedNodes = [];
         for (const key of Object.keys(parsedModifiedState?.nodes)) {
             if (key in stateJson.nodes) {
                 stateJson.nodes[key].consumerData = {...stateJson.nodes[key].consumerData, ...parsedModifiedState.nodes[key].consumerData};
@@ -51,13 +51,13 @@ export const removeUnwantedKeys = (state: string) => {
         return state;
     }
     const isObject = (obj) => {
-        return obj !== undefined && obj !== null && obj.constructor == Object;
-    }
+        return obj !== undefined && obj !== null && obj.constructor === Object;
+    };
     let stateJson;
     if (!isObject(state)) {
         stateJson = JSON.parse(state);
     } else {
-        stateJson = state
+        stateJson = state;
     }
     // delete unwanted stuff from state.
     delete stateJson.panels;

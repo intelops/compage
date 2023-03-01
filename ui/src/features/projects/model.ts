@@ -49,6 +49,20 @@ export type ListProjectsError = {
     message: string;
 };
 
+// existsProject models (the structure matches as of now with CreateProjectRequest but have kept it
+// separate for future customizations)
+export interface ExistsProjectResponse extends ProjectEntity {
+}
+
+export interface ExistsProjectRequest {
+    id: string;
+}
+
+// This type describes the error object structure:
+export type ExistsProjectError = {
+    message: string;
+};
+
 // getProject models (the structure matches as of now with CreateProjectRequest but have kept it
 // separate for future customizations)
 export interface GetProjectResponse extends ProjectEntity {

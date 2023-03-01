@@ -4,31 +4,24 @@ import {Grid} from "@mui/material";
 import {GenerateCode} from "../../features/code-operations/component";
 import {SwitchProject} from "../../features/projects/switch-project";
 import Button from "@mui/material/Button";
-import {
-    getCurrentProjectDetails,
-    removeCurrentConfig,
-    removeCurrentState,
-    removeModifiedState,
-    setReset
-} from "../../utils/localstorage-client";
 
-const resetState = () => {
-    const currentProjectDetails: string = getCurrentProjectDetails();
-    if (currentProjectDetails) {
-        const userNameAndProjectAndVersion = currentProjectDetails.split("###");
-        const message = `Are you sure you want to reset the project [${userNameAndProjectAndVersion[1]}]?`;
-        if (!window.confirm(message)) {
-            return;
-        }
-        removeCurrentConfig();
-        removeCurrentState();
-        removeModifiedState();
-        setReset(true);
-        // TODO just reset to last saved state.
-        // after resetting, needs to manually reload so, avoiding manual step here.
-        window.location.reload();
-    }
-};
+// const resetState = () => {
+//     const currentProjectDetails: string = getCurrentProjectDetails();
+//     if (currentProjectDetails) {
+//         const userNameAndProjectAndVersion = currentProjectDetails.split("###");
+//         const message = `Are you sure you want to reset the project [${userNameAndProjectAndVersion[1]}]?`;
+//         if (!window.confirm(message)) {
+//             return;
+//         }
+//         removeCurrentConfig();
+//         removeCurrentState();
+//         removeModifiedState();
+//         setReset(true);
+//         // TODO just reset to last saved state.
+//         // after resetting, needs to manually reload so, avoiding manual step here.
+//         window.location.reload();
+//     }
+// };
 
 export const ButtonsPanel = () => {
     const navigate = useNavigate();

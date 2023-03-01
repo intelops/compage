@@ -13,7 +13,8 @@ import {selectAuthData} from "../../features/auth/slice";
 import {SwitchProject} from "../../features/projects/switch-project";
 import {getCurrentUserName} from "../../utils/sessionstorage-client";
 import {GetProjectRequest} from "../../features/projects/model";
-import {getProjectAsync} from "../../features/projects/async-apis/getProject";
+import {existsProjectAsync} from "../../features/projects/async-apis/existsProject";
+import {selectExistsProjectError} from "../../features/projects/slice";
 
 const isSameUser = () => {
     const currentProjectDetails = getCurrentProjectDetails();
@@ -37,6 +38,8 @@ const loadExisting = (currentCnf: string) => {
 
 export const Home = () => {
     const authData = useAppSelector(selectAuthData);
+    const existsProjectError = useAppSelector(selectExistsProjectError);
+
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -46,13 +49,15 @@ export const Home = () => {
             const getProjectRequest: GetProjectRequest = {
                 id: userNameAndProjectAndVersion[1]
             };
-            dispatch(getProjectAsync(getProjectRequest));
+            dispatch(existsProjectAsync(getProjectRequest));
         }
     }, [dispatch]);
 
     if (!authData.login) {
         return <Navigate to="/login"/>;
     }
+
+    const message = JSON.parse(existsProjectError)?.message;
 
     const getDiagramData = () => {
         let diagramMakerData;
@@ -76,7 +81,7 @@ export const Home = () => {
     };
 
     const getContent = (): React.ReactNode => {
-        if (isProjectNotValid()) {
+        if (isProjectNotValid() && message.includes("404")) {
             // choose from existing or create a new project
             return <SwitchProject isOpen={true}></SwitchProject>;
         }

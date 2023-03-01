@@ -10,7 +10,7 @@ import {red} from '@mui/material/colors';
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {Navigate} from "react-router-dom";
 import {selectAuthData} from "../../features/auth/slice";
-import {selectListProjectsData, selectListProjectsStatus} from "../../features/projects/slice";
+import {selectListProjectsData} from "../../features/projects/slice";
 import {ListProjectsRequest} from "../../features/projects/model";
 import {listProjectsAsync} from "../../features/projects/async-apis/listProjects";
 import Box from '@mui/material/Box';
@@ -18,7 +18,6 @@ import {Stack} from "@mui/material";
 
 export const Account = () => {
     const authData = useAppSelector(selectAuthData);
-    const listProjectsStatus = useAppSelector(selectListProjectsStatus);
     const listProjectsData = useAppSelector(selectListProjectsData);
     const dispatch = useAppDispatch();
 

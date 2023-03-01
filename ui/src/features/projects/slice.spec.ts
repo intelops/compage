@@ -12,6 +12,11 @@ describe('projects reducer', () => {
             status: 'idle',
             error: null
         },
+        existsProject: {
+            data: {},
+            status: 'idle',
+            error: null
+        },
         listProjects: {
             data: [],
             status: 'idle',
@@ -32,6 +37,11 @@ describe('projects reducer', () => {
                 error: null
             },
             getProject: {
+                data: {},
+                status: 'idle',
+                error: null
+            },
+            existsProject: {
                 data: {},
                 status: 'idle',
                 error: null

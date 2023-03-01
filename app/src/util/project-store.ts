@@ -21,7 +21,7 @@ const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: 
     if (!projectEntity.repository?.name) {
         repository.name = getSanitizedName(projectEntity.displayName);
     } else {
-        repository.name = getSanitizedName(projectEntity.repository.name);
+        repository.name = projectEntity.repository.name;
     }
 
     // if branch is not set, add "compage" as default branch.

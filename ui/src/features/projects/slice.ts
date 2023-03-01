@@ -4,6 +4,7 @@ import {createProjectAsync} from "./async-apis/createProject";
 import {listProjectsAsync} from "./async-apis/listProjects";
 import {getProjectAsync} from "./async-apis/getProject";
 import {updateProjectAsync} from './async-apis/updateProject';
+import {existsProjectAsync} from "./async-apis/existsProject";
 
 export interface ProjectState {
     createProject: {
@@ -15,17 +16,22 @@ export interface ProjectState {
         data: any,
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
-    }
+    };
     getProject: {
         data: any,
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
-    }
+    };
+    existsProject: {
+        data: any,
+        status: 'idle' | 'loading' | 'failed';
+        error: string | null;
+    };
     updateProject: {
         data: any,
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
-    }
+    };
 }
 
 const initialState: ProjectState = {
@@ -35,6 +41,11 @@ const initialState: ProjectState = {
         error: null
     },
     getProject: {
+        data: {},
+        status: 'idle',
+        error: null
+    },
+    existsProject: {
         data: {},
         status: 'idle',
         error: null
@@ -76,6 +87,19 @@ export const projectsSlice = createSlice({
         }).addCase(listProjectsAsync.rejected, (state, action) => {
             state.listProjects.status = 'failed';
             if (action.payload) state.listProjects.error = JSON.stringify(action.payload);
+        }).addCase(existsProjectAsync.pending, (state) => {
+            state.existsProject.status = 'loading';
+            state.existsProject.error = null;
+        }).addCase(existsProjectAsync.fulfilled, (state, action) => {
+            state.existsProject.status = 'idle';
+            state.existsProject.error = null;
+            state.existsProject.data = action.payload;
+        }).addCase(existsProjectAsync.rejected, (state, action) => {
+            state.existsProject.status = 'failed';
+            console.log("error action payload : ", action.payload);
+            if (action.payload) {
+                state.existsProject.error = JSON.stringify(action.payload);
+            }
         }).addCase(getProjectAsync.pending, (state) => {
             state.getProject.status = 'loading';
             state.getProject.error = null;
@@ -111,6 +135,10 @@ export const selectListProjectsStatus = (state: RootState) => state.projects.lis
 export const selectGetProjectData = (state: RootState) => state.projects.getProject.data;
 export const selectGetProjectError = (state: RootState) => state.projects.getProject.error;
 export const selectGetProjectStatus = (state: RootState) => state.projects.getProject.status;
+
+export const selectExistsProjectData = (state: RootState) => state.projects.existsProject.data;
+export const selectExistsProjectError = (state: RootState) => state.projects.existsProject.error;
+export const selectExistsProjectStatus = (state: RootState) => state.projects.existsProject.status;
 
 export const selectUpdateProjectData = (state: RootState) => state.projects.updateProject.data;
 export const selectUpdateProjectError = (state: RootState) => state.projects.updateProject.error;
