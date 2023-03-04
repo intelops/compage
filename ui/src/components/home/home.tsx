@@ -81,7 +81,7 @@ export const Home = () => {
     };
 
     const getContent = (): React.ReactNode => {
-        if (isProjectNotValid() && message.includes("404")) {
+        if (isProjectNotValid() && message?.includes("404")) {
             // choose from existing or create a new project
             return <SwitchProject isOpen={true}></SwitchProject>;
         }
