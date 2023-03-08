@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/kube-tarian/compage/core/internal/handlers"
+	"github.com/intelops/compage/core/internal/handlers"
 )
 
 func StartRestServer() error {

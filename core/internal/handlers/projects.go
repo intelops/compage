@@ -3,10 +3,10 @@ package handlers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/kube-tarian/compage/core/internal/converter/rest"
-	"github.com/kube-tarian/compage/core/internal/core"
-	"github.com/kube-tarian/compage/core/internal/generator"
-	"github.com/kube-tarian/compage/core/internal/taroperations"
+	"github.com/intelops/compage/core/internal/converter/rest"
+	"github.com/intelops/compage/core/internal/core"
+	"github.com/intelops/compage/core/internal/generator"
+	"github.com/intelops/compage/core/internal/taroperations"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 )

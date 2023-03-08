@@ -30,6 +30,6 @@ export const updateProjectAsync = createAsyncThunk<UpdateProjectResponse, Update
             return thunkApi.rejectWithValue({
                 message: errorMessage
             });
-        })
+        });
     }
 );

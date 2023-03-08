@@ -1,7 +1,7 @@
 package golang
 
 import (
-	"github.com/kube-tarian/compage/core/internal/languages"
+	"github.com/intelops/compage/core/internal/languages"
 )
 
 // GoNode language specific struct.

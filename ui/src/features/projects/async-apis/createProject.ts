@@ -1,7 +1,7 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {CreateProjectError, CreateProjectRequest, CreateProjectResponse} from "../model";
 import {createProject} from "../api";
-import {toastr} from 'react-redux-toastr'
+import {toastr} from 'react-redux-toastr';
 import {setCurrentConfig, setCurrentProjectDetails, setCurrentState} from "../../../utils/localstorage-client";
 
 export const createProjectAsync = createAsyncThunk<CreateProjectResponse, CreateProjectRequest, { rejectValue: CreateProjectError }>(
@@ -36,6 +36,6 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
             return thunkApi.rejectWithValue({
                 message: errorMessage
             });
-        })
+        });
     }
 );

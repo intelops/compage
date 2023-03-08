@@ -2,9 +2,9 @@ package languages
 
 import (
 	"fmt"
-	"github.com/kube-tarian/compage/core/internal/core"
-	"github.com/kube-tarian/compage/core/internal/core/edge"
-	"github.com/kube-tarian/compage/core/internal/core/node"
+	"github.com/intelops/compage/core/internal/core"
+	"github.com/intelops/compage/core/internal/core/edge"
+	"github.com/intelops/compage/core/internal/core/node"
 )
 
 const Go = "go"

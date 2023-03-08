@@ -2,9 +2,9 @@ package golang
 
 import (
 	"context"
-	"github.com/kube-tarian/compage/core/internal/core/node"
-	"github.com/kube-tarian/compage/core/internal/languages"
-	"github.com/kube-tarian/compage/core/internal/utils"
+	"github.com/intelops/compage/core/internal/core/node"
+	"github.com/intelops/compage/core/internal/languages"
+	"github.com/intelops/compage/core/internal/utils"
 	"os"
 	"strings"
 	"text/template"

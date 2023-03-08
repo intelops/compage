@@ -48,16 +48,16 @@ const Header = () => {
             if (authData.login) {
                 return <MenuItem key={setting} onClick={handleLogout}>
                     <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
+                </MenuItem>;
             }
-            return ""
+            return "";
         }
         if (setting === "Account") {
             return <MenuItem key={setting} onClick={handleAccount}>
                 <Typography textAlign="center">{setting}</Typography>
             </MenuItem>;
         }
-    }
+    };
 
     const getMenu = () => {
         if (authData.login) {
@@ -90,10 +90,10 @@ const Header = () => {
                         {settings.map((setting) => getMenuItem(setting))}
                     </Menu>
                 </Box>
-            </Toolbar>
+            </Toolbar>;
         }
-        return ""
-    }
+        return "";
+    };
 
     const getCurrentProjectSelected = () => {
         if (authData.login) {
@@ -125,9 +125,9 @@ const Header = () => {
                         src={Logo}
                     />
                 </Link>
-            </Toolbar>
+            </Toolbar>;
         }
-        return ""
+        return "";
     };
 
     return <AppBar position="absolute">

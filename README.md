@@ -1,9 +1,9 @@
-<p align="center"><img src="compage-logo2-0.png" width="400"></p>
+<p align="center"><img src="compage-logo.png" width="400"></p>
 <p align="center"><b>Low-Code No-Code for Cloud Native</b></p>
 
 <p align="center">
   <a href="Github Discussions">
-    <img src="https://img.shields.io/github/discussions/kube-tarian/compage" alt="Github Discussions">
+    <img src="https://img.shields.io/github/discussions/intelops/compage" alt="Github Discussions">
   </a>
   <a href="code_of_conduct.md">
     <img src="https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg" alt="Contributor Covenant">
@@ -12,7 +12,7 @@
     <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License">
   </a>
   <a href="deepsource-badge">
-    <img src="https://deepsource.io/gh/kube-tarian/compage.svg/?label=active+issues&show_trend=true&token=m1DCdAuysqc5fOcnRlY8GsWA" alt="deepsource">
+    <img src="https://deepsource.io/gh/intelops/compage.svg/?label=active+issues&show_trend=true&token=m1DCdAuysqc5fOcnRlY8GsWA" alt="deepsource">
   </a>
 </p>
 

@@ -3,9 +3,9 @@ import storage from 'redux-persist/lib/storage';
 import {persistReducer, persistStore} from 'redux-persist';
 // import thunk from 'redux-thunk';
 // import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
-import storageSession from 'reduxjs-toolkit-persist/lib/storage/session'
+import storageSession from 'reduxjs-toolkit-persist/lib/storage/session';
 import {FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE} from "reduxjs-toolkit-persist";
-import {reducer as toastrReducer} from 'react-redux-toastr'
+import {reducer as toastrReducer} from 'react-redux-toastr';
 import {Action, Reducer} from "redux";
 import codeOperationsReducer from "../features/code-operations/slice";
 import projectsReducer from "../features/projects/slice";
@@ -18,12 +18,12 @@ const rootPersistConfig = {
     key: 'root',
     storage,
     // stateReconciler: autoMergeLevel2,
-}
+};
 
 const authenticationPersistConfig = {
     key: 'user',
     storage: storageSession,
-}
+};
 
 const persistedRootReducer = combineReducers({
     openApiYamlOperations: persistReducer(rootPersistConfig, openApiYamlOperationsReducer),
@@ -31,7 +31,7 @@ const persistedRootReducer = combineReducers({
     projects: persistReducer(rootPersistConfig, projectsReducer),
     auth: persistReducer(authenticationPersistConfig, authReducer),
     toastr: toastrReducer,
-})
+});
 
 
 export const rootReducer: Reducer<RootState> = (
@@ -59,10 +59,10 @@ export const store = configureStore(
                 unauthenticatedMiddleware
             ]),
     }
-)
+);
 
-export type RootState = ReturnType<typeof persistedRootReducer>
-export type AppDispatch = typeof store.dispatch
+export type RootState = ReturnType<typeof persistedRootReducer>;
+export type AppDispatch = typeof store.dispatch;
 export const persistor = persistStore(store);
 export type AppThunk<ReturnType = void> = ThunkAction<ReturnType,
     RootState,

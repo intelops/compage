@@ -6,7 +6,7 @@ entries:
     created: "2023-02-15T13:40:18.052288378+05:30"
     description: A Helm chart for Kubernetes
     digest: 1ad02b156f9f2ddd6c7f5a126c5f15dadf345f1726888de5bf3cc617023e3ec0
-    icon: https://github.com/kube-tarian/compage/raw/main/compage-logo2-0.png
+    icon: https://github.com/intelops/compage/raw/main/compage-logo2-0.png
     name: compage
     type: application
     urls:
@@ -17,7 +17,7 @@ entries:
     created: "2023-02-15T13:40:18.050694826+05:30"
     description: A Helm chart for Kubernetes
     digest: 0ab69ad21867a9c7663e4e501fa5614c6cc2cd33d17cb44c4b58eaeb7791bb54
-    icon: https://github.com/kube-tarian/compage/raw/main/compage-logo2-0.png
+    icon: https://github.com/intelops/compage/raw/main/compage-logo2-0.png
     name: compage
     type: application
     urls:
@@ -28,7 +28,7 @@ entries:
     created: "2023-02-15T13:40:18.048701705+05:30"
     description: A Helm chart for Kubernetes
     digest: a9706e89c8b8b808c141388eddea7123392f5f35389844a4baf2182dc155ef4b
-    icon: https://github.com/kube-tarian/compage/raw/main/compage-logo2-0.png
+    icon: https://github.com/intelops/compage/raw/main/compage-logo2-0.png
     name: compage
     type: application
     urls:
@@ -39,7 +39,7 @@ entries:
     created: "2023-02-15T13:40:18.047233953+05:30"
     description: A Helm chart for Kubernetes
     digest: 27a75ab81e60915c7e7268ebfe4fcd53e124eaedb390a46d021d09b083d3253f
-    icon: https://github.com/kube-tarian/compage/raw/main/compage-logo2-0.png
+    icon: https://github.com/intelops/compage/raw/main/compage-logo2-0.png
     name: compage
     type: application
     urls:
@@ -50,7 +50,7 @@ entries:
     created: "2023-02-15T13:40:18.045496239+05:30"
     description: A Helm chart for Kubernetes
     digest: a0f03b6a71c8d1ad89ea5fadf1a7d2f5f52253987022770216ff84b567b26043
-    icon: https://github.com/kube-tarian/compage/raw/main/compage-logo2-0.png
+    icon: https://github.com/intelops/compage/raw/main/compage-logo2-0.png
     name: compage
     type: application
     urls:

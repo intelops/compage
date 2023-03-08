@@ -1,2 +1,0 @@
-# create yamls for all the templates specified in helm chart, replacing values from values.yaml
-helm template compage charts/compage -f charts/compage/values.yaml --debug > mm.yaml

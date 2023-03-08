@@ -8,17 +8,6 @@ import {getProject} from "../util/project-store";
 
 const openApiYamlRouter = Router();
 
-const getNode = (nodes: Map<string, CompageNode> | undefined, nodeId: string) => {
-    if (nodes && nodes.size > 0) {
-        const map = new Map(Object.entries(nodes));
-        const compageNode = map.get(nodeId);
-        if (compageNode) {
-            return compageNode;
-        }
-    }
-    return undefined;
-};
-
 // uploads openApiYaml file
 openApiYamlRouter.post("/upload", requireUserNameMiddleware, multer.single('file'), async (request: Request, response: Response) => {
     const userName = request.header(X_USER_NAME_HEADER);

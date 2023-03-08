@@ -2,7 +2,7 @@
   "name": "app",
   "version": "0.0.1",
   "main": "index.js",
-  "repository": "https://github.com/kube-tarian/compage.git",
+  "repository": "https://github.com/intelops/compage.git",
   "author": "Mahendra <mahendra.b@intelops.dev>",
   "private": true,
   "scripts": {

@@ -1,9 +1,9 @@
 package grpc
 
 import (
-	project "github.com/kube-tarian/compage/core/gen/api/v1"
-	"github.com/kube-tarian/compage/core/internal/converter"
-	"github.com/kube-tarian/compage/core/internal/core"
+	project "github.com/intelops/compage/core/gen/api/v1"
+	"github.com/intelops/compage/core/internal/converter"
+	"github.com/intelops/compage/core/internal/core"
 	"time"
 )
 

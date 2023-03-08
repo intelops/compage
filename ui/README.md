@@ -47,7 +47,7 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 # Steps to run the compage on local
 #### Clone the compage repo
-`https://github.com/kube-tarian/compage.git`
+`https://github.com/intelops/compage.git`
 #### Navigate to compage repo
 - Fire command : `npm i`
 #### Navigate to compage/ui directory

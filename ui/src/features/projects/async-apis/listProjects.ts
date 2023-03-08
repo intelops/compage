@@ -25,11 +25,7 @@ export const listProjectsAsync = createAsyncThunk<ListProjectsResponse, ListProj
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;
-            //TODO remove loggers - debugging how to redirect to login
-            console.log("reached1")
             if (statusCode === 401){
-                //TODO remove loggers - debugging how to redirect to login
-                console.log("reached2")
                 sessionStorage.clear();
             }
             const message = e.response.data.message;
@@ -39,6 +35,6 @@ export const listProjectsAsync = createAsyncThunk<ListProjectsResponse, ListProj
             return thunkApi.rejectWithValue({
                 message: errorMessage
             });
-        })
+        });
     }
 );

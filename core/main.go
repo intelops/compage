@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	server "github.com/kube-tarian/compage/core/cmd/grpc"
-	project "github.com/kube-tarian/compage/core/gen/api/v1"
+	server "github.com/intelops/compage/core/cmd/grpc"
+	project "github.com/intelops/compage/core/gen/api/v1"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

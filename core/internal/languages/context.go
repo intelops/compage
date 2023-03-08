@@ -2,8 +2,8 @@ package languages
 
 import (
 	"context"
-	"github.com/kube-tarian/compage/core/internal/core"
-	"github.com/kube-tarian/compage/core/internal/utils"
+	"github.com/intelops/compage/core/internal/core"
+	"github.com/intelops/compage/core/internal/utils"
 )
 
 const ContextVars = "ContextVars"

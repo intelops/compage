@@ -47,5 +47,5 @@ name = "go"
 enabled = true
 
   [analyzers.meta]
-  import_root = "github.com/kube-tarian/compage"
+  import_root = "github.com/intelops/compage"
   dependencies_vendored = true

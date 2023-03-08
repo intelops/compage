@@ -1,4 +1,4 @@
 [submodule "core/templates/compage-template-go"]
 	path = core/templates/compage-template-go
-	url = git@github.com:mahendraintelops/compage-template-go.git
-    branch = template-v6
+	url = git@github.com:intelops/compage-template-go.git
+    branch = template-v7

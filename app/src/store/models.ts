@@ -77,13 +77,13 @@ export interface UserResourceList {
 }
 
 // user
-export const user_group = "compage.kube-tarian.github.com";
+export const user_group = "compage.intelops.github.com";
 export const user_version = "v1alpha1";
 export const user_plural = "users";
 export const user_kind = "User"
 
 // project
-export const project_group = "compage.kube-tarian.github.com";
+export const project_group = "compage.intelops.github.com";
 export const project_version = "v1alpha1";
 export const project_plural = "projects";
 export const project_kind = "Project"

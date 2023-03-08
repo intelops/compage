@@ -2,11 +2,11 @@ package grpc
 
 import (
 	_ "embed"
-	project "github.com/kube-tarian/compage/core/gen/api/v1"
-	"github.com/kube-tarian/compage/core/internal/converter/grpc"
-	"github.com/kube-tarian/compage/core/internal/generator"
-	"github.com/kube-tarian/compage/core/internal/taroperations"
-	"github.com/kube-tarian/compage/core/internal/utils"
+	project "github.com/intelops/compage/core/gen/api/v1"
+	"github.com/intelops/compage/core/internal/converter/grpc"
+	"github.com/intelops/compage/core/internal/generator"
+	"github.com/intelops/compage/core/internal/taroperations"
+	"github.com/intelops/compage/core/internal/utils"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

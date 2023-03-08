@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package api.v1;
-option go_package = "github.com/kube-tarian/compage/core/gen/api/v1;project";
+option go_package = "github.com/intelops/compage/core/gen/api/v1;project";
 
 service ProjectService {
   rpc GenerateCode (GenerateCodeRequest) returns (stream GenerateCodeResponse) {}

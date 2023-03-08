@@ -5,6 +5,6 @@ metadata:
   labels:
     {{- include "compage.app.labels" . | nindent 4 }}
 rules:
-  - apiGroups: ["compage.kube-tarian.github.com"]
+  - apiGroups: ["compage.intelops.github.com"]
     resources: ["*"]
     verbs: ["*"]

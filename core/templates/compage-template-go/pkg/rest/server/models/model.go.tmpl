@@ -1,7 +1,0 @@
-package models
-
-type {{.ResourceName}} struct {
-    {{range $k, $v := .Fields}}
-    {{$k}} {{$v}}
-    {{end}}
-}

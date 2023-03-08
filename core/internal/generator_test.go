@@ -1,9 +1,9 @@
 package internal
 
 import (
-	"github.com/kube-tarian/compage/core/internal/converter/rest"
-	"github.com/kube-tarian/compage/core/internal/core"
-	"github.com/kube-tarian/compage/core/internal/generator"
+	"github.com/intelops/compage/core/internal/converter/rest"
+	"github.com/intelops/compage/core/internal/core"
+	"github.com/intelops/compage/core/internal/generator"
 	log "github.com/sirupsen/logrus"
 	"testing"
 )

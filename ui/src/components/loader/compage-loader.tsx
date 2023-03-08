@@ -1,5 +1,5 @@
-import LoadingOverlay from 'react-loading-overlay'
-import BounceLoader from 'react-spinners/BounceLoader'
+import LoadingOverlay from 'react-loading-overlay';
+import BounceLoader from 'react-spinners/BounceLoader';
 import "./compage-loader.scss";
 import styled, {css} from "styled-components";
 
@@ -29,5 +29,5 @@ export const CompageLoader = ({active}) => {
             spinner={<BounceLoader/>}
             text="Loading...">
         </LoadingOverlay>;
-    </DarkBackground>
-}
+    </DarkBackground>;
+};

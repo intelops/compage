@@ -3,9 +3,9 @@ package converter
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/kube-tarian/compage/core/internal/core"
-	"github.com/kube-tarian/compage/core/internal/core/node"
-	"github.com/kube-tarian/compage/core/internal/languages"
+	"github.com/intelops/compage/core/internal/core"
+	"github.com/intelops/compage/core/internal/core/node"
+	"github.com/intelops/compage/core/internal/languages"
 	"golang.org/x/exp/maps"
 )
 

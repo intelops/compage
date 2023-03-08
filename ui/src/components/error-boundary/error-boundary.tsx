@@ -6,7 +6,7 @@ interface IErrorProps {
 
 interface IErrorState {
     error?: {};
-    errorInfo?: {}
+    errorInfo?: {};
 }
 
 export class ErrorBoundary extends React.Component<IErrorProps, IErrorState> {

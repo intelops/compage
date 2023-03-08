@@ -4,7 +4,7 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
-	"github.com/kube-tarian/compage/core/internal/utils"
+	"github.com/intelops/compage/core/internal/utils"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"os"

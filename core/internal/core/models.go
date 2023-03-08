@@ -1,8 +1,8 @@
 package core
 
 import (
-	"github.com/kube-tarian/compage/core/internal/core/edge"
-	"github.com/kube-tarian/compage/core/internal/core/node"
+	"github.com/intelops/compage/core/internal/core/edge"
+	"github.com/intelops/compage/core/internal/core/node"
 	"time"
 )
 

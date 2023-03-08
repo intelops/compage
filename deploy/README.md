@@ -1,6 +1,6 @@
 1. Clone the repo and move to root dir of compage project.
 ```shell
-git clone https://github.com/kube-tarian/compage.git
+git clone https://github.com/intelops/compage.git
 ```
 2. Fire below commands one by one in order.
 ```shell
@@ -138,10 +138,10 @@ minikube ip
 ## Install latest version from github helm repo
 ```shell
 GITHUB_TOKEN="" # ask Mahendra for token
-helm repo remove kube-tarian
-helm repo add "kube-tarian" --username $GITHUB_TOKEN --password $GITHUB_TOKEN "https://raw.githubusercontent.com/kube-tarian/compage/main/charts"
-helm pull kube-tarian/compage --username $GITHUB_TOKEN --password $GITHUB_TOKEN
-helm install compage kube-tarian/compage --values charts/compage/values.yaml
+helm repo remove intelops
+helm repo add "intelops" --username $GITHUB_TOKEN --password $GITHUB_TOKEN "https://raw.githubusercontent.com/intelops/compage/main/charts"
+helm pull intelops/compage --username $GITHUB_TOKEN --password $GITHUB_TOKEN
+helm install compage intelops/compage --values charts/compage/values.yaml
 kubectl get pods -n compage
 
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-ui

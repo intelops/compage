@@ -1,4 +1,4 @@
-module github.com/kube-tarian/compage/core
+module github.com/intelops/compage/core
 
 go 1.20
 

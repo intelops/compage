@@ -1,8 +1,8 @@
 package rest
 
 import (
-	"github.com/kube-tarian/compage/core/internal/converter"
-	"github.com/kube-tarian/compage/core/internal/core"
+	"github.com/intelops/compage/core/internal/converter"
+	"github.com/intelops/compage/core/internal/core"
 	"time"
 )
 

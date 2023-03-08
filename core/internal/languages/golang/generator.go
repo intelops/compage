@@ -3,8 +3,8 @@ package golang
 import (
 	"context"
 	"errors"
-	"github.com/kube-tarian/compage/core/internal/languages"
-	"github.com/kube-tarian/compage/core/internal/utils"
+	"github.com/intelops/compage/core/internal/languages"
+	"github.com/intelops/compage/core/internal/utils"
 )
 
 // Generator generates golang specific code according to config passed
