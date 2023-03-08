@@ -28,7 +28,7 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
     // first letter of the Resource should always be capital.
     const capitalizeFirstLetter = (input: string) => {
         return input.charAt(0).toUpperCase() + input.slice(1);
-    }
+    };
 
     const handleNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setData({
@@ -92,7 +92,7 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
                 <Button variant="contained"
                         disabled={data.name === ""
                             || !isJsonString(data.fields)
-                            //TODO below is now working
+                            // TODO below is now working
                             || Object.keys(data.fields).length === 0}
                         onClick={handleModifyRestResourceClick}>
                     Modify Resource
@@ -100,4 +100,4 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
             </DialogActions>
         </Dialog>
     </React.Fragment>;
-}
+};

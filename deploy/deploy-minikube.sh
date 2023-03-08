@@ -8,9 +8,9 @@ source ./create-minikube-cluster.sh
 # docker in minikube needs to be used so, source build-docker-images.sh can not be used here.
 
 TAG_NAME="0.0.1"
-CORE_IMAGE="ghcr.io/mahendraintelops/compage/core:$TAG_NAME"
-APP_IMAGE="ghcr.io/mahendraintelops/compage/app:$TAG_NAME"
-UI_IMAGE="ghcr.io/mahendraintelops/compage/ui:$TAG_NAME"
+CORE_IMAGE="ghcr.io/intelops/compage/core:$TAG_NAME"
+APP_IMAGE="ghcr.io/intelops/compage/app:$TAG_NAME"
+UI_IMAGE="ghcr.io/intelops/compage/ui:$TAG_NAME"
 
 # set the docker env
 eval $(minikube docker-env)

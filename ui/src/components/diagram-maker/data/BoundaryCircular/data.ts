@@ -18,8 +18,8 @@ export const getData = (parentWidth, parentHeight, currentConfig: string) => {
         }
     }
     const graph: DiagramMakerData<{}, {}> = {
-        nodes: nodes,
-        edges: edges,
+        nodes,
+        edges,
         panels: {
             library: {
                 id: 'library',
@@ -43,4 +43,4 @@ export const getData = (parentWidth, parentHeight, currentConfig: string) => {
         editor: {mode: EditorMode.DRAG},
     };
     return graph;
-} 
+};

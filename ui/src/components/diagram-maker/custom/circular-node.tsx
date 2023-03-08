@@ -2,7 +2,7 @@ import React from 'react';
 import {DiagramMakerNode} from "diagram-maker";
 
 interface CircularNodeProps {
-    node: DiagramMakerNode<any>
+    node: DiagramMakerNode<any>;
 }
 
 export const CircularNode = (props: CircularNodeProps) => {
@@ -21,4 +21,4 @@ export const CircularNode = (props: CircularNodeProps) => {
             </div>
         </div>
     </React.Fragment>;
-}
+};

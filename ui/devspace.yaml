@@ -26,7 +26,7 @@ pipelines:
 # We recommend to skip image building during development (devspace dev) as much as possible
 images:
   ui:
-    image: ghcr.io/mahendraintelops/compage/ui
+    image: ghcr.io/intelops/compage/ui
     dockerfile: ./Dockerfile
 
 # This is a list of `deployments` that DevSpace can create for this project
@@ -42,7 +42,7 @@ deployments:
       # You may also use `valuesFiles` to load values from files, e.g. valuesFiles: ["values.yaml"]
       values:
         containers:
-          - image: ghcr.io/mahendraintelops/compage/ui
+          - image: ghcr.io/intelops/compage/ui
             env:
             - name: REACT_APP_GITHUB_APP_CLIENT_ID
               value: ${REACT_APP_GITHUB_APP_CLIENT_ID}
@@ -58,7 +58,7 @@ deployments:
 dev:
   ui:
     # Search for the container that runs this image
-    imageSelector: ghcr.io/mahendraintelops/compage/ui
+    imageSelector: ghcr.io/intelops/compage/ui
     # Replace the container image with this dev-optimized image (allows to skip image building during development)
     devImage: ghcr.io/loft-sh/devspace-containers/typescript:18-alpine
     # Sync files between the local filesystem and the development container

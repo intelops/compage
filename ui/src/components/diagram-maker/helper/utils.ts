@@ -3,7 +3,7 @@ import {Action, AnyAction} from 'redux';
 
 export function createDivWithText(text: string) {
     const newDiv = document.createElement('div');
-    newDiv.id = text
+    newDiv.id = text;
     const newContent = document.createTextNode(text);
     newDiv.appendChild(newContent);
     return newDiv;
@@ -13,7 +13,7 @@ export function createRectangularNode(node: DiagramMakerNode<{ odd?: boolean }>,
     const id = node.id.substring(0, 10);
     const newDiv = createDivWithText(id);
     newDiv.classList.add('rectangle', 'example-node', 'rectangle-image');
-    newDiv.style.display = "flex"
+    newDiv.style.display = "flex";
     newDiv.style.flexWrap = "wrap";
     newDiv.style.justifyContent = "center";
     newDiv.style.alignItems = "center";
@@ -105,7 +105,7 @@ export function createNodeWithDropdown(node: DiagramMakerNode<any>, container: H
 export function createCircularNode(node: DiagramMakerNode<any>, container: HTMLElement, eventListener: () => void) {
     const id = node.id.substring(0, 10);
     const newDiv = createDivWithText(id);
-    newDiv.style.display = "flex"
+    newDiv.style.display = "flex";
     newDiv.style.flexWrap = "wrap";
     newDiv.style.justifyContent = "center";
     newDiv.style.alignItems = "center";

@@ -18,10 +18,10 @@ import {
 
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import "diagram-maker/dist/diagramMaker.css";
-import "./scss/common.css"
-import "./scss/CircularNode.css"
-import "./scss/RectangularNode.css"
-import "./scss/Logger.css"
+import "./scss/common.css";
+import "./scss/CircularNode.css";
+import "./scss/RectangularNode.css";
+import "./scss/Logger.css";
 
 import React, {useRef} from "react";
 import {

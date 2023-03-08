@@ -17,7 +17,7 @@ app:
     name:
     annotations: {}
   image:
-    repository: ghcr.io/mahendraintelops/compage/app
+    repository: ghcr.io/intelops/compage/app
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
@@ -68,7 +68,7 @@ core:
     name:
     annotations: {}
   image:
-    repository: ghcr.io/mahendraintelops/compage/core
+    repository: ghcr.io/intelops/compage/core
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
@@ -119,7 +119,7 @@ ui:
     name:
     annotations: {}
   image:
-    repository: ghcr.io/mahendraintelops/compage/ui
+    repository: ghcr.io/intelops/compage/ui
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""

@@ -3,7 +3,7 @@ import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 
 interface ContextNodeProps {
-    id: string | undefined,
+    id: string | undefined;
 }
 
 export const ContextNode = (props: ContextNodeProps) => {
@@ -28,30 +28,30 @@ export const ContextNode = (props: ContextNodeProps) => {
         if (payload.name) {
             return <><strong>Name</strong> : {payload.name}</>;
         }
-        return ""
-    }
+        return "";
+    };
 
     const getType = () => {
         if (payload.type) {
             return <><strong>Type</strong>: {payload.type}</>;
         }
-        return ""
-    }
+        return "";
+    };
 
     const getLanguage = () => {
         if (payload.language) {
             return <><strong>Language</strong> : {payload.language}</>;
         }
-        return ""
-    }
+        return "";
+    };
 
     const getIsServer = () => {
         return <><strong>IsServer</strong>: {payload.isServer ? "Yes" : "No"}</>;
-    }
+    };
 
     const getIsClient = () => {
         return <><strong>IsClient</strong>: {payload.isClient ? "Yes" : "No"}</>;
-    }
+    };
 
     return <React.Fragment>
         <div className="contextMenu">
@@ -68,4 +68,4 @@ export const ContextNode = (props: ContextNodeProps) => {
             {getIsClient()}
         </div>
     </React.Fragment>;
-}
+};

@@ -24,7 +24,7 @@ export const UploadYaml = ({nodeId}: ArgTypes) => {
             const userNameAndProjectAndVersion = currentProjectDetails.split("###");
             const uploadYamlRequest: UploadYamlRequest = {
                 projectId: userNameAndProjectAndVersion[1],
-                nodeId: nodeId,
+                nodeId,
                 file: openApiYamlFile,
             };
             if (uploadYamlStatus !== 'loading') {

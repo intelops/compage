@@ -53,10 +53,10 @@ export interface CompageJson {
 
 
 // Rest Protocol
-export const Rest = "REST"
+export const Rest = "REST";
 
 // Grpc Protocol
-export const Grpc = "GRPC"
+export const Grpc = "GRPC";
 
 // Ws Protocol
-export const Ws = "WS"
+export const Ws = "WS";

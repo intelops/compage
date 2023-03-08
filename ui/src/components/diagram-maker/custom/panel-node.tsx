@@ -10,33 +10,33 @@ import SwipeUpAltIcon from '@mui/icons-material/SwipeUpAlt';
 import CircleIcon from '@mui/icons-material/Circle';
 
 interface PanelNodeProps {
-    typeId: string,
-    text: string,
+    typeId: string;
+    text: string;
 }
 
 export const PanelNode = (props: PanelNodeProps) => {
     const getIcon = (typeId: string, text: string) => {
         switch (typeId) {
             case "node-type-circle":
-                return <SwapHorizRoundedIcon>{text}</SwapHorizRoundedIcon>
+                return <SwapHorizRoundedIcon>{text}</SwapHorizRoundedIcon>;
             case "node-type-rectangle":
-                return <SwapHorizRoundedIcon>{text}</SwapHorizRoundedIcon>
+                return <SwapHorizRoundedIcon>{text}</SwapHorizRoundedIcon>;
             case "node-type-rectangle-top-bottom":
-                return <SwapVertRoundedIcon>{text}</SwapVertRoundedIcon>
+                return <SwapVertRoundedIcon>{text}</SwapVertRoundedIcon>;
             case "node-type-start-top-bottom":
-                return <SwipeDownAltIcon>{text}</SwipeDownAltIcon>
+                return <SwipeDownAltIcon>{text}</SwipeDownAltIcon>;
             case "node-type-end-top-bottom":
-                return <SwipeUpAltIcon>{text}</SwipeUpAltIcon>
+                return <SwipeUpAltIcon>{text}</SwipeUpAltIcon>;
             case "node-type-start":
-                return <SwipeRightAltRoundedIcon>{text}</SwipeRightAltRoundedIcon>
+                return <SwipeRightAltRoundedIcon>{text}</SwipeRightAltRoundedIcon>;
             case "node-type-end":
-                return <SwipeLeftAltIcon>{text}</SwipeLeftAltIcon>
+                return <SwipeLeftAltIcon>{text}</SwipeLeftAltIcon>;
             case "node-type-dead":
-                return <CircleIcon>{text}</CircleIcon>
+                return <CircleIcon>{text}</CircleIcon>;
             default:
                 return <GridViewIcon>{text}</GridViewIcon>;
         }
-    }
+    };
 
     return <React.Fragment>
         <div style={{marginTop: "10px"}}
@@ -49,4 +49,4 @@ export const PanelNode = (props: PanelNodeProps) => {
             </Tooltip>
         </div>
     </React.Fragment>;
-}
+};

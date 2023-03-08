@@ -8,7 +8,7 @@ import 'react-json-pretty/themes/monikai.css';
 import {Provider} from "react-redux";
 import {persistor, store} from './redux/store';
 import {PersistGate} from 'redux-persist/integration/react';
-import ReduxToastr from 'react-redux-toastr'
+import ReduxToastr from 'react-redux-toastr';
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement

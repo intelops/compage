@@ -7,7 +7,7 @@ export interface CodeOperationsState {
         data: any;
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
-    }
+    };
 }
 
 const initialState: CodeOperationsState = {
@@ -28,7 +28,7 @@ export const codeOperationsSlice = createSlice({
             state.generateCode.error = null;
         }).addCase(generateCodeAsync.fulfilled, (state, action) => {
             state.generateCode.status = 'idle';
-            state.generateCode.error = null
+            state.generateCode.error = null;
             state.generateCode.data = action.payload;
         }).addCase(generateCodeAsync.rejected, (state, action) => {
             state.generateCode.status = 'failed';

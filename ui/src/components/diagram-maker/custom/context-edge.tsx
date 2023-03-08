@@ -3,7 +3,7 @@ import Divider from "@mui/material/Divider";
 import {getParsedModifiedState} from "../helper/helper";
 
 interface ContextEdgeProps {
-    id: string | undefined,
+    id: string | undefined;
 }
 
 export const ContextEdge = (props: ContextEdgeProps) => {
@@ -23,22 +23,22 @@ export const ContextEdge = (props: ContextEdgeProps) => {
         if (payload.name) {
             return <><strong>Name</strong> : {payload.name}</>;
         }
-        return ""
-    }
+        return "";
+    };
 
     const getType = () => {
         if (payload.type) {
             return <><strong>Type</strong> : {payload.type}</>;
         }
-        return ""
-    }
+        return "";
+    };
 
     const getProtocol = () => {
         if (payload.protocol) {
             return <><strong>Protocol</strong> : {payload.protocol}</>;
         }
-        return ""
-    }
+        return "";
+    };
 
     return <React.Fragment>
         <div className="contextMenu">
@@ -51,4 +51,4 @@ export const ContextEdge = (props: ContextEdgeProps) => {
             {getProtocol()}
         </div>
     </React.Fragment>;
-}
+};

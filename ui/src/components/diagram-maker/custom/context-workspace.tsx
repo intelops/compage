@@ -9,4 +9,4 @@ export const ContextWorkspace = (props: ContextWorkspaceProps) => {
             This is the Workspace.
         </div>
     </React.Fragment>;
-}
+};

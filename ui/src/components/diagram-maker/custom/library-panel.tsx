@@ -18,4 +18,4 @@ export const LibraryPanel = (props: LibraryPanelProps) => {
         <PanelNode typeId="node-type-end" text="End Node"/>
         <PanelNode typeId="node-type-dead" text="Dead Node"/>
     </div>;
-}
+};

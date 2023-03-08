@@ -73,4 +73,4 @@ export const SwipeAbleTemporaryDrawer = () => {
             ))}
         </div>
     );
-}
+};

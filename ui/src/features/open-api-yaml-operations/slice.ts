@@ -7,7 +7,7 @@ export interface OpenApiYamlOperationsState {
         data: any;
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
-    }
+    };
 }
 
 const initialState: OpenApiYamlOperationsState = {
@@ -28,7 +28,7 @@ export const openApiYamlSlice = createSlice({
             state.uploadYaml.error = null;
         }).addCase(uploadYamlAsync.fulfilled, (state, action) => {
             state.uploadYaml.status = 'idle';
-            state.uploadYaml.error = null
+            state.uploadYaml.error = null;
             state.uploadYaml.data = action.payload;
         }).addCase(uploadYamlAsync.rejected, (state, action) => {
             state.uploadYaml.status = 'failed';

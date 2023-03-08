@@ -2,7 +2,7 @@ import React from 'react';
 import {getConfig} from "../helper/config";
 
 interface PotentialNodeProps {
-    typeId: string
+    typeId: string;
 }
 
 export const PotentialNode = (props: PotentialNodeProps) => {
@@ -12,4 +12,4 @@ export const PotentialNode = (props: PotentialNodeProps) => {
             {props.typeId}
         </div>
     </React.Fragment>;
-}
+};

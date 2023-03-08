@@ -1,7 +1,7 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {UploadYamlError, UploadYamlRequest, UploadYamlResponse} from "../model";
 import {uploadYaml} from "../api";
-import {toastr} from 'react-redux-toastr'
+import {toastr} from 'react-redux-toastr';
 
 export const uploadYamlAsync = createAsyncThunk<UploadYamlResponse, UploadYamlRequest, { rejectValue: UploadYamlError }>(
     'open-api-yaml-operations/upload',
@@ -9,12 +9,12 @@ export const uploadYamlAsync = createAsyncThunk<UploadYamlResponse, UploadYamlRe
         return uploadYaml(uploadYamlRequest).then(response => {
             // Check if status is not okay:
             if (response.status !== 200) {
-                const message = `Failed to upload for '${uploadYamlRequest.projectId}'. Received: ${response.status}`;
-                console.log(message);
-                toastr.error(`uploadYaml [Failure]`, message);
+                const msg = `Failed to upload for '${uploadYamlRequest.projectId}'. Received: ${response.status}`;
+                console.log(msg);
+                toastr.error(`uploadYaml [Failure]`, msg);
                 // Return the error message:
                 return thunkApi.rejectWithValue({
-                    message: message
+                    message: msg
                 });
             }
             const message = `Successfully uploaded file '${uploadYamlRequest.projectId}'`;
@@ -30,6 +30,6 @@ export const uploadYamlAsync = createAsyncThunk<UploadYamlResponse, UploadYamlRe
             return thunkApi.rejectWithValue({
                 message: errorMessage
             });
-        })
+        });
     }
 );

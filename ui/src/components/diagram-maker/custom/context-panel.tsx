@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface ContextPanelProps {
-    id: string | undefined,
+    id: string | undefined;
 }
 
 export const ContextPanel = (props: ContextPanelProps) => {
@@ -13,4 +13,4 @@ export const ContextPanel = (props: ContextPanelProps) => {
             This is the panel {props.id}
         </div>
     </React.Fragment>;
-}
+};
