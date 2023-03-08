@@ -53,7 +53,7 @@ serverTypes
   {
     "protocol": "REST",
     "port": "9999",
-    "framework": "net/http",
+    "framework": "go-gin",
     "resources": [
       {
         "Name": "User",
@@ -85,7 +85,7 @@ serverTypes
   {
     "protocol": "REST",
     "port": "9990",
-    "framework": "net/http",
+    "framework": "go-gin",
     "resources": [
       {
         "Name": "Device",

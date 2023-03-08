@@ -461,7 +461,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         languages = ["go", "javascript", "java", "ruby", "python"];
     }
     const handleModifyRestResourceClick = (resource: Resource) => {
-        console.log(resource.fields);
         const restServerConfig = payload.restServerConfig;
         restServerConfig.resources.push(resource);
         setPayload({
@@ -472,7 +471,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const onModifyRestResourceClose = () => {
-        console.log("onModifyRestResourceClose clicked");
         setPayload({
             ...payload,
             isModifyRestResourceOpen: !payload.isModifyRestResourceOpen

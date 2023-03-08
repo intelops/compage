@@ -126,7 +126,7 @@ func NewLanguageNode(compageJson *core.CompageJson, node *node.Node) (*LanguageN
 				client.Framework = languageNode.RestConfig.Server.Framework
 			} else {
 				// default rest client code based on below framework.
-				client.Framework = "net/http"
+				client.Framework = "go-gin"
 			}
 		}
 	}

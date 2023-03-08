@@ -54,8 +54,16 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
         });
     };
 
+    const onClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
+        // this prevents dialog box from closing.
+        if (reason === "backdropClick") {
+            return;
+        }
+        props.onModifyRestResourceClose();
+    };
+
     return <React.Fragment>
-        <Dialog open={props.isOpen} onClose={props.onModifyRestResourceClose}>
+        <Dialog open={props.isOpen} onClose={onClose}>
             <DialogTitle>Modify [REST Server] resource : {props.nodeId}</DialogTitle>
             <Divider/>
             <DialogContent style={{
@@ -87,8 +95,7 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" color="secondary"
-                        onClick={props.onModifyRestResourceClose}>Cancel</Button>
+                <Button variant="outlined" color="secondary" onClick={props.onModifyRestResourceClose}>Cancel</Button>
                 <Button variant="contained"
                         disabled={data.name === ""
                             || !isJsonString(data.fields)
