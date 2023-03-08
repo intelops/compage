@@ -14,7 +14,6 @@ import {SwitchProject} from "../../features/projects/switch-project";
 import {getCurrentUserName} from "../../utils/sessionstorage-client";
 import {GetProjectRequest} from "../../features/projects/model";
 import {existsProjectAsync} from "../../features/projects/async-apis/existsProject";
-import {selectExistsProjectError} from "../../features/projects/slice";
 
 const isSameUser = () => {
     const currentProjectDetails = getCurrentProjectDetails();
@@ -38,7 +37,7 @@ const loadExisting = (currentCnf: string) => {
 
 export const Home = () => {
     const authData = useAppSelector(selectAuthData);
-    const existsProjectError = useAppSelector(selectExistsProjectError);
+    // const existsProjectError = useAppSelector(selectExistsProjectError);
 
     const dispatch = useAppDispatch();
 
@@ -57,7 +56,7 @@ export const Home = () => {
         return <Navigate to="/login"/>;
     }
 
-    const message = JSON.parse(existsProjectError)?.message;
+    // const message = JSON.parse(existsProjectError)?.message;
 
     const getDiagramData = () => {
         let diagramMakerData;
@@ -81,7 +80,8 @@ export const Home = () => {
     };
 
     const getContent = (): React.ReactNode => {
-        if (isProjectNotValid() && message?.includes("404")) {
+        // below check is commented as the recent existsProject calls response is checked. Need to find a way to get the correct content here.
+        if (isProjectNotValid() /*|| message?.includes("404")*/) {
             // choose from existing or create a new project
             return <SwitchProject isOpen={true}></SwitchProject>;
         }

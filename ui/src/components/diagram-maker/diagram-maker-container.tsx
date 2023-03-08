@@ -66,6 +66,7 @@ import * as _ from "lodash";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import {getCurrentUserName} from "../../utils/sessionstorage-client";
+import {useNavigate} from "react-router-dom";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -94,6 +95,7 @@ export const DiagramMakerContainer = ({
     const diagramMakerRef = useRef() as any;
     const dispatch = useAppDispatch();
     const getProjectData = useAppSelector(selectGetProjectData);
+    const navigate = useNavigate();
 
     // handle ctrl+s in window
     const handleKeyDown = (event) => {
@@ -434,6 +436,8 @@ export const DiagramMakerContainer = ({
             // save in backend
             const updateProjectRequest: UpdateProjectRequest = prepareUpdateProjectRequest();
             dispatch(updateProjectAsync(updateProjectRequest));
+        } else {
+            navigate("/");
         }
     };
 

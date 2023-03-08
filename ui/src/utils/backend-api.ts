@@ -8,13 +8,6 @@ export const sanitizeString = (input: string) => {
     return input.split(" ").join("_");
 };
 
-const BackendApi = () => {
-    return axios.create({
-        baseURL: config.backend_base_url,
-        headers: getHeaders()
-    });
-};
-
 export const AuthBackendApi = () => {
     const path = "/auth";
     return axios.create({

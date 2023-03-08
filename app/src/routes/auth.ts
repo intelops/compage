@@ -14,10 +14,6 @@ const getBasicAuthenticationPair = () => {
 
 authRouter.post("/authenticate", async (req, res) => {
     const {code} = req.body;
-    console.log("Code :", code)
-    console.log("config.client_id :", config.client_id)
-    console.log("config.client_secret :", config.client_secret)
-    console.log("config.redirect_uri :", config.redirect_uri)
     // Request to exchange code for an access token
     axios({
         url: `https://github.com/login/oauth/access_token`, method: "POST", data: {
@@ -56,10 +52,7 @@ authRouter.post("/authenticate", async (req, res) => {
 authRouter.get("/logout", requireUserNameMiddleware, async (req, res) => {
     const {userName} = req.query
     const bearerToken = `${getBasicAuthenticationPair()}`
-    console.log("bearerToken : ", bearerToken)
     const accessToken = await getToken(<string>userName)
-    console.log("accessToken : ", accessToken)
-    console.log("config.client_id: ", config.client_id)
     axios({
         headers: {
             Accept: "application/vnd.github+json",
