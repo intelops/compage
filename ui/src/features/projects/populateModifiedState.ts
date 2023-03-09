@@ -33,7 +33,7 @@ export const updateModifiedState = (json: CompageJson) => {
             // iterate over nodes and check if they have any consumerData attached to them.
             for (let key in parsedState.nodes) {
                 const consumerData = parsedState.nodes[key]?.consumerData;
-                if (Object.keys(consumerData).length > 1) {
+                if (consumerData && Object.keys(consumerData).length > 1) {
                     // add this node to modifiedState
                     resultState.nodes[key] = getNodeConsumerData(parsedState.nodes[key]);
                 }
