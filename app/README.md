@@ -1,7 +1,8 @@
-### app
-- This component constitutes integrates the Github Oauth2 App for authentication.
+# app
+- This component constitutes integrates the GitHub Oauth2 App for authentication.
 - This also uses K8s's etcd store to persist projects and users related data.
 - It's an Express JS based REST server and gRPC client to core component.
+
 #### How to run this component?
 - Navigate to app directory [`cd app`] from root directory of compage
 - Fire `npm install` to install the dependencies
