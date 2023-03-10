@@ -86,3 +86,23 @@ Solution: **Compage**
 - **please suggest what you would like to add as features**
 
 -------------------------
+#### Current features in compage
+- An opensource tool that runs on your k8s cluster (mostly a local cluster running on developer's machine), helps to visually develop backend workloads for cloud-native & K8s.
+- Easy to adopt & use UI.
+- GitHub's integration for authentication, container build tools, cosign, etc.
+- Equipped with diagramming library to define the project requirements by drawing the flow of backend workloads.
+- Annotations, labels, tags, versioning, etc. can be defined within the diagram using forms.
+- Auto generate code for backend workloads like Rest API.
+- Auto generate the backend code, based on requirements defined via diagram & forms.
+- Auto build containers as multi-stage and/or distro-less to make them secure, portable and optimal.
+- Automatically take care of all git processes like tagging, versioning, commits, PRs, etc.
+- Automatically enforce software supply chain security process like generating cosign configuration in GitHub actions for generated source code for the diagrams drawn, generating deepsource configurations, generating configurations for deployments, services etc. in K8s env.
+- Can be deployed directly with docker images or via Helm chart. Helm chart is the tested and preferred way. Even if you are deploying compage with docker images, you still need K8s cluster access to persist project and user data in etcd as CRs.
+-
+
+#### How to use Compage?
+- A user logs in to the compage using his/her GitHub credentials. He/she will then need to provide permissions for the Compage GitHub App to create repositories on user's behalf, commit generated code to the repositories.
+- User will be shown with a diaglog box, where user has to select from existing projects or create a new project.
+- A compage project has a one-to-one relationship with GitHub repository. The compage project's connected GitHub repository can contain all the generated source code for all the nodes created on drawing panel. Compage follows monorepo method, all connected microservices in single git repository.
+- User then can use drawing panel to create nodes and configure them using forms. At last, user has to save the project and hit `Generate Code` button. The code will be generated and saved to GitHub repository.
+- User can later use same panel to add more microservices(nodes) or modify existing microservices. When the code is generated, version is locked till that point and any change made post code-generation till next code-generation is locked next version. User's can have at most 10 versions per project. Moving between versions is not yet supported.
