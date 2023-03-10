@@ -8,25 +8,32 @@ If you find a bug while working with the Compage, please [open an issue on GitHu
 You are more than welcome to open issues in this project to [suggest new features](https://github.com/intelops/compage/issues/new?labels=kind%2Ffeature&template=feature-request.md&title=Feature%20Request:).
 
 ## Contributing Code
-This project is mainly written in Golang. To contribute code,
+This project is written in Golang, NodeJs(TypeScript) and ReactJs(TypeScript). To contribute code,
 1. Ensure you are running golang version 1.11.4 or greater for go module support
 2. Set the following environment variables:
     ```
     GO111MODULE=on
     GOFLAGS=-mod=vendor
     ```
-3. Fork the project
-4. Clone the project: `git clone https://github.com/[YOUR_USERNAME]/compage && cd compage`
-5. Run `go clean -modcache`
-6. Run `go mod vendor` to update the dependencies
-7. Build the project, e.g. via `go build .`
-8. Make changes
-9. Run unit tests: `./hack/coverage.bash`
-10. Run E2E tests: `cd e2e/ && go test -v -ginkgo.v`
-11. Format your code: `go fmt ./...`
-12. Commit changes *([Please refer the commit message conventions](https://www.conventionalcommits.org/en/v1.0.0/))*
-13. Push commits
-14. Open pull request
+3. Ensure you have NodeJs(LTS >= 18.12.0) installed for Core and UI part of the compage.
+4. Ensure you have access to any Kubernetes(KinD and minikube will do too) cluster to store the compage projects and users related data on it.
+   #### KinD
+   - Install KinD from https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries
+   - Create KinD cluster https://kind.sigs.k8s.io/docs/user/quick-start/#creating-a-cluster
+   - Check if you can access the cluster created in previous step and you are able to list dow n the pods.
+   #### minikube
+   - Install create minikube cluster from https://minikube.sigs.k8s.io/docs/start/
+   - Check if you can access the cluster created in previous step and you are able to list dow n the pods.
+5. Fork the project.
+6. Clone the project: `git clone https://github.com/[YOUR_USERNAME]/compage && cd compage`
+7. kindly refer compage.md file to know the structure of the project.
+8. The Compage has 3 servers (subprojects) which need to be started to run the compage on local
+   - core (Golang), navigate to core directory and follow its [core README](./core/README.md)
+   - app (Nodejs), navigate to app directory and follow its [app README](./app/README.md)
+   - ui (ReactJs), navigate to ui directory and follow its [ui README](./ui/README.md)
+9. Commit changes *([Please refer the commit message conventions](https://www.conventionalcommits.org/en/v1.0.0/))*
+10. Push commits
+11. Open pull request
 
 ## Improving the Documentation
-The documentation is contained within `./docs` and made with Docusaurus. See the [Docs README](./docs) for infos about developing the docs.
+The documentation is contained within `./docs` and made with Docusaurus. See the [Docs README](./docs/README.md) for infos about developing the docs.
