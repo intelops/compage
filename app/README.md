@@ -7,6 +7,8 @@
 - Navigate to app directory [`cd app`] from root directory of compage
 - Fire `npm install` to install the dependencies
 - Install the CRDs for projects and users (when you are running for the first time.) by firing below commands
+    - `kubectl create ns compage`
+    - `kubectl config set-context --current --namespace=compage`
     - `kubectl apply -f crds/projects.yaml`
     - `kubectl apply -f crds/users.yaml`
 - Check if you are able to list `projects` and `users`. You should see below just after you fire above commands for the first time.
@@ -19,5 +21,5 @@
   ❯ kubectl get users -A
   No resources found 
 ```
-- If you find some other error apart from the above error, that means you couldn't complete the installation of CRDs.
+- If you find some other error apart from the above one, that means the installation of CRDs didn't succeed.
 - Run `npm run dev` command to start the express-server. This command will auto-reload the changes you make to app directory.
