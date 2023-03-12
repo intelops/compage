@@ -4,7 +4,7 @@
     git clone https://github.com/intelops/compage.git
     ```
    
-2. Navigate to deploy directory and run below script to create docker images of core, app and ui components. You may want to change the tag there. The same tag you will later use in values.yaml of compage's helm chart.
+2. Navigate to deploy directory and run below script to create docker images of core, app and ui components. You may want to change the tag there. The same tag you will later need to update in values.yaml of compage's helm chart along with imagePullPolicy set to Never.
    ```shell
     ./build-docker-images.sh   
    ```
@@ -15,38 +15,42 @@
     kubectl create ns compage
     kubectl config set-context --current --namespace=compage
     ```
-
-4. Create docker pull secret as the docker images are in private registry. The secret here has just got the read package access.
+   or on KinD cluster
    ```shell
-   kubectl create secret docker-registry compage-pull-secret --docker-server=ghcr.io --docker-username=mahendraintelops --docker-password=XXXXX --docker-email=mahendra.b@intelops.dev
+    kind create cluster --name compage
+    kubectl create ns compage
+    kubectl config set-context --current --namespace=compage
    ```
 
-5. Retrieve minikube ip.
+4. Retrieve minikube ip.
    ```shell
    minikube ip
    ```
-   
-6. Update minikube ip in `/etc/hosts`.
-   `MINIKUBE_IP (retrieved by 'minikube ip' command) www.compage.dev`
-
-7. Fire below command in root directory.
+   or on KinD cluster
+   ```shell
+   KIND_NODE_IP=$(kubectl get nodes -o wide --no-headers | awk -v OFS='\t' '{print $6}')
+   ```
+5. Update minikube ip in `/etc/hosts`.
+   ```shell
+   $MINIKUBE_IP (retrieved by 'minikube ip' command) www.compage.dev
+   ```
+   or on KinD cluster
+   ```shell
+   $KIND_NODE_IP (retrieved by above command) www.compage.dev
+   ```
+6. Fire below command in root directory.
    ```shell
    helm install compage charts/compage --values charts/compage/values.yaml
    ```
 
-8. Check if the pods got created.
+7. Wait till pods are up and running in compage ns.
    ```shell
-   kubectl get pods -n compage
-   ```
-
-9. Wait till pods are up and running in compage ns.
-   ```
    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-ui
    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-core
    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-app
    ```
    
-10. Go to  http://www.compage.dev:32222 
+8. Go to  http://www.compage.dev:32222 
 
 ## Different shell scripts in deploy directory.
 ### create-kind-cluster.sh

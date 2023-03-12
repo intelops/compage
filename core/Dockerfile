@@ -22,6 +22,7 @@ CMD ["go", "run", "main.go"]
 ################ Production ################
 FROM node:18.12-alpine
 RUN npm install @openapitools/openapi-generator-cli -g
+RUN apk add openjdk8-jre
 # test if the below command avoids loading the files later.
 RUN openapi-generator-cli version
 COPY --from=builder /app/main /

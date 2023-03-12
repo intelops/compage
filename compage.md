@@ -11,9 +11,9 @@ markmap:
 ## app
 - NodeJs Express Server
 - [Repository](https://github.com/intelops/compage/tree/main/app)
-- Github Integration
+- GitHub Integration
 - gRPC Client to core
-- Commit generated code to user's github account using Simple-Git
+- Commit generated code to user's GitHub account using Simple-Git
 - Integration with K8s [store the projects details to etcd through K8s custom resources]
 
 ## core
