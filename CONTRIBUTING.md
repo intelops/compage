@@ -38,3 +38,18 @@ This project is written in Golang, NodeJs(TypeScript) and ReactJs(TypeScript). T
 
 ## Improving the Documentation
 The documentation is contained within `./docs` and made with Docusaurus. See the [Docs README](./docs/README.md) for infos about developing the docs.
+
+## Regenerate the gRPC code from .proto files
+- Install below packages in order to regenerate the gRPC code.
+   ```shell
+   go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+   go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+   ``` 
+- Update below statement in ~/.zshrc or ~/.bashrc depending on the shell you are using.
+   ```shell
+  export PATH="$PATH:$(go env GOPATH)/bin"
+   ```
+- Download buf binary from this link - https://github.com/bufbuild/buf/releases and fire the command from core directory of compage.
+   ```shell
+   buf generate
+   ```
