@@ -20,20 +20,21 @@ This project is written in Golang, NodeJs(TypeScript) and ReactJs(TypeScript). T
    #### KinD
    - Install KinD from https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries
    - Create KinD cluster https://kind.sigs.k8s.io/docs/user/quick-start/#creating-a-cluster
-   - Check if you can access the cluster created in previous step and you are able to list dow n the pods.
+   - Check if you can access the cluster created in previous step, and you are able to list down the pods.
    #### minikube
-   - Install create minikube cluster from https://minikube.sigs.k8s.io/docs/start/
-   - Check if you can access the cluster created in previous step and you are able to list dow n the pods.
+   - Install and create minikube cluster from https://minikube.sigs.k8s.io/docs/start/
+   - Check if you can access the cluster created in previous step, and you are able to list down the pods.
 5. Fork the project.
 6. Clone the project: `git clone https://github.com/[YOUR_USERNAME]/compage && cd compage`
 7. kindly refer compage.md file to know the structure of the project.
-8. The Compage has 3 servers (subprojects) which need to be started to run the compage on local
+8. Refer [GitHub App setup](./github-app-setup.md)
+9. The Compage has 3 servers (subprojects) which need to be started to run the compage on local
    - core (Golang), navigate to core directory and follow its [core README](./core/README.md)
    - app (Nodejs), navigate to app directory and follow its [app README](./app/README.md)
    - ui (ReactJs), navigate to ui directory and follow its [ui README](./ui/README.md)
-9. Commit changes *([Please refer the commit message conventions](https://www.conventionalcommits.org/en/v1.0.0/))*
-10. Push commits
-11. Open pull request
+10. Commit changes *([Please refer the commit message conventions](https://www.conventionalcommits.org/en/v1.0.0/))*
+11. Push commits
+12. Open pull request
 
 ## Improving the Documentation
 The documentation is contained within `./docs` and made with Docusaurus. See the [Docs README](./docs/README.md) for infos about developing the docs.

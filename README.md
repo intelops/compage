@@ -2,7 +2,7 @@
 <p style="text-align:center"><b>Low-Code No-Code for Cloud Native</b></p>
 
 <p style="text-align:center">
-  <a href="code_of_conduct.md">
+  <a href="code-of-conduct.md">
     <img src="https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg" alt="Contributor Covenant">
   </a>
   <a href="https://opensource.org/licenses/Apache-2.0">
@@ -105,3 +105,7 @@ Solution: **Compage**
 - A compage project has a one-to-one relationship with GitHub repository. The compage project's connected GitHub repository can contain all the generated source code for all the nodes created on drawing panel. Compage follows monorepo method, all connected microservices in single git repository.
 - User then can use drawing panel to create nodes and configure them using forms. At last, user has to save the project and hit `Generate Code` button. The code will be generated and saved to GitHub repository.
 - User can later use same panel to add more microservices(nodes) or modify existing microservices. When the code is generated, version is locked till that point and any change made post code-generation till next code-generation is locked next version. User's can have at most 10 versions per project. Moving between versions is not yet supported.
+
+## Getting started with compage
+- Register an app - Refer [GitHub App setup](./github-app-setup.md).
+- Follow step-by-step instructions given here [Run Compage on local](./deploy/README.md).

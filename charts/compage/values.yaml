@@ -1,4 +1,4 @@
-## Define serviceAccount names for components. Defaults to component's fully qualified name.
+# GitHub app configuration.
 githubApp:
   # update below value cluster's node ip and with port specified here (.Values.ui.service.nodePort)
   redirectURI: "http://www.compage.dev:32222/login"
