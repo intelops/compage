@@ -16,7 +16,7 @@ export const Footer = () => {
                     justifyContent: "center",
                 }}>
                     <Typography variant="h6" >
-                        A great help to developer by intelops!!!
+                        A great help to developer by IntelOps!!!
                     </Typography>
                 </Toolbar>
             </AppBar>
