@@ -2,7 +2,7 @@ import {simpleGit, SimpleGit, SimpleGitOptions} from "simple-git";
 import {gitOperations} from "./common";
 import {Repository} from "../../routes/models";
 
-export interface PushNewProjectToGithubRequest {
+export interface PushNewProjectToGitServerRequest {
     projectVersion: string;
     generatedProjectPath: string;
     repository: Repository;
@@ -11,9 +11,9 @@ export interface PushNewProjectToGithubRequest {
     email: string;
 }
 
-export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: PushNewProjectToGithubRequest): Promise<string> => {
+export const pushNewProjectToGitServer = async (pushNewProjectToGitServerRequest: PushNewProjectToGitServerRequest): Promise<string> => {
     const options: Partial<SimpleGitOptions> = {
-        baseDir: pushNewProjectToGithubRequest.generatedProjectPath,
+        baseDir: pushNewProjectToGitServerRequest.generatedProjectPath,
         binary: 'git',
         maxConcurrentProcesses: 6,
         trimmed: false,
@@ -36,14 +36,15 @@ export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: Push
         return error
     }
     // add local git config like username and email
-    await git.addConfig('user.email', pushNewProjectToGithubRequest.email);
-    await git.addConfig('user.name', pushNewProjectToGithubRequest.userName);
+    await git.addConfig('user.email', pushNewProjectToGitServerRequest.email);
+    await git.addConfig('user.name', pushNewProjectToGitServerRequest.userName);
 
+    // TODO when the support for other git providers will be added, need to change below hardcoded string.
     // Set up GitHub url like this so no manual entry of user pass needed
-    const gitHubUrl = `https://${pushNewProjectToGithubRequest.userName}:${pushNewProjectToGithubRequest.password}@github.com/${pushNewProjectToGithubRequest.userName}/${pushNewProjectToGithubRequest.repository.name}.git`;
+    const gitServerUrl = `https://${pushNewProjectToGitServerRequest.userName}:${pushNewProjectToGitServerRequest.password}@github.com/${pushNewProjectToGitServerRequest.userName}/${pushNewProjectToGitServerRequest.repository.name}.git`;
 
     // Add remote repository url as origin to repository
-    await git.addRemote('origin', gitHubUrl).then(
+    await git.addRemote('origin', gitServerUrl).then(
         (success: any) => {
             console.debug("git remote add origin succeeded");
         }, (failure: any) => {
@@ -55,5 +56,5 @@ export const pushNewProjectToGithub = async (pushNewProjectToGithubRequest: Push
     }
 
     // add, commit and push
-    return await gitOperations(git, pushNewProjectToGithubRequest.repository, pushNewProjectToGithubRequest.projectVersion)
+    return await gitOperations(git, pushNewProjectToGitServerRequest.repository, pushNewProjectToGitServerRequest.projectVersion)
 }

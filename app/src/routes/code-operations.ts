@@ -2,9 +2,9 @@ import {getProjectGrpcClient} from "../grpc/project";
 import {Router} from "express";
 import * as fs from "fs";
 import * as os from "os";
-import {pushToExistingProjectOnGithub, PushToExistingProjectOnGithubRequest} from "../util/simple-git/existing-project";
+import {pushToExistingProjectOnGitServer, PushToExistingProjectOnGitServerRequest} from "../util/simple-git/existing-project";
 import {getToken} from "../util/user-store";
-import {cloneExistingProjectFromGithub, CloneExistingProjectFromGithubRequest} from "../util/simple-git/clone";
+import {cloneExistingProjectFromGitServer, CloneExistingProjectFromGitServerRequest} from "../util/simple-git/clone";
 import {GenerateCodeError, GenerateCodeRequest, GenerateCodeResponse, Project} from "./models";
 import {requireUserNameMiddleware} from "../middlewares/auth";
 import {getProjectResource, patchProjectResource} from "../store/project-client";
@@ -106,14 +106,14 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
         extract.on('finish', async () => {
             let password = <string>await getToken(<string>projectResource.spec.user?.name);
             // clone existing repository
-            const cloneExistingProjectFromGithubRequest: CloneExistingProjectFromGithubRequest = {
+            const cloneExistingProjectFromGitServerRequest: CloneExistingProjectFromGitServerRequest = {
                 clonedProjectPath: `${downloadedProjectPath}`,
                 userName: <string>projectResource.spec.user.name,
                 password: password,
                 repository: projectResource.spec.repository
             }
 
-            let error: string = await cloneExistingProjectFromGithub(cloneExistingProjectFromGithubRequest)
+            let error: string = await cloneExistingProjectFromGitServer(cloneExistingProjectFromGitServerRequest)
             if (error.length > 0) {
                 cleanup(downloadedProjectPath);
                 // send status back to ui
@@ -122,17 +122,17 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
             }
 
             // save to GitHub
-            const pushToExistingProjectOnGithubRequest: PushToExistingProjectOnGithubRequest = {
+            const pushToExistingProjectOnGitServerRequest: PushToExistingProjectOnGitServerRequest = {
                 projectVersion: projectResource.spec.version,
                 generatedProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
-                existingProject: cloneExistingProjectFromGithubRequest.clonedProjectPath + "/" + projectResource.spec.repository?.name,
+                existingProject: cloneExistingProjectFromGitServerRequest.clonedProjectPath + "/" + projectResource.spec.repository?.name,
                 userName: projectResource.spec.user.name,
                 email: projectResource.spec.user.email,
                 password: password,
                 repository: projectResource.spec.repository
             }
 
-            error = await pushToExistingProjectOnGithub(pushToExistingProjectOnGithubRequest)
+            error = await pushToExistingProjectOnGitServer(pushToExistingProjectOnGitServerRequest)
             if (error.length > 0) {
                 cleanup(downloadedProjectPath);
                 // send status back to ui

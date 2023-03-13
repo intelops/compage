@@ -3,7 +3,7 @@ import * as fs from "fs";
 import {gitOperations} from "./common";
 import {Repository} from "../../routes/models";
 
-export interface PushToExistingProjectOnGithubRequest {
+export interface PushToExistingProjectOnGitServerRequest {
     projectVersion: string;
     generatedProjectPath: string;
     repository: Repository;
@@ -13,9 +13,9 @@ export interface PushToExistingProjectOnGithubRequest {
     email: string;
 }
 
-export const pushToExistingProjectOnGithub = async (pushToExistingProjectOnGithubRequest: PushToExistingProjectOnGithubRequest): Promise<string> => {
+export const pushToExistingProjectOnGitServer = async (pushToExistingProjectOnGitServerRequest: PushToExistingProjectOnGitServerRequest): Promise<string> => {
     const options: Partial<SimpleGitOptions> = {
-        baseDir: pushToExistingProjectOnGithubRequest.existingProject,
+        baseDir: pushToExistingProjectOnGitServerRequest.existingProject,
         binary: 'git',
         maxConcurrentProcesses: 6,
         trimmed: false,
@@ -25,13 +25,13 @@ export const pushToExistingProjectOnGithub = async (pushToExistingProjectOnGithu
     const git: SimpleGit = simpleGit(options);
 
     // add local git config like username and email
-    await git.addConfig('user.email', pushToExistingProjectOnGithubRequest.email);
-    await git.addConfig('user.name', pushToExistingProjectOnGithubRequest.userName);
+    await git.addConfig('user.email', pushToExistingProjectOnGitServerRequest.email);
+    await git.addConfig('user.name', pushToExistingProjectOnGitServerRequest.userName);
 
     // copy over the new files to this cloned files.
-    fs.cpSync(pushToExistingProjectOnGithubRequest.generatedProjectPath, pushToExistingProjectOnGithubRequest.existingProject, {recursive: true})
-    console.log(`${pushToExistingProjectOnGithubRequest.generatedProjectPath} files copied to ${pushToExistingProjectOnGithubRequest.existingProject}`)
+    fs.cpSync(pushToExistingProjectOnGitServerRequest.generatedProjectPath, pushToExistingProjectOnGitServerRequest.existingProject, {recursive: true})
+    console.log(`${pushToExistingProjectOnGitServerRequest.generatedProjectPath} files copied to ${pushToExistingProjectOnGitServerRequest.existingProject}`)
 
     // add, commit and push
-    return await gitOperations(git, pushToExistingProjectOnGithubRequest.repository, pushToExistingProjectOnGithubRequest.projectVersion)
+    return await gitOperations(git, pushToExistingProjectOnGitServerRequest.repository, pushToExistingProjectOnGitServerRequest.projectVersion)
 }
