@@ -17,7 +17,7 @@ export const getEdgeConsumerData = (edge: any) => {
 };
 
 
-export const updateModifiedState = (json: CompageJson) => {
+export const updateModifiedState = (compageJson: CompageJson) => {
     const modifiedState = getModifiedState();
     if (!modifiedState
         || modifiedState === "{}"
@@ -27,25 +27,26 @@ export const updateModifiedState = (json: CompageJson) => {
             nodes: {},
             edges: {}
         };
-        const parsedState = json;
+
         // state has nodes
-        if (Object.keys(parsedState?.nodes).length !== 0) {
+        if (Object.keys(compageJson?.nodes).length !== 0) {
             // iterate over nodes and check if they have any consumerData attached to them.
-            for (let key in parsedState.nodes) {
-                const consumerData = parsedState.nodes[key]?.consumerData;
+            for (let key in compageJson.nodes) {
+                const consumerData = compageJson.nodes[key]?.consumerData;
                 if (consumerData && Object.keys(consumerData).length > 1) {
                     // add this node to modifiedState
-                    resultState.nodes[key] = getNodeConsumerData(parsedState.nodes[key]);
+                    resultState.nodes[key] = getNodeConsumerData(compageJson.nodes[key]);
                 }
             }
         }
-        if (Object.keys(parsedState?.edges).length !== 0) {
+        // state has edges
+        if (Object.keys(compageJson?.edges).length !== 0) {
             // iterate over edges and check if they have any consumerData attached to them.
-            for (let key in parsedState.edges) {
-                const consumerData = parsedState.edges[key]?.consumerData;
+            for (let key in compageJson.edges) {
+                const consumerData = compageJson.edges[key]?.consumerData;
                 if (consumerData && Object.keys(consumerData).length > 0) {
                     // add this edge to modifiedState
-                    resultState.edges[key] = getEdgeConsumerData(parsedState.edges[key]);
+                    resultState.edges[key] = getEdgeConsumerData(compageJson.edges[key]);
                 }
             }
         }

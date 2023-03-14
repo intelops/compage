@@ -1,5 +1,6 @@
 import {DiagramMakerNode, Event, WorkspaceActions} from 'diagram-maker';
 import {Action, AnyAction} from 'redux';
+import {getModifiedState} from "../../../utils/localstorage-client";
 
 export function createDivWithText(text: string) {
     const newDiv = document.createElement('div');
@@ -104,7 +105,16 @@ export function createNodeWithDropdown(node: DiagramMakerNode<any>, container: H
 
 export function createCircularNode(node: DiagramMakerNode<any>, container: HTMLElement, eventListener: () => void) {
     const id = node.id.substring(0, 10);
-    const newDiv = createDivWithText(id);
+    let modifiedState = getModifiedState();
+    // add name given by user to this node.
+    const name = JSON.parse(modifiedState)?.nodes[id]?.consumerData?.name;
+    let displayName;
+    if (name) {
+        displayName = name;
+    } else {
+        displayName = id;
+    }
+    const newDiv = createDivWithText(displayName);
     newDiv.style.display = "flex";
     newDiv.style.flexWrap = "wrap";
     newDiv.style.justifyContent = "center";
