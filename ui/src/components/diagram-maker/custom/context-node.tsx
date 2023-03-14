@@ -14,9 +14,9 @@ export const ContextNode = (props: ContextNodeProps) => {
         type: parsedModifiedState.nodes[props.id]?.consumerData.type !== undefined ? parsedModifiedState.nodes[props.id].consumerData.type : "",
         language: parsedModifiedState.nodes[props.id]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.id].consumerData.language : "",
         isServer: parsedModifiedState.nodes[props.id]?.consumerData.isServer !== undefined ? parsedModifiedState.nodes[props.id].consumerData.isServer : false,
-        isClient: parsedModifiedState.nodes[props.id]?.consumerData.isClient !== undefined ? parsedModifiedState.nodes[props.id].consumerData.isClient : false,
-        // api resources to be generated
-        resources: [],
+        template: parsedModifiedState.nodes[props.id]?.consumerData.template !== undefined ? parsedModifiedState.nodes[props.id].consumerData.template : false,
+        // serverTypes to be generated
+        serverTypes: parsedModifiedState.nodes[props.id]?.consumerData.serverTypes !== undefined ? parsedModifiedState.nodes[props.id].consumerData.serverTypes : [],
         url: parsedModifiedState?.nodes[props.id]?.consumerData.url !== undefined ? parsedModifiedState.nodes[props.id].consumerData.url : "",
     });
 
@@ -45,12 +45,17 @@ export const ContextNode = (props: ContextNodeProps) => {
         return "";
     };
 
-    const getIsServer = () => {
-        return <><strong>IsServer</strong>: {payload.isServer ? "Yes" : "No"}</>;
+    const getTemplate = () => {
+        return <><strong>Template</strong>: {payload.template}</>;
     };
 
-    const getIsClient = () => {
-        return <><strong>IsClient</strong>: {payload.isClient ? "Yes" : "No"}</>;
+    const getServerTypes = () => {
+        let result = "<>";
+        for (let i = 0; i < payload.serverTypes.length; i++) {
+            result += JSON.stringify(payload.serverTypes[i]);
+        }
+        result += "</>";
+        return result;
     };
 
     return <React.Fragment>
@@ -63,9 +68,13 @@ export const ContextNode = (props: ContextNodeProps) => {
             <br/>
             {getLanguage()}
             <br/>
-            {getIsServer()}
+            {getTemplate()}
             <br/>
-            {getIsClient()}
+            {/*{getServerTypes()}*/}
+            {/*<br/>*/}
+            {/*{getIsServer()}*/}
+            {/*<br/>*/}
+            {/*{getIsClient()}*/}
         </div>
     </React.Fragment>;
 };
