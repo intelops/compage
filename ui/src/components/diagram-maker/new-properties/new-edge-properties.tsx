@@ -5,7 +5,7 @@ import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import {setModifiedState} from "../../../utils/localstorage-client";
+import {getCurrentConfig, setModifiedState} from "../../../utils/localstorage-client";
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
@@ -29,7 +29,7 @@ interface ClientTypesConfig {
 const getClientTypesConfig = (parsedModifiedState, edgeId): ClientTypesConfig => {
     const clientTypes = parsedModifiedState.edges[edgeId]?.consumerData?.clientTypes;
     const clientTypesConfig = {};
-    if (clientTypes  || clientTypes !== undefined || clientTypes !== "[]") {
+    if (clientTypes || clientTypes !== undefined || clientTypes !== "[]") {
         for (let i = 0; i < clientTypes?.length; i++) {
             if (clientTypes[i]["protocol"] === Rest) {
                 clientTypesConfig["isRestServer"] = true;
@@ -48,6 +48,7 @@ const getClientTypesConfig = (parsedModifiedState, edgeId): ClientTypesConfig =>
 
 export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     const parsedModifiedState = getParsedModifiedState();
+    let parsedCurrentConfig = JSON.parse(getCurrentConfig());
     const clientTypesConfig: ClientTypesConfig = getClientTypesConfig(parsedModifiedState, props.edgeId);
 
     const [payload, setPayload] = React.useState({
@@ -158,6 +159,15 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
 
     const getRestServerPort = () => {
         if (payload.isRestServer) {
+            // retrieve port from src node.
+            const srcNode = parsedCurrentConfig.edges[props.edgeId].src;
+            const serverTypes = parsedModifiedState.nodes[srcNode]?.consumerData?.serverTypes;
+            for (let i = 0; i < serverTypes.length; i++) {
+                // for rest protocol.
+                if (serverTypes[i].protocol === Rest) {
+                    payload.restServerPort = serverTypes[i].port;
+                }
+            }
             return <TextField
                 required
                 size="medium"
@@ -165,6 +175,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                 id="restServerPort"
                 label="Rest Server Port"
                 type="text"
+                disabled
                 value={payload.restServerPort}
                 onChange={handleRestServerPortChange}
                 variant="outlined"
@@ -280,10 +291,10 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                     />
                     {getRestServerCheck()}
                     {getRestServerPort()}
-                    {getGrpcServerCheck()}
-                    {getGrpcServerPort()}
-                    {getWsServerCheck()}
-                    {getWsServerPort()}
+                    {/*{getGrpcServerCheck()}*/}
+                    {/*{getGrpcServerPort()}*/}
+                    {/*{getWsServerCheck()}*/}
+                    {/*{getWsServerPort()}*/}
                 </Stack>
             </DialogContent>
             <DialogActions>

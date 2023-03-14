@@ -117,9 +117,8 @@ export function createCircularNode(node: DiagramMakerNode<any>, container: HTMLE
     const newDiv = createDivWithText(displayName);
     newDiv.style.display = "flex";
     newDiv.style.flexWrap = "wrap";
-    newDiv.style.justifyContent = "center";
-    newDiv.style.alignItems = "center";
-    newDiv.style.alignContent = "center";
+    newDiv.style.overflow = "hidden";
+    newDiv.style.placeContent = "normal";
     newDiv.style.flexDirection = "row";
     newDiv.classList.add('circle', 'example-node', 'circle-image');
     if (node.diagramMakerData.selected) {
@@ -128,6 +127,8 @@ export function createCircularNode(node: DiagramMakerNode<any>, container: HTMLE
     container.innerHTML = '';
     const connectorDiv = document.createElement('div');
     connectorDiv.classList.add('outer');
+    connectorDiv.style.placeContent = "normal";
+    connectorDiv.style.overflow = "hidden";
     connectorDiv.setAttribute('data-id', node.id);
     connectorDiv.setAttribute('data-type', 'DiagramMaker.Connector');
     connectorDiv.setAttribute('data-draggable', 'true');

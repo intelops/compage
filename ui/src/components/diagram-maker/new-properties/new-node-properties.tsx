@@ -561,16 +561,16 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         borderRadius: "15px",
                         border: payload.isGrpcServer ? '1px solid #dadada' : ''
                     }} direction="column" spacing={2}>
-                        {getGrpcServerCheck()}
-                        {getGrpcServerConfig()}
+                        {/*{getGrpcServerCheck()}*/}
+                        {/*{getGrpcServerConfig()}*/}
                     </Stack>
                     <Stack style={{
                         padding: "10px",
                         borderRadius: "15px",
                         border: payload.isWsServer ? '1px solid #dadada' : ''
                     }} direction="column" spacing={2}>
-                        {getWsServerCheck()}
-                        {getWsServerConfig()}
+                        {/*{getWsServerCheck()}*/}
+                        {/*{getWsServerConfig()}*/}
                     </Stack>
                 </Stack>
             </DialogContent>
