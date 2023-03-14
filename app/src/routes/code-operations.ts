@@ -2,7 +2,10 @@ import {getProjectGrpcClient} from "../grpc/project";
 import {Router} from "express";
 import * as fs from "fs";
 import * as os from "os";
-import {pushToExistingProjectOnGitServer, PushToExistingProjectOnGitServerRequest} from "../util/simple-git/existing-project";
+import {
+    pushToExistingProjectOnGitServer,
+    PushToExistingProjectOnGitServerRequest
+} from "../util/simple-git/existing-project";
 import {getToken} from "../util/user-store";
 import {cloneExistingProjectFromGitServer, CloneExistingProjectFromGitServerRequest} from "../util/simple-git/clone";
 import {GenerateCodeError, GenerateCodeRequest, GenerateCodeResponse, Project} from "./models";
@@ -24,7 +27,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
     const projectId = generateCodeRequest.projectId
     const cleanup = (downloadedProjectPath: string) => {
         // remove directory created, delete directory recursively
-        rimraf(downloadedProjectPath, () => {
+        rimraf(downloadedProjectPath).then((result: any) => {
             console.debug(`${downloadedProjectPath} is cleaned up`);
         });
     }
