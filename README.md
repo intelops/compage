@@ -1,12 +1,12 @@
-<p align="center"><img src="compage-logo.png" width="400" alt=""></p>
-<p align="center"><b>Low-Code, No-Code for Cloud-native</b></p>
+<p align="center"><img src="images/compage-logo.png" width="400" alt=""></p>
+<p align="center"><b>Low-Code, No-Code for cloud-native</b></p>
 
 <h4 align="center">
     <a href="https://discord.gg/DeapQc22qe">Discord</a> |
     <a href="https://github.com/intelops/compage/discussions">Discussions</a> |
     <a href="https://compage.dev?utm_source=github&utm_medium=social/">Site</a> |
     <a href="https://docs.compage.dev?utm_source=github&utm_medium=social/">Guide</a> |
-    <a href="https://docs.compage.dev/docs/intro">Docs</a> |
+    <a href="https://docs.compage.dev/docs/introduction">Docs</a> |
     <a href="https://docs.compage.dev/docs/introduction/contribute?utm_source=github&utm_medium=social">Contribute</a><br/><br/>
 </h4>
 
@@ -116,7 +116,7 @@ Solution: **Compage**
 - User can later use same panel to add more microservices(nodes) or modify existing microservices. When the code is generated, version is locked till that point and any change made post code-generation till next code-generation is locked next version. User's can have at most 10 versions per project. Moving between versions is not yet supported.
 
 ## Architecture
-![architecture.png](architecture.png)
+![architecture.png](images/architecture.png)
 ## Contributing
 You are warmly welcome to contribute to Compage.
 Please refer the detailed guide [CONTRIBUTING.md](./CONTRIBUTING.md).

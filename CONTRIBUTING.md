@@ -8,7 +8,11 @@ If you find a bug while working with the Compage, please [open an issue on GitHu
 You are more than welcome to open issues in this project to [suggest new features](https://github.com/intelops/compage/issues/new?labels=kind%2Ffeature&template=feature-request.md&title=Feature%20Request:).
 
 ## Contributing Code
-This project is written in Golang, NodeJs(TypeScript) and ReactJs(TypeScript). To contribute code,
+This project is written in Golang, NodeJs(TypeScript) and ReactJs(TypeScript). 
+
+![block-diagram.png](images/architecture-high.png)
+
+To contribute code,
 1. Ensure you are running golang version 1.11.4 or greater for go module support
 2. Set the following environment variables:
     ```
@@ -53,3 +57,5 @@ The documentation is contained within `./docs` and made with Docusaurus. See the
    ```shell
    buf generate
    ```
+- How K8s is in picture with above 3 components.
+![architecture-med.png](images%2Farchitecture-med.png)
