@@ -57,5 +57,5 @@ The documentation is contained within `./docs` and made with Docusaurus. See the
    ```shell
    buf generate
    ```
-- How K8s is in picture with above 3 components.
+## How K8s and GitHub are interacted with above 3 components?
 ![architecture-med.png](images%2Farchitecture-med.png)
