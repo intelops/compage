@@ -1,14 +1,23 @@
-<p style="text-align:center"><img src="compage-logo.png" width="400" alt=""></p>
-<p style="text-align:center"><b>Low-Code No-Code for Cloud Native</b></p>
+<p align="center"><img src="compage-logo.png" width="400" alt=""></p>
+<p align="center"><b>Low-Code, No-Code for Cloud-native</b></p>
 
-<p style="text-align:center">
-  <a href="code-of-conduct.md">
-    <img src="https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg" alt="Contributor Covenant">
-  </a>
-  <a href="https://opensource.org/licenses/Apache-2.0">
-    <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License">
-  </a>
-</p>
+<h4 align="center">
+    <a href="https://discord.gg/DeapQc22qe">Discord</a> |
+    <a href="https://github.com/intelops/compage/discussions">Discussions</a> |
+    <a href="https://compage.dev?utm_source=github&utm_medium=social/">Site</a> |
+    <a href="https://docs.compage.dev?utm_source=github&utm_medium=social/">Guide</a> |
+    <a href="https://docs.compage.dev/docs/intro">Docs</a> |
+    <a href="https://docs.compage.dev/docs/introduction/contribute?utm_source=github&utm_medium=social">Contribute</a><br/><br/>
+</h4>
+
+<h4 align="center">
+
+[![Price](https://img.shields.io/badge/price-FREE-0098f7.svg)](https://github.com/intelops/compage/blob/main/LICENSE) [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/DeapQc22qe)
+[![Discussions](https://badgen.net/badge/icon/discussions?label=open)](https://github.com/intelops/compage/discussions)
+[![Code of Conduct](https://badgen.net/badge/icon/code-of-conduct?label=open)](./code-of-conduct.md)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+</h4>
 
 <hr>
 
@@ -106,6 +115,19 @@ Solution: **Compage**
 - User then can use drawing panel to create nodes and configure them using forms. At last, user has to save the project and hit `Generate Code` button. The code will be generated and saved to GitHub repository.
 - User can later use same panel to add more microservices(nodes) or modify existing microservices. When the code is generated, version is locked till that point and any change made post code-generation till next code-generation is locked next version. User's can have at most 10 versions per project. Moving between versions is not yet supported.
 
-## Getting started with compage
+## Architecture
+![architecture.png](architecture.png)
+## Contributing
+You are warmly welcome to contribute to Compage.
+Please refer the detailed guide [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+## Community
+Active communication channels
+- Discord: [Discord](https://discord.gg/DeapQc22qe)
+
+## Quick start
 - Register an app - Refer [GitHub App setup](./github-app-setup.md).
 - Follow step-by-step instructions given here [Run Compage on local](./deploy/README.md).
+
+## License
+Refer the licence - [LICENCE](./LICENSE).

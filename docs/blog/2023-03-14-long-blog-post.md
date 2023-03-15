@@ -1,7 +1,7 @@
 ---
 slug: long-blog-post
 title: Long Blog Post demo
-authors: endi
+authors: mahendraintelops
 tags: [hello, docusaurus]
 ---
 
