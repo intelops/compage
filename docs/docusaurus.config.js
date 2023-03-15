@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Compage by IntelOps',
-  tagline: 'smoothens developer\'s life easy',
+  tagline: 'smoothens developer\'s workflow',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
@@ -62,17 +62,17 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      image: 'img/compage-social-card.jpg',
       navbar: {
-        title: 'Compage by IntelOps',
+        title: '',
         logo: {
           alt: 'Compage',
-          src: 'img/logo.svg',
+          src: 'img/logo.png',
         },
         items: [
           {
             type: 'doc',
-            docId: 'intro',
+            docId: 'introduction',
             position: 'left',
             label: 'Documentation',
           },
@@ -92,7 +92,7 @@ const config = {
             items: [
               {
                 label: 'Documentation',
-                to: '/docs/intro',
+                to: '/docs/introduction',
               },
             ],
           },
@@ -127,7 +127,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Compage by IntelOps, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Compage by IntelOps, Inc.`,
       },
       prism: {
         theme: lightCodeTheme,
