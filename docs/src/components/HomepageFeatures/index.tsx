@@ -14,28 +14,25 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/undraw_compage_mountain.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Compage has been created from the ground up to be easily installed, sketched the diagrams and used to get your code generated quickly.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
+    title: 'Draw the diagrams',
     Svg: require('@site/static/img/undraw_compage_tree.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+          Drag nodes and create edges between nodes as per your requirement.
       </>
     ),
   },
   {
-    title: 'Powered by React',
+    title: 'Generate code',
     Svg: require('@site/static/img/undraw_compage_react.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Skeleton projects with some standard practices will be created out of the configuration supplied.
       </>
     ),
   },

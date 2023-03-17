@@ -5,9 +5,6 @@ authors: mahendraintelops
 tags: [k8s, custom-resources, applications]
 ---
 
-Kubernetes is an open source container orchestration engine for automating deployment, scaling, and management of
-containerized applications.
-
 We have been working on an open source project which runs on K8s cluster. We had a need to persist some data, we had two
 options. Either use a full-fledged database or store the data in some files in plain text format.
 
@@ -21,12 +18,14 @@ If you are new to K8s custom-resources, please read on below link.
 The main difference between CR(custom resource) and CRD(custom resource definition) is that the CRD is a schema whereas
 CR represents a resource matching that CRD.
 
+### Setup KinD based K8s cluster 
 For this blog, let's use KinD to create a local K8s cluster. Please follow steps given on below links.
 
 - Install KinD from https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries
 - Create KinD cluster https://kind.sigs.k8s.io/docs/user/quick-start/#creating-a-cluster
 - Check if you can access the cluster created in previous step, and you are able to list down the pods.
 
+### Code walkthrough
 All the code is present [here](https://github.com/intelops/k8s-custom-resource-demo). The project consists of ExpressJS
 with typescript as a choice of language. The structure of the repository looks like below,
 
@@ -90,9 +89,10 @@ commands which work with in-built resources, the same would work with your custo
 kubectl get employee -A
 ```
 
+### Node client to K8s - @kubernetes/client-node
 To perform CRUD operations on the custom resources programmatically, we have
 used [`@kubernetes/client-node`](https://www.npmjs.com/package/@kubernetes/client-node) npm package. We have to
-initialise K8s client in the package and its done by adding below snippet in the
+initialise K8s client in the package and it's done by adding below snippet in the
 code.
 
 ```typescript
@@ -110,6 +110,7 @@ const client = kubeConfig.makeApiClient(k8s.CustomObjectsApi);
 Once the client is created using KubeConfig, we can use the methods available to perform actions on K8s resources(
 including custom resources).
 
+### Methods to perform CRUD operations on K8s custom resource
 #### To create a custom resource,
 
 ```typescript
@@ -162,7 +163,7 @@ With above client code added, it can now be invoked from http handlers. You can 
 
 Run the code cloned using below command. You can now use curl commands to create/update/read/delete custom resources.
 
-#### Create an employee
+### Create an employee
 
 - Fire below command to create an employee.
 
@@ -177,6 +178,6 @@ kubectl get employee -A
 ```
 
 Similarly, you can call other rest apis too which will retrieve the data from K8s.
-
+### Conclusion
 We saw that how we can use K8s custom resources to persist the application data when deploying a full-fledged database
 is not an option. Let us know your thoughts on this.

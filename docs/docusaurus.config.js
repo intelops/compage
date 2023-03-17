@@ -72,14 +72,20 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'introduction',
+            docId: 'overview',
             position: 'left',
             label: 'Documentation',
           },
           {to: '/blog', label: 'Blog', position: 'left'},
           {
             href: 'https://github.com/intelops/compage',
-            label: 'GitHub',
+            // label: 'GitHub',
+            className: 'pseudo-icon github-icon',
+            position: 'right',
+          },
+          {
+            href: 'https://discord.gg/DeapQc22qe',
+            className: 'pseudo-icon discord-icon',
             position: 'right',
           },
         ],
@@ -87,15 +93,6 @@ const config = {
       footer: {
         style: 'dark',
         links: [
-          {
-            title: 'Docs',
-            items: [
-              {
-                label: 'Documentation',
-                to: '/docs/introduction',
-              },
-            ],
-          },
           {
             title: 'Community',
             items: [
@@ -111,6 +108,23 @@ const config = {
                 label: 'Twitter',
                 href: 'https://twitter.com/IntelOpsAi',
               },
+              {
+                label: 'GitHub',
+                href: 'https://github.com/intelops/compage',
+              },
+            ],
+          },
+          {
+            title: 'Developers',
+            items: [
+              {
+                label: 'Getting Started',
+                to: '/docs/introduction/getting-started',
+              },
+              {
+                label: 'Contributing',
+                to: '/docs/contributing',
+              },
             ],
           },
           {
@@ -121,8 +135,8 @@ const config = {
                 to: '/blog',
               },
               {
-                label: 'GitHub',
-                href: 'https://github.com/intelops/compage',
+                label: 'IntelOps Inc.',
+                href: 'https://intelops.ai',
               },
             ],
           },
