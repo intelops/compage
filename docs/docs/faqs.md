@@ -4,44 +4,32 @@ sidebar_position: 5
 
 # FAQs
 
-Let's discover **Docusaurus in less than 5 minutes**.
+## What can Compage help me with?
 
-## Getting Started
+If you are developer and working on microservices, you might have experienced the pain of integrations with latest and
+trending technologies and tools. There are many scaffolding tools, generators in market and have different way of
+implementing same stuff. Compage will help you generate the project with the popular integrations.
 
-Get started by **creating a new site**.
+## Is Compage regularly maintained?
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+Compage is an open-source project that is actively maintained by the IntelOps team. The tool is currently in alpha state
+and will go in major breaking changes in near future. Join the [Discord server](https://discord.gg/DeapQc22qe) so you
+don't miss any updates.
 
-### What you'll need
+## How can I request a new feature?
 
-- [Node.js](https://nodejs.org/en/download/) version 16.14 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+If you would like to request a feature to be added to Compage, feel free to do so through any of the following channels:
 
-## Generate a new site
+- GitHub [issues](https://github.com/intelops/compage/issues)
+- Discord [server](https://discord.gg/DeapQc22qe) (#feature-requests channel)
+- Via [Twitter](https://twitter.com/IntelOpsAi)
 
-Generate a new Docusaurus site using the **classic template**.
+## Where can I see the upcoming features?
 
-The classic template will automatically be added to your project after you run the command:
+We will make a heavy use of GitHub issues. so if you think we should prioritize a certain feature over another, let your
+voice be heard by up-voting it, we really appreciate your input. Also, let us know if we are missing anything.
 
-```bash
-npm init docusaurus@latest my-website classic
-```
+## How can I stay in the loop with new releases?
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/overview.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+Please check  [changelog](https://github.com/intelops/compage/releases). The best way to find out about the cool
+features and improvements we've shipped in the latest releases.

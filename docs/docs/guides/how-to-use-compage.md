@@ -3,21 +3,9 @@ sidebar_position: 1
 ---
 
 # How to use Compage?
-
-You have just learned the **basics of Docusaurus** and made some changes to the **initial template**.
-
-Docusaurus has **much more to offer**!
-
-Have **5 more minutes**? Take a look at **[versioning](../more/manage-docs-versions.md)** and **[i18n](../more/translate-your-site.md)**.
-
-Anything **unclear** or **buggy** in this tutorial? [Please report it!](https://github.com/facebook/docusaurus/discussions/4610)
-
-## What's next?
-
-- Read the [official documentation](https://docusaurus.io/)
-- Modify your site configuration with [`docusaurus.config.js`](https://docusaurus.io/docs/api/docusaurus-config)
-- Add navbar and footer items with [`themeConfig`](https://docusaurus.io/docs/api/themes/configuration)
-- Add a custom [Design and Layout](https://docusaurus.io/docs/styling-layout)
-- Add a [search bar](https://docusaurus.io/docs/search)
-- Find inspirations in the [Docusaurus showcase](https://docusaurus.io/showcase)
-- Get involved in the [Docusaurus Community](https://docusaurus.io/community/support)
+End users of the Compage are developers in team. A developer as a user 
+- Logs in to the compage using his/her GitHub credentials. He/she needs to provide permissions for the Compage GitHub App to create repositories on his/her behalf, commit generated code to the repositories.
+- Selects from existing projects or creates a new project from the dialog box presented.
+A compage project has a one-to-one relationship with GitHub repository. The compage project's connected GitHub repository can contain all the generated source code for all the nodes created on drawing panel. Compage follows monorepo method, all connected microservices in single git repository.
+- Uses drawing canvas to create nodes and configure one by one using forms after double-clicking on nodes. At last, he/she saves the project and hits `Generate Code` button. The code will be generated and saved to connected GitHub repository for that project.
+- Uses same panel to add more microservices(nodes) or modify existing microservices. When the code is generated, version is locked till that point and any change made post code-generation till next code-generation is part of next version. User's can have at most 10 versions per project as of now. Moving between versions is not yet supported.
