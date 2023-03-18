@@ -1,9 +1,9 @@
 # GitHub app configuration.
 githubApp:
   # update below value cluster's node ip and with port specified here (.Values.ui.service.nodePort)
-  redirectURI: "http://www.compage.dev:32222/login"
-  clientId: "NWY4YjgyMDhmZmEwMDAzMTZkMmQ="
-  clientSecret: "YmI0MTg5YmM5MjQ2MWY4YjZhM2UzNWZjMzFhYzFhMjVmYWUwMTE0Ngo="
+  redirectURI: "http://www.mycompage.dev:32222/login"
+  clientId: "XXXXX"
+  clientSecret: "XXXXX"
 
 # TODO the below is not yet configurable. Code has direct references so, any change in below value will break the application.
 systemNamespace: compage
@@ -60,6 +60,7 @@ app:
 
   affinity: {}
 core:
+  telemetry: false
   enabled: true
   name: core
   replicaCount: 1
@@ -144,7 +145,7 @@ ui:
     #      - chart-example.local
   compageApp:
 #   update below value cluster's node ip and with port specified here (.Values.app.service.nodePort)
-    serverUrl: http://www.compage.dev:31111
+    serverUrl: http://www.mycompage.dev:31111
   podAnnotations: {}
 
   podSecurityContext: {}

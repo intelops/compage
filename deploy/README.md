@@ -33,11 +33,11 @@
    
 5. Update minikube ip in `/etc/hosts`.
    ```shell
-   $MINIKUBE_IP (retrieved by 'minikube ip' command) www.compage.dev
+   $MINIKUBE_IP (retrieved by 'minikube ip' command) www.mycompage.dev
    ```
    or on KinD cluster
    ```shell
-   $KIND_NODE_IP (retrieved by above command) www.compage.dev
+   $KIND_NODE_IP (retrieved by above command) www.mycompage.dev
    ```
    
 6. Fire below command in root directory.
@@ -52,7 +52,7 @@
    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=compage-app
    ```
    
-8. Go to  http://www.compage.dev:32222 
+8. Go to  http://www.mycompage.dev:32222 
 
 ## Different shell scripts in deploy directory.
 ### create-kind-cluster.sh

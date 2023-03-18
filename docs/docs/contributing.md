@@ -31,31 +31,6 @@ here [contributors](https://github.com/intelops/compage/blob/main/CONTRIBUTING.m
 
 - Congrats you’re officially a Compage contributor 🎊
 
-## Contributor walk-through video
-
-<div style={{
-    position: 'relative',
-    paddingBottom: '56.25%',
-    paddingTop:'30px',
-    height:0,
-    overflow:'hidden',
-  }}>
-  <iframe
-    src=''
-    allowFullScreen
-    webkitallowfullscreen="true"
-    frameBorder="0"
-    style={{
-      position: 'absolute',
-      top:0,
-      left:0,
-      width:'100%',
-      height:'100%',
-    }}
-  >
-  </iframe>
-</div>
-
 ---
 If you're in need of any assistance at any stage of your contributing journey please don't hesitate to reach out to
 anybody in the `#general` or `#feedback` discord channels, also let us know if you want to be added to the

@@ -37,8 +37,8 @@ To contribute code,
    - app (Nodejs), navigate to app directory and follow its [app README](./app/README.md)
    - ui (ReactJs), navigate to ui directory and follow its [ui README](./ui/README.md)
 10. Commit changes *([Please refer the commit message conventions](https://www.conventionalcommits.org/en/v1.0.0/))*
-11. Push commits
-12. Open pull request
+11. Push commits.
+12. Open pull request.
 
 ## Improving the Documentation
 The documentation is contained within `./docs` and made with Docusaurus. See the [Docs README](./docs/README.md) for infos about developing the docs.
