@@ -31,7 +31,7 @@ import {
   OPENAPI,
   openApiLanguageFrameworks,
 } from "./utils";
-
+import "./new-node-properties.scss";
 interface NewNodePropertiesProps {
   isOpen: boolean;
   nodeId: string;
@@ -286,8 +286,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return resourceNames;
       };
       const listItems = getResources().map((d) => (
-        <li key={d}>
-          {d}
+        <li key={d} className="flex">
+          <p className="list"> {d}</p>
           <DeleteIcon
             onClick={() => {
               handleDeleteRestResourceClick(d);
