@@ -6,6 +6,7 @@ import {
   Alert,
   FormControl,
   InputLabel,
+  ListSubheader,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -30,6 +31,29 @@ interface ModifyRestResourceProperties {
 }
 
 export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
+  // Datatypes available in Golang
+  const dataTypes = {
+    int: [
+      "int8",
+      "int16",
+      "int32",
+      "int64",
+      "uint8",
+      "uint16",
+      "uint32",
+      "uint64",
+      "int",
+      "uint",
+      "rune",
+      "byte",
+      "uintptr",
+    ],
+    float: ["float32", "float64 "],
+    complex: ["complex64", "complex128"],
+    bool: ["bool"],
+    string: ["string"],
+  };
+
   const [data, setData] = useState({
     name: props.resource?.name || "",
     fields: JSON.stringify(props.resource?.fields) || "",
@@ -103,7 +127,6 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
     if (reason === "clickaway") {
       return;
     }
-
     setAlert(false);
   };
 
@@ -146,6 +169,9 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
   const handleSelectField = (event: SelectChangeEvent) => {
     setFieldValue(event.target.value);
   };
+
+  console.log(data.fields, fieldValue);
+
   return (
     <React.Fragment>
       <Dialog open={props.isOpen} onClose={onClose}>
@@ -195,30 +221,29 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
                       }}
                       variant="outlined"
                     />
-                    <FormControl
-                      // size="medium"
-                      // variant="outlined"
-                      sx={{ m: 1, minWidth: 120 }}
-                      // fullWidth
-                    >
+                    <FormControl sx={{ m: 1, minWidth: 120 }}>
                       <InputLabel id="demo-simple-select-filled-label">
                         Data Type
                       </InputLabel>
                       <Select
+                        native
                         labelId="demo-simple-select-filled-label"
-                        id="demo-simple-select-filled"
-                        value={
-                          field.fieldValue === ""
-                            ? fieldValue
-                            : field.fieldValue
-                        }
+                        id="grouped-select"
                         label="Data Type"
                         onChange={handleSelectField}
                       >
-                        <MenuItem value={"int"}>int</MenuItem>
-                        <MenuItem value={"bool"}>bool</MenuItem>
-                        <MenuItem value={"string"}>string</MenuItem>
-                        <MenuItem value={"float32"}>float32</MenuItem>
+                        <option aria-label="None" value="" disabled hidden />
+                        {Object.keys(dataTypes).map((dt, k) => {
+                          return (
+                            <optgroup label={dt} key={k}>
+                              {dataTypes[dt].map((type: string, i: number) => (
+                                <option value={type} key={k + i}>
+                                  {type}
+                                </option>
+                              ))}
+                            </optgroup>
+                          );
+                        })}
                       </Select>
                     </FormControl>
                     <Button
