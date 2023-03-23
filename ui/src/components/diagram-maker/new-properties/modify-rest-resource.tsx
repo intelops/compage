@@ -228,6 +228,7 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
                       <Select
                         native
                         labelId="demo-simple-select-filled-label"
+                        defaultValue=""
                         id="grouped-select"
                         label="Data Type"
                         onChange={handleSelectField}
