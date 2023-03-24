@@ -5,5 +5,8 @@
 
 #### How to run this component?
 - Navigate to core directory [cd app] from root directory of compage.
+- Fire below set of commands in sequence to initialize the git submodules.
+    -- `git submodule init`
+    -- `git submodule update --remote`
 - Fire `go mod tidy` to install the dependencies.
 - Run command `go run main.go` to start the gRPC server.
