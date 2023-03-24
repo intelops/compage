@@ -48,7 +48,7 @@ export interface UserResourceSpec {
 
 export interface OldVersion {
     version: string;
-    json: {};
+    json: string;
 }
 
 export interface ProjectResourceSpec {

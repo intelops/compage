@@ -70,7 +70,7 @@ projectsRouter.put("/:id", requireUserNameMiddleware, async (request: Request, r
     const projectEntity: ProjectEntity = request.body;
     const updatedProjectEntity = await updateProject(projectId, <string>userName, projectEntity);
     if (updatedProjectEntity.id.length !== 0) {
-        // update github with .compage/config.json
+        // update GitHub with .compage/config.json
         return await updateToGithub(updatedProjectEntity, response);
     }
     // TODO this is coming null [not a compulsory field]
