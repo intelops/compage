@@ -3,7 +3,7 @@ import {Request, Response, Router} from "express";
 import {X_USER_NAME_HEADER} from "../util/constants";
 import multer from "../middlewares/multer";
 import * as fs from "fs";
-import {CompageNode, ProjectEntity, UploadYamlError, UploadYamlRequest, UploadYamlResponse} from "./models";
+import {ProjectEntity, UploadYamlError, UploadYamlRequest, UploadYamlResponse} from "./models";
 import {getProject} from "../util/project-store";
 
 const openApiYamlRouter = Router();

@@ -55,7 +55,7 @@ projectsRouter.post("/", requireUserNameMiddleware, async (request: Request, res
     const projectEntity: ProjectEntity = request.body;
     const savedProjectEntity: ProjectEntity = await createProject(<string>userName, projectEntity);
     if (savedProjectEntity.id.length !== 0) {
-        // create repository on github and .compage/config.json file/
+        // create repository on GitHub and .compage/config.json file/
         return await createOnGithub(savedProjectEntity, response)
     }
     const message = `${savedProjectEntity.displayName}[${savedProjectEntity.id}] project couldn't be created.`;

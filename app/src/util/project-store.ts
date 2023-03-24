@@ -184,9 +184,6 @@ export const updateProject = async (projectId: string, userName: string, project
         if (projectEntity.metadata) {
             existingProjectResource.spec.metadata = JSON.stringify(projectEntity.metadata);
         }
-        if (projectEntity.version) {
-            existingProjectResource.spec.version = projectEntity.version;
-        }
         existingProjectResource.spec.id = projectId;
         existingProjectResource.spec.json = JSON.stringify(projectEntity.json);
 
