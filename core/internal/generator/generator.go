@@ -71,12 +71,12 @@ func Generator(coreProject *core.Project) error {
 					return err
 				}
 				// generate code by openapi.yaml
-				err = RunOpenApiGenerator("generate", "-i", fileName, "-g", strings.ToLower(languageNode.RestConfig.Server.Framework), "-o", nodeDirectoryName, "--git-user-id", coreProject.UserName, "--git-repo-id", coreProject.RepositoryName)
+				err = RunOpenApiGenerator("generate", "-i", fileName, "-g", strings.ToLower(languageNode.RestConfig.Server.Framework), "-o", nodeDirectoryName, "--git-user-id", coreProject.UserName, "--git-repo-id", coreProject.RepositoryName+"/"+compageNode.ConsumerData.Name)
 				if err != nil {
 					return errors.New("something happened while running openApi generator")
 				}
 				// generate documentation for the code
-				err = RunOpenApiGenerator("generate", "-i", fileName, "-g", "dynamic-html", "-o", nodeDirectoryName+"/gen/docs", "--git-user-id", coreProject.UserName, "--git-repo-id", coreProject.RepositoryName)
+				err = RunOpenApiGenerator("generate", "-i", fileName, "-g", "dynamic-html", "-o", nodeDirectoryName+"/gen/docs", "--git-user-id", coreProject.UserName, "--git-repo-id", coreProject.RepositoryName+"/"+compageNode.ConsumerData.Name)
 				if err != nil {
 					return errors.New("something happened while running openApi generator for documentation.")
 				}
