@@ -479,7 +479,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
 
     const onClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
         // this prevents dialog box from closing.
-        if (reason === "backdropClick") {
+        if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
         }
         props.onClose();
