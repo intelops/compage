@@ -37,10 +37,19 @@ export const GenerateCode = () => {
             if (!name) {
                 return true;
             }
-            const serverTypes = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.serverTypes;
-            if (!serverTypes || serverTypes === "" || serverTypes === "[]") {
+            const restServerType = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.restServerType;
+            if (!restServerType || restServerType === "" || restServerType === "{}") {
                 return true;
             }
+            // TODO check later
+            // const wsServerType = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.wsServerType;
+            // if (!wsServerType || wsServerType === "" || wsServerType === "{}") {
+            //     return true;
+            // }
+            // const grpcServerType = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.grpcServerType;
+            // if (!grpcServerType || grpcServerType === "" || grpcServerType === "{}") {
+            //     return true;
+            // }
         }
         // edges
         for (let key in removeUnwantedKeysGetCurrentState?.edges) {

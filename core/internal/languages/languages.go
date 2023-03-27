@@ -136,34 +136,29 @@ func NewLanguageNode(compageJson *core.CompageJson, node *node.Node) (*LanguageN
 // GetServersForNode retrieves all servers for given node
 func GetServersForNode(nodeP *node.Node) (*Servers, error) {
 	servers := &Servers{}
-	// check if the node is server
-	if nodeP.ConsumerData.ServerTypes != nil {
+	// check if the node is REST server
+	if nodeP.ConsumerData.RestServerType != nil {
 		// retrieve Rest server config and store in below variable
 		var restServer *RestServer
-		// iterate over the serverTypes. Protocol in serverType decides server's type.
-		for _, serverType := range nodeP.ConsumerData.ServerTypes {
-			serverProtocol := serverType.Protocol
-			if serverProtocol == core.Rest {
-				restServer = &RestServer{
-					Framework: serverType.Framework,
-					Port:      serverType.Port,
-				}
-				// set resources or openApiFileYamlContent based on availability.
-				if serverType.Resources != nil && len(serverType.Resources) > 0 {
-					restServer.Resources = serverType.Resources
-				} else if len(serverType.OpenApiFileYamlContent) > 0 {
-					restServer.OpenApiFileYamlContent = serverType.OpenApiFileYamlContent
-				}
-				(*servers)[core.Rest] = restServer
-				return servers, nil
-			} else if serverProtocol == core.Grpc {
-				return nil, fmt.Errorf("unsupported serverProtocol %s for language : %s", serverProtocol,
-					nodeP.ConsumerData.Language)
-			} else if serverProtocol == core.Ws {
-				return nil, fmt.Errorf("unsupported serverProtocol %s for language : %s", serverProtocol,
-					nodeP.ConsumerData.Language)
-			}
+		restServer = &RestServer{
+			Framework: nodeP.ConsumerData.RestServerType.Framework,
+			Port:      nodeP.ConsumerData.RestServerType.Port,
 		}
+		// set resources or openApiFileYamlContent based on availability.
+		if nodeP.ConsumerData.RestServerType.Resources != nil && len(nodeP.ConsumerData.RestServerType.Resources) > 0 {
+			restServer.Resources = nodeP.ConsumerData.RestServerType.Resources
+		} else if len(nodeP.ConsumerData.RestServerType.OpenApiFileYamlContent) > 0 {
+			restServer.OpenApiFileYamlContent = nodeP.ConsumerData.RestServerType.OpenApiFileYamlContent
+		}
+		(*servers)[core.Rest] = restServer
+	}
+	if nodeP.ConsumerData.GrpcServerType != nil {
+		// catch gRPC server details here
+		// TODO
+	}
+	if nodeP.ConsumerData.WsServerType != nil {
+		// catch Ws server details here
+		// TODO
 	}
 	// empty servers as no server config received in compageJson.
 	return servers, nil

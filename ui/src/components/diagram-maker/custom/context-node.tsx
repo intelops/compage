@@ -15,8 +15,12 @@ export const ContextNode = (props: ContextNodeProps) => {
         language: parsedModifiedState.nodes[props.id]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.id].consumerData.language : "",
         isServer: parsedModifiedState.nodes[props.id]?.consumerData.isServer !== undefined ? parsedModifiedState.nodes[props.id].consumerData.isServer : false,
         template: parsedModifiedState.nodes[props.id]?.consumerData.template !== undefined ? parsedModifiedState.nodes[props.id].consumerData.template : false,
-        // serverTypes to be generated
-        serverTypes: parsedModifiedState.nodes[props.id]?.consumerData.serverTypes !== undefined ? parsedModifiedState.nodes[props.id].consumerData.serverTypes : [],
+        // restServerType to be generated
+        restServerType: parsedModifiedState.nodes[props.id]?.consumerData.restServerType !== undefined ? parsedModifiedState.nodes[props.id].consumerData.restServerType : {},
+        // grpcServerType to be generated
+        grpcServerType: parsedModifiedState.nodes[props.id]?.consumerData.grpcServerType !== undefined ? parsedModifiedState.nodes[props.id].consumerData.grpcServerType : {},
+        // wsServerType to be generated
+        wsServerType: parsedModifiedState.nodes[props.id]?.consumerData.wsServerType !== undefined ? parsedModifiedState.nodes[props.id].consumerData.wsServerType : {},
         url: parsedModifiedState?.nodes[props.id]?.consumerData.url !== undefined ? parsedModifiedState.nodes[props.id].consumerData.url : "",
     });
 
@@ -49,15 +53,6 @@ export const ContextNode = (props: ContextNodeProps) => {
         return <><strong>Template</strong>: {payload.template}</>;
     };
 
-    const getServerTypes = () => {
-        let result = "<>";
-        for (let i = 0; i < payload.serverTypes.length; i++) {
-            result += JSON.stringify(payload.serverTypes[i]);
-        }
-        result += "</>";
-        return result;
-    };
-
     return <React.Fragment>
         <div className="contextMenu">
             <strong> Node </strong>: {props.id}
@@ -70,11 +65,6 @@ export const ContextNode = (props: ContextNodeProps) => {
             <br/>
             {getTemplate()}
             <br/>
-            {/*{getServerTypes()}*/}
-            {/*<br/>*/}
-            {/*{getIsServer()}*/}
-            {/*<br/>*/}
-            {/*{getIsClient()}*/}
         </div>
     </React.Fragment>;
 };

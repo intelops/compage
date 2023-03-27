@@ -4,18 +4,31 @@ export interface Resource {
     fields: Map<string, Map<string, string>>;
 }
 
-export interface ServerType {
-    protocol: string;
+interface RestServerType {
     port: string;
-    framework: string
-    resources: Resource[];
-    openApiFileYamlContent: string;
+    framework?: string
+    resources?: Resource[];
+    openApiFileYamlContent?: string;
+}
+
+export interface GrpcServerType {
+    port: string;
+    framework?: string
+    resources?: Resource[];
+    protoFileContent?: string;
+}
+
+export interface WsServerType {
+    port: string;
+    framework?: string
+    resources?: Resource[];
 }
 
 export interface NodeConsumerData {
     name: string;
     template: string;
-    serverTypes: ServerType[];
+    restServerType: RestServerType;
+    grpcServerType: GrpcServerType;
     language: string;
     metadata?: Map<string, string>;
     annotations?: Map<string, string>;
