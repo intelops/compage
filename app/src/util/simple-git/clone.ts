@@ -1,5 +1,6 @@
 import {simpleGit, SimpleGit, SimpleGitOptions} from "simple-git";
 import {Repository} from "../../routes/models";
+import Logger from "../logger";
 
 export interface CloneExistingProjectFromGitServerRequest {
     clonedProjectPath: string,
@@ -21,14 +22,14 @@ export const cloneExistingProjectFromGitServer = async (cloneExistingProjectFrom
 
     // Set up GitServer url like this so no manual entry of user pass needed
     const gitServerUrl = `https://${cloneExistingProjectFromGitServerRequest.userName}:${cloneExistingProjectFromGitServerRequest.password}@github.com/${cloneExistingProjectFromGitServerRequest.userName}/${cloneExistingProjectFromGitServerRequest.repository.name}.git`;
-    let error: string = ""
+    let error: string = "";
     // clone git repository
     await git.clone(gitServerUrl).then(
         (success: any) => {
-            console.debug("git clone succeeded");
+            Logger.debug("git clone succeeded");
         }, (failure: any) => {
-            console.debug('git clone failed : ', failure);
-            error = "git clone failed" + failure
+            Logger.debug('git clone failed : ', failure);
+            error = "git clone failed" + failure;
         });
-    return error
+    return error;
 }

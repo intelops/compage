@@ -6,13 +6,14 @@ import {
     pushToExistingProjectOnGitServer,
     PushToExistingProjectOnGitServerRequest
 } from "../util/simple-git/existing-project";
-import {getToken} from "../util/user-store";
+import {getToken} from "../util/user-client";
 import {cloneExistingProjectFromGitServer, CloneExistingProjectFromGitServerRequest} from "../util/simple-git/clone";
 import {GenerateCodeError, GenerateCodeRequest, GenerateCodeResponse, Project} from "./models";
 import {requireUserNameMiddleware} from "../middlewares/auth";
-import {getProjectResource, patchProjectResource} from "../store/project-client";
+import {getProjectResource, patchProjectResource} from "../store/project-store";
 import {NAMESPACE, X_USER_NAME_HEADER} from "../util/constants";
 import {OldVersion} from "../store/models";
+import Logger from "../util/logger";
 
 const rimraf = require("rimraf");
 const tar = require('tar')
@@ -38,7 +39,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
     const cleanup = (downloadedProjectPath: string) => {
         // remove directory created, delete directory recursively
         rimraf(downloadedProjectPath).then((result: any) => {
-            console.debug(`${downloadedProjectPath} is cleaned up`);
+            Logger.debug(`${downloadedProjectPath} is cleaned up`);
         });
     }
 
@@ -110,7 +111,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
         // chunk is available, append it to the given path.
         if (response.fileChunk) {
             fs.appendFileSync(projectTarFilePath, response.fileChunk);
-            console.debug(`writing tar file chunk to: ${projectTarFilePath}`);
+            Logger.debug(`writing tar file chunk to: ${projectTarFilePath}`);
         }
     });
 
@@ -131,7 +132,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
         // stream on extraction on tar file
         let fscrs = fs.createReadStream(projectTarFilePath)
         fscrs.on('error', function (err: any) {
-            console.log(JSON.stringify(err))
+            Logger.error(JSON.stringify(err))
         });
         fscrs.pipe(extract)
 
@@ -172,7 +173,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
                 return resource.status(500).json(getGenerateCodeError(message));
             }
 
-            console.log(`saved ${downloadedProjectPath} to github.`)
+            Logger.debug(`saved ${downloadedProjectPath} to github.`)
             cleanup(downloadedProjectPath);
 
             // update status in k8s
@@ -248,7 +249,7 @@ const removeUnwantedKeys = (state: string) => {
     const isObject = (obj: any) => {
         return obj.constructor === Object;
     };
-    console.log(state)
+    Logger.debug(state)
     let stateJson;
     if (!isObject(state)) {
         stateJson = JSON.parse(state);

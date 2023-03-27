@@ -1,4 +1,4 @@
-import {createUserResource, getUserResource, patchUserResource} from "../store/user-client";
+import {createUserResource, getUserResource, patchUserResource} from "../store/user-store";
 import {user_group, user_kind, user_version, UserResource, UserResourceSpec} from "../store/models";
 
 const NAMESPACE = "compage";

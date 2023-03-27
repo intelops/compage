@@ -2,6 +2,7 @@ import * as k8s from "@kubernetes/client-node";
 
 import {client} from "../app";
 import {Resource, ResourceList} from "./models";
+import Logger from "../util/logger";
 
 export const initializeKubeClient = () => {
     const kubeConfig = new k8s.KubeConfig();
@@ -28,8 +29,8 @@ export const deleteObject = async ({
             name
         );
     } catch (e: any) {
-        console.debug("error while deleting custom object : ", e?.body)
-        // console.log("error while getting custom object : ", e?.body?.reason)
+        Logger.debug("error while deleting custom object : ", e?.body)
+        // Logger.info("error while getting custom object : ", e?.body?.reason)
     }
 }
 
@@ -50,8 +51,8 @@ export const getObject = async ({
         const resource: Resource = JSON.parse(JSON.stringify(object.body))
         return resource
     } catch (e: any) {
-        console.debug("error while getting custom object : ", e?.body)
-        // console.log("error while getting custom object : ", e?.body?.reason)
+        Logger.debug("error while getting custom object : ", e?.body)
+        // Logger.info("error while getting custom object : ", e?.body?.reason)
         const resource: Resource = {apiVersion: "", kind: "", metadata: undefined, spec: undefined}
         return resource
     }
@@ -76,8 +77,8 @@ export const patchObject = async ({
         const resource: Resource = JSON.parse(JSON.stringify(object.body))
         return resource
     } catch (e: any) {
-        console.debug("error while patching custom object : ", e?.body)
-        // console.log("error while patching custom object : ", e?.body?.reason)
+        Logger.debug("error while patching custom object : ", e?.body)
+        // Logger.info("error while patching custom object : ", e?.body?.reason)
         const resource: Resource = {apiVersion: "", kind: "", metadata: undefined, spec: undefined}
         return resource
     }
@@ -100,8 +101,8 @@ export const createObject = async ({
         const resource: Resource = JSON.parse(JSON.stringify(object.body))
         return resource
     } catch (e: any) {
-        console.debug("error while creating custom object : ", e)
-        // console.log("error while creating custom object : ", e?.body?.reason)
+        Logger.debug("error while creating custom object : ", e)
+        // Logger.info("error while creating custom object : ", e?.body?.reason)
         const resource: Resource = {apiVersion: "", kind: "", metadata: undefined, spec: undefined}
         return resource
     }
@@ -130,8 +131,8 @@ export const listObjects = async ({
             const resources: ResourceList = JSON.parse(JSON.stringify(object.body))
             return resources
         } catch (e: any) {
-            console.debug("error while listing custom object : ", e?.body)
-            // console.log("error while listing custom object : ", e?.body?.reason)
+            Logger.debug("error while listing custom object : ", e?.body)
+            // Logger.info("error while listing custom object : ", e?.body?.reason)
             const resources: ResourceList = {apiVersion: "", items: [], kind: "", metadata: undefined}
             return resources
         }
@@ -146,8 +147,8 @@ export const listObjects = async ({
             const resources: ResourceList = JSON.parse(JSON.stringify(object.body))
             return resources
         } catch (e: any) {
-            console.debug("error while listing custom object : ", e?.body)
-            // console.log("error while listing custom object : ", e?.body?.reason)
+            Logger.debug("error while listing custom object : ", e?.body)
+            // Logger.info("error while listing custom object : ", e?.body?.reason)
             const resources: ResourceList = {apiVersion: "", items: [], kind: "", metadata: undefined}
             return resources
         }

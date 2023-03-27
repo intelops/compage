@@ -8,7 +8,8 @@ import {
     getProjectResource,
     listProjectResources,
     patchProjectResource
-} from "../store/project-client";
+} from "../store/project-store";
+import Logger from "./logger";
 
 // convertProjectEntityToProjectResourceSpec creates projectResourceSpec on k8s cluster.
 const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: string, projectEntity: ProjectEntity) => {
@@ -91,7 +92,7 @@ export const deleteProject = async (userName: string, projectId: string) => {
 // getProject returns project for userName and projectId supplied
 export const getProject = async (userName: string, projectId: string) => {
     // TODO I may need to apply labelSelector here - below impl is done temporarily.
-    // currently added filter post projects retrieval(which can be slower if there are too many projects with same name.
+    // currently added filter post projects retrieval(It can be slower if there are too many projects with same name.)
     const projectResource = await getProjectResource(NAMESPACE, projectId);
     if (projectResource?.metadata?.labels?.userName === userName) {
         return convertProjectResourceToProjectEntity(projectResource)
@@ -190,7 +191,8 @@ export const updateProject = async (projectId: string, userName: string, project
         // send spec only as the called method considers updating specs only.
         // existingProjectResource.metadata.name = projectId here
         const patchedProjectResource = await patchProjectResource(NAMESPACE, existingProjectResource.metadata.name, JSON.stringify(existingProjectResource.spec));
-        console.log(patchedProjectResource);
+        Logger.debug(patchedProjectResource);
+
         if (patchedProjectResource.apiVersion) {
             return convertProjectResourceToProjectEntity(patchedProjectResource);
         }

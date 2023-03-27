@@ -1,5 +1,5 @@
 import axios from "axios";
-import {getToken} from "../util/user-store";
+import {getToken} from "./user-client";
 
 const ACCEPT = `application/vnd.github+json`;
 const USER_REPO_URL = `https://api.github.com/user/repos`;
