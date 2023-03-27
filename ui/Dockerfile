@@ -1,5 +1,5 @@
 # build environment
-FROM node:18.12-alpine as builder
+FROM node:18.15-alpine as builder
 WORKDIR /app
 COPY . .
 RUN npm install -g npm@latest && npm install --production=false
