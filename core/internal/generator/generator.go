@@ -52,8 +52,6 @@ func Generator(coreProject *core.Project) error {
 				if err != nil {
 					return err
 				}
-			} else if compageNode.ConsumerData.Language == languages.NodeJs {
-				return errors.New("unsupported language : " + languages.NodeJs)
 			} else {
 				return errors.New("unsupported language : " + compageNode.ConsumerData.Language)
 			}

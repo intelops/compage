@@ -32,7 +32,7 @@ export interface ClientType {
 }
 
 export interface EdgeConsumerData {
-    externalNodeName: string;
+    externalNode: string;
     clientTypes: ClientType[];
     metadata: Map<string, string>;
     annotations: Map<string, string>;

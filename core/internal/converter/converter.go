@@ -89,8 +89,8 @@ func validate(compageJson *core.CompageJson) error {
 		}
 	}
 	for _, e := range compageJson.Edges {
-		if e.ConsumerData.ExternalNodeName == "" {
-			return fmt.Errorf("externalNodeName should not be empty")
+		if e.ConsumerData.ExternalNode == "" {
+			return fmt.Errorf("externalNode should not be empty")
 		}
 	}
 	// no need to populate port in individual edge as we need to have that validation on ui itself.
@@ -102,8 +102,8 @@ func validate(compageJson *core.CompageJson) error {
 
 func populateExternalNodeInEdges(compageJson *core.CompageJson) *core.CompageJson {
 	for _, edge := range compageJson.Edges {
-		if edge.ConsumerData.ExternalNodeName == "" {
-			edge.ConsumerData.ExternalNodeName, edge.ConsumerData.OpenApiFileYamlContent = getExternalNodeAndOpenApiFileYamlContentForEdge(edge.Src, compageJson.Nodes)
+		if edge.ConsumerData.ExternalNode == "" {
+			edge.ConsumerData.ExternalNode, edge.ConsumerData.OpenApiFileYamlContent = getExternalNodeAndOpenApiFileYamlContentForEdge(edge.Src, compageJson.Nodes)
 		}
 	}
 	return compageJson
@@ -112,6 +112,9 @@ func populateExternalNodeInEdges(compageJson *core.CompageJson) *core.CompageJso
 func getExternalNodeAndOpenApiFileYamlContentForEdge(src string, nodes []*node.Node) (string, string) {
 	for _, n := range nodes {
 		if src == n.ID {
+			//for _, serverType := range n.ConsumerData.ServerTypes {
+			//	serverType.OpenApiFileYamlContent
+			//}
 			//TODO below need to be replaced (n.ConsumerData.OpenApiFileYamlContent)
 			return n.ConsumerData.Name, ""
 		}

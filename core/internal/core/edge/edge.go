@@ -13,7 +13,7 @@ type ConsumerData struct {
 	ClientTypes            []ClientType           `json:"clientTypes,omitempty"`
 	Metadata               map[string]interface{} `json:"metadata,omitempty"`
 	Annotations            map[string]string      `json:"annotations,omitempty"`
-	ExternalNodeName       string                 `json:"externalNodeName,omitempty"`
+	ExternalNode           string                 `json:"externalNode,omitempty"`
 	OpenApiFileYamlContent string                 `json:"openApiFileYamlContent,omitempty"`
 }
 

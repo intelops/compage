@@ -8,7 +8,6 @@ import (
 )
 
 const Go = "go"
-const NodeJs = "nodejs"
 const Compage string = "compage"
 const OpenApi string = "openApi"
 
@@ -126,7 +125,7 @@ func NewLanguageNode(compageJson *core.CompageJson, node *node.Node) (*LanguageN
 				client.Framework = languageNode.RestConfig.Server.Framework
 			} else {
 				// default rest client code based on below framework.
-				client.Framework = "go-gin"
+				client.Framework = "go-gin-server"
 			}
 		}
 	}
@@ -182,7 +181,7 @@ func GetClientsForNode(edges []*edge.Edge, nodeP *node.Node) (*Clients, error) {
 						Protocol: clientType.Protocol,
 						Port:     clientType.Port,
 						// TODO refer node's name here instead of id.
-						ExternalNode: e.ConsumerData.ExternalNodeName,
+						ExternalNode: e.ConsumerData.ExternalNode,
 					})
 					// only one rest client config for a given edge.
 					break
