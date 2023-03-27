@@ -458,7 +458,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     if (isCompageTemplate(payload.template)) {
         languages = ["go"];
     } else {
-        languages = ["go", "javascript", "java", "ruby", "python"];
+        languages = ["go", "javascript", "java", "ruby", "python", "rust"];
     }
     const handleModifyRestResourceClick = (resource: Resource) => {
         const restServerConfig = payload.restServerConfig;
