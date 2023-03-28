@@ -36,13 +36,12 @@ interface ServerTypesConfig {
     wsServerConfig?: WsServerConfig;
 }
 
-// TODO incomplete impl below
 const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig => {
     const restServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.restServerConfig;
     const grpcServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.grpcServerConfig;
     const wsServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.wsServerConfig;
     const serverTypesConfig: ServerTypesConfig = {};
-    if (restServerConfig && restServerConfig !== "{}") {
+    if (restServerConfig && restServerConfig !== "{}" && Object.keys(restServerConfig).length > 0) {
         serverTypesConfig.isRestServer = true;
         serverTypesConfig.restServerConfig = {
             framework: restServerConfig.framework,
@@ -51,7 +50,7 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
             resources: restServerConfig.resources
         };
     }
-    if (grpcServerConfig && grpcServerConfig !== "{}") {
+    if (grpcServerConfig && grpcServerConfig !== "{}" && Object.keys(grpcServerConfig).length > 0) {
         serverTypesConfig.isGrpcServer = true;
         serverTypesConfig.grpcServerConfig = {
             framework: grpcServerConfig.framework,
@@ -60,7 +59,7 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
             resources: grpcServerConfig.resources
         };
     }
-    if (wsServerConfig && wsServerConfig !== "{}") {
+    if (wsServerConfig && wsServerConfig !== "{}" && Object.keys(wsServerConfig).length > 0) {
         serverTypesConfig.isWsServer = true;
         serverTypesConfig.wsServerConfig = {
             framework: wsServerConfig.framework,
@@ -117,7 +116,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         if (payload.isRestServer) {
             restServerConfig = {
                 framework: payload.restServerConfig.framework,
-                port: payload.restServerConfig.port,
+                port: payload.restServerConfig.port || "8080",
             };
             if (isCompageTemplate(payload.template)) {
                 restServerConfig.resources = payload.restServerConfig.resources;
