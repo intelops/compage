@@ -73,7 +73,7 @@ func GetCompageJson(jsonString string) (*core.CompageJson, error) {
 // validate validates edges and nodes in compage json.
 func validate(compageJson *core.CompageJson) error {
 	// validations on node fields and setting default values.
-	compageJson = populateExternalNodeInEdges(compageJson)
+	compageJson = populateExternalNodeInfoInEdges(compageJson)
 	for _, n := range compageJson.Nodes {
 		// name can't be empty for node
 		if n.ConsumerData.Name == "" {
@@ -100,26 +100,49 @@ func validate(compageJson *core.CompageJson) error {
 	return nil
 }
 
-func populateExternalNodeInEdges(compageJson *core.CompageJson) *core.CompageJson {
+func populateExternalNodeInfoInEdges(compageJson *core.CompageJson) *core.CompageJson {
 	for _, edge := range compageJson.Edges {
 		if edge.ConsumerData.ExternalNode == "" {
-			edge.ConsumerData.ExternalNode, edge.ConsumerData.OpenApiFileYamlContent = getExternalNodeAndOpenApiFileYamlContentForEdge(edge.Src, compageJson.Nodes)
+			// extract externalNode (src for the edge)
+			edge.ConsumerData.ExternalNode = getExternalNodeForEdge(edge.Src, compageJson.Nodes)
+		}
+		if edge.ConsumerData.RestClientConfig != nil {
+			// extract OpenApiFileYamlContent for rest server in src
+			edge.ConsumerData.RestClientConfig.OpenApiFileYamlContent = getOpenApiFileYamlContentForEdge(edge.Src, compageJson.Nodes)
+		}
+		if edge.ConsumerData.GrpcClientConfig != nil {
+			// extract ProtoFileContent for rest server in src
+			edge.ConsumerData.GrpcClientConfig.ProtoFileContent = getProtoFileContentForEdge(edge.Src, compageJson.Nodes)
 		}
 	}
 	return compageJson
 }
 
-func getExternalNodeAndOpenApiFileYamlContentForEdge(src string, nodes []*node.Node) (string, string) {
+func getExternalNodeForEdge(src string, nodes []*node.Node) string {
 	for _, n := range nodes {
 		if src == n.ID {
-			//for _, serverType := range n.ConsumerData.ServerTypes {
-			//	serverType.OpenApiFileYamlContent
-			//}
-			//TODO below need to be replaced (n.ConsumerData.OpenApiFileYamlContent)
-			return n.ConsumerData.Name, ""
+			return n.ConsumerData.Name
 		}
 	}
-	return "", ""
+	return ""
+}
+
+func getProtoFileContentForEdge(src string, nodes []*node.Node) string {
+	for _, n := range nodes {
+		if src == n.ID {
+			return n.ConsumerData.GrpcServerConfig.ProtoFileContent
+		}
+	}
+	return ""
+}
+
+func getOpenApiFileYamlContentForEdge(src string, nodes []*node.Node) string {
+	for _, n := range nodes {
+		if src == n.ID {
+			return n.ConsumerData.RestServerConfig.OpenApiFileYamlContent
+		}
+	}
+	return ""
 }
 
 // GetMetadata converts string to map

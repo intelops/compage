@@ -10,23 +10,25 @@ type Edge struct {
 
 // ConsumerData has detailed attributes of an edge
 type ConsumerData struct {
-	RestClientConfig       *RestClientConfig      `json:"restClientConfig,omitempty"`
-	GrpcClientConfig       *GrpcClientConfig      `json:"grpcClientConfig,omitempty"`
-	WsClientConfig         *WsClientConfig        `json:"wsClientConfig,omitempty"`
-	Metadata               map[string]interface{} `json:"metadata,omitempty"`
-	Annotations            map[string]string      `json:"annotations,omitempty"`
-	ExternalNode           string                 `json:"externalNode,omitempty"`
-	OpenApiFileYamlContent string                 `json:"openApiFileYamlContent,omitempty"`
+	RestClientConfig *RestClientConfig      `json:"restClientConfig,omitempty"`
+	GrpcClientConfig *GrpcClientConfig      `json:"grpcClientConfig,omitempty"`
+	WsClientConfig   *WsClientConfig        `json:"wsClientConfig,omitempty"`
+	Metadata         map[string]interface{} `json:"metadata,omitempty"`
+	Annotations      map[string]string      `json:"annotations,omitempty"`
+	ExternalNode     string                 `json:"externalNode,omitempty"`
 }
 
 // RestClientConfig holds information for an edge for rest protocol.
 type RestClientConfig struct {
-	Port string `json:"port"`
+	Port                   string `json:"port"`
+	OpenApiFileYamlContent string `json:"openApiFileYamlContent,omitempty"`
 }
 
 // GrpcClientConfig holds information for an edge for grpc protocol.
 type GrpcClientConfig struct {
 	Port string `json:"port"`
+	// ProtoFileContent holds protoFileContent
+	ProtoFileContent string `json:"protoFileContent,omitempty"`
 }
 
 // WsClientConfig holds information for an edge for ws protocol.
