@@ -90,6 +90,6 @@ export const Home = () => {
 
     return <React.Fragment>
         {getContent()}
-        <DiagramMakerContainer initialData={getDiagramData()} darkTheme={false}/>
+        <DiagramMakerContainer initialData={getDiagramData()} darkTheme={true}/>
     </React.Fragment>;
 };

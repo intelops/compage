@@ -3,6 +3,7 @@ module github.com/intelops/compage/core
 go 1.20
 
 require (
+	github.com/gertd/go-pluralize v0.2.1
 	github.com/gin-gonic/gin v1.9.0
 	github.com/sirupsen/logrus v1.9.0
 	golang.org/x/exp v0.0.0-20221019170559-20944726eadf

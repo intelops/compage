@@ -44,8 +44,6 @@ func Generator(coreProject *core.Project) error {
 				// trigger template runner
 				// create data map with values from LanguageNode and project to replace placeholders  - this is required as the
 				// names may be conflicting in nature
-				// TODO
-				// format the go code.
 				values := ctx.Value(languages.ContextVars).(languages.Values)
 				nodeDirectoryName := values.NodeDirectoryName
 				err := RunGoFmt(nodeDirectoryName)
