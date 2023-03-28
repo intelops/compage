@@ -57,8 +57,9 @@ export const GenerateCode = () => {
             if (!name) {
                 return true;
             }
-            const clientTypes = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData?.clientTypes;
-            if (!clientTypes || clientTypes === "" || clientTypes === "[]") {
+            // rest, similar checks need to be added below for grpc and ws.
+            const restClientConfig = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData?.restClientConfig;
+            if (!restClientConfig || restClientConfig === "" || restClientConfig === "{}") {
                 return true;
             }
         }

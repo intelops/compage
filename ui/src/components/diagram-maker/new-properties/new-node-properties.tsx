@@ -42,7 +42,6 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
     const grpcServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.grpcServerConfig;
     const wsServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.wsServerConfig;
     const serverTypesConfig: ServerTypesConfig = {};
-    debugger
     if (restServerConfig && restServerConfig !== "{}") {
         serverTypesConfig.isRestServer = true;
         serverTypesConfig.restServerConfig = {

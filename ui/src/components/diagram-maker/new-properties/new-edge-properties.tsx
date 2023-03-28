@@ -9,7 +9,7 @@ import {getCurrentConfig, setModifiedState} from "../../../utils/localstorage-cl
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
-import {Grpc, Rest, Ws} from "../models";
+import {GrpcClientConfig, RestClientConfig, WsClientConfig} from "../models";
 
 interface NewEdgePropertiesProps {
     isOpen: boolean;
@@ -27,22 +27,26 @@ interface ClientTypesConfig {
 }
 
 const getClientTypesConfig = (parsedModifiedState, edgeId): ClientTypesConfig => {
-    const clientTypes = parsedModifiedState.edges[edgeId]?.consumerData?.clientTypes;
     const clientTypesConfig = {};
-    if (clientTypes || clientTypes !== undefined || clientTypes !== "[]") {
-        for (let i = 0; i < clientTypes?.length; i++) {
-            if (clientTypes[i]["protocol"] === Rest) {
-                clientTypesConfig["isRestServer"] = true;
-                clientTypesConfig["restServerPort"] = clientTypes[i]["port"];
-            } else if (clientTypes[i]["protocol"] === Grpc) {
-                clientTypesConfig["isGrpcServer"] = true;
-                clientTypesConfig["grpcServerPort"] = clientTypes[i]["port"];
-            } else if (clientTypes[i]["protocol"] === Ws) {
-                clientTypesConfig["isWsServer"] = true;
-                clientTypesConfig["wsServerPort"] = clientTypes[i]["port"];
-            }
-        }
+    // rest
+    const restClientConfig = parsedModifiedState.edges[edgeId]?.consumerData?.restClientConfig;
+    if (restClientConfig && restClientConfig !== "{}") {
+        clientTypesConfig["isRestServer"] = true;
+        clientTypesConfig["restServerPort"] = restClientConfig.port;
     }
+    // grpc
+    const grpcClientConfig = parsedModifiedState.edges[edgeId]?.consumerData?.grpcClientConfig;
+    if (grpcClientConfig && grpcClientConfig !== "{}") {
+        clientTypesConfig["isGrpcServer"] = true;
+        clientTypesConfig["grpcServerPort"] = grpcClientConfig.port;
+    }
+    // ws
+    const wsClientConfig = parsedModifiedState.edges[edgeId]?.consumerData?.wsClientConfig;
+    if (wsClientConfig && wsClientConfig !== "{}") {
+        clientTypesConfig["isWsServer"] = true;
+        clientTypesConfig["wsServerPort"] = wsClientConfig.port;
+    }
+
     return clientTypesConfig;
 };
 
@@ -65,24 +69,18 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     // update state with additional properties added from UI (Post edge creation)
     const handleUpdate = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        const clientTypes = [];
+        const restClientConfig: RestClientConfig = {port: ""};
+        const grpcClientConfig: GrpcClientConfig = {port: ""};
+        const wsClientConfig: WsClientConfig = {port: ""};
+
         if (payload.isRestServer) {
-            const restConfig = {};
-            restConfig["protocol"] = Rest;
-            restConfig["port"] = payload.restServerPort;
-            clientTypes.push(restConfig);
+            restClientConfig.port = payload.restServerPort;
         }
         if (payload.isGrpcServer) {
-            const grpcConfig = {};
-            grpcConfig["protocol"] = Grpc;
-            grpcConfig["port"] = payload.grpcServerPort;
-            clientTypes.push(grpcConfig);
+            grpcClientConfig.port = payload.grpcServerPort;
         }
         if (payload.isWsServer) {
-            const wsConfig = {};
-            wsConfig["protocol"] = Ws;
-            wsConfig["port"] = payload.wsServerPort;
-            clientTypes.push(wsConfig);
+            wsClientConfig.port = payload.wsServerPort;
         }
         const modifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
@@ -91,14 +89,18 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             // adding consumerData to new edge in modifiedState
             modifiedState.edges[props.edgeId] = {
                 consumerData: {
-                    clientTypes,
+                    restClientConfig,
+                    grpcClientConfig,
+                    wsClientConfig,
                     name: payload.name,
                 }
             };
         } else {
             // adding consumerData to existing edge in modifiedState
             modifiedState.edges[props.edgeId].consumerData = {
-                clientTypes,
+                restClientConfig,
+                grpcClientConfig,
+                wsClientConfig,
                 name: payload.name,
             };
         }
@@ -161,12 +163,9 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         if (payload.isRestServer) {
             // retrieve port from src node.
             const srcNode = parsedCurrentConfig.edges[props.edgeId].src;
-            const serverTypes = parsedModifiedState.nodes[srcNode]?.consumerData?.serverTypes;
-            for (let i = 0; i < serverTypes.length; i++) {
-                // for rest protocol.
-                if (serverTypes[i].protocol === Rest) {
-                    payload.restServerPort = serverTypes[i].port;
-                }
+            const restServerConfig = parsedModifiedState.nodes[srcNode]?.consumerData?.restServerConfig;
+            if (restServerConfig && restServerConfig !== '{}') {
+                payload.restServerPort = restServerConfig.port;
             }
             return <TextField
                 required
@@ -213,6 +212,12 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
 
     const getGrpcServerPort = () => {
         if (payload.isGrpcServer) {
+            // retrieve port from src node.
+            const srcNode = parsedCurrentConfig.edges[props.edgeId].src;
+            const grpcServerConfig = parsedModifiedState.nodes[srcNode]?.consumerData?.grpcServerConfig;
+            if (grpcServerConfig && grpcServerConfig !== '{}') {
+                payload.grpcServerPort = grpcServerConfig.port;
+            }
             return <TextField
                 required
                 size="medium"
@@ -257,6 +262,12 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
 
     const getWsServerPort = () => {
         if (payload.isWsServer) {
+            // retrieve port from src node.
+            const srcNode = parsedCurrentConfig.edges[props.edgeId].src;
+            const wsServerConfig = parsedModifiedState.nodes[srcNode]?.consumerData?.wsServerConfig;
+            if (wsServerConfig && wsServerConfig !== '{}') {
+                payload.wsServerPort = wsServerConfig.port;
+            }
             return <TextField
                 required
                 size="medium"

@@ -10,17 +10,26 @@ type Edge struct {
 
 // ConsumerData has detailed attributes of an edge
 type ConsumerData struct {
-	ClientTypes            []ClientType           `json:"clientTypes,omitempty"`
+	RestClientConfig       *RestClientConfig      `json:"restClientConfig,omitempty"`
+	GrpcClientConfig       *GrpcClientConfig      `json:"grpcClientConfig,omitempty"`
+	WsClientConfig         *WsClientConfig        `json:"wsClientConfig,omitempty"`
 	Metadata               map[string]interface{} `json:"metadata,omitempty"`
 	Annotations            map[string]string      `json:"annotations,omitempty"`
 	ExternalNode           string                 `json:"externalNode,omitempty"`
 	OpenApiFileYamlContent string                 `json:"openApiFileYamlContent,omitempty"`
 }
 
-// ClientType holds information for an edge
-type ClientType struct {
-	Protocol string `json:"protocol"`
-	Port     string `json:"port"`
-	// Framework will be the same as client's rest server framework.
-	// Framework string `json:"framework"`
+// RestClientConfig holds information for an edge for rest protocol.
+type RestClientConfig struct {
+	Port string `json:"port"`
+}
+
+// GrpcClientConfig holds information for an edge for grpc protocol.
+type GrpcClientConfig struct {
+	Port string `json:"port"`
+}
+
+// WsClientConfig holds information for an edge for ws protocol.
+type WsClientConfig struct {
+	Port string `json:"port"`
 }

@@ -37,12 +37,27 @@ type RestServer struct {
 
 // RestClient holds information about edge between nodeA and nodeB.
 type RestClient struct {
-	Protocol     string `json:"protocol"`
 	Port         string `json:"port"`
 	Framework    string `json:"framework"`
 	ExternalNode string `json:"externalNode"`
 	// OpenApiFileYamlContent holds openApiFileYamlContent
 	OpenApiFileYamlContent string `json:"openApiFileYamlContent,omitempty"`
+}
+
+// GrpcClient holds information about edge between nodeA and nodeB.
+type GrpcClient struct {
+	Port         string `json:"port"`
+	Framework    string `json:"framework"`
+	ExternalNode string `json:"externalNode"`
+	// ProtoFileContent holds protoFileContent
+	ProtoFileContent string `json:"protoFileContent,omitempty"`
+}
+
+// WsClient holds information about edge between nodeA and nodeB.
+type WsClient struct {
+	Port         string `json:"port"`
+	Framework    string `json:"framework"`
+	ExternalNode string `json:"externalNode"`
 }
 
 // RestConfig rest configs
@@ -167,26 +182,26 @@ func GetServersForNode(nodeP *node.Node) (*Servers, error) {
 // GetClientsForNode retrieves all clients for given node
 func GetClientsForNode(edges []*edge.Edge, nodeP *node.Node) (*Clients, error) {
 	var restClients []RestClient
+	var grpcClients []GrpcClient
+	var wsClients []WsClient
+
 	for _, e := range edges {
 		// if the current node is in dest field of edge, it means it's a client to node in src field of edge.
 		if e.Dest == nodeP.ID {
-			for _, clientType := range e.ConsumerData.ClientTypes {
-				if clientType.Protocol == core.Rest {
-					restClients = append(restClients, RestClient{
-						Protocol: clientType.Protocol,
-						Port:     clientType.Port,
-						// TODO refer node's name here instead of id.
-						ExternalNode: e.ConsumerData.ExternalNode,
-					})
-					// only one rest client config for a given edge.
-					break
-				} else if clientType.Protocol == core.Grpc {
-					return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
-						clientType.Protocol, nodeP.ConsumerData.Language)
-				} else if clientType.Protocol == core.Ws {
-					return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
-						clientType.Protocol, nodeP.ConsumerData.Language)
-				}
+			if e.ConsumerData.RestClientConfig != nil {
+				restClients = append(restClients, RestClient{
+					Port: e.ConsumerData.RestClientConfig.Port,
+					// TODO refer node's name here instead of id.
+					ExternalNode: e.ConsumerData.ExternalNode,
+				})
+			}
+			if e.ConsumerData.GrpcClientConfig != nil {
+				return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
+					"grpc", nodeP.ConsumerData.Language)
+			}
+			if e.ConsumerData.WsClientConfig != nil {
+				return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
+					"ws", nodeP.ConsumerData.Language)
 			}
 		}
 	}
@@ -194,6 +209,14 @@ func GetClientsForNode(edges []*edge.Edge, nodeP *node.Node) (*Clients, error) {
 	// if there are any rest clients return them
 	if len(restClients) > 0 {
 		(*clients)[core.Rest] = restClients
+	}
+	// if there are any grpc clients return them
+	if len(grpcClients) > 0 {
+		(*clients)[core.Grpc] = grpcClients
+	}
+	// if there are any ws clients return them
+	if len(wsClients) > 0 {
+		(*clients)[core.Ws] = wsClients
 	}
 	return clients, nil
 }

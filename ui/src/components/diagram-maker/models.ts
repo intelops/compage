@@ -41,14 +41,23 @@ export interface CompageNode {
     consumerData: NodeConsumerData;
 }
 
-export interface ClientType {
+export interface RestClientConfig {
     port: string;
-    protocol: string;
+}
+
+export interface GrpcClientConfig {
+    port: string;
+}
+
+export interface WsClientConfig {
+    port: string;
 }
 
 export interface EdgeConsumerData {
     externalNode: string;
-    clientTypes: ClientType[];
+    restClientConfig: RestClientConfig;
+    grpcClientConfig: GrpcClientConfig;
+    wsClientConfig: WsClientConfig;
     metadata: Map<string, string>;
     annotations: Map<string, string>;
 }
@@ -65,13 +74,3 @@ export interface CompageJson {
     nodes: Map<string, CompageNode>;
     version: string;
 }
-
-
-// Rest Protocol
-export const Rest = "REST";
-
-// Grpc Protocol
-export const Grpc = "GRPC";
-
-// Ws Protocol
-export const Ws = "WS";
