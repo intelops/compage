@@ -7,7 +7,7 @@ export const isCompageTemplate = (input: string) => {
 
 // compage template frameworks supported.
 export const compageLanguageFrameworks = {
-    "go": ["go-gin"],
+    "go": ["go-gin-server"],
 };
 
 // openapi template frameworks supported.
