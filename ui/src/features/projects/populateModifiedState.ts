@@ -31,6 +31,7 @@ export const updateModifiedState = (compageJson: CompageJson) => {
         // state has nodes
         if (Object.keys(compageJson?.nodes).length !== 0) {
             // iterate over nodes and check if they have any consumerData attached to them.
+            // tslint:disable-next-line: forin
             for (let key in compageJson.nodes) {
                 const consumerData = compageJson.nodes[key]?.consumerData;
                 if (consumerData && Object.keys(consumerData).length > 1) {
@@ -42,6 +43,7 @@ export const updateModifiedState = (compageJson: CompageJson) => {
         // state has edges
         if (Object.keys(compageJson?.edges).length !== 0) {
             // iterate over edges and check if they have any consumerData attached to them.
+            // tslint:disable-next-line: forin
             for (let key in compageJson.edges) {
                 const consumerData = compageJson.edges[key]?.consumerData;
                 if (consumerData && Object.keys(consumerData).length > 0) {

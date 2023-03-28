@@ -54,6 +54,7 @@ export interface WsClientConfig {
 }
 
 export interface EdgeConsumerData {
+    name: string;
     externalNode: string;
     restClientConfig: RestClientConfig;
     grpcClientConfig: GrpcClientConfig;
