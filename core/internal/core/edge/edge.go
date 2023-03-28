@@ -16,19 +16,17 @@ type ConsumerData struct {
 	Metadata         map[string]interface{} `json:"metadata,omitempty"`
 	Annotations      map[string]string      `json:"annotations,omitempty"`
 	ExternalNode     string                 `json:"externalNode,omitempty"`
+	Name             string                 `json:"name"`
 }
 
 // RestClientConfig holds information for an edge for rest protocol.
 type RestClientConfig struct {
-	Port                   string `json:"port"`
-	OpenApiFileYamlContent string `json:"openApiFileYamlContent,omitempty"`
+	Port string `json:"port"`
 }
 
 // GrpcClientConfig holds information for an edge for grpc protocol.
 type GrpcClientConfig struct {
 	Port string `json:"port"`
-	// ProtoFileContent holds protoFileContent
-	ProtoFileContent string `json:"protoFileContent,omitempty"`
 }
 
 // WsClientConfig holds information for an edge for ws protocol.

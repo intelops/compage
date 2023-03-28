@@ -3,7 +3,6 @@ package languages
 import (
 	"fmt"
 	"github.com/intelops/compage/core/internal/core"
-	"github.com/intelops/compage/core/internal/core/edge"
 	"github.com/intelops/compage/core/internal/core/node"
 )
 
@@ -44,6 +43,15 @@ type RestClient struct {
 	OpenApiFileYamlContent string `json:"openApiFileYamlContent,omitempty"`
 }
 
+// GrpcServer holds information about the node's grpc server.
+type GrpcServer struct {
+	Port      string          `json:"port"`
+	Framework string          `json:"framework"`
+	Resources []node.Resource `json:"resources"`
+	// ProtoFileContent holds protoFileContent
+	ProtoFileContent string `json:"protoFileContent,omitempty"`
+}
+
 // GrpcClient holds information about edge between nodeA and nodeB.
 type GrpcClient struct {
 	Port         string `json:"port"`
@@ -51,6 +59,13 @@ type GrpcClient struct {
 	ExternalNode string `json:"externalNode"`
 	// ProtoFileContent holds protoFileContent
 	ProtoFileContent string `json:"protoFileContent,omitempty"`
+}
+
+// WsServer holds information about the node's ws server.
+type WsServer struct {
+	Port      string          `json:"port"`
+	Framework string          `json:"framework"`
+	Resources []node.Resource `json:"resources"`
 }
 
 // WsClient holds information about edge between nodeA and nodeB.
@@ -68,16 +83,14 @@ type RestConfig struct {
 
 // GrpcConfig grpc configs
 type GrpcConfig struct {
-	Framework string          `json:"framework"`
-	Port      string          `json:"port"`
-	Resources []node.Resource `json:"resources"`
+	Server  *GrpcServer  `json:"server"`
+	Clients []GrpcClient `json:"clients"`
 }
 
 // WsConfig ws configs
 type WsConfig struct {
-	Framework string          `json:"framework"`
-	Port      string          `json:"port"`
-	Resources []node.Resource `json:"resources"`
+	Server  *WsServer  `json:"server"`
+	Clients []WsClient `json:"clients"`
 }
 
 // DBConfig holds information about db for a node
@@ -111,11 +124,12 @@ func NewLanguageNode(compageJson *core.CompageJson, node *node.Node) (*LanguageN
 		return nil, err
 	}
 
-	// This will be used to create clients to other servers. This is required for custom template plus the, cli/frameworks plan for next release
-	clients, err := GetClientsForNode(compageJson.Edges, node)
+	// Retrieves clients for node to other servers(other nodes). This is required for custom template plus the cli/frameworks plan for next release
+	clients, err := GetClientsForNode(compageJson, node)
 	if err != nil {
 		return nil, err
 	}
+
 	// check if the servers has rest entry (if node is not server or node is not REST server)
 	if restServer, ok := (*servers)[core.Rest]; ok {
 		// one node, one rest server
@@ -123,6 +137,7 @@ func NewLanguageNode(compageJson *core.CompageJson, node *node.Node) (*LanguageN
 			Server: restServer.(*RestServer),
 		}
 	}
+
 	// check if any rest client needs to be created
 	if restClients, ok := (*clients)[core.Rest]; ok {
 		// if the component is just client and not server, languageNode.RestConfig will be nil in that case.
@@ -133,6 +148,7 @@ func NewLanguageNode(compageJson *core.CompageJson, node *node.Node) (*LanguageN
 		} else {
 			languageNode.RestConfig.Clients = restClients.([]RestClient)
 		}
+
 		// set framework to all clients for this node as it's set for server.
 		for _, client := range languageNode.RestConfig.Clients {
 			// if server is nil, assign default framework i.e. http client
@@ -180,26 +196,43 @@ func GetServersForNode(nodeP *node.Node) (*Servers, error) {
 }
 
 // GetClientsForNode retrieves all clients for given node
-func GetClientsForNode(edges []*edge.Edge, nodeP *node.Node) (*Clients, error) {
+func GetClientsForNode(compageJson *core.CompageJson, nodeP *node.Node) (*Clients, error) {
 	var restClients []RestClient
 	var grpcClients []GrpcClient
 	var wsClients []WsClient
 
-	for _, e := range edges {
+	for _, e := range compageJson.Edges {
 		// if the current node is in dest field of edge, it means it's a client to node in src field of edge.
 		if e.Dest == nodeP.ID {
 			if e.ConsumerData.RestClientConfig != nil {
+				openApiFileYamlContent, framework := getOpenApiFileYamlContentAndFrameworkFromNodeForEdge(e.Src, compageJson.Nodes)
+
 				restClients = append(restClients, RestClient{
 					Port: e.ConsumerData.RestClientConfig.Port,
-					// TODO refer node's name here instead of id.
-					ExternalNode: e.ConsumerData.ExternalNode,
+					// TODO refer node's name here instead of id. This is required for service-name generation. Need to re-check.
+					ExternalNode:           e.Src,
+					Framework:              framework,
+					OpenApiFileYamlContent: openApiFileYamlContent,
 				})
 			}
 			if e.ConsumerData.GrpcClientConfig != nil {
+				protoFileContent, framework := getProtoFileContentAndFrameworkFromNodeForEdge(e.Src, compageJson.Nodes)
+				grpcClients = append(grpcClients, GrpcClient{
+					Port: e.ConsumerData.RestClientConfig.Port,
+					// TODO refer node's name here instead of id. This is required for service-name generation. Need to re-check.
+					ExternalNode:     e.Src,
+					Framework:        framework,
+					ProtoFileContent: protoFileContent,
+				})
 				return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
 					"grpc", nodeP.ConsumerData.Language)
 			}
 			if e.ConsumerData.WsClientConfig != nil {
+				wsClients = append(wsClients, WsClient{
+					Port: e.ConsumerData.RestClientConfig.Port,
+					// TODO refer node's name here instead of id. This is required for service-name generation. Need to re-check.
+					ExternalNode: e.Src,
+				})
 				return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
 					"ws", nodeP.ConsumerData.Language)
 			}
@@ -219,4 +252,22 @@ func GetClientsForNode(edges []*edge.Edge, nodeP *node.Node) (*Clients, error) {
 		(*clients)[core.Ws] = wsClients
 	}
 	return clients, nil
+}
+
+func getProtoFileContentAndFrameworkFromNodeForEdge(src string, nodes []*node.Node) (string, string) {
+	for _, n := range nodes {
+		if src == n.ID {
+			return n.ConsumerData.GrpcServerConfig.ProtoFileContent, n.ConsumerData.GrpcServerConfig.Framework
+		}
+	}
+	return "", ""
+}
+
+func getOpenApiFileYamlContentAndFrameworkFromNodeForEdge(src string, nodes []*node.Node) (string, string) {
+	for _, n := range nodes {
+		if src == n.ID {
+			return n.ConsumerData.RestServerConfig.OpenApiFileYamlContent, n.ConsumerData.RestServerConfig.Framework
+		}
+	}
+	return "", ""
 }
