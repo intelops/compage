@@ -15,19 +15,19 @@ type ConsumerData struct {
 	Template string `json:"template"`
 	// Name of component (required, this will be service and deployment name).
 	Name string `json:"name"`
-	// RestServerType holds all config related to REST server. If nil, it means that the node is not REST server.
-	RestServerType *RestServerType `json:"restServerType,omitempty"`
-	// GrpcServerType holds all config related to gRPC server. If nil, it means that the node is not gRPC server.
-	GrpcServerType *GrpcServerType `json:"grpcServerType,omitempty"`
-	// WsServerType holds all config related to ws server. If nil, it means that the node is not ws server.
-	WsServerType *WsServerType `json:"wsServerType,omitempty"`
+	// RestServerConfig holds all config related to REST server. If nil, it means that the node is not REST server.
+	RestServerConfig *RestServerConfig `json:"restServerConfig,omitempty"`
+	// GrpcServerConfig holds all config related to gRPC server. If nil, it means that the node is not gRPC server.
+	GrpcServerConfig *GrpcServerConfig `json:"grpcServerConfig,omitempty"`
+	// WsServerConfig holds all config related to ws server. If nil, it means that the node is not ws server.
+	WsServerConfig *WsServerConfig `json:"wsServerConfig,omitempty"`
 	// Metadata holds misc information about the node.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Annotations holds annotations for the node.
 	Annotations map[string]string `json:"annotations,omitempty"`
 }
 
-type RestServerType struct {
+type RestServerConfig struct {
 	Port      string     `json:"port"`
 	Framework string     `json:"framework"`
 	Resources []Resource `json:"resources"`
@@ -35,7 +35,7 @@ type RestServerType struct {
 	OpenApiFileYamlContent string `json:"openApiFileYamlContent,omitempty"`
 }
 
-type GrpcServerType struct {
+type GrpcServerConfig struct {
 	Port      string     `json:"port"`
 	Framework string     `json:"framework"`
 	Resources []Resource `json:"resources"`
@@ -43,7 +43,7 @@ type GrpcServerType struct {
 	ProtoFileContent string `json:"protoFileContent,omitempty"`
 }
 
-type WsServerType struct {
+type WsServerConfig struct {
 	Port      string     `json:"port"`
 	Framework string     `json:"framework"`
 	Resources []Resource `json:"resources"`

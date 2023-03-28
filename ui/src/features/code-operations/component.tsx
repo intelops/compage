@@ -37,17 +37,17 @@ export const GenerateCode = () => {
             if (!name) {
                 return true;
             }
-            const restServerType = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.restServerType;
-            if (!restServerType || restServerType === "" || restServerType === "{}") {
+            const restServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.restServerConfig;
+            if (!restServerConfig || restServerConfig === "" || restServerConfig === "{}") {
                 return true;
             }
             // TODO check later
-            // const wsServerType = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.wsServerType;
-            // if (!wsServerType || wsServerType === "" || wsServerType === "{}") {
+            // const wsServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.wsServerConfig;
+            // if (!wsServerConfig || wsServerConfig === "" || wsServerConfig === "{}") {
             //     return true;
             // }
-            // const grpcServerType = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.grpcServerType;
-            // if (!grpcServerType || grpcServerType === "" || grpcServerType === "{}") {
+            // const grpcServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.grpcServerConfig;
+            // if (!grpcServerConfig || grpcServerConfig === "" || grpcServerConfig === "{}") {
             //     return true;
             // }
         }

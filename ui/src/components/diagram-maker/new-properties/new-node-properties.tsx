@@ -10,7 +10,7 @@ import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
-import {GrpcServerType, Resource, RestServerType, WsServerType} from "../models";
+import {GrpcServerConfig, Resource, RestServerConfig, WsServerConfig} from "../models";
 import {ModifyRestResource} from "./modify-rest-resource";
 import DeleteIcon from '@mui/icons-material/Delete';
 import {useAppSelector} from "../../../redux/hooks";
@@ -29,44 +29,44 @@ interface NewNodePropertiesProps {
 
 interface ServerTypesConfig {
     isRestServer?: boolean;
-    restServerType?: RestServerType;
+    restServerConfig?: RestServerConfig;
     isGrpcServer?: boolean;
-    grpcServerType?: GrpcServerType;
+    grpcServerConfig?: GrpcServerConfig;
     isWsServer?: boolean;
-    wsServerType?: WsServerType;
+    wsServerConfig?: WsServerConfig;
 }
 
 // TODO incomplete impl below
 const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig => {
-    const restServerType = parsedModifiedState.nodes[nodeId]?.consumerData.restServerType;
-    const grpcServerType = parsedModifiedState.nodes[nodeId]?.consumerData.grpcServerType;
-    const wsServerType = parsedModifiedState.nodes[nodeId]?.consumerData.wsServerType;
+    const restServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.restServerConfig;
+    const grpcServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.grpcServerConfig;
+    const wsServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.wsServerConfig;
     const serverTypesConfig: ServerTypesConfig = {};
     debugger
-    if (restServerType && restServerType !== "{}") {
+    if (restServerConfig && restServerConfig !== "{}") {
         serverTypesConfig.isRestServer = true;
-        serverTypesConfig.restServerType = {
-            framework: restServerType.framework,
-            openApiFileYamlContent: restServerType.openApiFileYamlContent,
-            port: restServerType.port,
-            resources: restServerType.resources
+        serverTypesConfig.restServerConfig = {
+            framework: restServerConfig.framework,
+            openApiFileYamlContent: restServerConfig.openApiFileYamlContent,
+            port: restServerConfig.port,
+            resources: restServerConfig.resources
         };
     }
-    if (grpcServerType && grpcServerType !== "{}") {
+    if (grpcServerConfig && grpcServerConfig !== "{}") {
         serverTypesConfig.isGrpcServer = true;
-        serverTypesConfig.grpcServerType = {
-            framework: grpcServerType.framework,
-            port: grpcServerType.port,
-            protoFileContent: grpcServerType.protoFileContent,
-            resources: grpcServerType.resources
+        serverTypesConfig.grpcServerConfig = {
+            framework: grpcServerConfig.framework,
+            port: grpcServerConfig.port,
+            protoFileContent: grpcServerConfig.protoFileContent,
+            resources: grpcServerConfig.resources
         };
     }
-    if (wsServerType && wsServerType !== "{}") {
+    if (wsServerConfig && wsServerConfig !== "{}") {
         serverTypesConfig.isWsServer = true;
-        serverTypesConfig.wsServerType = {
-            framework: wsServerType.framework,
-            port: wsServerType.port,
-            resources: wsServerType.resources
+        serverTypesConfig.wsServerConfig = {
+            framework: wsServerConfig.framework,
+            port: wsServerConfig.port,
+            resources: wsServerConfig.resources
         };
     }
     return serverTypesConfig;
@@ -82,24 +82,24 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         parsedModifiedState = getParsedModifiedState();
     }
     const serverTypesConfig: ServerTypesConfig = getServerTypesConfig(parsedModifiedState, props.nodeId);
-    const emptyRestServerType: RestServerType = {
+    const emptyRestServerConfig: RestServerConfig = {
         framework: "", port: "", resources: [], openApiFileYamlContent: ""
     };
-    const emptyGrpcServerType: GrpcServerType = {
+    const emptyGrpcServerConfig: GrpcServerConfig = {
         framework: "", port: "", protoFileContent: "", resources: []
     };
-    const emptyWsServerType: WsServerType = {framework: "", port: "", resources: []};
+    const emptyWsServerConfig: WsServerConfig = {framework: "", port: "", resources: []};
 
     const [payload, setPayload] = React.useState({
         name: parsedModifiedState.nodes[props.nodeId]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.name : "",
         template: parsedModifiedState.nodes[props.nodeId]?.consumerData.template !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.template : COMPAGE,
         language: parsedModifiedState.nodes[props.nodeId]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.language : "",
         isRestServer: serverTypesConfig.isRestServer || false,
-        restServerType: serverTypesConfig.restServerType || emptyRestServerType,
+        restServerConfig: serverTypesConfig.restServerConfig || emptyRestServerConfig,
         isGrpcServer: serverTypesConfig.isGrpcServer || false,
-        grpcServerType: serverTypesConfig.grpcServerType || emptyGrpcServerType,
+        grpcServerConfig: serverTypesConfig.grpcServerConfig || emptyGrpcServerConfig,
         isWsServer: serverTypesConfig.isWsServer || false,
-        wsServerType: serverTypesConfig.wsServerType || emptyWsServerType,
+        wsServerConfig: serverTypesConfig.wsServerConfig || emptyWsServerConfig,
         isModifyRestResourceOpen: false,
         currentRestResource: {
             name: "",
@@ -111,34 +111,33 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     // update state with additional properties added from UI (Post node creation)
     const handleUpdate = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        let restServerType = {};
-        let grpcServerType = {};
-        let wsServerType = {};
+        let restServerConfig: RestServerConfig;
+        let grpcServerConfig: GrpcServerConfig;
+        let wsServerConfig: WsServerConfig;
 
         if (payload.isRestServer) {
-            const restServerConfig: RestServerType = {
-                framework: payload.restServerType.framework,
-                port: payload.restServerType.port,
+            restServerConfig = {
+                framework: payload.restServerConfig.framework,
+                port: payload.restServerConfig.port,
             };
             if (isCompageTemplate(payload.template)) {
-                restServerConfig.resources = payload.restServerType.resources;
+                restServerConfig.resources = payload.restServerConfig.resources;
             } else {
                 restServerConfig.resources = [];
                 restServerConfig.openApiFileYamlContent = uploadYamlData.content;
             }
-            restServerType = restServerConfig;
         }
         if (payload.isGrpcServer) {
-            grpcServerType = {
-                framework: payload.grpcServerType.framework,
-                port: payload.grpcServerType.port,
+            grpcServerConfig = {
+                framework: payload.grpcServerConfig.framework,
+                port: payload.grpcServerConfig.port,
                 resources: []
             };
         }
         if (payload.isWsServer) {
-            wsServerType = {
-                framework: payload.wsServerType.framework,
-                port: payload.wsServerType.port,
+            wsServerConfig = {
+                framework: payload.wsServerConfig.framework,
+                port: payload.wsServerConfig.port,
                 resources: []
             };
         }
@@ -153,9 +152,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     template: payload.template,
                     name: payload.name,
                     language: payload.language,
-                    restServerType: restServerType,
-                    grpcServerType: grpcServerType,
-                    wsServerType: wsServerType,
+                    restServerConfig: restServerConfig,
+                    grpcServerConfig: grpcServerConfig,
+                    wsServerConfig: wsServerConfig,
                 }
             };
         } else {
@@ -164,9 +163,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 template: payload.template,
                 name: payload.name,
                 language: payload.language,
-                restServerType: restServerType,
-                grpcServerType: grpcServerType,
-                wsServerType: wsServerType,
+                restServerConfig: restServerConfig,
+                grpcServerConfig: grpcServerConfig,
+                wsServerConfig: wsServerConfig,
             };
         }
         // image to node display
@@ -181,9 +180,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             isGrpcServer: false,
             isRestServer: false,
             isWsServer: false,
-            grpcServerType: emptyGrpcServerType,
-            restServerType: emptyRestServerType,
-            wsServerType: emptyWsServerType,
+            grpcServerConfig: emptyGrpcServerConfig,
+            restServerConfig: emptyRestServerConfig,
+            wsServerConfig: emptyWsServerConfig,
             isModifyRestResourceOpen: false,
             currentRestResource: {
                 name: "",
@@ -229,18 +228,18 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const handleDeleteRestResourceClick = (d) => {
-        payload.restServerType.resources = payload.restServerType.resources.filter(item => item.name !== d);
+        payload.restServerConfig.resources = payload.restServerConfig.resources.filter(item => item.name !== d);
         setPayload({
             ...payload,
-            restServerType: payload.restServerType
+            restServerConfig: payload.restServerConfig
         });
     };
 
     const getExistingResources = () => {
-        if (payload.restServerType.resources?.length > 0) {
+        if (payload.restServerConfig.resources?.length > 0) {
             const getResources = () => {
                 const resourceNames = [];
-                payload.restServerType.resources.forEach(resource => {
+                payload.restServerConfig.resources.forEach(resource => {
                     resourceNames.push(resource.name);
                 });
                 return resourceNames;
@@ -280,11 +279,11 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 required
                 size="medium"
                 margin="dense"
-                id="restServerTypePort"
+                id="restServerConfigPort"
                 label="Port"
                 type="number"
-                value={payload.restServerType.port}
-                onChange={handleRestServerTypePortChange}
+                value={payload.restServerConfig.port}
+                onChange={handleRestServerConfigPortChange}
                 variant="outlined"
             />;
         }
@@ -307,7 +306,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         }
     };
 
-    const getRestServerType = () => {
+    const getRestServerConfig = () => {
         if (payload.isRestServer) {
             return <React.Fragment>
                 {getPortContent()}
@@ -319,8 +318,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     id="restFramework"
                     label="Framework"
                     type="text"
-                    value={payload.restServerType.framework}
-                    onChange={handleRestServerTypeFrameworkChange}
+                    value={payload.restServerConfig.framework}
+                    onChange={handleRestServerConfigFrameworkChange}
                     variant="outlined">
                     {frameworks.map((framework: string) => (
                         <MenuItem key={framework} value={framework}>
@@ -346,21 +345,21 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         </React.Fragment>;
     };
 
-    const handleRestServerTypeFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const restServerType = payload.restServerType;
-        restServerType.framework = event.target.value;
+    const handleRestServerConfigFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const restServerConfig = payload.restServerConfig;
+        restServerConfig.framework = event.target.value;
         setPayload({
             ...payload,
-            restServerType
+            restServerConfig
         });
     };
 
-    const handleRestServerTypePortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const restServerType = payload.restServerType;
-        restServerType.port = event.target.value;
+    const handleRestServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const restServerConfig = payload.restServerConfig;
+        restServerConfig.port = event.target.value;
         setPayload({
             ...payload,
-            restServerType
+            restServerConfig
         });
     };
 
@@ -371,18 +370,18 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const getGrpcServerType = () => {
+    const getGrpcServerConfig = () => {
         if (payload.isGrpcServer) {
             return <React.Fragment>
                 <TextField
                     required
                     size="medium"
                     margin="dense"
-                    id="grpcServerTypePort"
+                    id="grpcServerConfigPort"
                     label="Port"
                     type="text"
-                    value={payload.grpcServerType.port}
-                    onChange={handleGrpcServerTypePortChange}
+                    value={payload.grpcServerConfig.port}
+                    onChange={handleGrpcServerConfigPortChange}
                     variant="outlined"
                 />
             </React.Fragment>;
@@ -404,12 +403,12 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         </React.Fragment>;
     };
 
-    const handleGrpcServerTypePortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const grpcServerType = payload.grpcServerType;
-        grpcServerType.port = event.target.value;
+    const handleGrpcServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const grpcServerConfig = payload.grpcServerConfig;
+        grpcServerConfig.port = event.target.value;
         setPayload({
             ...payload,
-            grpcServerType: grpcServerType,
+            grpcServerConfig: grpcServerConfig,
         });
     };
 
@@ -420,18 +419,18 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const getWsServerType = () => {
+    const getWsServerConfig = () => {
         if (payload.isWsServer) {
             return <React.Fragment>
                 <TextField
                     required
                     size="medium"
                     margin="dense"
-                    id="wsServerTypePort"
+                    id="wsServerConfigPort"
                     label="Port"
                     type="text"
-                    value={payload.wsServerType.port}
-                    onChange={handleWsServerTypePortChange}
+                    value={payload.wsServerConfig.port}
+                    onChange={handleWsServerConfigPortChange}
                     variant="outlined"
                 />
             </React.Fragment>;
@@ -453,12 +452,12 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         </React.Fragment>;
     };
 
-    const handleWsServerTypePortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const wsServerType = payload.wsServerType;
-        wsServerType.port = event.target.value;
+    const handleWsServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const wsServerConfig = payload.wsServerConfig;
+        wsServerConfig.port = event.target.value;
         setPayload({
             ...payload,
-            wsServerType: wsServerType
+            wsServerConfig: wsServerConfig
         });
     };
 
@@ -470,11 +469,11 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         languages = ["go", "javascript", "java", "ruby", "python", "rust"];
     }
     const handleModifyRestResourceClick = (resource: Resource) => {
-        const restServerType = payload.restServerType;
-        restServerType.resources.push(resource);
+        const restServerConfig = payload.restServerConfig;
+        restServerConfig.resources.push(resource);
         setPayload({
             ...payload,
-            restServerType: restServerType,
+            restServerConfig: restServerConfig,
             isModifyRestResourceOpen: !payload.isModifyRestResourceOpen
         });
     };
@@ -563,7 +562,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         border: payload.isRestServer ? '1px solid #dadada' : ''
                     }} direction="column" spacing={2}>
                         {getRestServerCheck()}
-                        {getRestServerType()}
+                        {getRestServerConfig()}
                     </Stack>
                     <Stack style={{
                         padding: "10px",
@@ -571,7 +570,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         border: payload.isGrpcServer ? '1px solid #dadada' : ''
                     }} direction="column" spacing={2}>
                         {/*{getGrpcServerCheck()}*/}
-                        {/*{getGrpcServerType()}*/}
+                        {/*{getGrpcServerConfig()}*/}
                     </Stack>
                     <Stack style={{
                         padding: "10px",
@@ -579,7 +578,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         border: payload.isWsServer ? '1px solid #dadada' : ''
                     }} direction="column" spacing={2}>
                         {/*{getWsServerCheck()}*/}
-                        {/*{getWsServerType()}*/}
+                        {/*{getWsServerConfig()}*/}
                     </Stack>
                 </Stack>
             </DialogContent>

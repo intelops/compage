@@ -15,12 +15,12 @@ export const ContextNode = (props: ContextNodeProps) => {
         language: parsedModifiedState.nodes[props.id]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.id].consumerData.language : "",
         isServer: parsedModifiedState.nodes[props.id]?.consumerData.isServer !== undefined ? parsedModifiedState.nodes[props.id].consumerData.isServer : false,
         template: parsedModifiedState.nodes[props.id]?.consumerData.template !== undefined ? parsedModifiedState.nodes[props.id].consumerData.template : false,
-        // restServerType to be generated
-        restServerType: parsedModifiedState.nodes[props.id]?.consumerData.restServerType !== undefined ? parsedModifiedState.nodes[props.id].consumerData.restServerType : {},
-        // grpcServerType to be generated
-        grpcServerType: parsedModifiedState.nodes[props.id]?.consumerData.grpcServerType !== undefined ? parsedModifiedState.nodes[props.id].consumerData.grpcServerType : {},
+        // restServerConfig to be generated
+        restServerConfig: parsedModifiedState.nodes[props.id]?.consumerData.restServerConfig !== undefined ? parsedModifiedState.nodes[props.id].consumerData.restServerConfig : {},
+        // grpcServerConfig to be generated
+        grpcServerConfig: parsedModifiedState.nodes[props.id]?.consumerData.grpcServerConfig !== undefined ? parsedModifiedState.nodes[props.id].consumerData.grpcServerConfig : {},
         // wsServerType to be generated
-        wsServerType: parsedModifiedState.nodes[props.id]?.consumerData.wsServerType !== undefined ? parsedModifiedState.nodes[props.id].consumerData.wsServerType : {},
+        wsServerConfig: parsedModifiedState.nodes[props.id]?.consumerData.wsServerConfig !== undefined ? parsedModifiedState.nodes[props.id].consumerData.wsServerConfig : {},
         url: parsedModifiedState?.nodes[props.id]?.consumerData.url !== undefined ? parsedModifiedState.nodes[props.id].consumerData.url : "",
     });
 
