@@ -273,16 +273,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return "";
     };
 
-    // create language:frameworks map based on template chosen
-    let map;
-    if (isCompageTemplate(payload.restServerConfig.template)) {
-        map = new Map(Object.entries(COMPAGE_LANGUAGE_FRAMEWORKS));
-    } else {
-        map = new Map(Object.entries(OPENAPI_LANGUAGE_FRAMEWORKS));
-    }
-
-    const frameworks = map.get(payload.language) || [];
-
     const getPortContent = () => {
         if (isCompageTemplate(payload.restServerConfig.template)) {
             return <TextField
@@ -319,6 +309,21 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
 
     const getRestServerConfig = () => {
         if (payload.isRestServer) {
+            let templates;
+            if (payload.language === GO) {
+                templates = [COMPAGE, OPENAPI];
+            } else {
+                templates = [OPENAPI]
+            }
+            // create language:frameworks map based on template chosen
+            let map;
+            if (isCompageTemplate(payload.restServerConfig.template)) {
+                map = new Map(Object.entries(COMPAGE_LANGUAGE_FRAMEWORKS));
+            } else {
+                map = new Map(Object.entries(OPENAPI_LANGUAGE_FRAMEWORKS));
+            }
+            const frameworks = map.get(payload.language) || [];
+
             return <React.Fragment>
                 <TextField
                     required
@@ -488,13 +493,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             wsServerConfig: wsServerConfig
         });
     };
-
-    let templates;
-    if (payload.language === GO) {
-        templates = [COMPAGE, OPENAPI];
-    } else {
-        templates = [OPENAPI]
-    }
 
     const handleModifyRestResourceClick = (resource: Resource) => {
         const restServerConfig = payload.restServerConfig;
