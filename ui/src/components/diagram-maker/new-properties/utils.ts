@@ -6,17 +6,26 @@ export const isCompageTemplate = (input: string) => {
 };
 
 // compage template frameworks supported.
-export const compageLanguageFrameworks = {
+export const COMPAGE_LANGUAGE_FRAMEWORKS = {
     "go": ["go-gin-server"],
 };
 
+export const GO = "go";
+export const JAVASCRIPT = "javascript";
+export const TYPESCRIPT = "typescript";
+export const JAVA = "java";
+export const RUST = "rust";
+export const RUBY = "ruby";
+export const PYTHON = "python";
+export const LANGUAGES = [GO, JAVA, JAVASCRIPT, RUST, RUBY, PYTHON, TYPESCRIPT];
+
 // openapi template frameworks supported.
-export const openApiLanguageFrameworks = {
-    "go": ["go-server", "go-gin-server", "go-echo-server"],
-    "javascript": ["nodejs-express-server"],
-    "typescript": ["typescript-node", "typescript-axios"],
-    "java": ["java-play-framework", "java-micronaut-server", "java-undertow-server", "spring"],
-    "rust": ["rust-server"],
-    "ruby": ["ruby-on-rails", "ruby-sinatra"],
-    "python": ["python-flask"],
+export const OPENAPI_LANGUAGE_FRAMEWORKS = {
+    GO: ["go-server", "go-gin-server", "go-echo-server"],
+    JAVASCRIPT: ["nodejs-express-server"],
+    TYPESCRIPT: ["typescript-node", "typescript-axios"],
+    JAVA: ["java-play-framework", "java-micronaut-server", "java-undertow-server", "spring"],
+    RUST: ["rust-server"],
+    RUBY: ["ruby-on-rails", "ruby-sinatra"],
+    PYTHON: ["python-flask"],
 };

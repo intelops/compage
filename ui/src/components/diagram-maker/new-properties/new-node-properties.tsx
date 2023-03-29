@@ -18,7 +18,15 @@ import {selectUploadYamlData, selectUploadYamlStatus} from "../../../features/op
 import {updateModifiedState} from "../../../features/projects/populateModifiedState";
 import {sanitizeString} from "../../../utils/backend-api";
 import {UploadYaml} from "../../../features/open-api-yaml-operations/component";
-import {COMPAGE, compageLanguageFrameworks, isCompageTemplate, OPENAPI, openApiLanguageFrameworks} from "./utils";
+import {
+    COMPAGE,
+    COMPAGE_LANGUAGE_FRAMEWORKS,
+    GO,
+    isCompageTemplate,
+    LANGUAGES,
+    OPENAPI,
+    OPENAPI_LANGUAGE_FRAMEWORKS
+} from "./utils";
 
 interface NewNodePropertiesProps {
     isOpen: boolean;
@@ -268,9 +276,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     // create language:frameworks map based on template chosen
     let map;
     if (isCompageTemplate(payload.restServerConfig.template)) {
-        map = new Map(Object.entries(compageLanguageFrameworks));
+        map = new Map(Object.entries(COMPAGE_LANGUAGE_FRAMEWORKS));
     } else {
-        map = new Map(Object.entries(openApiLanguageFrameworks));
+        map = new Map(Object.entries(OPENAPI_LANGUAGE_FRAMEWORKS));
     }
 
     const frameworks = map.get(payload.language) || [];
@@ -481,13 +489,13 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const templates = [COMPAGE, OPENAPI];
-    let languages;
-    if (isCompageTemplate(payload.restServerConfig.template)) {
-        languages = ["go"];
+    let templates;
+    if (payload.language === GO) {
+        templates = [COMPAGE, OPENAPI];
     } else {
-        languages = ["go", "javascript", "java", "ruby", "python", "rust"];
+        templates = [OPENAPI]
     }
+
     const handleModifyRestResourceClick = (resource: Resource) => {
         const restServerConfig = payload.restServerConfig;
         restServerConfig.resources.push(resource);
@@ -553,7 +561,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         {/*<MenuItem value="">*/}
                         {/*    <em>Create new</em>*/}
                         {/*</MenuItem>*/}
-                        {languages.map((language: string) => (
+                        {LANGUAGES.map((language: string) => (
                             <MenuItem key={language} value={language}>
                                 {language}
                             </MenuItem>
