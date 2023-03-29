@@ -148,17 +148,6 @@ func NewLanguageNode(compageJson *core.CompageJson, node *node.Node) (*LanguageN
 		} else {
 			languageNode.RestConfig.Clients = restClients.([]RestClient)
 		}
-
-		// set framework to all clients for this node as it's set for server.
-		for _, client := range languageNode.RestConfig.Clients {
-			// if server is nil, assign default framework i.e. http client
-			if languageNode.RestConfig.Server != nil {
-				client.Framework = languageNode.RestConfig.Server.Framework
-			} else {
-				// default rest client code based on below framework.
-				client.Framework = "go-gin-server"
-			}
-		}
 	}
 
 	return languageNode, nil
@@ -206,11 +195,9 @@ func GetClientsForNode(compageJson *core.CompageJson, nodeP *node.Node) (*Client
 		if e.Dest == nodeP.ID {
 			if e.ConsumerData.RestClientConfig != nil {
 				openApiFileYamlContent, framework := getOpenApiFileYamlContentAndFrameworkFromNodeForEdge(e.Src, compageJson.Nodes)
-
 				restClients = append(restClients, RestClient{
-					Port: e.ConsumerData.RestClientConfig.Port,
-					// TODO refer node's name here instead of id. This is required for service-name generation. Need to re-check.
-					ExternalNode:           e.Src,
+					Port:                   e.ConsumerData.RestClientConfig.Port,
+					ExternalNode:           e.ConsumerData.ExternalNode,
 					Framework:              framework,
 					OpenApiFileYamlContent: openApiFileYamlContent,
 				})
@@ -218,9 +205,8 @@ func GetClientsForNode(compageJson *core.CompageJson, nodeP *node.Node) (*Client
 			if e.ConsumerData.GrpcClientConfig != nil {
 				protoFileContent, framework := getProtoFileContentAndFrameworkFromNodeForEdge(e.Src, compageJson.Nodes)
 				grpcClients = append(grpcClients, GrpcClient{
-					Port: e.ConsumerData.RestClientConfig.Port,
-					// TODO refer node's name here instead of id. This is required for service-name generation. Need to re-check.
-					ExternalNode:     e.Src,
+					Port:             e.ConsumerData.RestClientConfig.Port,
+					ExternalNode:     e.ConsumerData.ExternalNode,
 					Framework:        framework,
 					ProtoFileContent: protoFileContent,
 				})
@@ -229,9 +215,8 @@ func GetClientsForNode(compageJson *core.CompageJson, nodeP *node.Node) (*Client
 			}
 			if e.ConsumerData.WsClientConfig != nil {
 				wsClients = append(wsClients, WsClient{
-					Port: e.ConsumerData.RestClientConfig.Port,
-					// TODO refer node's name here instead of id. This is required for service-name generation. Need to re-check.
-					ExternalNode: e.Src,
+					Port:         e.ConsumerData.RestClientConfig.Port,
+					ExternalNode: e.ConsumerData.ExternalNode,
 				})
 				return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
 					"ws", nodeP.ConsumerData.Language)

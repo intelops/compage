@@ -49,6 +49,11 @@ const getClientTypesConfig = (parsedModifiedState, edgeId): ClientTypesConfig =>
     return clientTypesConfig;
 };
 
+const getExternalNode = (edgeId: string) => {
+    const parsedConfig = JSON.parse(getCurrentConfig());
+    return parsedConfig.nodes[parsedConfig.edges[edgeId].src].consumerData.name
+};
+
 export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     const parsedModifiedState = getParsedModifiedState();
     const parsedCurrentConfig = JSON.parse(getCurrentConfig());
@@ -78,9 +83,8 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             };
         }
 
-        const parsedConfig = JSON.parse(getCurrentConfig());
         modifiedState.edges[props.edgeId]["consumerData"]["name"] = payload.name;
-        modifiedState.edges[props.edgeId]["consumerData"]["externalNode"] = parsedConfig.edges[props.edgeId].src;
+        modifiedState.edges[props.edgeId]["consumerData"]["externalNode"] = getExternalNode(props.edgeId);
         if (payload.isRestServer) {
             modifiedState.edges[props.edgeId]["consumerData"]["restClientConfig"] = {port: payload.restServerPort};
         }
