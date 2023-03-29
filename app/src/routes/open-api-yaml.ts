@@ -3,8 +3,9 @@ import {Request, Response, Router} from "express";
 import {X_USER_NAME_HEADER} from "../util/constants";
 import multer from "../middlewares/multer";
 import * as fs from "fs";
-import {CompageNode, ProjectEntity, UploadYamlError, UploadYamlRequest, UploadYamlResponse} from "./models";
-import {getProject} from "../util/project-store";
+import {ProjectEntity, UploadYamlError, UploadYamlRequest, UploadYamlResponse} from "./models";
+import {getProject} from "../util/project-client";
+import Logger from "../util/logger";
 
 const openApiYamlRouter = Router();
 
@@ -23,16 +24,18 @@ openApiYamlRouter.post("/upload", requireUserNameMiddleware, multer.single('file
             // delete file once content is extracted
             fs.rmSync(request.file.path);
             const message = `File got uploaded.`;
-            console.log(message);
+            Logger.info(message);
+            // TODO the upload happens so quickly that artificial delay is required and it will help for better experience.
+            await new Promise(r => setTimeout(r, 1000));
             return response.status(200).json(getUploadYamlResponse(uploadYamlRequest.projectId, uploadYamlRequest.nodeId, content, message));
-        } catch (e) {
-            const message = `File couldn't be uploaded due to : ${e}`;
-            console.log(message);
+        } catch (error) {
+            const message = `File couldn't be uploaded due to : ${error}`;
+            Logger.error(message);
             return response.status(500).json(getUploadYamlError(message));
         }
     }
     const message = `File couldn't be uploaded.`;
-    console.log(message);
+    Logger.warn(message);
     return response.status(500).json(getUploadYamlError(message));
 });
 

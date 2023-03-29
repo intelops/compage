@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/intelops/compage/core/internal/core"
-	"github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages"
 	"golang.org/x/exp/maps"
 )
@@ -73,7 +72,6 @@ func GetCompageJson(jsonString string) (*core.CompageJson, error) {
 // validate validates edges and nodes in compage json.
 func validate(compageJson *core.CompageJson) error {
 	// validations on node fields and setting default values.
-	compageJson = populateExternalNodeInEdges(compageJson)
 	for _, n := range compageJson.Nodes {
 		// name can't be empty for node
 		if n.ConsumerData.Name == "" {
@@ -88,35 +86,12 @@ func validate(compageJson *core.CompageJson) error {
 			n.ConsumerData.Template = languages.Compage
 		}
 	}
-	for _, e := range compageJson.Edges {
-		if e.ConsumerData.ExternalNodeName == "" {
-			return fmt.Errorf("externalNodeName should not be empty")
-		}
-	}
+
 	// no need to populate port in individual edge as we need to have that validation on ui itself.
 	// Reasons 1. user may use grpc protocol when the src node doesn't have one. We need to show the protocols in
 	// edge dropdown based on the server configs on src node :D
 
 	return nil
-}
-
-func populateExternalNodeInEdges(compageJson *core.CompageJson) *core.CompageJson {
-	for _, edge := range compageJson.Edges {
-		if edge.ConsumerData.ExternalNodeName == "" {
-			edge.ConsumerData.ExternalNodeName, edge.ConsumerData.OpenApiFileYamlContent = getExternalNodeAndOpenApiFileYamlContentForEdge(edge.Src, compageJson.Nodes)
-		}
-	}
-	return compageJson
-}
-
-func getExternalNodeAndOpenApiFileYamlContentForEdge(src string, nodes []*node.Node) (string, string) {
-	for _, n := range nodes {
-		if src == n.ID {
-			//TODO below need to be replaced (n.ConsumerData.OpenApiFileYamlContent)
-			return n.ConsumerData.Name, ""
-		}
-	}
-	return "", ""
 }
 
 // GetMetadata converts string to map

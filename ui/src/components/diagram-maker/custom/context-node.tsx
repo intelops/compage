@@ -13,10 +13,13 @@ export const ContextNode = (props: ContextNodeProps) => {
         name: parsedModifiedState.nodes[props.id]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.id].consumerData.name : "",
         type: parsedModifiedState.nodes[props.id]?.consumerData.type !== undefined ? parsedModifiedState.nodes[props.id].consumerData.type : "",
         language: parsedModifiedState.nodes[props.id]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.id].consumerData.language : "",
-        isServer: parsedModifiedState.nodes[props.id]?.consumerData.isServer !== undefined ? parsedModifiedState.nodes[props.id].consumerData.isServer : false,
         template: parsedModifiedState.nodes[props.id]?.consumerData.template !== undefined ? parsedModifiedState.nodes[props.id].consumerData.template : false,
-        // serverTypes to be generated
-        serverTypes: parsedModifiedState.nodes[props.id]?.consumerData.serverTypes !== undefined ? parsedModifiedState.nodes[props.id].consumerData.serverTypes : [],
+        // restServerConfig to be generated
+        restServerConfig: parsedModifiedState.nodes[props.id]?.consumerData.restServerConfig !== undefined ? parsedModifiedState.nodes[props.id].consumerData.restServerConfig : {},
+        // grpcServerConfig to be generated
+        grpcServerConfig: parsedModifiedState.nodes[props.id]?.consumerData.grpcServerConfig !== undefined ? parsedModifiedState.nodes[props.id].consumerData.grpcServerConfig : {},
+        // wsServerType to be generated
+        wsServerConfig: parsedModifiedState.nodes[props.id]?.consumerData.wsServerConfig !== undefined ? parsedModifiedState.nodes[props.id].consumerData.wsServerConfig : {},
         url: parsedModifiedState?.nodes[props.id]?.consumerData.url !== undefined ? parsedModifiedState.nodes[props.id].consumerData.url : "",
     });
 
@@ -49,15 +52,6 @@ export const ContextNode = (props: ContextNodeProps) => {
         return <><strong>Template</strong>: {payload.template}</>;
     };
 
-    const getServerTypes = () => {
-        let result = "<>";
-        for (let i = 0; i < payload.serverTypes.length; i++) {
-            result += JSON.stringify(payload.serverTypes[i]);
-        }
-        result += "</>";
-        return result;
-    };
-
     return <React.Fragment>
         <div className="contextMenu">
             <strong> Node </strong>: {props.id}
@@ -70,11 +64,6 @@ export const ContextNode = (props: ContextNodeProps) => {
             <br/>
             {getTemplate()}
             <br/>
-            {/*{getServerTypes()}*/}
-            {/*<br/>*/}
-            {/*{getIsServer()}*/}
-            {/*<br/>*/}
-            {/*{getIsClient()}*/}
         </div>
     </React.Fragment>;
 };

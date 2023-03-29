@@ -1,5 +1,6 @@
 import {SimpleGit} from "simple-git";
 import {Repository} from "../../routes/models";
+import Logger from "../logger";
 
 export const gitOperations = async (git: SimpleGit, repository: Repository, projectVersion: string): Promise<string> => {
     // Add all files for commit
@@ -7,48 +8,48 @@ export const gitOperations = async (git: SimpleGit, repository: Repository, proj
     await git.add('.')
         .then(
             (success: any) => {
-                console.debug("git add succeeded");
+                Logger.debug("git add succeeded");
             }, (failure: any) => {
-                console.debug('git add failed : ', failure);
-                error = "git add failed" + failure
+                Logger.debug('git add failed : ', failure);
+                error = "git add failed" + failure;
             });
     if (error.length > 0) {
-        return error
+        return error;
     }
 
     // Commit files as Initial Commit
     await git.commit(`commit by compage : generated files through compage for version: ${projectVersion}`)
         .then(
             (success: any) => {
-                console.debug('git commit succeeded');
+                Logger.debug('git commit succeeded');
             }, (failure: any) => {
-                console.debug('git commit failed : ', failure);
-                error = "git commit failed" + failure
+                Logger.debug('git commit failed : ', failure);
+                error = "git commit failed" + failure;
             });
     if (error.length > 0) {
-        return error
+        return error;
     }
 
     //  checkoutLocalBranch checks out local branch with name supplied
     await git.checkoutLocalBranch(repository.branch + "-" + projectVersion)
         .then(
             (success: any) => {
-                console.debug('git checkoutLocalBranch succeeded');
+                Logger.debug('git checkoutLocalBranch succeeded');
             }, (failure: any) => {
-                console.debug('git checkoutLocalBranch failed : ', failure);
-                error = "git checkoutLocalBranch failed" + failure
+                Logger.debug('git checkoutLocalBranch failed : ', failure);
+                error = "git checkoutLocalBranch failed" + failure;
             });
     if (error.length > 0) {
-        return error
+        return error;
     }
 
     // Finally push to online repository
     await git.push('origin', repository.branch + "-" + projectVersion, {'--force': null})
         .then((success: any) => {
-            console.debug('git push succeeded');
+            Logger.debug('git push succeeded');
         }, (failure: any) => {
-            console.debug('git push failed : ', failure);
-            error = "git push failed" + failure
+            Logger.debug('git push failed : ', failure);
+            error = "git push failed" + failure;
         });
-    return error
+    return error;
 }

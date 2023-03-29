@@ -6,13 +6,14 @@ import {
     pushToExistingProjectOnGitServer,
     PushToExistingProjectOnGitServerRequest
 } from "../util/simple-git/existing-project";
-import {getToken} from "../util/user-store";
+import {getToken} from "../util/user-client";
 import {cloneExistingProjectFromGitServer, CloneExistingProjectFromGitServerRequest} from "../util/simple-git/clone";
 import {GenerateCodeError, GenerateCodeRequest, GenerateCodeResponse, Project} from "./models";
 import {requireUserNameMiddleware} from "../middlewares/auth";
-import {getProjectResource, patchProjectResource} from "../store/project-client";
+import {getProjectResource, patchProjectResource} from "../store/project-store";
 import {NAMESPACE, X_USER_NAME_HEADER} from "../util/constants";
 import {OldVersion} from "../store/models";
+import Logger from "../util/logger";
 
 const rimraf = require("rimraf");
 const tar = require('tar')
@@ -25,10 +26,20 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
     const userName = request.header(X_USER_NAME_HEADER) || "";
     const generateCodeRequest: GenerateCodeRequest = request.body;
     const projectId = generateCodeRequest.projectId
+    const nextVersion = (version: string): string => {
+        const number = parseInt(version.substring(1, version.length)) + 1;
+        return "v" + number;
+    };
+
+    const previousVersion = (version: string): string => {
+        const number = parseInt(version.substring(1, version.length)) - 1;
+        return "v" + number;
+    };
+
     const cleanup = (downloadedProjectPath: string) => {
         // remove directory created, delete directory recursively
         rimraf(downloadedProjectPath).then((result: any) => {
-            console.debug(`${downloadedProjectPath} is cleaned up`);
+            Logger.debug(`${downloadedProjectPath} is cleaned up`);
         });
     }
 
@@ -47,6 +58,25 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
         const message = `unable to generate code, have at least a node added to your project: ${projectResource.spec.displayName}[${projectId}].`
         return resource.status(500).json(getGenerateCodeError(message));
     }
+
+    // check to decide whether to call core or not. This means that user has done no changes in this version since last code generation. Re-generating code for same diagram is not a good idea.
+    if (projectResource.spec.version != "v1") {
+        const currentVersion = projectResource.spec.version;
+        const lastVersion = previousVersion(currentVersion);
+        const oldVersions = projectResource.spec.oldVersions;
+        // iterate over all oldVersions to find the last version in it.
+        for (let oldVersion of oldVersions) {
+            // check if the lastVersion matches with current version
+            if (oldVersion.version === lastVersion) {
+                // remove unwanted keys and then do the equality check. This is needed to avoid keys used to render ui.
+                if (JSON.stringify(removeUnwantedKeys(oldVersion.json)) === JSON.stringify(removeUnwantedKeys(projectResource.spec.json))) {
+                    const message = `unable to generate code, No new changes found since last generation: ${projectResource.spec.displayName}[${projectId}].`
+                    return resource.status(500).json(getGenerateCodeError(message));
+                }
+            }
+        }
+    }
+
     // create directory hierarchy here itself as creating it after receiving data will not be proper.
     const originalProjectPath = `${os.tmpdir()}/${projectResource.spec.displayName}`;
     const downloadedProjectPath = `${originalProjectPath}_downloaded`;
@@ -81,7 +111,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
         // chunk is available, append it to the given path.
         if (response.fileChunk) {
             fs.appendFileSync(projectTarFilePath, response.fileChunk);
-            console.debug(`writing tar file chunk to: ${projectTarFilePath}`);
+            Logger.debug(`writing tar file chunk to: ${projectTarFilePath}`);
         }
     });
 
@@ -102,7 +132,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
         // stream on extraction on tar file
         let fscrs = fs.createReadStream(projectTarFilePath)
         fscrs.on('error', function (err: any) {
-            console.log(JSON.stringify(err))
+            Logger.error(JSON.stringify(err))
         });
         fscrs.pipe(extract)
 
@@ -143,7 +173,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
                 return resource.status(500).json(getGenerateCodeError(message));
             }
 
-            console.log(`saved ${downloadedProjectPath} to github.`)
+            Logger.debug(`saved ${downloadedProjectPath} to github.`)
             cleanup(downloadedProjectPath);
 
             // update status in k8s
@@ -152,10 +182,6 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
             metadata.version = projectResource.spec.version;
             // add metadata back to projectResource.spec
             projectResource.spec.metadata = JSON.stringify(metadata)
-            const nextVersion = (version: string): string => {
-                const number = parseInt(version.substring(1, version.length)) + 1;
-                return "v" + number;
-            };
             // change version now
             if (projectResource.spec.oldVersions) {
                 const oldVersion: OldVersion = {
@@ -214,5 +240,39 @@ const getGenerateCodeError = (message: string) => {
     }
     return generateCodeError;
 }
+
+const removeUnwantedKeys = (state: string) => {
+    if (state === undefined || state === null || (!state || state === "{}")) {
+        // happens at the beginning with value "{}"
+        return state;
+    }
+    const isObject = (obj: any) => {
+        return obj.constructor === Object;
+    };
+    Logger.debug(state)
+    let stateJson;
+    if (!isObject(state)) {
+        stateJson = JSON.parse(state);
+    } else {
+        stateJson = state;
+    }
+    // delete unwanted stuff from state.
+    delete stateJson.panels;
+    delete stateJson.plugins;
+    delete stateJson?.potentialEdge;
+    delete stateJson.potentialNode;
+    delete stateJson.editor;
+    delete stateJson?.undoHistory;
+    delete stateJson.workspace;
+    // nodes
+    for (let key in stateJson.nodes) {
+        delete stateJson.nodes[key]?.diagramMakerData;
+    }
+    // edges
+    for (let key in stateJson.edges) {
+        delete stateJson.edges[key]?.diagramMakerData;
+    }
+    return stateJson;
+};
 
 export default codeOperationsRouter;

@@ -10,7 +10,7 @@ import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
-import {Grpc, Resource, Rest, Ws} from "../models";
+import {GrpcServerConfig, Resource, RestServerConfig, WsServerConfig} from "../models";
 import {ModifyRestResource} from "./modify-rest-resource";
 import DeleteIcon from '@mui/icons-material/Delete';
 import {useAppSelector} from "../../../redux/hooks";
@@ -26,46 +26,46 @@ interface NewNodePropertiesProps {
     onClose: () => void;
 }
 
-interface ServerConfig {
-    protocol?: string;
-    port?: string;
-    framework?: string;
-    resources?: Resource[];
-    openApiFileYamlContent?: string;
-}
 
 interface ServerTypesConfig {
     isRestServer?: boolean;
-    restServerConfig?: ServerConfig;
+    restServerConfig?: RestServerConfig;
     isGrpcServer?: boolean;
-    grpcServerConfig?: ServerConfig;
+    grpcServerConfig?: GrpcServerConfig;
     isWsServer?: boolean;
-    wsServerConfig?: ServerConfig;
+    wsServerConfig?: WsServerConfig;
 }
 
-// TODO incomplete impl below
 const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig => {
-    const serverTypes = parsedModifiedState.nodes[nodeId]?.consumerData.serverTypes;
+    const restServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.restServerConfig;
+    const grpcServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.grpcServerConfig;
+    const wsServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.wsServerConfig;
     const serverTypesConfig: ServerTypesConfig = {};
-    if (serverTypes || serverTypes !== undefined || serverTypes !== "[]") {
-        for (let i = 0; i < serverTypes?.length; i++) {
-            if (serverTypes[i]["protocol"] === Rest) {
-                serverTypesConfig.isRestServer = true;
-                serverTypesConfig.restServerConfig = {};
-                serverTypesConfig.restServerConfig.port = serverTypes[i]["port"];
-                serverTypesConfig.restServerConfig.framework = serverTypes[i]["framework"];
-                serverTypesConfig.restServerConfig.resources = serverTypes[i]["resources"];
-                serverTypesConfig.restServerConfig.openApiFileYamlContent = serverTypes[i]["openApiFileYamlContent"];
-            } else if (serverTypes[i]["protocol"] === Grpc) {
-                serverTypesConfig.isGrpcServer = true;
-                serverTypesConfig.grpcServerConfig = {};
-                serverTypesConfig.grpcServerConfig.port = serverTypes[i]["port"];
-            } else if (serverTypes[i]["protocol"] === Ws) {
-                serverTypesConfig.isWsServer = true;
-                serverTypesConfig.wsServerConfig = {};
-                serverTypesConfig.wsServerConfig.port = serverTypes[i]["port"];
-            }
-        }
+    if (restServerConfig && restServerConfig !== "{}" && Object.keys(restServerConfig).length > 0) {
+        serverTypesConfig.isRestServer = true;
+        serverTypesConfig.restServerConfig = {
+            framework: restServerConfig.framework,
+            openApiFileYamlContent: restServerConfig.openApiFileYamlContent,
+            port: restServerConfig.port,
+            resources: restServerConfig.resources
+        };
+    }
+    if (grpcServerConfig && grpcServerConfig !== "{}" && Object.keys(grpcServerConfig).length > 0) {
+        serverTypesConfig.isGrpcServer = true;
+        serverTypesConfig.grpcServerConfig = {
+            framework: grpcServerConfig.framework,
+            port: grpcServerConfig.port,
+            protoFileContent: grpcServerConfig.protoFileContent,
+            resources: grpcServerConfig.resources
+        };
+    }
+    if (wsServerConfig && wsServerConfig !== "{}" && Object.keys(wsServerConfig).length > 0) {
+        serverTypesConfig.isWsServer = true;
+        serverTypesConfig.wsServerConfig = {
+            framework: wsServerConfig.framework,
+            port: wsServerConfig.port,
+            resources: wsServerConfig.resources
+        };
     }
     return serverTypesConfig;
 };
@@ -80,19 +80,24 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         parsedModifiedState = getParsedModifiedState();
     }
     const serverTypesConfig: ServerTypesConfig = getServerTypesConfig(parsedModifiedState, props.nodeId);
-    const emptyConfig: ServerConfig = {
-        framework: "", port: "", protocol: "", resources: []
+    const emptyRestServerConfig: RestServerConfig = {
+        framework: "", port: "", resources: [], openApiFileYamlContent: ""
     };
+    const emptyGrpcServerConfig: GrpcServerConfig = {
+        framework: "", port: "", protoFileContent: "", resources: []
+    };
+    const emptyWsServerConfig: WsServerConfig = {framework: "", port: "", resources: []};
+
     const [payload, setPayload] = React.useState({
         name: parsedModifiedState.nodes[props.nodeId]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.name : "",
         template: parsedModifiedState.nodes[props.nodeId]?.consumerData.template !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.template : COMPAGE,
         language: parsedModifiedState.nodes[props.nodeId]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.language : "",
         isRestServer: serverTypesConfig.isRestServer || false,
-        restServerConfig: serverTypesConfig.restServerConfig || emptyConfig,
+        restServerConfig: serverTypesConfig.restServerConfig || emptyRestServerConfig,
         isGrpcServer: serverTypesConfig.isGrpcServer || false,
-        grpcServerConfig: serverTypesConfig.grpcServerConfig || emptyConfig,
+        grpcServerConfig: serverTypesConfig.grpcServerConfig || emptyGrpcServerConfig,
         isWsServer: serverTypesConfig.isWsServer || false,
-        wsServerConfig: serverTypesConfig.wsServerConfig || emptyConfig,
+        wsServerConfig: serverTypesConfig.wsServerConfig || emptyWsServerConfig,
         isModifyRestResourceOpen: false,
         currentRestResource: {
             name: "",
@@ -104,12 +109,14 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     // update state with additional properties added from UI (Post node creation)
     const handleUpdate = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        const serverTypes = [];
+        let restServerConfig: RestServerConfig;
+        let grpcServerConfig: GrpcServerConfig;
+        let wsServerConfig: WsServerConfig;
+
         if (payload.isRestServer) {
-            const restServerConfig: ServerConfig = {
+            restServerConfig = {
                 framework: payload.restServerConfig.framework,
-                port: payload.restServerConfig.port,
-                protocol: Rest,
+                port: payload.restServerConfig.port || "8080",
             };
             if (isCompageTemplate(payload.template)) {
                 restServerConfig.resources = payload.restServerConfig.resources;
@@ -117,25 +124,20 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 restServerConfig.resources = [];
                 restServerConfig.openApiFileYamlContent = uploadYamlData.content;
             }
-            serverTypes.push(restServerConfig);
         }
         if (payload.isGrpcServer) {
-            const grpcServerConfig: ServerConfig = {
+            grpcServerConfig = {
                 framework: payload.grpcServerConfig.framework,
                 port: payload.grpcServerConfig.port,
-                protocol: Grpc,
                 resources: []
             };
-            serverTypes.push(grpcServerConfig);
         }
         if (payload.isWsServer) {
-            const wsServerConfig: ServerConfig = {
+            wsServerConfig = {
                 framework: payload.wsServerConfig.framework,
                 port: payload.wsServerConfig.port,
-                protocol: Ws,
                 resources: []
             };
-            serverTypes.push(wsServerConfig);
         }
 
         const modifiedState = getParsedModifiedState();
@@ -148,7 +150,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     template: payload.template,
                     name: payload.name,
                     language: payload.language,
-                    serverTypes
+                    restServerConfig: restServerConfig,
+                    grpcServerConfig: grpcServerConfig,
+                    wsServerConfig: wsServerConfig,
                 }
             };
         } else {
@@ -157,7 +161,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 template: payload.template,
                 name: payload.name,
                 language: payload.language,
-                serverTypes
+                restServerConfig: restServerConfig,
+                grpcServerConfig: grpcServerConfig,
+                wsServerConfig: wsServerConfig,
             };
         }
         // image to node display
@@ -172,9 +178,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             isGrpcServer: false,
             isRestServer: false,
             isWsServer: false,
-            grpcServerConfig: emptyConfig,
-            restServerConfig: emptyConfig,
-            wsServerConfig: emptyConfig,
+            grpcServerConfig: emptyGrpcServerConfig,
+            restServerConfig: emptyRestServerConfig,
+            wsServerConfig: emptyWsServerConfig,
             isModifyRestResourceOpen: false,
             currentRestResource: {
                 name: "",
@@ -400,7 +406,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         grpcServerConfig.port = event.target.value;
         setPayload({
             ...payload,
-            grpcServerConfig
+            grpcServerConfig: grpcServerConfig,
         });
     };
 
@@ -449,7 +455,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         wsServerConfig.port = event.target.value;
         setPayload({
             ...payload,
-            wsServerConfig
+            wsServerConfig: wsServerConfig
         });
     };
 
@@ -458,14 +464,14 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     if (isCompageTemplate(payload.template)) {
         languages = ["go"];
     } else {
-        languages = ["go", "javascript", "java", "ruby", "python"];
+        languages = ["go", "javascript", "java", "ruby", "python", "rust"];
     }
     const handleModifyRestResourceClick = (resource: Resource) => {
         const restServerConfig = payload.restServerConfig;
         restServerConfig.resources.push(resource);
         setPayload({
             ...payload,
-            restServerConfig,
+            restServerConfig: restServerConfig,
             isModifyRestResourceOpen: !payload.isModifyRestResourceOpen
         });
     };
@@ -479,7 +485,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
 
     const onClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
         // this prevents dialog box from closing.
-        if (reason === "backdropClick") {
+        if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
         }
         props.onClose();

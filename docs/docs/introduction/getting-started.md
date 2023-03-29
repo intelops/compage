@@ -65,6 +65,27 @@ kubectl config set-context --current --namespace=compage
 
 Fire below set of commands and install the compage on your KinD cluster running locally.
 
+Before this, you will have to create a docker image for ui component. As this is a UI component and commands in
+Dockerfile use below CONFIG values
+
+- REACT_APP_GITHUB_APP_CLIENT_ID
+- REACT_APP_GITHUB_APP_REDIRECT_URI
+- REACT_APP_COMPAGE_APP_SERVER_URL
+
+to create it, you will have to use your configurations and create a docker image using below commands (run them from base folder of compage)
+
+```shell
+TAG_NAME="{version you are installing so that it will be automatically taken.}"
+UI_IMAGE="ghcr.io/intelops/compage/ui:$TAG_NAME"
+# Assuming this is the name of your kind cluster
+CLUSTER_NAME=compage
+# create docker image for ui
+docker build -t $UI_IMAGE  --network host ui/
+kind load docker-image --name $CLUSTER_NAME $UI_IMAGE
+```
+
+Once you are done with above commands, kindly run below set of commands. 
+
 ```shell
 helm repo remove intelops
 helm repo add "intelops" "https://raw.githubusercontent.com/intelops/compage/main/charts"

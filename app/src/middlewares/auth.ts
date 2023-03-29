@@ -1,4 +1,4 @@
-import {getToken} from "../util/user-store";
+import {getToken} from "../util/user-client";
 import {NextFunction, Request, Response} from "express";
 import {X_USER_NAME_HEADER} from "../util/constants";
 

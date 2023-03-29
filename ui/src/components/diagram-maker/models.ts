@@ -4,17 +4,32 @@ export interface Resource {
     fields: Map<string, Map<string, string>>;
 }
 
-export interface ServerType {
-    protocol: string;
+export interface RestServerConfig {
     port: string;
-    framework: string;
-    resources: Resource[];
+    framework?: string;
+    resources?: Resource[];
+    openApiFileYamlContent?: string;
+}
+
+export interface GrpcServerConfig {
+    port: string;
+    framework?: string
+    resources?: Resource[];
+    protoFileContent?: string;
+}
+
+export interface WsServerConfig {
+    port: string;
+    framework?: string
+    resources?: Resource[];
 }
 
 export interface NodeConsumerData {
     name: string;
     template: string;
-    serverTypes?: ServerType[];
+    restServerConfig?: RestServerConfig;
+    grpcServerConfig?: GrpcServerConfig;
+    wsServerConfig?: WsServerConfig;
     language: string;
     metadata: Map<string, string>;
     annotations: Map<string, string>;
@@ -26,14 +41,24 @@ export interface CompageNode {
     consumerData: NodeConsumerData;
 }
 
-export interface ClientType {
+export interface RestClientConfig {
     port: string;
-    protocol: string;
+}
+
+export interface GrpcClientConfig {
+    port: string;
+}
+
+export interface WsClientConfig {
+    port: string;
 }
 
 export interface EdgeConsumerData {
-    externalNodeName: string;
-    clientTypes: ClientType[];
+    name: string;
+    externalNode: string;
+    restClientConfig: RestClientConfig;
+    grpcClientConfig: GrpcClientConfig;
+    wsClientConfig: WsClientConfig;
     metadata: Map<string, string>;
     annotations: Map<string, string>;
 }
@@ -50,13 +75,3 @@ export interface CompageJson {
     nodes: Map<string, CompageNode>;
     version: string;
 }
-
-
-// Rest Protocol
-export const Rest = "REST";
-
-// Grpc Protocol
-export const Grpc = "GRPC";
-
-// Ws Protocol
-export const Ws = "WS";

@@ -2,6 +2,7 @@ package golang
 
 import (
 	"context"
+	"github.com/gertd/go-pluralize"
 	"github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages"
 	"github.com/intelops/compage/core/internal/utils"
@@ -46,6 +47,8 @@ func NewCopier(ctx context.Context) *Copier {
 	nodeName := values.Get(languages.NodeName)
 	userName := values.Get(languages.UserName)
 
+	pluralizeClient := pluralize.NewClient()
+
 	//populate map to replace templates
 	data := map[string]interface{}{
 		"RepositoryName": repositoryName,
@@ -63,7 +66,7 @@ func NewCopier(ctx context.Context) *Copier {
 		var resourcesData []resourceData
 		resources := values.LanguageNode.RestConfig.Server.Resources
 		for _, r := range resources {
-			resourcesData = append(resourcesData, resourceData{ResourceName: r.Name, ResourceNamePlural: strings.ToLower(r.Name) + "s"})
+			resourcesData = append(resourcesData, resourceData{ResourceName: r.Name, ResourceNamePlural: pluralizeClient.Plural(strings.ToLower(r.Name))})
 		}
 		data["Resources"] = resourcesData
 		data["ServerPort"] = values.LanguageNode.RestConfig.Server.Port

@@ -34,7 +34,7 @@ export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
 
     const handleDialogClose = async (e: any, reason: "backdropClick" | "escapeKeyDown") => {
         // this prevents dialog box from closing.
-        if (reason === "backdropClick") {
+        if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
         }
         if (handleClose) {

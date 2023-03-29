@@ -102,7 +102,7 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
 
     const onClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
         // this prevents dialog box from closing.
-        if (reason === "backdropClick") {
+        if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
         }
         props.onModifyRestResourceClose();

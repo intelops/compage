@@ -12,6 +12,7 @@ import (
 )
 
 // CallOpenApiGenerator calls OpenApiGenerator
+// TODO remove this before release
 func CallOpenApiGenerator(context *gin.Context) {
 	go func() {
 		_ = generator.RunOpenApiGenerator("generate", "-i", "https://raw.githubusercontent.com/openapitools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml", "-g", "ruby", "-o", "/tmp/test-project/")

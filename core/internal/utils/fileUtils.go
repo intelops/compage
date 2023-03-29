@@ -10,7 +10,7 @@ import (
 
 // GetProjectDirectoryName returns tarFile parent path
 func GetProjectDirectoryName(name string) string {
-	return TmpPath + "/" + strings.ToLower(name)
+	return TmpPath + "/" + name
 }
 
 // CreateDirectories creates the directory specified and all other directories in the path.

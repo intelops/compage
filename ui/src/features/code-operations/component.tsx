@@ -37,10 +37,19 @@ export const GenerateCode = () => {
             if (!name) {
                 return true;
             }
-            const serverTypes = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.serverTypes;
-            if (!serverTypes || serverTypes === "" || serverTypes === "[]") {
+            const restServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.restServerConfig;
+            if (!restServerConfig || restServerConfig === "" || restServerConfig === "{}") {
                 return true;
             }
+            // TODO check later
+            // const wsServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.wsServerConfig;
+            // if (!wsServerConfig || wsServerConfig === "" || wsServerConfig === "{}") {
+            //     return true;
+            // }
+            // const grpcServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.grpcServerConfig;
+            // if (!grpcServerConfig || grpcServerConfig === "" || grpcServerConfig === "{}") {
+            //     return true;
+            // }
         }
         // edges
         for (let key in removeUnwantedKeysGetCurrentState?.edges) {
@@ -48,8 +57,9 @@ export const GenerateCode = () => {
             if (!name) {
                 return true;
             }
-            const clientTypes = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData?.clientTypes;
-            if (!clientTypes || clientTypes === "" || clientTypes === "[]") {
+            // rest, similar checks need to be added below for grpc and ws.
+            const restClientConfig = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData?.restClientConfig;
+            if (!restClientConfig || restClientConfig === "" || restClientConfig === "{}") {
                 return true;
             }
         }

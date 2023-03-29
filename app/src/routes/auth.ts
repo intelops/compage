@@ -1,7 +1,7 @@
 import axios from "axios";
 import {btoa} from "buffer";
 import {Router} from "express";
-import {getToken, setToken} from "../util/user-store";
+import {getToken, setToken} from "../util/user-client";
 import config from "../util/constants";
 import {requireUserNameMiddleware} from "../middlewares/auth";
 import {LoginError} from "./models";
