@@ -13,7 +13,6 @@ export const ContextNode = (props: ContextNodeProps) => {
         name: parsedModifiedState.nodes[props.id]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.id].consumerData.name : "",
         type: parsedModifiedState.nodes[props.id]?.consumerData.type !== undefined ? parsedModifiedState.nodes[props.id].consumerData.type : "",
         language: parsedModifiedState.nodes[props.id]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.id].consumerData.language : "",
-        template: parsedModifiedState.nodes[props.id]?.consumerData.template !== undefined ? parsedModifiedState.nodes[props.id].consumerData.template : false,
         // restServerConfig to be generated
         restServerConfig: parsedModifiedState.nodes[props.id]?.consumerData.restServerConfig !== undefined ? parsedModifiedState.nodes[props.id].consumerData.restServerConfig : {},
         // grpcServerConfig to be generated
@@ -49,7 +48,7 @@ export const ContextNode = (props: ContextNodeProps) => {
     };
 
     const getTemplate = () => {
-        return <><strong>Template</strong>: {payload.template}</>;
+        return <><strong>Template</strong>: {payload.restServerConfig.template}</>;
     };
 
     return <React.Fragment>

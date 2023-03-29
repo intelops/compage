@@ -47,7 +47,8 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
             framework: restServerConfig.framework,
             openApiFileYamlContent: restServerConfig.openApiFileYamlContent,
             port: restServerConfig.port,
-            resources: restServerConfig.resources
+            resources: restServerConfig.resources,
+            template: restServerConfig.template
         };
     }
     if (grpcServerConfig && grpcServerConfig !== "{}" && Object.keys(grpcServerConfig).length > 0) {
@@ -81,7 +82,11 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     }
     const serverTypesConfig: ServerTypesConfig = getServerTypesConfig(parsedModifiedState, props.nodeId);
     const emptyRestServerConfig: RestServerConfig = {
-        framework: "", port: "", resources: [], openApiFileYamlContent: ""
+        template: "",
+        framework: "",
+        port: "",
+        resources: [],
+        openApiFileYamlContent: ""
     };
     const emptyGrpcServerConfig: GrpcServerConfig = {
         framework: "", port: "", protoFileContent: "", resources: []
@@ -90,7 +95,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
 
     const [payload, setPayload] = React.useState({
         name: parsedModifiedState.nodes[props.nodeId]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.name : "",
-        template: parsedModifiedState.nodes[props.nodeId]?.consumerData.template !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.template : COMPAGE,
         language: parsedModifiedState.nodes[props.nodeId]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.language : "",
         isRestServer: serverTypesConfig.isRestServer || false,
         restServerConfig: serverTypesConfig.restServerConfig || emptyRestServerConfig,
@@ -117,8 +121,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             restServerConfig = {
                 framework: payload.restServerConfig.framework,
                 port: payload.restServerConfig.port || "8080",
+                template: payload.restServerConfig.template,
             };
-            if (isCompageTemplate(payload.template)) {
+            if (isCompageTemplate(payload.restServerConfig.template)) {
                 restServerConfig.resources = payload.restServerConfig.resources;
             } else {
                 restServerConfig.resources = [];
@@ -147,7 +152,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             // adding consumerData to new node in modifiedState
             modifiedState.nodes[props.nodeId] = {
                 consumerData: {
-                    template: payload.template,
                     name: payload.name,
                     language: payload.language,
                     restServerConfig: restServerConfig,
@@ -158,7 +162,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         } else {
             // adding consumerData to existing node in modifiedState
             modifiedState.nodes[props.nodeId].consumerData = {
-                template: payload.template,
                 name: payload.name,
                 language: payload.language,
                 restServerConfig: restServerConfig,
@@ -173,7 +176,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         setModifiedState(JSON.stringify(modifiedState));
         setPayload({
             name: "",
-            template: "",
             language: "",
             isGrpcServer: false,
             isRestServer: false,
@@ -191,9 +193,11 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const handleTemplateChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const restServerConfig = payload.restServerConfig;
+        restServerConfig.template = event.target.value;
         setPayload({
             ...payload,
-            template: event.target.value
+            restServerConfig
         });
     };
 
@@ -263,7 +267,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
 
     // create language:frameworks map based on template chosen
     let map;
-    if (isCompageTemplate(payload.template)) {
+    if (isCompageTemplate(payload.restServerConfig.template)) {
         map = new Map(Object.entries(compageLanguageFrameworks));
     } else {
         map = new Map(Object.entries(openApiLanguageFrameworks));
@@ -272,7 +276,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const frameworks = map.get(payload.language) || [];
 
     const getPortContent = () => {
-        if (isCompageTemplate(payload.template)) {
+        if (isCompageTemplate(payload.restServerConfig.template)) {
             return <TextField
                 required
                 size="medium"
@@ -289,10 +293,11 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const getResourcesContent = () => {
-        if (isCompageTemplate(payload.template)) {
+        if (isCompageTemplate(payload.restServerConfig.template)) {
             return <React.Fragment>
-                <Button variant="outlined" color="secondary" onClick={handleAddRestResourceClick}>Add
-                    Resource</Button>
+                <Button variant="outlined" color="secondary" onClick={handleAddRestResourceClick}>
+                    Add Resource
+                </Button>
                 {
                     getExistingResources()
                 }
@@ -307,7 +312,23 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const getRestServerConfig = () => {
         if (payload.isRestServer) {
             return <React.Fragment>
-                {getPortContent()}
+                <TextField
+                    required
+                    size="medium"
+                    select
+                    margin="dense"
+                    id="template"
+                    label="Template for Component"
+                    type="text"
+                    value={payload.restServerConfig.template}
+                    onChange={handleTemplateChange}
+                    variant="outlined">
+                    {templates.map((template: string) => (
+                        <MenuItem key={template} value={template}>
+                            {template}
+                        </MenuItem>
+                    ))}
+                </TextField>
                 <TextField
                     required
                     size="medium"
@@ -325,6 +346,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         </MenuItem>
                     ))}
                 </TextField>
+                {getPortContent()}
                 {getResourcesContent()}
             </React.Fragment>;
         }
@@ -461,7 +483,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
 
     const templates = [COMPAGE, OPENAPI];
     let languages;
-    if (isCompageTemplate(payload.template)) {
+    if (isCompageTemplate(payload.restServerConfig.template)) {
         languages = ["go"];
     } else {
         languages = ["go", "javascript", "java", "ruby", "python", "rust"];
@@ -517,23 +539,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         onChange={handleNameChange}
                         variant="outlined"
                     />
-                    <TextField
-                        required
-                        size="medium"
-                        select
-                        margin="dense"
-                        id="template"
-                        label="Template for Component"
-                        type="text"
-                        value={payload.template}
-                        onChange={handleTemplateChange}
-                        variant="outlined">
-                        {templates.map((template: string) => (
-                            <MenuItem key={template} value={template}>
-                                {template}
-                            </MenuItem>
-                        ))}
-                    </TextField>
                     <TextField
                         required
                         size="medium"

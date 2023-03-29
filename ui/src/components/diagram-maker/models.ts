@@ -5,6 +5,7 @@ export interface Resource {
 }
 
 export interface RestServerConfig {
+    template: string;
     port: string;
     framework?: string;
     resources?: Resource[];

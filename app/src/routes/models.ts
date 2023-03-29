@@ -5,6 +5,7 @@ export interface Resource {
 }
 
 interface RestServerConfig {
+    template: string;
     port: string;
     framework?: string
     resources?: Resource[];
@@ -26,7 +27,6 @@ export interface WsServerConfig {
 
 export interface NodeConsumerData {
     name: string;
-    template: string;
     restServerConfig: RestServerConfig;
     grpcServerConfig: GrpcServerConfig;
     wsServerConfig: WsServerConfig;
