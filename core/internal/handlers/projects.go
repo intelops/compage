@@ -46,7 +46,7 @@ func GenerateCode(context *gin.Context) {
 		return
 	}
 	// trigger project generation
-	if err := generator.Generator(project); err != nil {
+	if err := generator.Generate(project); err != nil {
 		log.Error(err)
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

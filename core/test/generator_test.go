@@ -29,7 +29,7 @@ func TestGenerator(t *testing.T) {
 		return
 	}
 	// trigger project generation
-	if err = generator.Generator(project); err != nil {
+	if err = generator.Generate(project); err != nil {
 		log.Error(err)
 	}
 }

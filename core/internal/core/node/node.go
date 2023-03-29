@@ -11,8 +11,6 @@ type Node struct {
 type ConsumerData struct {
 	// Language node's(component) language.
 	Language string `json:"language"`
-	// Template its template to be used to generate code.
-	Template string `json:"template"`
 	// Name of component (required, this will be service and deployment name).
 	Name string `json:"name"`
 	// RestServerConfig holds all config related to REST server. If nil, it means that the node is not REST server.
@@ -28,6 +26,7 @@ type ConsumerData struct {
 }
 
 type RestServerConfig struct {
+	Template  string     `json:"template"`
 	Port      string     `json:"port"`
 	Framework string     `json:"framework"`
 	Resources []Resource `json:"resources"`

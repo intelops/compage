@@ -35,7 +35,7 @@ func (s *server) GenerateCode(projectRequest *project.GenerateCodeRequest, serve
 	}
 
 	// triggers project generation
-	if err := generator.Generator(coreProject); err != nil {
+	if err := generator.Generate(coreProject); err != nil {
 		log.Debug(err)
 		return status.Errorf(codes.InvalidArgument,
 			"error while generating the project ["+err.Error()+"]")

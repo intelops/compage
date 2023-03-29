@@ -26,6 +26,6 @@ func (goNode *GoNode) FillDefaults() error {
 	return nil
 }
 
-func GetTemplatesRootPath() string {
+func GetGoTemplatesRootPath() string {
 	return templatesRootPath
 }

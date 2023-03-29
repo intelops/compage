@@ -17,7 +17,6 @@ type LanguageNode struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Annotations map[string]string      `json:"annotations,omitempty"`
 	Language    string                 `json:"language"`
-	Template    string                 `json:"template"`
 
 	RestConfig *RestConfig `json:"restConfig"`
 	GrpcConfig *GrpcConfig `json:"grpcConfig"`
@@ -27,6 +26,7 @@ type LanguageNode struct {
 
 // RestServer holds information about the node's REST server.
 type RestServer struct {
+	Template  string          `json:"template"`
 	Framework string          `json:"framework"`
 	Port      string          `json:"port"`
 	Resources []node.Resource `json:"resources"`
@@ -37,6 +37,7 @@ type RestServer struct {
 // RestClient holds information about edge between nodeA and nodeB.
 type RestClient struct {
 	Port         string `json:"port"`
+	Template     string `json:"template"`
 	Framework    string `json:"framework"`
 	ExternalNode string `json:"externalNode"`
 	// OpenApiFileYamlContent holds openApiFileYamlContent
@@ -116,7 +117,6 @@ func NewLanguageNode(compageJson *core.CompageJson, node *node.Node) (*LanguageN
 		Metadata:    node.ConsumerData.Metadata,
 		Annotations: node.ConsumerData.Annotations,
 		Language:    node.ConsumerData.Language,
-		Template:    node.ConsumerData.Template,
 	}
 
 	servers, err := GetServersForNode(node)
@@ -161,6 +161,7 @@ func GetServersForNode(nodeP *node.Node) (*Servers, error) {
 		// retrieve Rest server config and store in below variable
 		var restServer *RestServer
 		restServer = &RestServer{
+			Template:  nodeP.ConsumerData.RestServerConfig.Template,
 			Framework: nodeP.ConsumerData.RestServerConfig.Framework,
 			Port:      nodeP.ConsumerData.RestServerConfig.Port,
 		}
@@ -194,12 +195,14 @@ func GetClientsForNode(compageJson *core.CompageJson, nodeP *node.Node) (*Client
 		// if the current node is in dest field of edge, it means it's a client to node in src field of edge.
 		if e.Dest == nodeP.ID {
 			if e.ConsumerData.RestClientConfig != nil {
-				openApiFileYamlContent, framework := getOpenApiFileYamlContentAndFrameworkFromNodeForEdge(e.Src, compageJson.Nodes)
+				// extract information from edge's source node.
+				openApiFileYamlContent, framework, template := getOpenApiFileYamlContentAndFrameworkAndTemplateFromNodeForEdge(e.Src, compageJson.Nodes)
 				restClients = append(restClients, RestClient{
 					Port:                   e.ConsumerData.RestClientConfig.Port,
 					ExternalNode:           e.ConsumerData.ExternalNode,
 					Framework:              framework,
 					OpenApiFileYamlContent: openApiFileYamlContent,
+					Template:               template,
 				})
 			}
 			if e.ConsumerData.GrpcClientConfig != nil {
@@ -248,11 +251,11 @@ func getProtoFileContentAndFrameworkFromNodeForEdge(src string, nodes []*node.No
 	return "", ""
 }
 
-func getOpenApiFileYamlContentAndFrameworkFromNodeForEdge(src string, nodes []*node.Node) (string, string) {
+func getOpenApiFileYamlContentAndFrameworkAndTemplateFromNodeForEdge(src string, nodes []*node.Node) (string, string, string) {
 	for _, n := range nodes {
 		if src == n.ID {
-			return n.ConsumerData.RestServerConfig.OpenApiFileYamlContent, n.ConsumerData.RestServerConfig.Framework
+			return n.ConsumerData.RestServerConfig.OpenApiFileYamlContent, n.ConsumerData.RestServerConfig.Framework, n.ConsumerData.RestServerConfig.Template
 		}
 	}
-	return "", ""
+	return "", "", ""
 }

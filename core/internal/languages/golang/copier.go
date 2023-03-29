@@ -118,32 +118,36 @@ func (copier Copier) CreateRestServerDirectories() error {
 func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 	var filePaths []string
 	resourceName := strings.ToLower(resource.Name)
+
 	// copy controller files to generated project
 	targetResourceControllerFileName := copier.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + ControllerFile
-	_, err := utils.CopyFile(targetResourceControllerFileName, GetTemplatesRootPath()+ControllersPath+"/"+ControllerFile)
+	_, err := utils.CopyFile(targetResourceControllerFileName, GetGoTemplatesRootPath()+ControllersPath+"/"+ControllerFile)
 	if err != nil {
 		return err
 	}
 	filePaths = append(filePaths, targetResourceControllerFileName)
+
 	// copy model files to generated project
 	targetResourceModelFileName := copier.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + ModelFile
-	_, err = utils.CopyFile(targetResourceModelFileName, GetTemplatesRootPath()+ModelsPath+"/"+ModelFile)
-	if err != nil {
-		return err
+	_, err1 := utils.CopyFile(targetResourceModelFileName, GetGoTemplatesRootPath()+ModelsPath+"/"+ModelFile)
+	if err1 != nil {
+		return err1
 	}
 	filePaths = append(filePaths, targetResourceModelFileName)
+
 	// copy service files to generated project
 	targetResourceServiceFileName := copier.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + ServiceFile
-	_, err = utils.CopyFile(targetResourceServiceFileName, GetTemplatesRootPath()+ServicesPath+"/"+ServiceFile)
-	if err != nil {
-		return err
+	_, err2 := utils.CopyFile(targetResourceServiceFileName, GetGoTemplatesRootPath()+ServicesPath+"/"+ServiceFile)
+	if err2 != nil {
+		return err2
 	}
 	filePaths = append(filePaths, targetResourceServiceFileName)
+
 	// copy dao files to generated project
 	targetResourceDaoFileName := copier.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + DaoFile
-	_, err = utils.CopyFile(targetResourceDaoFileName, GetTemplatesRootPath()+DaosPath+"/"+DaoFile)
-	if err != nil {
-		return err
+	_, err3 := utils.CopyFile(targetResourceDaoFileName, GetGoTemplatesRootPath()+DaosPath+"/"+DaoFile)
+	if err3 != nil {
+		return err3
 	}
 	filePaths = append(filePaths, targetResourceDaoFileName)
 
@@ -151,8 +155,8 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 	copier.addResourceSpecificTemplateData(resource)
 
 	// apply template
-	if err2 := copier.applyTemplate(filePaths); err2 != nil {
-		return err2
+	if err4 := copier.applyTemplate(filePaths); err4 != nil {
+		return err4
 	}
 
 	return nil
@@ -166,12 +170,13 @@ func (copier Copier) CopyRestClientResourceFiles(client languages.RestClient) er
 
 	// copy client files to generated project.
 	targetResourceClientFileName := copier.NodeDirectoryName + ClientPath + "/" + client.ExternalNode + "-" + ClientFile
-	_, err := utils.CopyFile(targetResourceClientFileName, GetTemplatesRootPath()+ClientPath+"/"+ClientFile)
+	_, err := utils.CopyFile(targetResourceClientFileName, GetGoTemplatesRootPath()+ClientPath+"/"+ClientFile)
 	if err != nil {
 		return err
 	}
 	var filePaths []string
 	filePaths = append(filePaths, targetResourceClientFileName)
+
 	// apply template
 	if err2 := copier.applyTemplate(filePaths); err2 != nil {
 		return err2
@@ -213,7 +218,7 @@ func (copier Copier) CreateRestConfigs() error {
 }
 
 // CreateKubernetesFiles creates required directory and copies files from language template.
-func (copier Copier) CreateKubernetesFiles(templatePath string) error {
+func (copier Copier) CreateKubernetesFiles() error {
 	destKubernetesDirectory := copier.NodeDirectoryName + KubernetesPath
 	if err := utils.CreateDirectories(destKubernetesDirectory); err != nil {
 		return err
@@ -223,7 +228,7 @@ func (copier Copier) CreateKubernetesFiles(templatePath string) error {
 	if copier.GoNode.RestConfig.Server != nil {
 		// copy service files to generated kubernetes manifests
 		targetKubernetesServiceFileName := copier.NodeDirectoryName + KubernetesPath + "/" + KubernetesServiceFile
-		_, err := utils.CopyFile(targetKubernetesServiceFileName, GetTemplatesRootPath()+KubernetesPath+"/"+KubernetesServiceFile)
+		_, err := utils.CopyFile(targetKubernetesServiceFileName, GetGoTemplatesRootPath()+KubernetesPath+"/"+KubernetesServiceFile)
 		if err != nil {
 			return err
 		}
@@ -231,7 +236,7 @@ func (copier Copier) CreateKubernetesFiles(templatePath string) error {
 	}
 	// copy deployment files to generated kubernetes manifests
 	targetKubernetesDeploymentFileName := copier.NodeDirectoryName + KubernetesPath + "/" + KubernetesDeploymentFile
-	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, GetTemplatesRootPath()+KubernetesPath+"/"+KubernetesDeploymentFile)
+	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, GetGoTemplatesRootPath()+KubernetesPath+"/"+KubernetesDeploymentFile)
 	if err != nil {
 		return err
 	}
@@ -244,8 +249,8 @@ func (copier Copier) CreateKubernetesFiles(templatePath string) error {
 }
 
 // CreateRootLevelFiles copies all root level files at language template.
-func (copier Copier) CreateRootLevelFiles(templatePath string) error {
-	err := utils.CopyFiles(copier.NodeDirectoryName, templatePath)
+func (copier Copier) CreateRootLevelFiles() error {
+	err := utils.CopyFiles(copier.NodeDirectoryName, GetGoTemplatesRootPath())
 	if err != nil {
 		return err
 	}
