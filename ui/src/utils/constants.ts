@@ -21,3 +21,26 @@ export const config = {
     redirect_uri: REACT_APP_GITHUB_APP_REDIRECT_URI,
     backend_base_url: REACT_APP_COMPAGE_APP_SERVER_URL,
 };
+
+// GoLang Data types are declared
+export const goDataTypes = {
+    int: [
+      "int8",
+      "int16",
+      "int32",
+      "int64",
+      "uint8",
+      "uint16",
+      "uint32",
+      "uint64",
+      "int",
+      "uint",
+      "rune",
+      "byte",
+      "uintptr",
+    ],
+    float: ["float32", "float64 "],
+    complex: ["complex64", "complex128"],
+    bool: ["bool"],
+    string: ["string"],
+  };
