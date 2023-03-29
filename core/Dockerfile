@@ -2,7 +2,7 @@
 # Build stage will be used:
 # - for building the application for production
 # - as target for development (see devspace.yaml)
-FROM golang:1.19.4-alpine3.17 as builder
+FROM golang:1.20.2-alpine3.17 as builder
 
 # Create project directory (workdir)
 WORKDIR /app
@@ -20,9 +20,12 @@ CMD ["go", "run", "main.go"]
 
 
 ################ Production ################
-FROM node:18.12-alpine
+FROM node:18.15-alpine
 RUN npm install @openapitools/openapi-generator-cli -g
 RUN apk add openjdk8-jre
+COPY --from=golang:1.20.2-alpine3.17 /usr/local/go/ /usr/local/go/
+ENV PATH="/usr/local/go/bin:${PATH}"
+RUN go version
 # test if the below command avoids loading the files later.
 RUN openapi-generator-cli version
 COPY --from=builder /app/main /
