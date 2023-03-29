@@ -11,6 +11,3 @@ const TemplateExtensionPattern = "/*" + TemplateExtension
 
 // SubstrString char to split into substrings.
 const SubstrString = "/"
-
-// GolangTemplatesPath directory of template files
-const GolangTemplatesPath = "templates/compage-template-go"

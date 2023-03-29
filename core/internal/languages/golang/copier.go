@@ -76,7 +76,7 @@ func NewCopier(ctx context.Context) *Copier {
 	return &Copier{
 		Ctx:               ctx,
 		NodeDirectoryName: values.NodeDirectoryName,
-		GoNode:            &GoNode{LanguageNode: *values.LanguageNode},
+		GoNode:            &GoNode{LanguageNode: values.LanguageNode},
 		Data:              data,
 	}
 }
@@ -120,28 +120,28 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 	resourceName := strings.ToLower(resource.Name)
 	// copy controller files to generated project
 	targetResourceControllerFileName := copier.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + ControllerFile
-	_, err := utils.CopyFile(targetResourceControllerFileName, utils.GetProjectRootPath()+ControllersPath+"/"+ControllerFile)
+	_, err := utils.CopyFile(targetResourceControllerFileName, GetTemplatesRootPath()+ControllersPath+"/"+ControllerFile)
 	if err != nil {
 		return err
 	}
 	filePaths = append(filePaths, targetResourceControllerFileName)
 	// copy model files to generated project
 	targetResourceModelFileName := copier.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + ModelFile
-	_, err = utils.CopyFile(targetResourceModelFileName, utils.GetProjectRootPath()+ModelsPath+"/"+ModelFile)
+	_, err = utils.CopyFile(targetResourceModelFileName, GetTemplatesRootPath()+ModelsPath+"/"+ModelFile)
 	if err != nil {
 		return err
 	}
 	filePaths = append(filePaths, targetResourceModelFileName)
 	// copy service files to generated project
 	targetResourceServiceFileName := copier.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + ServiceFile
-	_, err = utils.CopyFile(targetResourceServiceFileName, utils.GetProjectRootPath()+ServicesPath+"/"+ServiceFile)
+	_, err = utils.CopyFile(targetResourceServiceFileName, GetTemplatesRootPath()+ServicesPath+"/"+ServiceFile)
 	if err != nil {
 		return err
 	}
 	filePaths = append(filePaths, targetResourceServiceFileName)
 	// copy dao files to generated project
 	targetResourceDaoFileName := copier.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + DaoFile
-	_, err = utils.CopyFile(targetResourceDaoFileName, utils.GetProjectRootPath()+DaosPath+"/"+DaoFile)
+	_, err = utils.CopyFile(targetResourceDaoFileName, GetTemplatesRootPath()+DaosPath+"/"+DaoFile)
 	if err != nil {
 		return err
 	}
@@ -166,7 +166,7 @@ func (copier Copier) CopyRestClientResourceFiles(client languages.RestClient) er
 
 	// copy client files to generated project.
 	targetResourceClientFileName := copier.NodeDirectoryName + ClientPath + "/" + client.ExternalNode + "-" + ClientFile
-	_, err := utils.CopyFile(targetResourceClientFileName, utils.GetProjectRootPath()+ClientPath+"/"+ClientFile)
+	_, err := utils.CopyFile(targetResourceClientFileName, GetTemplatesRootPath()+ClientPath+"/"+ClientFile)
 	if err != nil {
 		return err
 	}
@@ -223,7 +223,7 @@ func (copier Copier) CreateKubernetesFiles(templatePath string) error {
 	if copier.GoNode.RestConfig.Server != nil {
 		// copy service files to generated kubernetes manifests
 		targetKubernetesServiceFileName := copier.NodeDirectoryName + KubernetesPath + "/" + KubernetesServiceFile
-		_, err := utils.CopyFile(targetKubernetesServiceFileName, utils.GetProjectRootPath()+KubernetesPath+"/"+KubernetesServiceFile)
+		_, err := utils.CopyFile(targetKubernetesServiceFileName, GetTemplatesRootPath()+KubernetesPath+"/"+KubernetesServiceFile)
 		if err != nil {
 			return err
 		}
@@ -231,7 +231,7 @@ func (copier Copier) CreateKubernetesFiles(templatePath string) error {
 	}
 	// copy deployment files to generated kubernetes manifests
 	targetKubernetesDeploymentFileName := copier.NodeDirectoryName + KubernetesPath + "/" + KubernetesDeploymentFile
-	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, utils.GetProjectRootPath()+KubernetesPath+"/"+KubernetesDeploymentFile)
+	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, GetTemplatesRootPath()+KubernetesPath+"/"+KubernetesDeploymentFile)
 	if err != nil {
 		return err
 	}
@@ -265,7 +265,7 @@ func (copier Copier) apply() error {
 func (copier Copier) addResourceSpecificTemplateData(resource node.Resource) {
 	// set resource specific key/value for data.
 	copier.Data["ResourceName"] = resource.Name
-	//make every field public by making its first character capital.
+	// make every field public by making its first character capital.
 	fields := map[string]string{}
 	for key, value := range resource.Fields {
 		// TODO change this approach

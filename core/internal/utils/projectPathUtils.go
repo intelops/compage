@@ -12,7 +12,7 @@ var (
 	root = filepath.Join(filepath.Dir(b), "../..")
 )
 
-// GetProjectRootPath returns root path of golang project.
-func GetProjectRootPath() string {
-	return root + "/" + GolangTemplatesPath
+// GetProjectRootPath returns root path of the language template passed.
+func GetProjectRootPath(templatesPath string) string {
+	return root + "/" + templatesPath
 }

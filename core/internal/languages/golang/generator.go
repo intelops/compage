@@ -10,7 +10,14 @@ import (
 // Generator generates golang specific code according to config passed
 func Generator(ctx context.Context) error {
 	values := ctx.Value(languages.ContextVars).(languages.Values)
-	goNode := values.LanguageNode
+	goNode := GoNode{
+		LanguageNode: values.LanguageNode,
+	}
+	// fills default config for golang
+	err := goNode.FillDefaults()
+	if err != nil {
+		return err
+	}
 	nodeDirectoryName := values.NodeDirectoryName
 
 	// Copy required files from templates, a few of them may need renaming.
@@ -30,13 +37,13 @@ func Generator(ctx context.Context) error {
 		}
 
 		// copy kubernetes yaml's
-		err := copier.CreateKubernetesFiles(utils.GetProjectRootPath())
+		err := copier.CreateKubernetesFiles(GetTemplatesRootPath())
 		if err != nil {
 			return err
 		}
 
 		// copy all files at root level
-		err = copier.CreateRootLevelFiles(utils.GetProjectRootPath())
+		err = copier.CreateRootLevelFiles(GetTemplatesRootPath())
 		if err != nil {
 			return err
 		}
