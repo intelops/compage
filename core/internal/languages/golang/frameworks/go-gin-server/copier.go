@@ -73,6 +73,8 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplate
 		GoTemplatesRootPath: goTemplatesRootPath,
 		NodeDirectoryName:   nodeDirectoryName,
 		Data:                data,
+		IsServer:            isServer,
+		Resources:           resources,
 		Clients:             clients,
 		PluralizeClient:     pluralizeClient,
 	}

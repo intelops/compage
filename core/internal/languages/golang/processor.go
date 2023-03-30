@@ -6,22 +6,22 @@ import (
 )
 
 func Process(ctx context.Context) error {
-	goValues := ctx.Value(GoContextVars).(GoValues)
+	golangValues := ctx.Value(GoContextVars).(GoValues)
 
 	// fills default config for golang
-	if err := goValues.GoNode.FillDefaults(); err != nil {
+	if err := golangValues.LGoLangNode.FillDefaults(); err != nil {
 		log.Debugf("err : %s", err)
 		return err
 	}
 
-	// generate golang project using custom template.
+	// generate golang project
 	if err := Generate(ctx); err != nil {
 		log.Debugf("err : %s", err)
 		return err
 	}
 
 	// format the code generated
-	if err := RunGoFmt(goValues.Values.NodeDirectoryName); err != nil {
+	if err := RunGoFmt(golangValues.Values.NodeDirectoryName); err != nil {
 		log.Debugf("err : %s", err)
 		return err
 	}

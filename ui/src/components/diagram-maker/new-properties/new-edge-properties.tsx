@@ -50,8 +50,10 @@ const getClientTypesConfig = (parsedModifiedState, edgeId): ClientTypesConfig =>
 };
 
 const getExternalNode = (edgeId: string) => {
+    const parsedModifiedState = getParsedModifiedState();
     const parsedConfig = JSON.parse(getCurrentConfig());
-    return parsedConfig.nodes[parsedConfig.edges[edgeId].src].consumerData.name
+    const nodeId = parsedConfig.edges[edgeId].src;
+    return parsedModifiedState.nodes[nodeId].consumerData.name;
 };
 
 export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/intelops/compage/core/internal/languages"
-	"github.com/intelops/compage/core/internal/languages/golang/frameworks/go_gin_server"
+	"github.com/intelops/compage/core/internal/languages/golang/frameworks/go-gin-server"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/kubernetes"
 	log "github.com/sirupsen/logrus"
 )
@@ -14,47 +14,54 @@ import (
 func Generate(ctx context.Context) error {
 	// extract goNode
 	goValues := ctx.Value(GoContextVars).(GoValues)
-	goNode := goValues.GoNode
+	n := goValues.LGoLangNode
 	// rest config
-	if goNode.RestConfig != nil {
+	if n.RestConfig != nil {
 		// check for the templates
-		if goNode.RestConfig.Server.Template == languages.Compage {
-			if goNode.RestConfig.Server.Framework == "go-gin-server" {
+		if n.RestConfig.Server.Template == languages.Compage {
+			if n.RestConfig.Server.Framework == "go-gin-server" {
 				goGinServerCopier := getGoGinServerCopier(goValues)
 				if err := goGinServerCopier.CreateRestConfigs(); err != nil {
 					log.Debugf("err : %s", err)
 					return err
 				}
-
-				integrationsCopier := getIntegrationsCopier(goValues)
-				if err := integrationsCopier.CreateKubernetesFiles(); err != nil {
-					log.Debugf("err : %s", err)
-					return err
-				}
-
-				// copy all files at root level
+				// copy all files at root level, fire this at last(TODO - remove dockerfile from below and add it to docker integration)
 				if err := goGinServerCopier.CreateRootLevelFiles(); err != nil {
 					log.Debugf("err : %s", err)
 					return err
 				}
 			} else {
-				return errors.New(fmt.Sprintf("unsupported framework %s  for template %s for language %s", goNode.RestConfig.Server.Framework, goNode.RestConfig.Server.Template, goNode.Language))
+				return errors.New(fmt.Sprintf("unsupported framework %s  for template %s for language %s", n.RestConfig.Server.Framework, n.RestConfig.Server.Template, n.Language))
 			}
 		} else {
-			if goNode.RestConfig.Server.Template != languages.OpenApi {
+			if n.RestConfig.Server.Template != languages.OpenApi {
 				// call openapi generator
-				return errors.New(fmt.Sprintf("unsupported template %s for language %s", goNode.RestConfig.Server.Template, goNode.Language))
+				return errors.New(fmt.Sprintf("unsupported template %s for language %s", n.RestConfig.Server.Template, n.Language))
 			}
-			// add code to generate with openapi
+			// check if OpenApiFileYamlContent contains value.
+			if len(n.RestConfig.Server.OpenApiFileYamlContent) < 1 {
+				return errors.New("at least rest-config needs to be provided, OpenApiFileYamlContent is empty")
+			}
+
+			if err := languages.ProcessOpenApiTemplate(ctx); err != nil {
+				return err
+			}
 		}
 	}
 	// grpc config
-	if goNode.GrpcConfig != nil {
-		return errors.New(fmt.Sprintf("unsupported protocol %s for language %s", "grpc", goNode.Language))
+	if n.GrpcConfig != nil {
+		return errors.New(fmt.Sprintf("unsupported protocol %s for language %s", "grpc", n.Language))
 	}
 	// ws config
-	if goNode.WsConfig != nil {
-		return errors.New(fmt.Sprintf("unsupported protocol %s for language %s", "ws", goNode.Language))
+	if n.WsConfig != nil {
+		return errors.New(fmt.Sprintf("unsupported protocol %s for language %s", "ws", n.Language))
+	}
+
+	// k8s files needs to be generated for the whole project so, it should be here.
+	integrationsCopier := getIntegrationsCopier(goValues)
+	if err := integrationsCopier.CreateKubernetesFiles(); err != nil {
+		log.Debugf("err : %s", err)
+		return err
 	}
 
 	return nil
@@ -65,10 +72,10 @@ func getGoGinServerCopier(goValues GoValues) *go_gin_server.Copier {
 	repositoryName := goValues.Values.Get(languages.RepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := goValues.Values.NodeDirectoryName
-	isServer := goValues.GoNode.RestConfig.Server != nil
-	serverPort := goValues.GoNode.RestConfig.Server.Port
-	resources := goValues.GoNode.RestConfig.Server.Resources
-	clients := goValues.GoNode.RestConfig.Clients
+	isServer := goValues.LGoLangNode.RestConfig.Server != nil
+	serverPort := goValues.LGoLangNode.RestConfig.Server.Port
+	resources := goValues.LGoLangNode.RestConfig.Server.Resources
+	clients := goValues.LGoLangNode.RestConfig.Clients
 	goTemplatesRootPath := GetGoTemplatesRootPath()
 	// create golang specific copier
 	copier := go_gin_server.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, isServer, serverPort, resources, clients)
@@ -80,8 +87,8 @@ func getIntegrationsCopier(goValues GoValues) *kubernetes.Copier {
 	repositoryName := goValues.Values.Get(languages.RepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := goValues.Values.NodeDirectoryName
-	isServer := goValues.GoNode.RestConfig.Server != nil
-	serverPort := goValues.GoNode.RestConfig.Server.Port
+	isServer := goValues.LGoLangNode.RestConfig.Server != nil
+	serverPort := goValues.LGoLangNode.RestConfig.Server.Port
 	goTemplatesRootPath := GetGoTemplatesRootPath()
 
 	// create golang specific copier

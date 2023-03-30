@@ -7,6 +7,8 @@ import (
 )
 
 const Go = "go"
+const Python = "python"
+
 const Compage string = "compage"
 const OpenApi string = "openApi"
 

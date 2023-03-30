@@ -1,4 +1,4 @@
-package golang
+package python
 
 import (
 	"github.com/intelops/compage/core/internal/languages"
@@ -6,26 +6,27 @@ import (
 )
 
 // TemplatesPath directory of template files
+// TODO changed later
 const TemplatesPath = "templates/compage-template-go"
 
 var templatesRootPath = utils.GetProjectRootPath(TemplatesPath)
 
-// LGolangNode language specific struct.
-type LGolangNode struct {
+// LPythonNode language specific struct.
+type LPythonNode struct {
 	*languages.LanguageNode
 }
 
 // FillDefaults constructor function
-func (n *LGolangNode) FillDefaults() error {
+func (n *LPythonNode) FillDefaults() error {
 	for _, client := range n.RestConfig.Clients {
 		// set the default framework.
 		if client.Framework == "" {
-			client.Framework = "go-gin-server"
+			client.Framework = "python-flask"
 		}
 	}
 	return nil
 }
 
-func GetGoTemplatesRootPath() string {
+func GetPythonTemplatesRootPath() string {
 	return templatesRootPath
 }

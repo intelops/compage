@@ -1,25 +1,25 @@
-package golang
+package python
 
 import (
 	"context"
 	"github.com/intelops/compage/core/internal/languages"
 )
 
-const GoContextVars = "GoContextVars"
+const ContextVars = "ContextVars"
 
-type GoValues struct {
-	Values      *languages.Values
-	LGoLangNode *LGolangNode
+type Values struct {
+	Values     *languages.Values
+	PythonNode *LPythonNode
 }
 
 func AddValuesToContext(ctx context.Context) context.Context {
 	values := ctx.Value(languages.LanguageContextVars).(languages.Values)
-	v := GoValues{
+	v := Values{
 		Values: &values,
-		LGoLangNode: &LGolangNode{
+		PythonNode: &LPythonNode{
 			LanguageNode: values.LanguageNode,
 		},
 	}
 
-	return context.WithValue(ctx, GoContextVars, v)
+	return context.WithValue(ctx, ContextVars, v)
 }

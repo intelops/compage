@@ -2,15 +2,12 @@ package processor
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"github.com/intelops/compage/core/internal/core"
 	"github.com/intelops/compage/core/internal/languages"
 	"github.com/intelops/compage/core/internal/languages/golang"
+	"github.com/intelops/compage/core/internal/languages/python"
 	"github.com/intelops/compage/core/internal/utils"
 	log "github.com/sirupsen/logrus"
-	"os"
-	"strings"
 )
 
 // Process called from rest as well as gRPC
@@ -55,69 +52,15 @@ func Process(coreProject *core.Project) error {
 				log.Debugf("err : %s", err1)
 				return err1
 			}
-		} else {
-			/* process all languages. This means that the template is of openApi type.*/
-			// process rest server config.
-			if languageNode.RestConfig != nil {
-				// process only openApi template here.
-				if languageNode.RestConfig.Server.Template != languages.OpenApi {
-					return errors.New(fmt.Sprintf("unsupported template %s for language %s", languageNode.RestConfig.Server.Template, languageNode.Language))
-				}
-				// check if OpenApiFileYamlContent contains value.
-				if len(languageNode.RestConfig.Server.OpenApiFileYamlContent) < 1 {
-					return errors.New("at least rest-config needs to be provided, OpenApiFileYamlContent is empty")
-				}
-
-				if err0 := ProcessOpenApiTemplate(languageCtx); err0 != nil {
-					return err0
-				}
-
-				//TODO copy kubernetes yaml's
-			} else {
-				return errors.New("at least rest-config needs to be provided, OpenApiFileYamlContent is empty")
+		} else if languageNode.Language == languages.Python {
+			// add values(LanguageNode and configs from coreProject) to context.
+			pythonCtx := python.AddValuesToContext(languageCtx)
+			if err1 := python.Process(pythonCtx); err1 != nil {
+				log.Debugf("err : %s", err1)
+				return err1
 			}
 		}
 	}
 
 	return nil
-}
-
-func ProcessOpenApiTemplate(ctx context.Context) error {
-	values := ctx.Value(languages.LanguageContextVars).(languages.Values)
-
-	// create a file out of openApiYamlContent in request.
-	fileName, err := writeFile(values.LanguageNode.RestConfig.Server.OpenApiFileYamlContent)
-	if err != nil {
-		log.Debugf("err : %s", err)
-		return err
-	}
-
-	// generate code by openapi.yaml
-	if err0 := languages.RunOpenApiGenerator("generate", "-i", fileName, "-g", strings.ToLower(values.LanguageNode.RestConfig.Server.Framework), "-o", values.NodeDirectoryName, "--git-user-id", values.TemplateVars[languages.UserName], "--git-repo-id", values.TemplateVars[languages.RepositoryName]+"/"+values.LanguageNode.Name); err0 != nil {
-		log.Debugf("err : %s", err0)
-		return errors.New("something happened while running openApi generator")
-	}
-
-	// generate documentation for the code
-
-	if err1 := languages.RunOpenApiGenerator("generate", "-i", fileName, "-g", "dynamic-html", "-o", values.NodeDirectoryName+"/gen/docs", "--git-user-id", values.TemplateVars[languages.UserName], "--git-repo-id", values.TemplateVars[languages.RepositoryName]+"/"+values.LanguageNode.Name); err1 != nil {
-		log.Debugf("err : %s", err1)
-		return errors.New("something happened while running openApi generator for documentation")
-	}
-	return nil
-}
-
-func writeFile(content string) (string, error) {
-	file, err := os.CreateTemp("/tmp", "openapi")
-	if err != nil {
-		return "", err
-	}
-
-	defer func(f *os.File) {
-		_ = f.Close()
-	}(file)
-
-	_, err0 := file.WriteString(content)
-
-	return file.Name(), err0
 }
