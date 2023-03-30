@@ -1,4 +1,4 @@
-package generator
+package golang
 
 import (
 	log "github.com/sirupsen/logrus"

@@ -31,18 +31,19 @@ func CreateTarFile(projectName, projectDirectory string) error {
 	outFile, err := os.Create(projectTarFileName)
 	if err != nil {
 		_ = os.Remove(projectTarFileName)
-		log.Error("error creating archive file")
+		log.Errorf("error creating an archive file : %s", err.Error())
 		return err
 	}
 	defer func(outFile *os.File) {
 		_ = outFile.Close()
 	}(outFile)
-	err = createTarAndGz(projectFiles, outFile)
-	if err != nil {
+
+	if err0 := createTarAndGz(projectFiles, outFile); err0 != nil {
 		_ = os.Remove(projectTarFileName)
-		log.Error("error creating an archive file." + err.Error())
-		return err
+		log.Errorf("error creating an archive file : %s", err0.Error())
+		return err0
 	}
+
 	log.Debug("archiving and file compression completed.")
 	return nil
 }
@@ -60,7 +61,7 @@ func createTarAndGz(projectFiles []string, buffer io.Writer) error {
 	for _, f := range projectFiles {
 		err := addToTar(tarWriter, f)
 		if err != nil {
-			log.Error(err)
+			log.Errorf("err : %s", err.Error())
 			return err
 		}
 	}
@@ -71,7 +72,7 @@ func createTarAndGz(projectFiles []string, buffer io.Writer) error {
 func addToTar(tarWriter *tar.Writer, filename string) error {
 	f, err := os.Open(filename)
 	if err != nil {
-		log.Error(err)
+		log.Errorf("err : %s", err.Error())
 		return err
 	}
 	defer func(file *os.File) {
@@ -79,24 +80,24 @@ func addToTar(tarWriter *tar.Writer, filename string) error {
 	}(f)
 	info, err := f.Stat()
 	if err != nil {
-		log.Error(err)
+		log.Errorf("err : %s", err.Error())
 		return err
 	}
 	header, err := tar.FileInfoHeader(info, info.Name())
 	if err != nil {
-		log.Error(err)
+		log.Errorf("err : %s", err.Error())
 		return err
 	}
 	header.Name = filename
-	err = tarWriter.WriteHeader(header)
-	if err != nil {
-		log.Error(err)
-		return err
+
+	if err0 := tarWriter.WriteHeader(header); err != nil {
+		log.Errorf("err : %s", err0.Error())
+		return err0
 	}
-	_, err = io.Copy(tarWriter, f)
-	if err != nil {
-		log.Error(err)
-		return err
+	_, err1 := io.Copy(tarWriter, f)
+	if err1 != nil {
+		log.Errorf("err : %s", err1.Error())
+		return err1
 	}
 
 	return nil
@@ -107,6 +108,7 @@ func listProjectFiles(projectDirectoryPath string) []string {
 	var files []string
 	err := filepath.Walk(projectDirectoryPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
+			log.Errorf("err : %s", err.Error())
 			return err
 		}
 		if !utils.IgnorablePaths(path) && !info.IsDir() {
@@ -117,7 +119,7 @@ func listProjectFiles(projectDirectoryPath string) []string {
 		return nil
 	})
 	if err != nil {
-		log.Error(err)
+		log.Errorf("err : %s", err.Error())
 	}
 	return files
 }
@@ -129,6 +131,7 @@ func GetFile(tarFilePath string) (*File, bool) {
 	}
 	data, err := os.ReadFile(tarFilePath)
 	if err != nil {
+		log.Errorf("err : %s", err.Error())
 		return nil, false
 	}
 	return NewFile(tarFilePath, "tar.gz", len(data), bytes.NewReader(data)), true

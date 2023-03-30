@@ -61,7 +61,6 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplate
 		}
 
 		var resourcesData []resourceData
-		resources := resources
 		for _, r := range resources {
 			resourcesData = append(resourcesData, resourceData{ResourceName: r.Name, ResourceNamePlural: pluralizeClient.Plural(strings.ToLower(r.Name))})
 		}
@@ -127,25 +126,25 @@ func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 
 	// copy model files to generated project
 	targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + ModelFile
-	_, err1 := utils.CopyFile(targetResourceModelFileName, c.GoTemplatesRootPath+ModelsPath+"/"+ModelFile)
-	if err1 != nil {
-		return err1
+	_, err0 := utils.CopyFile(targetResourceModelFileName, c.GoTemplatesRootPath+ModelsPath+"/"+ModelFile)
+	if err0 != nil {
+		return err0
 	}
 	filePaths = append(filePaths, targetResourceModelFileName)
 
 	// copy service files to generated project
 	targetResourceServiceFileName := c.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + ServiceFile
-	_, err2 := utils.CopyFile(targetResourceServiceFileName, c.GoTemplatesRootPath+ServicesPath+"/"+ServiceFile)
-	if err2 != nil {
-		return err2
+	_, err1 := utils.CopyFile(targetResourceServiceFileName, c.GoTemplatesRootPath+ServicesPath+"/"+ServiceFile)
+	if err1 != nil {
+		return err1
 	}
 	filePaths = append(filePaths, targetResourceServiceFileName)
 
 	// copy dao files to generated project
 	targetResourceDaoFileName := c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + DaoFile
-	_, err3 := utils.CopyFile(targetResourceDaoFileName, c.GoTemplatesRootPath+DaosPath+"/"+DaoFile)
-	if err3 != nil {
-		return err3
+	_, err2 := utils.CopyFile(targetResourceDaoFileName, c.GoTemplatesRootPath+DaosPath+"/"+DaoFile)
+	if err2 != nil {
+		return err2
 	}
 	filePaths = append(filePaths, targetResourceDaoFileName)
 

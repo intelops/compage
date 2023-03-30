@@ -3,7 +3,7 @@ package test
 import (
 	"github.com/intelops/compage/core/internal/converter/rest"
 	"github.com/intelops/compage/core/internal/core"
-	"github.com/intelops/compage/core/internal/generator"
+	"github.com/intelops/compage/core/internal/processor"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"testing"
@@ -25,11 +25,11 @@ func TestGenerator(t *testing.T) {
 	// retrieve project struct
 	project, err := rest.GetProject(input)
 	if err != nil {
-		log.Error(err)
+		log.Errorf("err : %s", err.Error())
 		return
 	}
 	// trigger project generation
-	if err = generator.Generate(project); err != nil {
-		log.Error(err)
+	if err0 := processor.Process(project); err0 != nil {
+		log.Errorf("err : %s", err0.Error())
 	}
 }

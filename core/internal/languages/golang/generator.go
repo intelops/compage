@@ -7,10 +7,11 @@ import (
 	"github.com/intelops/compage/core/internal/languages"
 	"github.com/intelops/compage/core/internal/languages/golang/frameworks/go_gin_server"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/kubernetes"
+	log "github.com/sirupsen/logrus"
 )
 
-// Generator generates golang specific code according to config passed
-func Generator(ctx context.Context) error {
+// Generate generates golang specific code according to config passed
+func Generate(ctx context.Context) error {
 	// extract goNode
 	goValues := ctx.Value(GoContextVars).(GoValues)
 	goNode := goValues.GoNode
@@ -21,18 +22,20 @@ func Generator(ctx context.Context) error {
 			if goNode.RestConfig.Server.Framework == "go-gin-server" {
 				goGinServerCopier := getGoGinServerCopier(goValues)
 				if err := goGinServerCopier.CreateRestConfigs(); err != nil {
+					log.Debugf("err : %s", err)
 					return err
 				}
 
 				integrationsCopier := getIntegrationsCopier(goValues)
 				if err := integrationsCopier.CreateKubernetesFiles(); err != nil {
+					log.Debugf("err : %s", err)
 					return err
 				}
 
 				// copy all files at root level
-				err0 := goGinServerCopier.CreateRootLevelFiles()
-				if err0 != nil {
-					return err0
+				if err := goGinServerCopier.CreateRootLevelFiles(); err != nil {
+					log.Debugf("err : %s", err)
+					return err
 				}
 			} else {
 				return errors.New(fmt.Sprintf("unsupported framework %s  for template %s for language %s", goNode.RestConfig.Server.Framework, goNode.RestConfig.Server.Template, goNode.Language))

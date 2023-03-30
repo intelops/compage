@@ -5,7 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/intelops/compage/core/internal/converter/rest"
 	"github.com/intelops/compage/core/internal/core"
-	"github.com/intelops/compage/core/internal/generator"
+	"github.com/intelops/compage/core/internal/languages"
+	"github.com/intelops/compage/core/internal/processor"
 	"github.com/intelops/compage/core/internal/taroperations"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -15,7 +16,7 @@ import (
 // TODO remove this before release (this was created to test the openapi generator code)
 func CallOpenApiGenerator(context *gin.Context) {
 	go func() {
-		_ = generator.RunOpenApiGenerator("generate", "-i", "https://raw.githubusercontent.com/openapitools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml", "-g", "ruby", "-o", "/tmp/test-project/")
+		_ = languages.RunOpenApiGenerator("generate", "-i", "https://raw.githubusercontent.com/openapitools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml", "-g", "ruby", "-o", "/tmp/test-project/")
 	}()
 	context.JSON(http.StatusOK, gin.H{
 		"message": "called RunOpenApiGenerator",
@@ -34,21 +35,21 @@ func GenerateCode(context *gin.Context) {
 	// Validate input
 	var input core.ProjectInput
 	if err := context.ShouldBindJSON(&input); err != nil {
-		log.Error(err)
+		log.Errorf("err : %s", err)
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	// retrieve project struct
-	project, err := rest.GetProject(input)
-	if err != nil {
-		log.Error(err)
-		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	project, err0 := rest.GetProject(input)
+	if err0 != nil {
+		log.Errorf("err : %s", err0)
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err0.Error()})
 		return
 	}
 	// trigger project generation
-	if err := generator.Generate(project); err != nil {
-		log.Error(err)
-		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	if err1 := processor.Process(project); err1 != nil {
+		log.Errorf("err : %s", err1)
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err1.Error()})
 		return
 	}
 
@@ -63,7 +64,7 @@ func RegenerateCode(context *gin.Context) {
 	// Validate input
 	var input core.ProjectInput
 	if err := context.ShouldBindJSON(&input); err != nil {
-		log.Error(err)
+		log.Errorf("err : %s", err)
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

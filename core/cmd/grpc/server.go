@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	project "github.com/intelops/compage/core/gen/api/v1"
 	"github.com/intelops/compage/core/internal/converter/grpc"
-	"github.com/intelops/compage/core/internal/generator"
+	"github.com/intelops/compage/core/internal/processor"
 	"github.com/intelops/compage/core/internal/taroperations"
 	"github.com/intelops/compage/core/internal/utils"
 	log "github.com/sirupsen/logrus"
@@ -29,37 +29,36 @@ func (s *server) GenerateCode(projectRequest *project.GenerateCodeRequest, serve
 	// converts to core project
 	coreProject, err := grpc.GetProject(projectRequest)
 	if err != nil {
-		log.Debug(err)
+		log.Debugf("err : %s", err)
 		return status.Errorf(codes.InvalidArgument,
 			"error while converting request to project ["+err.Error()+"]")
 	}
 
-	// triggers project generation
-	if err := generator.Generate(coreProject); err != nil {
-		log.Debug(err)
+	// triggers project generation, process the request
+	if err0 := processor.Process(coreProject); err0 != nil {
+		log.Debugf("err : %s", err0)
 		return status.Errorf(codes.InvalidArgument,
-			"error while generating the project ["+err.Error()+"]")
+			"error while generating the project ["+err0.Error()+"]")
 	}
 
 	// CreateTarFile creates tar file for the project generated
-	err = taroperations.CreateTarFile(coreProject.Name, utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
-	if err != nil {
-		log.Debug(err)
+	if err1 := taroperations.CreateTarFile(coreProject.Name, utils.GetProjectDirectoryName(projectRequest.GetProjectName())); err1 != nil {
+		log.Debugf("err : %s", err1)
 		return status.Errorf(codes.Internal,
-			"error while converting request to project ["+err.Error()+"]")
+			"error while converting request to project ["+err1.Error()+"]")
 	}
 
 	// delete tmp/project-name folder
 	defer func(name string) {
-		if err = os.RemoveAll(name); err != nil {
-			log.Debug(err)
+		if err2 := os.RemoveAll(name); err2 != nil {
+			log.Debugf("err : %s", err2)
 		}
 	}(utils.GetProjectDirectoryName(projectRequest.GetProjectName()))
 
 	// delete just file
 	defer func(name string) {
-		if err = os.Remove(name); err != nil {
-			log.Debug(err)
+		if err3 := os.Remove(name); err3 != nil {
+			log.Debugf("err : %s", err3)
 		}
 	}(taroperations.GetProjectTarFilePath(projectRequest.GetProjectName()))
 
@@ -77,7 +76,7 @@ func (s *server) RegenerateCode(generateCodeRequest *project.GenerateCodeRequest
 	// GenerateCode
 	err := taroperations.CreateTarFile(generateCodeRequest.ProjectName, utils.GetProjectDirectoryName(generateCodeRequest.GetProjectName()))
 	if err != nil {
-		log.Debug(err)
+		log.Debugf("err : %s", err)
 		return status.Errorf(codes.InvalidArgument,
 			"error while creating a tar file ["+err.Error()+"]")
 	}
@@ -89,15 +88,13 @@ func sendFile(projectName string, server project.ProjectService_GenerateCodeServ
 	if !ok {
 		return status.Error(codes.NotFound, "file is not found")
 	}
-	err := server.SendHeader(f.Metadata())
-	if err != nil {
+	if err := server.SendHeader(f.Metadata()); err != nil {
 		return status.Error(codes.Internal, "error during sending header")
 	}
 	fileChunk := &project.GenerateCodeResponse{FileChunk: make([]byte, chunkSize)}
-	var n int
 Loop:
 	for {
-		n, err = f.Read(fileChunk.FileChunk)
+		n, err := f.Read(fileChunk.FileChunk)
 		switch err {
 		case nil:
 		case io.EOF:

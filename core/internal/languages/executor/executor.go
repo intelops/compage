@@ -13,20 +13,20 @@ func Execute(filePaths []string, data map[string]interface{}) error {
 		parsedTemplates := template.Must(template.New("").Option("missingkey=zero").ParseFiles(filePathName))
 		// generate go code now
 		fileName := filePathName[strings.LastIndex(filePathName, utils.SubstrString)+1:]
-		createdFile, err2 := os.Create(strings.TrimSuffix(filePathName, utils.TemplateExtension))
-		if err2 != nil {
-			return err2
+		createdFile, err := os.Create(strings.TrimSuffix(filePathName, utils.TemplateExtension))
+		if err != nil {
+			return err
 		}
-		if err2 = parsedTemplates.ExecuteTemplate(createdFile, fileName, data); err2 != nil {
-			return err2
+		if err0 := parsedTemplates.ExecuteTemplate(createdFile, fileName, data); err0 != nil {
+			return err0
 		}
 	}
 
 	// delete the template files
 	for _, filePathName := range filePaths {
 		if strings.HasSuffix(filePathName, ".tmpl") {
-			if err2 := os.Remove(filePathName); err2 != nil {
-				return err2
+			if err := os.Remove(filePathName); err != nil {
+				return err
 			}
 		}
 	}

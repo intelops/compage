@@ -52,18 +52,18 @@ func GetCompageJson(jsonString string) (*core.CompageJson, error) {
 		return nil, err
 	}
 	convertedX := ConvertMap(x)
-	convertedXBytes, err := json.Marshal(convertedX)
-	if err != nil {
-		return nil, err
+	convertedXBytes, err1 := json.Marshal(convertedX)
+	if err1 != nil {
+		return nil, err1
 	}
 	compageJson := &core.CompageJson{}
-	if err = json.Unmarshal(convertedXBytes, compageJson); err != nil {
-		return nil, err
+	if err2 := json.Unmarshal(convertedXBytes, compageJson); err2 != nil {
+		return nil, err2
 	}
 
 	// Validate compageJson
-	if err := validate(compageJson); err != nil {
-		return nil, err
+	if err3 := validate(compageJson); err3 != nil {
+		return nil, err3
 	}
 
 	return compageJson, nil
@@ -97,7 +97,7 @@ func validate(compageJson *core.CompageJson) error {
 // GetMetadata converts string to map
 func GetMetadata(metadataInput string) map[string]interface{} {
 	metadata := map[string]interface{}{}
-	if err := json.Unmarshal([]byte(metadataInput), &metadata); err != nil {
+	if err0 := json.Unmarshal([]byte(metadataInput), &metadata); err0 != nil {
 		return nil
 	}
 	return metadata

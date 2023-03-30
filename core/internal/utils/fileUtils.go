@@ -35,32 +35,32 @@ func CopyAllInSrcDirToDestDir(destDirectory, srcDirectory string, copyNestedDir 
 		return err
 	}
 
-	fileInfo, err0 := openedDir.Stat()
-	if err0 != nil {
-		return err0
+	fileInfo, err := openedDir.Stat()
+	if err != nil {
+		return err
 	}
 	if !fileInfo.IsDir() {
 		return fmt.Errorf("Source " + fileInfo.Name() + " is not a directory!")
 	}
 
-	if err1 := os.Mkdir(destDirectory, 0755); err1 != nil && !os.IsExist(err1) {
-		return err1
+	if err0 := os.Mkdir(destDirectory, 0755); err0 != nil && !os.IsExist(err0) {
+		return err0
 	}
 
-	files, err2 := os.ReadDir(srcDirectory)
-	if err2 != nil {
-		return err2
+	files, err := os.ReadDir(srcDirectory)
+	if err != nil {
+		return err
 	}
 	for _, file := range files {
 		if !file.IsDir() {
-			_, err3 := CopyFile(destDirectory+"/"+file.Name(), srcDirectory+"/"+file.Name())
-			if err3 != nil {
-				return err3
+			_, err0 := CopyFile(destDirectory+"/"+file.Name(), srcDirectory+"/"+file.Name())
+			if err0 != nil {
+				return err0
 			}
 		} else if copyNestedDir {
-			err3 := CopyAllInSrcDirToDestDir(destDirectory+"/"+file.Name(), srcDirectory+"/"+file.Name(), copyNestedDir)
-			if err3 != nil {
-				return err3
+			err0 := CopyAllInSrcDirToDestDir(destDirectory+"/"+file.Name(), srcDirectory+"/"+file.Name(), copyNestedDir)
+			if err0 != nil {
+				return err0
 			}
 		}
 	}

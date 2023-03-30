@@ -1,4 +1,4 @@
-package generator
+package languages
 
 import (
 	log "github.com/sirupsen/logrus"
