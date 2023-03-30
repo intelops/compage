@@ -7,6 +7,7 @@ import (
 	"github.com/intelops/compage/core/internal/languages"
 	"github.com/intelops/compage/core/internal/languages/golang/frameworks/go-gin-server"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/kubernetes"
+	"github.com/intelops/compage/core/internal/languages/templates"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -18,8 +19,8 @@ func Generate(ctx context.Context) error {
 	// rest config
 	if n.RestConfig != nil {
 		// check for the templates
-		if n.RestConfig.Server.Template == languages.Compage {
-			if n.RestConfig.Server.Framework == "go-gin-server" {
+		if n.RestConfig.Server.Template == templates.Compage {
+			if n.RestConfig.Server.Framework == GoGinServerFramework {
 				goGinServerCopier := getGoGinServerCopier(goValues)
 				if err := goGinServerCopier.CreateRestConfigs(); err != nil {
 					log.Debugf("err : %s", err)
@@ -34,7 +35,7 @@ func Generate(ctx context.Context) error {
 				return errors.New(fmt.Sprintf("unsupported framework %s  for template %s for language %s", n.RestConfig.Server.Framework, n.RestConfig.Server.Template, n.Language))
 			}
 		} else {
-			if n.RestConfig.Server.Template != languages.OpenApi {
+			if n.RestConfig.Server.Template != templates.OpenApi {
 				// call openapi generator
 				return errors.New(fmt.Sprintf("unsupported template %s for language %s", n.RestConfig.Server.Template, n.Language))
 			}

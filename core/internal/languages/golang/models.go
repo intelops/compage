@@ -7,6 +7,7 @@ import (
 
 // TemplatesPath directory of template files
 const TemplatesPath = "templates/compage-template-go"
+const GoGinServerFramework = "go-gin-server"
 
 var templatesRootPath = utils.GetProjectRootPath(TemplatesPath)
 
@@ -20,7 +21,7 @@ func (n *LGolangNode) FillDefaults() error {
 	for _, client := range n.RestConfig.Clients {
 		// set the default framework.
 		if client.Framework == "" {
-			client.Framework = "go-gin-server"
+			client.Framework = GoGinServerFramework
 		}
 	}
 	return nil

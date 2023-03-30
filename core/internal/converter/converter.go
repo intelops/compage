@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/intelops/compage/core/internal/core"
 	"github.com/intelops/compage/core/internal/languages"
+	"github.com/intelops/compage/core/internal/languages/templates"
 	"golang.org/x/exp/maps"
 )
 
@@ -83,7 +84,7 @@ func validate(compageJson *core.CompageJson) error {
 		}
 		// set default template as compage
 		if n.ConsumerData.RestServerConfig != nil && n.ConsumerData.RestServerConfig.Template == "" {
-			n.ConsumerData.RestServerConfig.Template = languages.Compage
+			n.ConsumerData.RestServerConfig.Template = templates.Compage
 		}
 	}
 

@@ -14,9 +14,6 @@ const JavaScript = "javascript"
 const TypeScript = "typescript"
 const Ruby = "ruby"
 
-const Compage string = "compage"
-const OpenApi string = "openApi"
-
 type LanguageNode struct {
 	ID          string                 `json:"ID"`
 	Name        string                 `json:"name"`

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/intelops/compage/core/internal/languages"
 	"github.com/intelops/compage/core/internal/languages/ruby/integrations/kubernetes"
+	"github.com/intelops/compage/core/internal/languages/templates"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,7 +18,7 @@ func Generate(ctx context.Context) error {
 	// rest config
 	if n.RestConfig != nil {
 		// check for the templates
-		if n.RestConfig.Server.Template == languages.OpenApi {
+		if n.RestConfig.Server.Template == templates.OpenApi {
 			// add code to generate with openapi
 			// check if OpenApiFileYamlContent contains value.
 			if len(n.RestConfig.Server.OpenApiFileYamlContent) < 1 {
