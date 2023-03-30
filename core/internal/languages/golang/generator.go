@@ -5,7 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/intelops/compage/core/internal/languages"
-	"github.com/intelops/compage/core/internal/languages/golang/frameworks/go-gin-server"
+	"github.com/intelops/compage/core/internal/languages/golang/frameworks/go_gin_server"
+	"github.com/intelops/compage/core/internal/languages/golang/integrations/kubernetes"
 )
 
 // Generator generates golang specific code according to config passed
@@ -23,9 +24,8 @@ func Generator(ctx context.Context) error {
 					return err
 				}
 
-				// copy kubernetes yaml files
-				err := goGinServerCopier.CreateKubernetesFiles()
-				if err != nil {
+				integrationsCopier := getIntegrationsCopier(goValues)
+				if err := integrationsCopier.CreateKubernetesFiles(); err != nil {
 					return err
 				}
 
@@ -67,7 +67,21 @@ func getGoGinServerCopier(goValues GoValues) *go_gin_server.Copier {
 	resources := goValues.GoNode.RestConfig.Server.Resources
 	clients := goValues.GoNode.RestConfig.Clients
 	goTemplatesRootPath := GetGoTemplatesRootPath()
-	// create golang specific goGinServerCopier
-	goGinServerCopier := go_gin_server.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, isServer, serverPort, resources, clients)
-	return goGinServerCopier
+	// create golang specific copier
+	copier := go_gin_server.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, isServer, serverPort, resources, clients)
+	return copier
+}
+
+func getIntegrationsCopier(goValues GoValues) *kubernetes.Copier {
+	userName := goValues.Values.Get(languages.UserName)
+	repositoryName := goValues.Values.Get(languages.RepositoryName)
+	nodeName := goValues.Values.Get(languages.NodeName)
+	nodeDirectoryName := goValues.Values.NodeDirectoryName
+	isServer := goValues.GoNode.RestConfig.Server != nil
+	serverPort := goValues.GoNode.RestConfig.Server.Port
+	goTemplatesRootPath := GetGoTemplatesRootPath()
+
+	// create golang specific copier
+	copier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, isServer, serverPort)
+	return copier
 }
