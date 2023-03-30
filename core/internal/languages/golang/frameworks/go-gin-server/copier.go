@@ -33,7 +33,6 @@ const ClientFile = "client.go.tmpl"
 type Copier struct {
 	NodeDirectoryName   string
 	GoTemplatesRootPath string
-	ProjectName         string
 	Data                map[string]interface{}
 	IsServer            bool
 	Port                string
