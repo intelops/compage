@@ -38,7 +38,7 @@ func Generate(ctx context.Context) error {
 		return errors.New(fmt.Sprintf("unsupported protocol %s for language %s", "ws", n.Language))
 	}
 
-	// k8s files needs to be generated for the whole project so, it should be here.
+	// k8s files need to be generated for the whole project so, it should be here.
 	integrationsCopier := getIntegrationsCopier(javascriptValues)
 	if err := integrationsCopier.CreateKubernetesFiles(); err != nil {
 		log.Debugf("err : %s", err)

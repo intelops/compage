@@ -35,6 +35,8 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, rustTempla
 	return &Copier{
 		RustTemplatesRootPath: rustTemplatesRootPath,
 		NodeDirectoryName:     nodeDirectoryName,
+		IsServer:              isServer,
+		Port:                  serverPort,
 		Data:                  data,
 	}
 }

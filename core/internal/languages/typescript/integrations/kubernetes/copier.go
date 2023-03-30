@@ -35,6 +35,8 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, typescript
 	return &Copier{
 		TypeScriptTemplatesRootPath: typescriptTemplatesRootPath,
 		NodeDirectoryName:           nodeDirectoryName,
+		IsServer:                    isServer,
+		Port:                        serverPort,
 		Data:                        data,
 	}
 }

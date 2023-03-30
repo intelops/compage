@@ -35,6 +35,8 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, javaTempla
 	return &Copier{
 		JavaTemplatesRootPath: javaTemplatesRootPath,
 		NodeDirectoryName:     nodeDirectoryName,
+		IsServer:              isServer,
+		Port:                  serverPort,
 		Data:                  data,
 	}
 }

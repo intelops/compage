@@ -35,6 +35,8 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, rubyTempla
 	return &Copier{
 		RubyTemplatesRootPath: rubyTemplatesRootPath,
 		NodeDirectoryName:     nodeDirectoryName,
+		IsServer:              isServer,
+		Port:                  serverPort,
 		Data:                  data,
 	}
 }

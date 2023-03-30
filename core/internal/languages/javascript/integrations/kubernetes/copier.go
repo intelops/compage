@@ -35,6 +35,8 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, javascript
 	return &Copier{
 		JavaScriptTemplatesRootPath: javascriptTemplatesRootPath,
 		NodeDirectoryName:           nodeDirectoryName,
+		IsServer:                    isServer,
+		Port:                        serverPort,
 		Data:                        data,
 	}
 }
