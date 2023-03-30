@@ -9,7 +9,7 @@ import {getCurrentConfig, setModifiedState} from "../../../utils/localstorage-cl
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
-import {Checkbox, FormControlLabel, Stack} from "@mui/material";
+import {Checkbox, DialogContentText, FormControlLabel, Stack} from "@mui/material";
 import {GrpcServerConfig, Resource, RestServerConfig, WsServerConfig} from "../models";
 import {ModifyRestResource} from "./modify-rest-resource";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -27,6 +27,7 @@ import {
     OPENAPI,
     OPENAPI_LANGUAGE_FRAMEWORKS
 } from "./utils";
+import "./new-node-properties.scss"
 
 interface NewNodePropertiesProps {
     isOpen: boolean;
@@ -120,6 +121,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const getPort = (template: string, port: string) => {
         return isCompageTemplate(template) ? port || "8080" : "8080";
     };
+
+    const [deleteStatus, setDeleteStatus] = React.useState(false)
 
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state with additional properties added from UI (Post node creation)
@@ -249,6 +252,11 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
+    const handleDeleteItem = (d:string)=>{
+        handleDeleteRestResourceClick(d);
+        setDeleteStatus(false)
+    }
+
     const getExistingResources = () => {
         if (payload.restServerConfig.resources?.length > 0) {
             const getResources = () => {
@@ -259,15 +267,36 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 return resourceNames;
             };
             const listItems = getResources().map((d) =>
-                <li key={d}>
-                    {d}<DeleteIcon onClick={() => {
-                    handleDeleteRestResourceClick(d);
-                }} fontSize="small"/>
+                <li key={d} className="list">
+                    <p className="item-text">{d}</p>
+                    <DeleteIcon onClick={() => setDeleteStatus(true)}
+                    fontSize="small"/>
+                <Dialog
+                    open={deleteStatus}
+                    onClose={()=>{}}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">
+                    {"Delete Confirmation?"}
+                    </DialogTitle>
+                    <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Would you like to delete this item from the list?
+                    </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                    <Button onClick={()=>setDeleteStatus(false)}>Disagree</Button>
+                    <Button onClick={()=>handleDeleteItem(d)} autoFocus>
+                        Agree
+                    </Button>
+                    </DialogActions>
+                </Dialog>
                 </li>
             );
 
             return <div>
-                Existing resources :
+                <p className="title">Existing resources :</p>
                 <ul>
                     {listItems}
                 </ul>

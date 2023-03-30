@@ -1,0 +1,23 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.list{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.35rem 2rem;
+    width: 50%;
+}
+
+.title{
+    font-size: 1.2rem;
+    font-weight: 900;
+    padding: 0.5rem 0;
+}
+
+.item-text{
+    font-size: 1.1rem;
+}
