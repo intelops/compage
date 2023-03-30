@@ -7,7 +7,7 @@ import (
 )
 
 // Generator generates golang specific code according to config passed
-func Generator(goNode GoNode, copier *Copier) error {
+func Generator(goNode *GoNode, copier *Copier) error {
 	// copy relevant files from templates based on config received, if the node is server
 	// rest config
 	if goNode.RestConfig != nil {

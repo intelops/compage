@@ -34,11 +34,11 @@ func Generate(coreProject *core.Project) error {
 			return err1
 		}
 
-		// add values to context.
-		ctx := languages.AddValuesToContext(context.Background(), coreProject, languageNode)
+		// add values(LanguageNode and configs from coreProject) to context.
+		languageCtx := languages.AddValuesToContext(context.Background(), coreProject, languageNode)
 
 		// extract nodeDirectoryName for formatter
-		values := ctx.Value(languages.ContextVars).(languages.Values)
+		values := languageCtx.Value(languages.LanguageContextVars).(languages.Values)
 		nodeDirectoryName := values.NodeDirectoryName
 
 		// create node directory in projectDirectory depicting a subproject
@@ -47,33 +47,14 @@ func Generate(coreProject *core.Project) error {
 			return err2
 		}
 
-		// if language is not set, consider that the node is go project
+		// process golang
 		if languageNode.Language == languages.Go {
-			// fills default config for golang
-			goNode := golang.GoNode{
-				// use from values instead of direct reference. No special reason but
-				LanguageNode: values.LanguageNode,
-			}
-			err3 := goNode.FillDefaults()
-			if err3 != nil {
-				log.Debugf("err : %s", err3)
-				return err3
-			}
-
-			// create golang specific copier
-			copier := golang.NewCopier(ctx)
-
-			// generate golang project using custom template.
-			if err4 := golang.Generator(goNode, copier); err4 != nil {
-				log.Debugf("err : %s", err4)
-				return err4
-			}
-
-			// format the code generated
-			err5 := RunGoFmt(nodeDirectoryName)
-			if err5 != nil {
-				log.Debugf("err : %s", err5)
-				return err5
+			// add values(LanguageNode and configs from coreProject) to context.
+			goCtx := golang.AddValuesToContext(languageCtx)
+			err := ProcessGolang(goCtx)
+			if err != nil {
+				log.Debugf("err : %s", err)
+				return err
 			}
 		} else {
 			/* process all languages. This means that the template is of openApi type.*/
@@ -87,26 +68,9 @@ func Generate(coreProject *core.Project) error {
 				if len(languageNode.RestConfig.Server.OpenApiFileYamlContent) < 1 {
 					return errors.New("at least rest-config needs to be provided, OpenApiFileYamlContent is empty")
 				}
-
-				// create a file out of openApiYamlContent in request.
-				fileName, err6 := writeFile(languageNode.RestConfig.Server.OpenApiFileYamlContent)
-				if err6 != nil {
-					log.Debugf("err : %s", err6)
-					return err6
-				}
-
-				// generate code by openapi.yaml
-				err7 := RunOpenApiGenerator("generate", "-i", fileName, "-g", strings.ToLower(languageNode.RestConfig.Server.Framework), "-o", nodeDirectoryName, "--git-user-id", coreProject.UserName, "--git-repo-id", coreProject.RepositoryName+"/"+compageNode.ConsumerData.Name)
-				if err7 != nil {
-					log.Debugf("err : %s", err7)
-					return errors.New("something happened while running openApi generator")
-				}
-
-				// generate documentation for the code
-				err8 := RunOpenApiGenerator("generate", "-i", fileName, "-g", "dynamic-html", "-o", nodeDirectoryName+"/gen/docs", "--git-user-id", coreProject.UserName, "--git-repo-id", coreProject.RepositoryName+"/"+compageNode.ConsumerData.Name)
-				if err8 != nil {
-					log.Debugf("err : %s", err8)
-					return errors.New("something happened while running openApi generator for documentation")
+				err := ProcessOpenApiTemplate(languageCtx)
+				if err != nil {
+					return err
 				}
 
 				//TODO copy kubernetes yaml's
@@ -116,6 +80,60 @@ func Generate(coreProject *core.Project) error {
 		}
 	}
 
+	return nil
+}
+
+func ProcessGolang(ctx context.Context) error {
+	goValues := ctx.Value(golang.GoContextVars).(golang.GoValues)
+
+	// fills default config for golang
+	err3 := goValues.GoNode.FillDefaults()
+	if err3 != nil {
+		log.Debugf("err : %s", err3)
+		return err3
+	}
+
+	// create golang specific copier
+	copier := golang.NewCopier(ctx)
+
+	// generate golang project using custom template.
+	if err4 := golang.Generator(goValues.GoNode, copier); err4 != nil {
+		log.Debugf("err : %s", err4)
+		return err4
+	}
+
+	// format the code generated
+	err5 := RunGoFmt(goValues.Values.NodeDirectoryName)
+	if err5 != nil {
+		log.Debugf("err : %s", err5)
+		return err5
+	}
+	return nil
+}
+
+func ProcessOpenApiTemplate(ctx context.Context) error {
+	values := ctx.Value(languages.LanguageContextVars).(languages.Values)
+
+	// create a file out of openApiYamlContent in request.
+	fileName, err6 := writeFile(values.LanguageNode.RestConfig.Server.OpenApiFileYamlContent)
+	if err6 != nil {
+		log.Debugf("err : %s", err6)
+		return err6
+	}
+
+	// generate code by openapi.yaml
+	err7 := RunOpenApiGenerator("generate", "-i", fileName, "-g", strings.ToLower(values.LanguageNode.RestConfig.Server.Framework), "-o", values.NodeDirectoryName, "--git-user-id", values.TemplateVars[languages.UserName], "--git-repo-id", values.TemplateVars[languages.RepositoryName]+"/"+values.LanguageNode.Name)
+	if err7 != nil {
+		log.Debugf("err : %s", err7)
+		return errors.New("something happened while running openApi generator")
+	}
+
+	// generate documentation for the code
+	err8 := RunOpenApiGenerator("generate", "-i", fileName, "-g", "dynamic-html", "-o", values.NodeDirectoryName+"/gen/docs", "--git-user-id", values.TemplateVars[languages.UserName], "--git-repo-id", values.TemplateVars[languages.RepositoryName]+"/"+values.LanguageNode.Name)
+	if err8 != nil {
+		log.Debugf("err : %s", err8)
+		return errors.New("something happened while running openApi generator for documentation")
+	}
 	return nil
 }
 

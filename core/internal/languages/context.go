@@ -6,7 +6,7 @@ import (
 	"github.com/intelops/compage/core/internal/utils"
 )
 
-const ContextVars = "ContextVars"
+const LanguageContextVars = "LanguageContextVars"
 
 type TemplateVarKey string
 
@@ -46,5 +46,5 @@ func AddValuesToContext(ctx context.Context, project *core.Project, languageNode
 		LanguageNode:      languageNode,
 	}
 
-	return context.WithValue(ctx, ContextVars, v)
+	return context.WithValue(ctx, LanguageContextVars, v)
 }

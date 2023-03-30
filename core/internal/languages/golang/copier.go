@@ -42,10 +42,10 @@ type Copier struct {
 }
 
 func NewCopier(ctx context.Context) *Copier {
-	values := ctx.Value(languages.ContextVars).(languages.Values)
-	repositoryName := values.Get(languages.RepositoryName)
-	nodeName := values.Get(languages.NodeName)
-	userName := values.Get(languages.UserName)
+	goValues := ctx.Value(GoContextVars).(GoValues)
+	repositoryName := goValues.Values.Get(languages.RepositoryName)
+	nodeName := goValues.Values.Get(languages.NodeName)
+	userName := goValues.Values.Get(languages.UserName)
 
 	pluralizeClient := pluralize.NewClient()
 
@@ -57,26 +57,26 @@ func NewCopier(ctx context.Context) *Copier {
 	}
 
 	//set all resources for main.go.tmpl
-	if values.LanguageNode.RestConfig.Server != nil {
+	if goValues.GoNode.RestConfig.Server != nil {
 		type resourceData struct {
 			ResourceNamePlural string
 			ResourceName       string
 		}
 
 		var resourcesData []resourceData
-		resources := values.LanguageNode.RestConfig.Server.Resources
+		resources := goValues.GoNode.RestConfig.Server.Resources
 		for _, r := range resources {
 			resourcesData = append(resourcesData, resourceData{ResourceName: r.Name, ResourceNamePlural: pluralizeClient.Plural(strings.ToLower(r.Name))})
 		}
 		data["Resources"] = resourcesData
-		data["ServerPort"] = values.LanguageNode.RestConfig.Server.Port
+		data["ServerPort"] = goValues.GoNode.RestConfig.Server.Port
 		data["IsServer"] = true
 	}
 
 	return &Copier{
 		Ctx:               ctx,
-		NodeDirectoryName: values.NodeDirectoryName,
-		GoNode:            &GoNode{LanguageNode: values.LanguageNode},
+		NodeDirectoryName: goValues.Values.NodeDirectoryName,
+		GoNode:            goValues.GoNode,
 		Data:              data,
 	}
 }
