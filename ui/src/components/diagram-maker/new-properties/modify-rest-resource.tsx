@@ -50,11 +50,30 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
         datatype:""
     })
 
-    // 
+    //attribute validation
+    const [attributeStatus, setAttributeStatus] = React.useState([{attribute:false}])
 
     // Dynamic Collection for adding select fields
     const [fieldCollection, setFieldCollection] = React.useState([{attribute: "", datatype: ""}])
 
+    // attributes of fields
+    let attributes = fieldCollection.map((field:any)=> field.attribute).filter((value)=>value !== "")
+    console.log(attributes);
+    
+    const attributeValidation = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement> , index:number)=>{
+        let value = ""
+        value = value + event.target.value;
+        if(attributes.includes(value)){
+            attributeStatus[index].attribute = true
+            console.log(value)
+        }
+        else{
+            attributeStatus[index].attribute = false
+        }
+        setField({...field,attribute:event.target.value})
+        
+    }
+    
     // first letter of the Resource should always be capital.
     const capitalizeFirstLetter = (input: string) => {
         return input.charAt(0).toUpperCase() + input.slice(1);
@@ -111,11 +130,12 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
 
 
     const handleAddField = (index:number)=>{
-        if(field.attribute && field.datatype){
+        if(field.attribute && field.datatype && attributeStatus[index].attribute === false){
             fieldCollection[index].attribute = field.attribute
             fieldCollection[index].datatype = field.datatype
             setField({attribute:"",datatype:""})
             setFieldCollection([...fieldCollection,{attribute:"",datatype:""}])
+            setAttributeStatus([...attributeStatus, {attribute:false} ])
         }
     }
 
@@ -126,10 +146,13 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
     }
 
     const addButtonStatus = (index:number)=>{
-        if(field.attribute === "" && field.datatype === "" && fieldCollection[index].attribute === "" && fieldCollection[index].datatype === "" ){
+        if(field.attribute === "" && field.datatype === "" && fieldCollection[index].attribute === "" && fieldCollection[index].datatype === "" && attributeStatus[index].attribute ){
             return true
         }
-        if(fieldCollection[index].attribute !== "" && fieldCollection[index].datatype !== ""){
+        if(fieldCollection[index].attribute !== "" && fieldCollection[index].datatype !== "" || attributeStatus[index].attribute){
+            return true
+        }
+        if((field.attribute === "" && field.datatype === "") || (field.attribute === "" && field.datatype !== "") || (field.attribute !== "" && field.datatype === "")){
             return true
         }
         if(field.attribute !== "" || field.datatype !== "" ){
@@ -155,6 +178,7 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
         },
     },
     };
+    console.log(attributeStatus);
     
     return <React.Fragment>
         <Dialog open={props.isOpen} onClose={onClose}>
@@ -188,12 +212,10 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
                                             id="attribute"
                                             label="Attribute"
                                             type="text"
+                                            error={attributeStatus[index].attribute}
+                                            helperText={attributeStatus[index].attribute ? "Attribute already exists!" : null}
                                             value={fieldType.attribute === "" ? field.attribute : fieldType.attribute }
-                                            onChange={(e) => {
-                                                setField({
-                                                ...field,
-                                                attribute:e.target.value
-                                            })}}
+                                            onChange={(e)=>attributeValidation(e, index)}
                                             variant="outlined"
                                         />
                                         <FormControl sx={{ m: 1, minWidth: 120 }}>
@@ -251,7 +273,7 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
             <DialogActions>
                 <Button variant="outlined" color="secondary" onClick={props.onModifyRestResourceClose}>Cancel</Button>
                 <Button variant="contained"
-                        disabled={data.name === ""}
+                        disabled={data.name === "" || (fieldCollection[0].attribute === "" || fieldCollection[0].attribute === "")}
                         onClick={handleModifyRestResourceClick}>
                     Modify Resource
                 </Button>
@@ -259,3 +281,14 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
         </Dialog>
     </React.Fragment>;
 };
+
+
+
+// (e) => {
+//     setField({
+//     ...field,
+//     attribute:e.target.value
+// })}
+
+
+// Attribute already exists!
