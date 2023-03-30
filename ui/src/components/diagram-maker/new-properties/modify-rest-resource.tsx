@@ -58,14 +58,12 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
 
     // attributes of fields
     let attributes = fieldCollection.map((field:any)=> field.attribute).filter((value)=>value !== "")
-    console.log(attributes);
     
     const attributeValidation = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement> , index:number)=>{
         let value = ""
         value = value + event.target.value;
         if(attributes.includes(value)){
             attributeStatus[index].attribute = true
-            console.log(value)
         }
         else{
             attributeStatus[index].attribute = false
@@ -178,7 +176,6 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
         },
     },
     };
-    console.log(attributeStatus);
     
     return <React.Fragment>
         <Dialog open={props.isOpen} onClose={onClose}>
@@ -281,14 +278,3 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
         </Dialog>
     </React.Fragment>;
 };
-
-
-
-// (e) => {
-//     setField({
-//     ...field,
-//     attribute:e.target.value
-// })}
-
-
-// Attribute already exists!
