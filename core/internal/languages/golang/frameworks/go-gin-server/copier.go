@@ -192,6 +192,17 @@ func (c Copier) addResourceSpecificTemplateData(resource node.Resource) {
 
 // CreateRestConfigs creates/copies relevant files to generated project
 func (c Copier) CreateRestConfigs() error {
+	if err := c.CreateRestServer(); err != nil {
+		return err
+	}
+	if err := c.CreateRestClients(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// CreateRestServer creates/copies relevant files to generated project
+func (c Copier) CreateRestServer() error {
 	// if the node is server, add server code
 	if c.IsServer {
 		// create directories for controller, service, dao, models
@@ -205,6 +216,11 @@ func (c Copier) CreateRestConfigs() error {
 			}
 		}
 	}
+	return nil
+}
+
+// CreateRestClients creates/copies relevant files to generated project
+func (c Copier) CreateRestClients() error {
 	// if the node is client, add client code
 	if c.Clients != nil {
 		// create directories for client
