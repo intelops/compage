@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-const KubernetesPath = "/kubernetes"
-const KubernetesDeploymentFile = "deployment.yaml.tmpl"
-const KubernetesServiceFile = "service.yaml.tmpl"
+const Path = "/kubernetes"
+const DeploymentFile = "deployment.yaml.tmpl"
+const ServiceFile = "service.yaml.tmpl"
 
 // Copier integrations specific copier
 type Copier struct {
@@ -42,7 +42,7 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplate
 
 // CreateKubernetesFiles creates required directory and copies files from language template.
 func (c Copier) CreateKubernetesFiles() error {
-	destKubernetesDirectory := c.NodeDirectoryName + KubernetesPath
+	destKubernetesDirectory := c.NodeDirectoryName + Path
 	if err := utils.CreateDirectories(destKubernetesDirectory); err != nil {
 		return err
 	}
@@ -50,16 +50,16 @@ func (c Copier) CreateKubernetesFiles() error {
 	var filePaths []string
 	if c.IsServer {
 		// copy service files to generated kubernetes manifests
-		targetKubernetesServiceFileName := c.NodeDirectoryName + KubernetesPath + "/" + KubernetesServiceFile
-		_, err := utils.CopyFile(targetKubernetesServiceFileName, c.GoTemplatesRootPath+KubernetesPath+"/"+KubernetesServiceFile)
+		targetKubernetesServiceFileName := c.NodeDirectoryName + Path + "/" + ServiceFile
+		_, err := utils.CopyFile(targetKubernetesServiceFileName, c.GoTemplatesRootPath+Path+"/"+ServiceFile)
 		if err != nil {
 			return err
 		}
 		filePaths = append(filePaths, targetKubernetesServiceFileName)
 	}
 	// copy deployment files to generated kubernetes manifests
-	targetKubernetesDeploymentFileName := c.NodeDirectoryName + KubernetesPath + "/" + KubernetesDeploymentFile
-	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, c.GoTemplatesRootPath+KubernetesPath+"/"+KubernetesDeploymentFile)
+	targetKubernetesDeploymentFileName := c.NodeDirectoryName + Path + "/" + DeploymentFile
+	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, c.GoTemplatesRootPath+Path+"/"+DeploymentFile)
 	if err != nil {
 		return err
 	}

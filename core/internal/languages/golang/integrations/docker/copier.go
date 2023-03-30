@@ -1,4 +1,4 @@
-package kubernetes
+package docker
 
 import (
 	"github.com/intelops/compage/core/internal/languages/executor"

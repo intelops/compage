@@ -14,11 +14,6 @@ import (
 )
 
 func main() {
-	//fmt.Println("starting rest server...")
-	//if err := rest.StartRestServer(); err != nil {
-	//	log.Fatalf("failed to serve: %v", err)
-	//}
-
 	fmt.Println("starting gRPC server...")
 	startGrpcServer()
 }

@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	project "github.com/intelops/compage/core/gen/api/v1"
 	"github.com/intelops/compage/core/internal/converter/grpc"
-	"github.com/intelops/compage/core/internal/processor"
+	"github.com/intelops/compage/core/internal/handlers"
 	"github.com/intelops/compage/core/internal/taroperations"
 	"github.com/intelops/compage/core/internal/utils"
 	log "github.com/sirupsen/logrus"
@@ -35,7 +35,7 @@ func (s *server) GenerateCode(projectRequest *project.GenerateCodeRequest, serve
 	}
 
 	// triggers project generation, process the request
-	if err0 := processor.Process(coreProject); err0 != nil {
+	if err0 := handlers.Handle(coreProject); err0 != nil {
 		log.Debugf("err : %s", err0)
 		return status.Errorf(codes.InvalidArgument,
 			"error while generating the project ["+err0.Error()+"]")
