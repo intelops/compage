@@ -7,6 +7,7 @@ import (
 	"github.com/intelops/compage/core/internal/languages/golang"
 	"github.com/intelops/compage/core/internal/languages/java"
 	"github.com/intelops/compage/core/internal/languages/python"
+	"github.com/intelops/compage/core/internal/languages/rust"
 	"github.com/intelops/compage/core/internal/utils"
 	log "github.com/sirupsen/logrus"
 )
@@ -64,6 +65,13 @@ func Handle(coreProject *core.Project) error {
 			// add values(LanguageNode and configs from coreProject) to context.
 			javaCtx := java.AddValuesToContext(languageCtx)
 			if err1 := java.Process(javaCtx); err1 != nil {
+				log.Debugf("err : %s", err1)
+				return err1
+			}
+		} else if languageNode.Language == languages.Rust {
+			// add values(LanguageNode and configs from coreProject) to context.
+			rustCtx := rust.AddValuesToContext(languageCtx)
+			if err1 := rust.Process(rustCtx); err1 != nil {
 				log.Debugf("err : %s", err1)
 				return err1
 			}

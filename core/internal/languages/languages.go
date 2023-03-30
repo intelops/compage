@@ -9,6 +9,7 @@ import (
 const Go = "go"
 const Python = "python"
 const Java = "java"
+const Rust = "rust"
 
 const Compage string = "compage"
 const OpenApi string = "openApi"
