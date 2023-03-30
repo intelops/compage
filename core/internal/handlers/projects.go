@@ -9,6 +9,7 @@ import (
 	"github.com/intelops/compage/core/internal/languages/javascript"
 	"github.com/intelops/compage/core/internal/languages/python"
 	"github.com/intelops/compage/core/internal/languages/rust"
+	"github.com/intelops/compage/core/internal/languages/typescript"
 	"github.com/intelops/compage/core/internal/utils"
 	log "github.com/sirupsen/logrus"
 )
@@ -80,6 +81,13 @@ func Handle(coreProject *core.Project) error {
 			// add values(LanguageNode and configs from coreProject) to context.
 			javascriptCtx := javascript.AddValuesToContext(languageCtx)
 			if err1 := javascript.Process(javascriptCtx); err1 != nil {
+				log.Debugf("err : %s", err1)
+				return err1
+			}
+		} else if languageNode.Language == languages.TypeScript {
+			// add values(LanguageNode and configs from coreProject) to context.
+			typescriptCtx := typescript.AddValuesToContext(languageCtx)
+			if err1 := typescript.Process(typescriptCtx); err1 != nil {
 				log.Debugf("err : %s", err1)
 				return err1
 			}

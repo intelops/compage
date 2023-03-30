@@ -11,6 +11,7 @@ const Python = "python"
 const Java = "java"
 const Rust = "rust"
 const JavaScript = "javascript"
+const TypeScript = "typescript"
 
 const Compage string = "compage"
 const OpenApi string = "openApi"
