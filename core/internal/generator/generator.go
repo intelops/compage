@@ -93,11 +93,8 @@ func ProcessGolang(ctx context.Context) error {
 		return err3
 	}
 
-	// create golang specific copier
-	copier := golang.NewCopier(ctx)
-
 	// generate golang project using custom template.
-	if err4 := golang.Generator(goValues.GoNode, copier); err4 != nil {
+	if err4 := golang.Generator(ctx); err4 != nil {
 		log.Debugf("err : %s", err4)
 		return err4
 	}

@@ -1,11 +1,13 @@
-package golang
+package go_gin_server
 
 import (
-	"context"
 	"github.com/gertd/go-pluralize"
 	"github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages"
 	"github.com/intelops/compage/core/internal/utils"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"os"
 	"strings"
 	"text/template"
@@ -34,50 +36,51 @@ const ClientFile = "client.go.tmpl"
 
 // Copier Language specific copier
 type Copier struct {
-	Ctx               context.Context
-	NodeDirectoryName string
-	GoNode            *GoNode
-	ProjectName       string
-	Data              map[string]interface{}
+	NodeDirectoryName   string
+	GoTemplatesRootPath string
+	ProjectName         string
+	Data                map[string]interface{}
+	IsServer            bool
+	Port                string
+	Resources           []node.Resource
+	Clients             []languages.RestClient
+	PluralizeClient     *pluralize.Client
 }
 
-func NewCopier(ctx context.Context) *Copier {
-	goValues := ctx.Value(GoContextVars).(GoValues)
-	repositoryName := goValues.Values.Get(languages.RepositoryName)
-	nodeName := goValues.Values.Get(languages.NodeName)
-	userName := goValues.Values.Get(languages.UserName)
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath string, isServer bool, serverPort string, resources []node.Resource, clients []languages.RestClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
 
-	//populate map to replace templates
+	// populate map to replace templates
 	data := map[string]interface{}{
 		"RepositoryName": repositoryName,
 		"NodeName":       strings.ToLower(nodeName),
 		"UserName":       userName,
 	}
 
-	//set all resources for main.go.tmpl
-	if goValues.GoNode.RestConfig.Server != nil {
+	// set all resources for main.go.tmpl
+	if isServer {
 		type resourceData struct {
 			ResourceNamePlural string
 			ResourceName       string
 		}
 
 		var resourcesData []resourceData
-		resources := goValues.GoNode.RestConfig.Server.Resources
+		resources := resources
 		for _, r := range resources {
 			resourcesData = append(resourcesData, resourceData{ResourceName: r.Name, ResourceNamePlural: pluralizeClient.Plural(strings.ToLower(r.Name))})
 		}
 		data["Resources"] = resourcesData
-		data["ServerPort"] = goValues.GoNode.RestConfig.Server.Port
-		data["IsServer"] = true
+		data["Port"] = serverPort
+		data["IsServer"] = isServer
 	}
 
 	return &Copier{
-		Ctx:               ctx,
-		NodeDirectoryName: goValues.Values.NodeDirectoryName,
-		GoNode:            goValues.GoNode,
-		Data:              data,
+		GoTemplatesRootPath: goTemplatesRootPath,
+		NodeDirectoryName:   nodeDirectoryName,
+		Data:                data,
+		Clients:             clients,
+		PluralizeClient:     pluralizeClient,
 	}
 }
 
@@ -121,7 +124,7 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 
 	// copy controller files to generated project
 	targetResourceControllerFileName := copier.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + ControllerFile
-	_, err := utils.CopyFile(targetResourceControllerFileName, GetGoTemplatesRootPath()+ControllersPath+"/"+ControllerFile)
+	_, err := utils.CopyFile(targetResourceControllerFileName, copier.GoTemplatesRootPath+ControllersPath+"/"+ControllerFile)
 	if err != nil {
 		return err
 	}
@@ -129,7 +132,7 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 
 	// copy model files to generated project
 	targetResourceModelFileName := copier.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + ModelFile
-	_, err1 := utils.CopyFile(targetResourceModelFileName, GetGoTemplatesRootPath()+ModelsPath+"/"+ModelFile)
+	_, err1 := utils.CopyFile(targetResourceModelFileName, copier.GoTemplatesRootPath+ModelsPath+"/"+ModelFile)
 	if err1 != nil {
 		return err1
 	}
@@ -137,7 +140,7 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 
 	// copy service files to generated project
 	targetResourceServiceFileName := copier.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + ServiceFile
-	_, err2 := utils.CopyFile(targetResourceServiceFileName, GetGoTemplatesRootPath()+ServicesPath+"/"+ServiceFile)
+	_, err2 := utils.CopyFile(targetResourceServiceFileName, copier.GoTemplatesRootPath+ServicesPath+"/"+ServiceFile)
 	if err2 != nil {
 		return err2
 	}
@@ -145,7 +148,7 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 
 	// copy dao files to generated project
 	targetResourceDaoFileName := copier.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + DaoFile
-	_, err3 := utils.CopyFile(targetResourceDaoFileName, GetGoTemplatesRootPath()+DaosPath+"/"+DaoFile)
+	_, err3 := utils.CopyFile(targetResourceDaoFileName, copier.GoTemplatesRootPath+DaosPath+"/"+DaoFile)
 	if err3 != nil {
 		return err3
 	}
@@ -155,11 +158,7 @@ func (copier Copier) CopyRestServerResourceFiles(resource node.Resource) error {
 	copier.addResourceSpecificTemplateData(resource)
 
 	// apply template
-	if err4 := copier.applyTemplate(filePaths); err4 != nil {
-		return err4
-	}
-
-	return nil
+	return copier.applyTemplate(filePaths)
 }
 
 // CopyRestClientResourceFiles copies rest client files from template and renames them as per client config.
@@ -170,7 +169,7 @@ func (copier Copier) CopyRestClientResourceFiles(client languages.RestClient) er
 
 	// copy client files to generated project.
 	targetResourceClientFileName := copier.NodeDirectoryName + ClientPath + "/" + client.ExternalNode + "-" + ClientFile
-	_, err := utils.CopyFile(targetResourceClientFileName, GetGoTemplatesRootPath()+ClientPath+"/"+ClientFile)
+	_, err := utils.CopyFile(targetResourceClientFileName, copier.GoTemplatesRootPath+ClientPath+"/"+ClientFile)
 	if err != nil {
 		return err
 	}
@@ -178,37 +177,33 @@ func (copier Copier) CopyRestClientResourceFiles(client languages.RestClient) er
 	filePaths = append(filePaths, targetResourceClientFileName)
 
 	// apply template
-	if err2 := copier.applyTemplate(filePaths); err2 != nil {
-		return err2
-	}
-
-	return nil
+	return copier.applyTemplate(filePaths)
 }
 
 // CreateRestConfigs creates/copies relevant files to generated project
 func (copier Copier) CreateRestConfigs() error {
 	// if the node is server, add server code
-	if copier.GoNode.RestConfig.Server != nil {
+	if copier.IsServer {
 		// create directories for controller, service, dao, models
 		if err := copier.CreateRestServerDirectories(); err != nil {
 			return err
 		}
 		// copy files with respect to the names of resources
-		for _, resource := range copier.GoNode.RestConfig.Server.Resources {
+		for _, resource := range copier.Resources {
 			if err := copier.CopyRestServerResourceFiles(resource); err != nil {
 				return err
 			}
 		}
 	}
 	// if the node is client, add client code
-	if copier.GoNode.RestConfig.Clients != nil {
+	if copier.Clients != nil {
 		// create directories for client
 		if err := copier.CreateRestClientDirectories(); err != nil {
 			return err
 		}
 
 		// copy files with respect to the names of resources
-		for _, client := range copier.GoNode.RestConfig.Clients {
+		for _, client := range copier.Clients {
 			if err := copier.CopyRestClientResourceFiles(client); err != nil {
 				return err
 			}
@@ -225,10 +220,10 @@ func (copier Copier) CreateKubernetesFiles() error {
 	}
 
 	var filePaths []string
-	if copier.GoNode.RestConfig.Server != nil {
+	if copier.IsServer {
 		// copy service files to generated kubernetes manifests
 		targetKubernetesServiceFileName := copier.NodeDirectoryName + KubernetesPath + "/" + KubernetesServiceFile
-		_, err := utils.CopyFile(targetKubernetesServiceFileName, GetGoTemplatesRootPath()+KubernetesPath+"/"+KubernetesServiceFile)
+		_, err := utils.CopyFile(targetKubernetesServiceFileName, copier.GoTemplatesRootPath+KubernetesPath+"/"+KubernetesServiceFile)
 		if err != nil {
 			return err
 		}
@@ -236,34 +231,24 @@ func (copier Copier) CreateKubernetesFiles() error {
 	}
 	// copy deployment files to generated kubernetes manifests
 	targetKubernetesDeploymentFileName := copier.NodeDirectoryName + KubernetesPath + "/" + KubernetesDeploymentFile
-	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, GetGoTemplatesRootPath()+KubernetesPath+"/"+KubernetesDeploymentFile)
+	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, copier.GoTemplatesRootPath+KubernetesPath+"/"+KubernetesDeploymentFile)
 	if err != nil {
 		return err
 	}
 	filePaths = append(filePaths, targetKubernetesDeploymentFileName)
-	if err = copier.applyTemplate(filePaths); err != nil {
-		return err
-	}
-
-	return nil
+	return copier.applyTemplate(filePaths)
 }
 
 // CreateRootLevelFiles copies all root level files at language template.
 func (copier Copier) CreateRootLevelFiles() error {
-	err := utils.CopyFiles(copier.NodeDirectoryName, GetGoTemplatesRootPath())
+	err := utils.CopyFiles(copier.NodeDirectoryName, copier.GoTemplatesRootPath)
 	if err != nil {
 		return err
 	}
-
-	return copier.apply()
-}
-
-func (copier Copier) apply() error {
-	_, files, err := utils.GetDirectoriesAndFilePaths(copier.NodeDirectoryName)
-	if err != nil {
-		return err
+	_, files, err0 := utils.GetDirectoriesAndFilePaths(copier.NodeDirectoryName)
+	if err0 != nil {
+		return err0
 	}
-
 	return copier.applyTemplate(files)
 }
 
@@ -273,13 +258,12 @@ func (copier Copier) addResourceSpecificTemplateData(resource node.Resource) {
 	// make every field public by making its first character capital.
 	fields := map[string]string{}
 	for key, value := range resource.Fields {
-		// TODO change this approach
-		key = strings.Title(key)
+		key = cases.Title(language.Und, cases.NoLower).String(key)
 		fields[key] = value
 	}
 	copier.Data["Fields"] = fields
 	copier.Data["ResourceNameSingular"] = strings.ToLower(resource.Name)
-	copier.Data["ResourceNamePlural"] = strings.ToLower(resource.Name) + "s"
+	copier.Data["ResourceNamePlural"] = copier.PluralizeClient.Plural(strings.ToLower(resource.Name))
 }
 
 func (copier Copier) applyTemplate(filePaths []string) error {
