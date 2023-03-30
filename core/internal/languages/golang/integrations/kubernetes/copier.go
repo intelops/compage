@@ -36,6 +36,8 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplate
 	return &Copier{
 		GoTemplatesRootPath: goTemplatesRootPath,
 		NodeDirectoryName:   nodeDirectoryName,
+		IsServer:            isServer,
+		Port:                serverPort,
 		Data:                data,
 	}
 }

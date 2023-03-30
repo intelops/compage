@@ -58,9 +58,10 @@ func Generate(ctx context.Context) error {
 		return errors.New(fmt.Sprintf("unsupported protocol %s for language %s", "ws", n.Language))
 	}
 
-	// k8s files needs to be generated for the whole project so, it should be here.
-	integrationsCopier := getIntegrationsCopier(goValues)
-	if err := integrationsCopier.CreateKubernetesFiles(); err != nil {
+	m := getIntegrationsCopier(goValues)
+	// k8s files need to be generated for the whole project so, it should be here.
+	k8sCopier := m["k8s"].(*kubernetes.Copier)
+	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
 		log.Debugf("err : %s", err)
 		return err
 	}
@@ -83,7 +84,7 @@ func getGoGinServerCopier(goValues GoValues) *go_gin_server.Copier {
 	return copier
 }
 
-func getIntegrationsCopier(goValues GoValues) *kubernetes.Copier {
+func getIntegrationsCopier(goValues GoValues) map[string]interface{} {
 	userName := goValues.Values.Get(languages.UserName)
 	repositoryName := goValues.Values.Get(languages.RepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
@@ -92,7 +93,10 @@ func getIntegrationsCopier(goValues GoValues) *kubernetes.Copier {
 	serverPort := goValues.LGoLangNode.RestConfig.Server.Port
 	goTemplatesRootPath := GetGoTemplatesRootPath()
 
-	// create golang specific copier
-	copier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, isServer, serverPort)
-	return copier
+	// create golang specific k8sCopier
+	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, isServer, serverPort)
+
+	return map[string]interface{}{
+		"k8s": k8sCopier,
+	}
 }
