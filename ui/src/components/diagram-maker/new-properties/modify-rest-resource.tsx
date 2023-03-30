@@ -270,7 +270,7 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
             <DialogActions>
                 <Button variant="outlined" color="secondary" onClick={props.onModifyRestResourceClose}>Cancel</Button>
                 <Button variant="contained"
-                        disabled={data.name === "" || (fieldCollection[0].attribute === "" || fieldCollection[0].attribute === "")}
+                        disabled={data.name === "" || (fieldCollection[0].attribute === "" || fieldCollection[0].datatype === "")}
                         onClick={handleModifyRestResourceClick}>
                     Modify Resource
                 </Button>
