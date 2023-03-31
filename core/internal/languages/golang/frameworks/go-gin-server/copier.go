@@ -20,8 +20,6 @@ const ServicesPath = RestServerPath + "/services"
 const ControllersPath = RestServerPath + "/controllers"
 const ModelsPath = RestServerPath + "/models"
 
-const ClientPath = "/pkg/rest/client"
-
 const ControllerFile = "controller.go.tmpl"
 const ServiceFile = "service.go.tmpl"
 const DaoFile = "dao.go.tmpl"
@@ -31,17 +29,18 @@ const ClientFile = "client.go.tmpl"
 
 // Copier Language specific copier
 type Copier struct {
-	NodeDirectoryName   string
-	GoTemplatesRootPath string
-	Data                map[string]interface{}
-	IsServer            bool
-	Port                string
-	Resources           []node.Resource
-	Clients             []languages.RestClient
-	PluralizeClient     *pluralize.Client
+	NodeDirectoryName string
+	TemplatesRootPath string
+	Data              map[string]interface{}
+	IsServer          bool
+	IsClient          bool
+	Port              string
+	Resources         []node.Resource
+	Clients           []languages.RestClient
+	PluralizeClient   *pluralize.Client
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath string, isServer bool, serverPort string, resources []node.Resource, clients []languages.RestClient) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isServer bool, serverPort string, resources []node.Resource, clients []languages.RestClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
 
@@ -67,15 +66,19 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplate
 		data["ServerPort"] = serverPort
 		data["IsServer"] = isServer
 	}
+	// if clients slice has elements
+	isClient := len(clients) > 0
+	data["IsClient"] = isClient
 
 	return &Copier{
-		GoTemplatesRootPath: goTemplatesRootPath,
-		NodeDirectoryName:   nodeDirectoryName,
-		Data:                data,
-		IsServer:            isServer,
-		Resources:           resources,
-		Clients:             clients,
-		PluralizeClient:     pluralizeClient,
+		TemplatesRootPath: templatesRootPath,
+		NodeDirectoryName: nodeDirectoryName,
+		Data:              data,
+		IsServer:          isServer,
+		IsClient:          isClient,
+		Resources:         resources,
+		Clients:           clients,
+		PluralizeClient:   pluralizeClient,
 	}
 }
 
@@ -119,7 +122,7 @@ func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 
 	// copy controller files to generated project
 	targetResourceControllerFileName := c.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + ControllerFile
-	_, err := utils.CopyFile(targetResourceControllerFileName, c.GoTemplatesRootPath+ControllersPath+"/"+ControllerFile)
+	_, err := utils.CopyFile(targetResourceControllerFileName, c.TemplatesRootPath+ControllersPath+"/"+ControllerFile)
 	if err != nil {
 		return err
 	}
@@ -127,7 +130,7 @@ func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 
 	// copy model files to generated project
 	targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + ModelFile
-	_, err0 := utils.CopyFile(targetResourceModelFileName, c.GoTemplatesRootPath+ModelsPath+"/"+ModelFile)
+	_, err0 := utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+ModelFile)
 	if err0 != nil {
 		return err0
 	}
@@ -135,7 +138,7 @@ func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 
 	// copy service files to generated project
 	targetResourceServiceFileName := c.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + ServiceFile
-	_, err1 := utils.CopyFile(targetResourceServiceFileName, c.GoTemplatesRootPath+ServicesPath+"/"+ServiceFile)
+	_, err1 := utils.CopyFile(targetResourceServiceFileName, c.TemplatesRootPath+ServicesPath+"/"+ServiceFile)
 	if err1 != nil {
 		return err1
 	}
@@ -143,7 +146,7 @@ func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 
 	// copy dao files to generated project
 	targetResourceDaoFileName := c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + DaoFile
-	_, err2 := utils.CopyFile(targetResourceDaoFileName, c.GoTemplatesRootPath+DaosPath+"/"+DaoFile)
+	_, err2 := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+DaoFile)
 	if err2 != nil {
 		return err2
 	}
@@ -163,8 +166,8 @@ func (c Copier) copyRestClientResourceFiles(client languages.RestClient) error {
 	c.Data["ClientServiceName"] = client.ExternalNode
 
 	// copy client files to generated project.
-	targetResourceClientFileName := c.NodeDirectoryName + ClientPath + "/" + client.ExternalNode + "-" + ClientFile
-	_, err := utils.CopyFile(targetResourceClientFileName, c.GoTemplatesRootPath+ClientPath+"/"+ClientFile)
+	targetResourceClientFileName := c.NodeDirectoryName + RestClientPath + "/" + client.ExternalNode + "-" + ClientFile
+	_, err := utils.CopyFile(targetResourceClientFileName, c.TemplatesRootPath+RestClientPath+"/"+ClientFile)
 	if err != nil {
 		return err
 	}
@@ -221,7 +224,7 @@ func (c Copier) CreateRestServer() error {
 // CreateRestClients creates/copies relevant files to generated project
 func (c Copier) CreateRestClients() error {
 	// if the node is client, add client code
-	if c.Clients != nil {
+	if c.IsClient {
 		// create directories for client
 		if err := c.createRestClientDirectories(); err != nil {
 			return err
@@ -239,7 +242,7 @@ func (c Copier) CreateRestClients() error {
 
 // CreateRootLevelFiles copies all root level files at language template.
 func (c Copier) CreateRootLevelFiles() error {
-	err := utils.CopyFiles(c.NodeDirectoryName, c.GoTemplatesRootPath)
+	err := utils.CopyFiles(c.NodeDirectoryName, c.TemplatesRootPath)
 	if err != nil {
 		return err
 	}

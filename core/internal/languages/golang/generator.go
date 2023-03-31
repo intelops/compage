@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/intelops/compage/core/internal/languages"
 	"github.com/intelops/compage/core/internal/languages/golang/frameworks/go-gin-server"
+	"github.com/intelops/compage/core/internal/languages/golang/integrations/docker"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/kubernetes"
 	"github.com/intelops/compage/core/internal/languages/templates"
 	log "github.com/sirupsen/logrus"
@@ -26,7 +27,7 @@ func Generate(ctx context.Context) error {
 					log.Debugf("err : %s", err)
 					return err
 				}
-				// copy all files at root level, fire this at last(TODO - remove dockerfile from below and add it to docker integration)
+				// copy all files at root level, fire this at last
 				if err := goGinServerCopier.CreateRootLevelFiles(); err != nil {
 					log.Debugf("err : %s", err)
 					return err
@@ -59,6 +60,14 @@ func Generate(ctx context.Context) error {
 	}
 
 	m := getIntegrationsCopier(goValues)
+
+	// dockerfile needs to be generated for the whole project so, it should be here.
+	dockerCopier := m["docker"].(*docker.Copier)
+	if err := dockerCopier.CreateDockerFile(); err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+
 	// k8s files need to be generated for the whole project so, it should be here.
 	k8sCopier := m["k8s"].(*kubernetes.Copier)
 	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
@@ -78,9 +87,9 @@ func getGoGinServerCopier(goValues GoValues) *go_gin_server.Copier {
 	serverPort := goValues.LGoLangNode.RestConfig.Server.Port
 	resources := goValues.LGoLangNode.RestConfig.Server.Resources
 	clients := goValues.LGoLangNode.RestConfig.Clients
-	goTemplatesRootPath := GetGoTemplatesRootPath()
+	path := GetGoTemplatesRootPath() + "/frameworks/" + GoGinServerFramework
 	// create golang specific copier
-	copier := go_gin_server.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, isServer, serverPort, resources, clients)
+	copier := go_gin_server.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort, resources, clients)
 	return copier
 }
 
@@ -91,12 +100,16 @@ func getIntegrationsCopier(goValues GoValues) map[string]interface{} {
 	nodeDirectoryName := goValues.Values.NodeDirectoryName
 	isServer := goValues.LGoLangNode.RestConfig.Server != nil
 	serverPort := goValues.LGoLangNode.RestConfig.Server.Port
-	goTemplatesRootPath := GetGoTemplatesRootPath()
+	path := GetGoTemplatesRootPath()
+
+	// create golang specific dockerCopier
+	dockerCopier := docker.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
 
 	// create golang specific k8sCopier
-	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, isServer, serverPort)
+	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
 
 	return map[string]interface{}{
-		"k8s": k8sCopier,
+		"docker": dockerCopier,
+		"k8s":    k8sCopier,
 	}
 }
