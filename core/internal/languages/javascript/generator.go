@@ -39,8 +39,10 @@ func Generate(ctx context.Context) error {
 	}
 
 	// k8s files need to be generated for the whole project so, it should be here.
-	integrationsCopier := getIntegrationsCopier(javascriptValues)
-	if err := integrationsCopier.CreateKubernetesFiles(); err != nil {
+	m := getIntegrationsCopier(javascriptValues)
+
+	k8sCopier := m["k8s"].(*kubernetes.Copier)
+	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
 		log.Debugf("err : %s", err)
 		return err
 	}
@@ -48,16 +50,19 @@ func Generate(ctx context.Context) error {
 	return nil
 }
 
-func getIntegrationsCopier(javascriptValues Values) *kubernetes.Copier {
+func getIntegrationsCopier(javascriptValues Values) map[string]interface{} {
 	userName := javascriptValues.Values.Get(languages.UserName)
 	repositoryName := javascriptValues.Values.Get(languages.RepositoryName)
 	nodeName := javascriptValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := javascriptValues.Values.NodeDirectoryName
 	isServer := javascriptValues.JavaScriptNode.RestConfig.Server != nil
 	serverPort := javascriptValues.JavaScriptNode.RestConfig.Server.Port
-	javascriptTemplatesRootPath := GetJavaScriptTemplatesRootPath()
+	path := GetJavaScriptTemplatesRootPath()
 
-	// create javascript specific copier
-	copier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, javascriptTemplatesRootPath, isServer, serverPort)
-	return copier
+	// create javascript specific k8sCopier
+	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
+
+	return map[string]interface{}{
+		"k8s": k8sCopier,
+	}
 }

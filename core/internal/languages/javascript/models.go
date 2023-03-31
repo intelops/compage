@@ -6,8 +6,7 @@ import (
 )
 
 // TemplatesPath directory of template files
-// TODO changed later
-const TemplatesPath = "templates/compage-template-go"
+const TemplatesPath = "templates/compage-template-javascript"
 
 var templatesRootPath = utils.GetProjectRootPath(TemplatesPath)
 

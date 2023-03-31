@@ -6,3 +6,7 @@
 	path = core/templates/compage-template-java
 	url = https://github.com/intelops/compage-template-java.git
     branch = template-v1
+[submodule "core/templates/compage-template-javascript"]
+	path = core/templates/compage-template-javascript
+	url = https://github.com/intelops/compage-template-javascript.git
+    branch = template-v1
