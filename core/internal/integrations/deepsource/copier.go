@@ -26,8 +26,8 @@ func NewCopier(project *core.Project) *Copier {
 	}
 
 	return &Copier{
-		// TODO change this to generic integration path
-		TemplatesRootPath:    utils.GetProjectRootPath("templates/compage-template-go"),
+		// TODO change this path to constant. Add language specific analysers in a generic way later.
+		TemplatesRootPath:    utils.GetProjectRootPath("templates/common-templates"),
 		ProjectDirectoryName: utils.GetProjectDirectoryName(project.Name),
 		RepositoryName:       project.RepositoryName,
 		Data:                 data,

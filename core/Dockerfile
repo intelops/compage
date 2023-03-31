@@ -7,8 +7,8 @@ FROM golang:1.20.2-alpine3.17 as builder
 # Create project directory (workdir)
 WORKDIR /app
 
-# Add source code files to WORKDIR
-ADD . .
+# copy source code files to WORKDIR
+COPY . .
 
 # Build application
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o main .
@@ -29,7 +29,7 @@ RUN go version
 # test if the below command avoids loading the files later.
 RUN openapi-generator-cli version
 COPY --from=builder /app/main /
-ADD templates /app/templates
+COPY templates /app/templates
 # Application port (optional)
 EXPOSE 8080
 EXPOSE 50051
