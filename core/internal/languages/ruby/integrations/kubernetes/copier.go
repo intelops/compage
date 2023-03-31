@@ -12,14 +12,14 @@ const ServiceFile = "service.yaml.tmpl"
 
 // Copier integrations specific copier
 type Copier struct {
-	NodeDirectoryName     string
-	RubyTemplatesRootPath string
-	Data                  map[string]interface{}
-	IsServer              bool
-	Port                  string
+	NodeDirectoryName string
+	TemplatesRootPath string
+	Data              map[string]interface{}
+	IsServer          bool
+	Port              string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, rubyTemplatesRootPath string, isServer bool, serverPort string) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isServer bool, serverPort string) *Copier {
 	// populate map to replace templates
 	data := map[string]interface{}{
 		"RepositoryName": repositoryName,
@@ -33,11 +33,11 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, rubyTempla
 	}
 
 	return &Copier{
-		RubyTemplatesRootPath: rubyTemplatesRootPath,
-		NodeDirectoryName:     nodeDirectoryName,
-		IsServer:              isServer,
-		Port:                  serverPort,
-		Data:                  data,
+		TemplatesRootPath: templatesRootPath,
+		NodeDirectoryName: nodeDirectoryName,
+		IsServer:          isServer,
+		Port:              serverPort,
+		Data:              data,
 	}
 }
 
@@ -52,7 +52,7 @@ func (c Copier) CreateKubernetesFiles() error {
 	if c.IsServer {
 		// copy service files to generated kubernetes manifests
 		targetKubernetesServiceFileName := c.NodeDirectoryName + Path + "/" + ServiceFile
-		_, err := utils.CopyFile(targetKubernetesServiceFileName, c.RubyTemplatesRootPath+Path+"/"+ServiceFile)
+		_, err := utils.CopyFile(targetKubernetesServiceFileName, c.TemplatesRootPath+Path+"/"+ServiceFile)
 		if err != nil {
 			return err
 		}
@@ -60,7 +60,7 @@ func (c Copier) CreateKubernetesFiles() error {
 	}
 	// copy deployment files to generated kubernetes manifests
 	targetKubernetesDeploymentFileName := c.NodeDirectoryName + Path + "/" + DeploymentFile
-	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, c.RubyTemplatesRootPath+Path+"/"+DeploymentFile)
+	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, c.TemplatesRootPath+Path+"/"+DeploymentFile)
 	if err != nil {
 		return err
 	}

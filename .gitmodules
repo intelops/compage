@@ -14,3 +14,7 @@
 	path = core/templates/compage-template-python
 	url = https://github.com/intelops/compage-template-python.git
     branch = template-v1
+[submodule "core/templates/compage-template-ruby"]
+	path = core/templates/compage-template-ruby
+	url = https://github.com/intelops/compage-template-ruby.git
+    branch = template-v1

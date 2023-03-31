@@ -39,8 +39,10 @@ func Generate(ctx context.Context) error {
 	}
 
 	// k8s files need to be generated for the whole project so, it should be here.
-	integrationsCopier := getIntegrationsCopier(rubyValues)
-	if err := integrationsCopier.CreateKubernetesFiles(); err != nil {
+	m := getIntegrationsCopier(rubyValues)
+
+	k8sCopier := m["k8s"].(*kubernetes.Copier)
+	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
 		log.Debugf("err : %s", err)
 		return err
 	}
@@ -48,16 +50,19 @@ func Generate(ctx context.Context) error {
 	return nil
 }
 
-func getIntegrationsCopier(rubyValues Values) *kubernetes.Copier {
+func getIntegrationsCopier(rubyValues Values) map[string]interface{} {
 	userName := rubyValues.Values.Get(languages.UserName)
 	repositoryName := rubyValues.Values.Get(languages.RepositoryName)
 	nodeName := rubyValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := rubyValues.Values.NodeDirectoryName
 	isServer := rubyValues.RubyNode.RestConfig.Server != nil
 	serverPort := rubyValues.RubyNode.RestConfig.Server.Port
-	rubyTemplatesRootPath := GetRubyTemplatesRootPath()
+	path := GetRubyTemplatesRootPath()
 
-	// create ruby specific copier
-	copier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, rubyTemplatesRootPath, isServer, serverPort)
-	return copier
+	// create ruby specific k8sCopier
+	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
+
+	return map[string]interface{}{
+		"k8s": k8sCopier,
+	}
 }
