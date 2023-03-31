@@ -2,3 +2,7 @@
 	path = core/templates/compage-template-go
 	url = git@github.com:intelops/compage-template-go.git
     branch = template-v8
+[submodule "core/templates/compage-template-java"]
+	path = core/templates/compage-template-java
+	url = https://github.com/intelops/compage-template-java.git
+    branch = template-v1
