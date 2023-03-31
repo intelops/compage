@@ -9,6 +9,7 @@ import {selectGetProjectData, selectUpdateProjectData} from "../projects/slice";
 import {removeUnwantedKeys} from "../../components/diagram-maker/helper/helper";
 import * as _ from "lodash";
 import {RestClientConfig, RestServerConfig} from "../../components/diagram-maker/models";
+import {isCompageTemplate} from "../../components/diagram-maker/new-properties/utils";
 
 export const GenerateCode = () => {
     const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
@@ -41,6 +42,10 @@ export const GenerateCode = () => {
             const restServerConfig: RestServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.restServerConfig;
             if (!restServerConfig || Object.keys(restServerConfig).length < 1) {
                 return true;
+            }
+            // in case of compage template, resources should not be empty.
+            if (isCompageTemplate(restServerConfig.template) && restServerConfig.resources.length < 1) {
+                return true
             }
             // TODO check later
             // const wsServerConfig: WsServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.wsServerConfig;
