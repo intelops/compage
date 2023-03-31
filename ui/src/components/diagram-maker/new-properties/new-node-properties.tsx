@@ -205,7 +205,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const handleTemplateChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const restServerConfig = payload.restServerConfig;
+        const restServerConfig: RestServerConfig = payload.restServerConfig;
         restServerConfig.template = event.target.value;
         setPayload({
             ...payload,
@@ -383,7 +383,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const handleRestServerConfigFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const restServerConfig = payload.restServerConfig;
+        const restServerConfig: RestServerConfig = payload.restServerConfig;
         restServerConfig.framework = event.target.value;
         setPayload({
             ...payload,
@@ -392,7 +392,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const handleRestServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const restServerConfig = payload.restServerConfig;
+        const restServerConfig: RestServerConfig = payload.restServerConfig;
         restServerConfig.port = event.target.value;
         setPayload({
             ...payload,
@@ -441,7 +441,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const handleGrpcServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const grpcServerConfig = payload.grpcServerConfig;
+        const grpcServerConfig: GrpcServerConfig = payload.grpcServerConfig;
         grpcServerConfig.port = event.target.value;
         setPayload({
             ...payload,
@@ -490,7 +490,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const handleWsServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const wsServerConfig = payload.wsServerConfig;
+        const wsServerConfig: WsServerConfig = payload.wsServerConfig;
         wsServerConfig.port = event.target.value;
         setPayload({
             ...payload,
@@ -499,7 +499,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const handleModifyRestResourceClick = (resource: Resource) => {
-        const restServerConfig = payload.restServerConfig;
+        const restServerConfig: RestServerConfig = payload.restServerConfig;
         restServerConfig.resources.push(resource);
         setPayload({
             ...payload,

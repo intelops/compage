@@ -9,7 +9,14 @@ import {getCurrentConfig, setModifiedState} from "../../../utils/localstorage-cl
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
-import {RestServerConfig} from "../models";
+import {
+    GrpcClientConfig,
+    GrpcServerConfig,
+    RestClientConfig,
+    RestServerConfig,
+    WsClientConfig,
+    WsServerConfig
+} from "../models";
 
 interface NewEdgePropertiesProps {
     isOpen: boolean;
@@ -29,20 +36,20 @@ interface ClientTypesConfig {
 const getClientTypesConfig = (parsedModifiedState, edgeId): ClientTypesConfig => {
     const clientTypesConfig = {};
     // rest
-    const restClientConfig = parsedModifiedState.edges[edgeId]?.consumerData?.restClientConfig;
-    if (restClientConfig && restClientConfig !== "{}" && Object.keys(restClientConfig).length > 0) {
+    const restClientConfig: RestClientConfig = parsedModifiedState.edges[edgeId]?.consumerData?.restClientConfig;
+    if (restClientConfig && Object.keys(restClientConfig).length > 0) {
         clientTypesConfig["isRestServer"] = true;
         clientTypesConfig["restServerPort"] = restClientConfig.port;
     }
     // grpc
-    const grpcClientConfig = parsedModifiedState.edges[edgeId]?.consumerData?.grpcClientConfig;
-    if (grpcClientConfig && grpcClientConfig !== "{}" && Object.keys(grpcClientConfig).length > 0) {
+    const grpcClientConfig: GrpcClientConfig = parsedModifiedState.edges[edgeId]?.consumerData?.grpcClientConfig;
+    if (grpcClientConfig && Object.keys(grpcClientConfig).length > 0) {
         clientTypesConfig["isGrpcServer"] = true;
         clientTypesConfig["grpcServerPort"] = grpcClientConfig.port;
     }
     // ws
-    const wsClientConfig = parsedModifiedState.edges[edgeId]?.consumerData?.wsClientConfig;
-    if (wsClientConfig && wsClientConfig !== "{}" && Object.keys(wsClientConfig).length > 0) {
+    const wsClientConfig: WsClientConfig = parsedModifiedState.edges[edgeId]?.consumerData?.wsClientConfig;
+    if (wsClientConfig && Object.keys(wsClientConfig).length > 0) {
         clientTypesConfig["isWsServer"] = true;
         clientTypesConfig["wsServerPort"] = wsClientConfig.port;
     }
@@ -211,8 +218,8 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         if (payload.isGrpcServer) {
             // retrieve port from src node.
             const srcNode = parsedCurrentConfig.edges[props.edgeId].src;
-            const grpcServerConfig = parsedModifiedState.nodes[srcNode]?.consumerData?.grpcServerConfig;
-            if (grpcServerConfig && grpcServerConfig !== '{}') {
+            const grpcServerConfig: GrpcServerConfig = parsedModifiedState.nodes[srcNode]?.consumerData?.grpcServerConfig;
+            if (grpcServerConfig && Object.keys(grpcServerConfig).length > 0) {
                 payload.grpcServerPort = grpcServerConfig.port;
             }
             return <TextField
@@ -261,8 +268,8 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         if (payload.isWsServer) {
             // retrieve port from src node.
             const srcNode = parsedCurrentConfig.edges[props.edgeId].src;
-            const wsServerConfig = parsedModifiedState.nodes[srcNode]?.consumerData?.wsServerConfig;
-            if (wsServerConfig && wsServerConfig !== '{}') {
+            const wsServerConfig: WsServerConfig = parsedModifiedState.nodes[srcNode]?.consumerData?.wsServerConfig;
+            if (wsServerConfig && Object.keys(wsServerConfig).length > 0) {
                 payload.wsServerPort = wsServerConfig.port;
             }
             return <TextField

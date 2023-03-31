@@ -14,14 +14,14 @@ export interface RestServerConfig {
 
 export interface GrpcServerConfig {
     port: string;
-    framework?: string
+    framework?: string;
     resources?: Resource[];
     protoFileContent?: string;
 }
 
 export interface WsServerConfig {
     port: string;
-    framework?: string
+    framework?: string;
     resources?: Resource[];
 }
 

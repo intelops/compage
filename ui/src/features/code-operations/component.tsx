@@ -8,6 +8,7 @@ import {getCurrentProjectDetails, getCurrentState} from "../../utils/localstorag
 import {selectGetProjectData, selectUpdateProjectData} from "../projects/slice";
 import {removeUnwantedKeys} from "../../components/diagram-maker/helper/helper";
 import * as _ from "lodash";
+import {RestClientConfig, RestServerConfig} from "../../components/diagram-maker/models";
 
 export const GenerateCode = () => {
     const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
@@ -37,17 +38,17 @@ export const GenerateCode = () => {
             if (!name) {
                 return true;
             }
-            const restServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.restServerConfig;
-            if (!restServerConfig || restServerConfig === "" || restServerConfig === "{}") {
+            const restServerConfig: RestServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.restServerConfig;
+            if (!restServerConfig || Object.keys(restServerConfig).length < 1) {
                 return true;
             }
             // TODO check later
-            // const wsServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.wsServerConfig;
-            // if (!wsServerConfig || wsServerConfig === "" || wsServerConfig === "{}") {
+            // const wsServerConfig: WsServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.wsServerConfig;
+            // if (!wsServerConfig || Object.keys(wsServerConfig).length < 1) {
             //     return true;
             // }
-            // const grpcServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.grpcServerConfig;
-            // if (!grpcServerConfig || grpcServerConfig === "" || grpcServerConfig === "{}") {
+            // const grpcServerConfig: GrpcServerConfig= removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.grpcServerConfig;
+            // if (!grpcServerConfig || Object.keys(grpcServerConfig).length < 1) {
             //     return true;
             // }
         }
@@ -58,8 +59,8 @@ export const GenerateCode = () => {
                 return true;
             }
             // rest, similar checks need to be added below for grpc and ws.
-            const restClientConfig = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData?.restClientConfig;
-            if (!restClientConfig || restClientConfig === "" || restClientConfig === "{}") {
+            const restClientConfig: RestClientConfig = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData?.restClientConfig;
+            if (!restClientConfig || Object.keys(restClientConfig).length < 1) {
                 return true;
             }
         }
