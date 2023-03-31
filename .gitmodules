@@ -22,3 +22,7 @@
 	path = core/templates/compage-template-rust
 	url = https://github.com/intelops/compage-template-rust.git
     branch = template-v1
+[submodule "core/templates/compage-template-typescript"]
+	path = core/templates/compage-template-typescript
+	url = https://github.com/intelops/compage-template-typescript.git
+    branch = template-v1

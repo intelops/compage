@@ -39,8 +39,10 @@ func Generate(ctx context.Context) error {
 	}
 
 	// k8s files need to be generated for the whole project so, it should be here.
-	integrationsCopier := getIntegrationsCopier(typescriptValues)
-	if err := integrationsCopier.CreateKubernetesFiles(); err != nil {
+	m := getIntegrationsCopier(typescriptValues)
+
+	k8sCopier := m["k8s"].(*kubernetes.Copier)
+	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
 		log.Debugf("err : %s", err)
 		return err
 	}
@@ -48,16 +50,19 @@ func Generate(ctx context.Context) error {
 	return nil
 }
 
-func getIntegrationsCopier(typescriptValues Values) *kubernetes.Copier {
+func getIntegrationsCopier(typescriptValues Values) map[string]interface{} {
 	userName := typescriptValues.Values.Get(languages.UserName)
 	repositoryName := typescriptValues.Values.Get(languages.RepositoryName)
 	nodeName := typescriptValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := typescriptValues.Values.NodeDirectoryName
 	isServer := typescriptValues.TypeScriptNode.RestConfig.Server != nil
 	serverPort := typescriptValues.TypeScriptNode.RestConfig.Server.Port
-	typescriptTemplatesRootPath := GetTypeScriptTemplatesRootPath()
+	path := GetTypeScriptTemplatesRootPath()
 
 	// create typescript specific copier
-	copier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, typescriptTemplatesRootPath, isServer, serverPort)
-	return copier
+	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
+
+	return map[string]interface{}{
+		"k8s": k8sCopier,
+	}
 }
