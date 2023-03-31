@@ -46,18 +46,21 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
     };
 
     const handleChooseProjectClick = () => {
-        const getProjectRequest: GetProjectRequest = {
-            id: data.projectName
-        };
-        dispatch(getProjectAsync(getProjectRequest));
-        if (handleClose) {
-            handleClose();
+        // allow to choose project only when the project is chosen from drop-down
+        if (data.projectName) {
+            const getProjectRequest: GetProjectRequest = {
+                id: data.projectName
+            };
+            dispatch(getProjectAsync(getProjectRequest));
+            if (handleClose) {
+                handleClose();
+            }
         }
     };
 
     const getActionButtons = (): React.ReactNode => {
         return <Button variant="contained"
-                       disabled={listProjectsStatus === 'loading' || getProjectStatus === 'loading'}
+                       disabled={listProjectsStatus === 'loading' || getProjectStatus === 'loading' || data.projectName === ''}
                        onClick={handleChooseProjectClick}>
             Choose Project
         </Button>;
