@@ -45,11 +45,11 @@ interface ServerTypesConfig {
 }
 
 const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig => {
-    const restServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.restServerConfig;
-    const grpcServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.grpcServerConfig;
-    const wsServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.wsServerConfig;
+    const restServerConfig: RestServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.restServerConfig;
+    const grpcServerConfig: GrpcServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.grpcServerConfig;
+    const wsServerConfig: WsServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.wsServerConfig;
     const serverTypesConfig: ServerTypesConfig = {};
-    if (restServerConfig && restServerConfig !== "{}" && Object.keys(restServerConfig).length > 0) {
+    if (restServerConfig && Object.keys(restServerConfig).length > 0) {
         serverTypesConfig.isRestServer = true;
         serverTypesConfig.restServerConfig = {
             framework: restServerConfig.framework,
@@ -59,7 +59,7 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
             template: restServerConfig.template
         };
     }
-    if (grpcServerConfig && grpcServerConfig !== "{}" && Object.keys(grpcServerConfig).length > 0) {
+    if (grpcServerConfig && Object.keys(grpcServerConfig).length > 0) {
         serverTypesConfig.isGrpcServer = true;
         serverTypesConfig.grpcServerConfig = {
             framework: grpcServerConfig.framework,
@@ -68,7 +68,7 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
             resources: grpcServerConfig.resources
         };
     }
-    if (wsServerConfig && wsServerConfig !== "{}" && Object.keys(wsServerConfig).length > 0) {
+    if (wsServerConfig && Object.keys(wsServerConfig).length > 0) {
         serverTypesConfig.isWsServer = true;
         serverTypesConfig.wsServerConfig = {
             framework: wsServerConfig.framework,
@@ -117,6 +117,10 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         }
     });
 
+    const getPort = (template: string, port: string) => {
+        return isCompageTemplate(template) ? port || "8080" : "8080";
+    };
+
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state with additional properties added from UI (Post node creation)
     const handleUpdate = (event: React.MouseEvent<HTMLElement>) => {
@@ -128,7 +132,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         if (payload.isRestServer) {
             restServerConfig = {
                 framework: payload.restServerConfig.framework,
-                port: payload.restServerConfig.port || "8080",
+                port: getPort(payload.restServerConfig.template, payload.restServerConfig.port),
                 template: payload.restServerConfig.template,
             };
             if (isCompageTemplate(payload.restServerConfig.template)) {
@@ -162,9 +166,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 consumerData: {
                     name: payload.name,
                     language: payload.language,
-                    restServerConfig: restServerConfig,
-                    grpcServerConfig: grpcServerConfig,
-                    wsServerConfig: wsServerConfig,
+                    restServerConfig,
+                    grpcServerConfig,
+                    wsServerConfig,
                 }
             };
         } else {
@@ -172,9 +176,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             modifiedState.nodes[props.nodeId].consumerData = {
                 name: payload.name,
                 language: payload.language,
-                restServerConfig: restServerConfig,
-                grpcServerConfig: grpcServerConfig,
-                wsServerConfig: wsServerConfig,
+                restServerConfig,
+                grpcServerConfig,
+                wsServerConfig,
             };
         }
         // image to node display
@@ -313,7 +317,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             if (payload.language === GO) {
                 templates = [COMPAGE, OPENAPI];
             } else {
-                templates = [OPENAPI]
+                templates = [OPENAPI];
             }
             // create language:frameworks map based on template chosen
             let map;
@@ -441,7 +445,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         grpcServerConfig.port = event.target.value;
         setPayload({
             ...payload,
-            grpcServerConfig: grpcServerConfig,
+            grpcServerConfig,
         });
     };
 
@@ -490,7 +494,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         wsServerConfig.port = event.target.value;
         setPayload({
             ...payload,
-            wsServerConfig: wsServerConfig
+            wsServerConfig
         });
     };
 
@@ -499,7 +503,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         restServerConfig.resources.push(resource);
         setPayload({
             ...payload,
-            restServerConfig: restServerConfig,
+            restServerConfig,
             isModifyRestResourceOpen: !payload.isModifyRestResourceOpen
         });
     };
