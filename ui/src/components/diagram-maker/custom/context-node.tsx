@@ -1,6 +1,7 @@
 import React from 'react';
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
+import {CompageNode, EmptyGrpcServerConfig, EmptyRestServerConfig, EmptyWsServerConfig} from "../models";
 
 interface ContextNodeProps {
     id: string | undefined;
@@ -8,18 +9,16 @@ interface ContextNodeProps {
 
 export const ContextNode = (props: ContextNodeProps) => {
     const parsedModifiedState = getParsedModifiedState();
-
+    const node: CompageNode = parsedModifiedState.nodes[props.id];
     const [payload] = React.useState({
-        name: parsedModifiedState.nodes[props.id]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.id].consumerData.name : "",
-        type: parsedModifiedState.nodes[props.id]?.consumerData.type !== undefined ? parsedModifiedState.nodes[props.id].consumerData.type : "",
-        language: parsedModifiedState.nodes[props.id]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.id].consumerData.language : "",
+        name: node?.consumerData.name !== undefined ? node.consumerData.name : "",
+        language: node?.consumerData.language !== undefined ? node.consumerData.language : "",
         // restServerConfig to be generated
-        restServerConfig: parsedModifiedState.nodes[props.id]?.consumerData.restServerConfig !== undefined ? parsedModifiedState.nodes[props.id].consumerData.restServerConfig : {},
+        restServerConfig: node?.consumerData.restServerConfig !== undefined ? node.consumerData.restServerConfig : EmptyRestServerConfig,
         // grpcServerConfig to be generated
-        grpcServerConfig: parsedModifiedState.nodes[props.id]?.consumerData.grpcServerConfig !== undefined ? parsedModifiedState.nodes[props.id].consumerData.grpcServerConfig : {},
+        grpcServerConfig: node?.consumerData.grpcServerConfig !== undefined ? node.consumerData.grpcServerConfig : EmptyGrpcServerConfig,
         // wsServerType to be generated
-        wsServerConfig: parsedModifiedState.nodes[props.id]?.consumerData.wsServerConfig !== undefined ? parsedModifiedState.nodes[props.id].consumerData.wsServerConfig : {},
-        url: parsedModifiedState?.nodes[props.id]?.consumerData.url !== undefined ? parsedModifiedState.nodes[props.id].consumerData.url : "",
+        wsServerConfig: node?.consumerData.wsServerConfig !== undefined ? node.consumerData.wsServerConfig : EmptyWsServerConfig,
     });
 
     if (!props.id) {
@@ -33,12 +32,6 @@ export const ContextNode = (props: ContextNodeProps) => {
         return "";
     };
 
-    const getType = () => {
-        if (payload.type) {
-            return <><strong>Type</strong>: {payload.type}</>;
-        }
-        return "";
-    };
 
     const getLanguage = () => {
         if (payload.language) {
@@ -48,7 +41,24 @@ export const ContextNode = (props: ContextNodeProps) => {
     };
 
     const getTemplate = () => {
-        return <><strong>Template</strong>: {payload.restServerConfig.template}</>;
+        if (payload.restServerConfig.template) {
+            return <><strong>Template</strong>: {payload.restServerConfig.template}</>;
+        }
+        return "";
+    };
+
+    const getFramework = () => {
+        if (payload.restServerConfig.framework) {
+            return <><strong>Framework</strong>: {payload.restServerConfig.framework}</>;
+        }
+        return "";
+    };
+
+    const getPort = () => {
+        if (payload.restServerConfig.port) {
+            return <><strong>Port</strong>: {payload.restServerConfig.port}</>;
+        }
+        return "";
     };
 
     return <React.Fragment>
@@ -57,12 +67,13 @@ export const ContextNode = (props: ContextNodeProps) => {
             <Divider/>
             {getName()}
             <br/>
-            {getType()}
-            <br/>
             {getLanguage()}
             <br/>
             {getTemplate()}
             <br/>
+            {getFramework()}
+            <br/>
+            {getPort()}
         </div>
     </React.Fragment>;
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import Divider from "@mui/material/Divider";
 import {getParsedModifiedState} from "../helper/helper";
+import {CompageEdge, EmptyGrpcServerConfig, EmptyRestServerConfig, EmptyWsServerConfig} from "../models";
 
 interface ContextEdgeProps {
     id: string | undefined;
@@ -8,11 +9,17 @@ interface ContextEdgeProps {
 
 export const ContextEdge = (props: ContextEdgeProps) => {
     const parsedModifiedState = getParsedModifiedState();
-
+    const edge: CompageEdge = parsedModifiedState.edges[props.id];
     const [payload] = React.useState({
-        type: parsedModifiedState.edges[props.id]?.consumerData.type !== undefined ? parsedModifiedState.edges[props.id].consumerData.type : "",
-        name: parsedModifiedState.edges[props.id]?.consumerData.name !== undefined ? parsedModifiedState.edges[props.id].consumerData.name : "",
-        protocol: parsedModifiedState.edges[props.id]?.consumerData.protocol !== undefined ? parsedModifiedState.edges[props.id].consumerData.protocol : "",
+        name: edge?.consumerData.name !== undefined ? edge.consumerData.name : "",
+        port: edge?.consumerData.name !== undefined ? edge.consumerData.name : "",
+        // restClientConfig
+        restClientConfig: edge?.consumerData.restClientConfig !== undefined ? edge.consumerData.restClientConfig : EmptyRestServerConfig,
+        // grpcClientConfig
+        grpcClientConfig: edge?.consumerData.grpcClientConfig !== undefined ? edge.consumerData.grpcClientConfig : EmptyGrpcServerConfig,
+        // wsServerType
+        wsClientConfig: edge?.consumerData.wsClientConfig !== undefined ? edge.consumerData.wsClientConfig : EmptyWsServerConfig,
+        externalNode: edge?.consumerData.externalNode !== undefined ? edge.consumerData.externalNode : "",
     });
 
     if (!props.id) {
@@ -26,16 +33,30 @@ export const ContextEdge = (props: ContextEdgeProps) => {
         return "";
     };
 
-    const getType = () => {
-        if (payload.type) {
-            return <><strong>Type</strong> : {payload.type}</>;
+    const getRestClientPort = () => {
+        if (payload.restClientConfig.port) {
+            return <><strong>Port(REST)</strong> : {payload.restClientConfig.port}</>;
         }
         return "";
     };
 
-    const getProtocol = () => {
-        if (payload.protocol) {
-            return <><strong>Protocol</strong> : {payload.protocol}</>;
+    const getGrpcClientPort = () => {
+        if (payload.grpcClientConfig.port) {
+            return <><strong>Port(gRPC)</strong> : {payload.grpcClientConfig.port}</>;
+        }
+        return "";
+    };
+
+    const getWsClientPort = () => {
+        if (payload.wsClientConfig.port) {
+            return <><strong>Port(WS)</strong> : {payload.wsClientConfig.port}</>;
+        }
+        return "";
+    };
+
+    const getExternalNode = () => {
+        if (payload.externalNode) {
+            return <><strong>External Node</strong> : {payload.externalNode}</>;
         }
         return "";
     };
@@ -46,9 +67,13 @@ export const ContextEdge = (props: ContextEdgeProps) => {
             <Divider/>
             {getName()}
             <br/>
-            {getType()}
+            {getExternalNode()}
             <br/>
-            {getProtocol()}
+            {getRestClientPort()}
+            <br/>
+            {getGrpcClientPort()}
+            <br/>
+            {getWsClientPort()}
         </div>
     </React.Fragment>;
 };

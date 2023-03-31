@@ -76,3 +76,25 @@ export interface CompageJson {
     nodes: Map<string, CompageNode>;
     version: string;
 }
+
+// empty interfaces
+export const EmptyRestServerConfig: RestServerConfig = {
+    template: "",
+    resources: [],
+    port: "",
+    framework: "",
+    openApiFileYamlContent: ""
+};
+
+export const EmptyGrpcServerConfig: GrpcServerConfig = {
+    resources: [],
+    port: "",
+    framework: "",
+    protoFileContent: ""
+};
+
+export const EmptyWsServerConfig: WsServerConfig = {
+    resources: [],
+    port: "",
+    framework: "",
+};
