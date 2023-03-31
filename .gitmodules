@@ -10,3 +10,7 @@
 	path = core/templates/compage-template-javascript
 	url = https://github.com/intelops/compage-template-javascript.git
     branch = template-v1
+[submodule "core/templates/compage-template-python"]
+	path = core/templates/compage-template-python
+	url = https://github.com/intelops/compage-template-python.git
+    branch = template-v1

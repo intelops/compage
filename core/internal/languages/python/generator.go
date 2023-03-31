@@ -39,8 +39,10 @@ func Generate(ctx context.Context) error {
 	}
 
 	// k8s files need to be generated for the whole project so, it should be here.
-	integrationsCopier := getIntegrationsCopier(pythonValues)
-	if err := integrationsCopier.CreateKubernetesFiles(); err != nil {
+	m := getIntegrationsCopier(pythonValues)
+
+	k8sCopier := m["k8s"].(*kubernetes.Copier)
+	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
 		log.Debugf("err : %s", err)
 		return err
 	}
@@ -48,16 +50,19 @@ func Generate(ctx context.Context) error {
 	return nil
 }
 
-func getIntegrationsCopier(pythonValues Values) *kubernetes.Copier {
+func getIntegrationsCopier(pythonValues Values) map[string]interface{} {
 	userName := pythonValues.Values.Get(languages.UserName)
 	repositoryName := pythonValues.Values.Get(languages.RepositoryName)
 	nodeName := pythonValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := pythonValues.Values.NodeDirectoryName
 	isServer := pythonValues.PythonNode.RestConfig.Server != nil
 	serverPort := pythonValues.PythonNode.RestConfig.Server.Port
-	pythonTemplatesRootPath := GetPythonTemplatesRootPath()
+	path := GetPythonTemplatesRootPath()
 
-	// create python specific copier
-	copier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, pythonTemplatesRootPath, isServer, serverPort)
-	return copier
+	// create python specific k8sCopier
+	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
+
+	return map[string]interface{}{
+		"k8s": k8sCopier,
+	}
 }
