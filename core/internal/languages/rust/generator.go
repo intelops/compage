@@ -39,8 +39,10 @@ func Generate(ctx context.Context) error {
 	}
 
 	// k8s files need to be generated for the whole project so, it should be here.
-	integrationsCopier := getIntegrationsCopier(rustValues)
-	if err := integrationsCopier.CreateKubernetesFiles(); err != nil {
+	m := getIntegrationsCopier(rustValues)
+
+	k8sCopier := m["k8s"].(*kubernetes.Copier)
+	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
 		log.Debugf("err : %s", err)
 		return err
 	}
@@ -48,16 +50,19 @@ func Generate(ctx context.Context) error {
 	return nil
 }
 
-func getIntegrationsCopier(rustValues Values) *kubernetes.Copier {
+func getIntegrationsCopier(rustValues Values) map[string]interface{} {
 	userName := rustValues.Values.Get(languages.UserName)
 	repositoryName := rustValues.Values.Get(languages.RepositoryName)
 	nodeName := rustValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := rustValues.Values.NodeDirectoryName
 	isServer := rustValues.RustNode.RestConfig.Server != nil
 	serverPort := rustValues.RustNode.RestConfig.Server.Port
-	rustTemplatesRootPath := GetRustTemplatesRootPath()
+	path := GetRustTemplatesRootPath()
 
 	// create rust specific copier
-	copier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, rustTemplatesRootPath, isServer, serverPort)
-	return copier
+	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
+
+	return map[string]interface{}{
+		"k8s": k8sCopier,
+	}
 }
