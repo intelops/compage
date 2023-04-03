@@ -1,0 +1,39 @@
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import {DialogContentText} from "@mui/material";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
+import React from "react";
+import {Resource} from "../models";
+
+interface DeleteRestResourceProperties {
+    open: boolean;
+    resource: Resource;
+    onDeleteRestResourceClose: () => void;
+    handleConfirmDeleteRestResourceClick: () => void;
+}
+
+export const DeleteRestResource = (props: DeleteRestResourceProperties) => {
+    return <Dialog
+        open={props.open}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+    >
+        <DialogTitle id="alert-dialog-title">
+            Delete Resource: {props.resource.name}?
+        </DialogTitle>
+        <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+                Are you sure to delete this resource?
+            </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+            <Button variant="outlined" color="secondary"
+                    onClick={props.onDeleteRestResourceClose}>Cancel</Button>
+            <Button variant="contained" onClick={props.handleConfirmDeleteRestResourceClick} autoFocus>
+                Delete
+            </Button>
+        </DialogActions>
+    </Dialog>;
+};

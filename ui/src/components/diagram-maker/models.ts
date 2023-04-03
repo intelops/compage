@@ -1,7 +1,7 @@
 export interface Resource {
     name: string;
     // the below map can contain metadata about the field.
-    fields: Map<string, Map<string, string>>;
+    fields?: Map<string, Map<string, string>>;
 }
 
 export interface RestServerConfig {
@@ -97,4 +97,9 @@ export const EmptyWsServerConfig: WsServerConfig = {
     resources: [],
     port: "",
     framework: "",
+};
+
+export const EmptyCurrentRestResource: Resource = {
+    name: "",
+    fields: new Map<string, Map<string, string>>()
 };

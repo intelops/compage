@@ -10,7 +10,16 @@ import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
-import {GrpcServerConfig, Resource, RestServerConfig, WsServerConfig} from "../models";
+import {
+    EmptyCurrentRestResource,
+    EmptyGrpcServerConfig,
+    EmptyRestServerConfig,
+    EmptyWsServerConfig,
+    GrpcServerConfig,
+    Resource,
+    RestServerConfig,
+    WsServerConfig
+} from "../models";
 import {ModifyRestResource} from "./modify-rest-resource";
 import DeleteIcon from '@mui/icons-material/Delete';
 import {useAppSelector} from "../../../redux/hooks";
@@ -27,6 +36,8 @@ import {
     OPENAPI,
     OPENAPI_LANGUAGE_FRAMEWORKS
 } from "./utils";
+import "./new-node-properties.scss";
+import {DeleteRestResource} from "./delete-rest-resource";
 
 interface NewNodePropertiesProps {
     isOpen: boolean;
@@ -89,32 +100,18 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         parsedModifiedState = getParsedModifiedState();
     }
     const serverTypesConfig: ServerTypesConfig = getServerTypesConfig(parsedModifiedState, props.nodeId);
-    const emptyRestServerConfig: RestServerConfig = {
-        template: "",
-        framework: "",
-        port: "",
-        resources: [],
-        openApiFileYamlContent: ""
-    };
-    const emptyGrpcServerConfig: GrpcServerConfig = {
-        framework: "", port: "", protoFileContent: "", resources: []
-    };
-    const emptyWsServerConfig: WsServerConfig = {framework: "", port: "", resources: []};
-
     const [payload, setPayload] = React.useState({
         name: parsedModifiedState.nodes[props.nodeId]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.name : "",
         language: parsedModifiedState.nodes[props.nodeId]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.language : "",
         isRestServer: serverTypesConfig.isRestServer || false,
-        restServerConfig: serverTypesConfig.restServerConfig || emptyRestServerConfig,
+        restServerConfig: serverTypesConfig.restServerConfig || EmptyRestServerConfig,
         isGrpcServer: serverTypesConfig.isGrpcServer || false,
-        grpcServerConfig: serverTypesConfig.grpcServerConfig || emptyGrpcServerConfig,
+        grpcServerConfig: serverTypesConfig.grpcServerConfig || EmptyGrpcServerConfig,
         isWsServer: serverTypesConfig.isWsServer || false,
-        wsServerConfig: serverTypesConfig.wsServerConfig || emptyWsServerConfig,
+        wsServerConfig: serverTypesConfig.wsServerConfig || EmptyWsServerConfig,
         isModifyRestResourceOpen: false,
-        currentRestResource: {
-            name: "",
-            fields: new Map<string, Map<string, string>>()
-        }
+        isDeleteRestResourceOpen: false,
+        currentRestResource: EmptyCurrentRestResource
     });
 
     const getPort = (template: string, port: string) => {
@@ -192,14 +189,12 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             isGrpcServer: false,
             isRestServer: false,
             isWsServer: false,
-            grpcServerConfig: emptyGrpcServerConfig,
-            restServerConfig: emptyRestServerConfig,
-            wsServerConfig: emptyWsServerConfig,
+            grpcServerConfig: EmptyGrpcServerConfig,
+            restServerConfig: EmptyRestServerConfig,
+            wsServerConfig: EmptyWsServerConfig,
             isModifyRestResourceOpen: false,
-            currentRestResource: {
-                name: "",
-                fields: new Map<string, Map<string, string>>()
-            }
+            isDeleteRestResourceOpen: false,
+            currentRestResource: EmptyCurrentRestResource
         });
         props.onClose();
     };
@@ -241,11 +236,13 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const handleDeleteRestResourceClick = (d) => {
-        payload.restServerConfig.resources = payload.restServerConfig.resources.filter(item => item.name !== d);
+    const handleDeleteRestResourceClick = (resourceName: string) => {
+        payload.currentRestResource = {
+            name: resourceName
+        };
         setPayload({
             ...payload,
-            restServerConfig: payload.restServerConfig
+            isDeleteRestResourceOpen: !payload.isDeleteRestResourceOpen
         });
     };
 
@@ -258,11 +255,14 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 });
                 return resourceNames;
             };
-            const listItems = getResources().map((d) =>
-                <li key={d}>
-                    {d}<DeleteIcon onClick={() => {
-                    handleDeleteRestResourceClick(d);
-                }} fontSize="small"/>
+            const listItems = getResources().map((resourceName) =>
+                <li key={resourceName} className="list">
+                    {resourceName}
+                    <DeleteIcon color="error"
+                                onClick={() => {
+                                    handleDeleteRestResourceClick(resourceName);
+                                }}
+                                fontSize="small"/>
                 </li>
             );
 
@@ -508,6 +508,23 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
+    const handleConfirmDeleteRestResourceClick = () => {
+        const currentRestResource = payload.currentRestResource;
+        payload.restServerConfig.resources = payload.restServerConfig.resources.filter(resource => resource.name !== currentRestResource.name);
+        setPayload({
+            ...payload,
+            restServerConfig: payload.restServerConfig,
+            isDeleteRestResourceOpen: !payload.isDeleteRestResourceOpen
+        });
+    };
+
+    const onDeleteRestResourceClose = () => {
+        setPayload({
+            ...payload,
+            isDeleteRestResourceOpen: !payload.isDeleteRestResourceOpen
+        });
+    };
+
     const onModifyRestResourceClose = () => {
         setPayload({
             ...payload,
@@ -524,6 +541,11 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     return <React.Fragment>
+        <DeleteRestResource open={payload.isDeleteRestResourceOpen}
+                            resource={payload.currentRestResource}
+                            onDeleteRestResourceClose={onDeleteRestResourceClose}
+                            handleConfirmDeleteRestResourceClick={handleConfirmDeleteRestResourceClick}/>
+
         <ModifyRestResource isOpen={payload.isModifyRestResourceOpen}
                             resource={payload.currentRestResource}
                             onModifyRestResourceClose={onModifyRestResourceClose}
