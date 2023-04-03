@@ -4,25 +4,25 @@
     branch = template-v8
 [submodule "core/templates/compage-template-java"]
 	path = core/templates/compage-template-java
-	url = https://github.com/intelops/compage-template-java.git
+	url = git@github.com:intelops/compage-template-java.git
     branch = template-v1
 [submodule "core/templates/compage-template-javascript"]
 	path = core/templates/compage-template-javascript
-	url = https://github.com/intelops/compage-template-javascript.git
+	url = git@github.com:intelops/compage-template-javascript.git
     branch = template-v1
 [submodule "core/templates/compage-template-python"]
 	path = core/templates/compage-template-python
-	url = https://github.com/intelops/compage-template-python.git
+	url = git@github.com:intelops/compage-template-python.git
     branch = template-v1
 [submodule "core/templates/compage-template-ruby"]
 	path = core/templates/compage-template-ruby
-	url = https://github.com/intelops/compage-template-ruby.git
+	url = git@github.com:intelops/compage-template-ruby.git
     branch = template-v1
 [submodule "core/templates/compage-template-rust"]
 	path = core/templates/compage-template-rust
-	url = https://github.com/intelops/compage-template-rust.git
+	url = git@github.com:intelops/compage-template-rust.git
     branch = template-v1
 [submodule "core/templates/compage-template-typescript"]
 	path = core/templates/compage-template-typescript
-	url = https://github.com/intelops/compage-template-typescript.git
+	url = git@github.com:intelops/compage-template-typescript.git
     branch = template-v1
