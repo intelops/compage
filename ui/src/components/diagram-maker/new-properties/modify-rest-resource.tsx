@@ -100,8 +100,11 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
     };
 
     const isEmptyField = () => {
+        if (payload.fieldsCollection.length <= 0){
+            return true;
+        }
         // this below means there are more than 1 fields and that means field is not empty.
-        if (payload.fieldsCollection.length > 1 || payload.fieldsCollection.length <= 0) {
+        if (payload.fieldsCollection.length > 1) {
             return false;
         }
         if (payload.fieldsCollection.length === 1) {
