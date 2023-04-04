@@ -7,10 +7,16 @@ import {
     InputLabel,
     ListSubheader,
     MenuItem,
+    Paper,
     Select,
     SelectChangeEvent,
     Stack,
-    Typography
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow
 } from "@mui/material";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
@@ -241,27 +247,27 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
                                 {
                                     dataTypesParser(INT)
                                 }
-                                <Divider />
+                                <Divider/>
                                 <ListSubheader color="primary">FLOAT</ListSubheader>
                                 {
                                     dataTypesParser(FLOAT)
                                 }
-                                <Divider />
+                                <Divider/>
                                 <ListSubheader color="primary">COMPLEX</ListSubheader>
                                 {
                                     dataTypesParser(COMPLEX)
                                 }
-                                <Divider />
+                                <Divider/>
                                 <ListSubheader color="primary">BOOL</ListSubheader>
                                 {
                                     dataTypesParser(BOOL)
                                 }
-                                <Divider />
+                                <Divider/>
                                 <ListSubheader color="primary">STRING</ListSubheader>
                                 {
                                     dataTypesParser(STRING)
                                 }
-                                <Divider />
+                                <Divider/>
                                 <ListSubheader color="primary">STRUCT</ListSubheader>
                                 {getCustomStructs(props.resourceNames)}
                             </Select>
@@ -276,28 +282,44 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
                     <hr/>
                     <br/>
                     Existing Fields:
-                    <Stack direction="column" spacing={1}>
-                        {
-                            payload.fieldsCollection.map((fld, index) => {
-                                return <React.Fragment key={index}>
-                                    <Stack direction="row" spacing={1}>
-                                        <Typography>
-                                            {fld.attribute}
-                                        </Typography>
-                                        <Typography>
-                                            {fld.datatype}
-                                        </Typography>
-                                        <Button onClick={() => handleEditField(index)}>
-                                            <EditIcon/>
-                                        </Button>
-                                        <Button onClick={() => handleRemoveField(index)}>
-                                            <RemoveIcon/>
-                                        </Button>
-                                    </Stack>
-                                </React.Fragment>;
-                            })
-                        }
-                    </Stack>
+                    <TableContainer component={Paper}>
+                        <Table sx={{minWidth: 450}}>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell align="left">Attribute</TableCell>
+                                    <TableCell align="center">Datatype</TableCell>
+                                    <TableCell align="center">Actions</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {
+                                    payload.fieldsCollection.map((fld, index) => (
+                                        <TableRow
+                                            key={index}
+                                            sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                        >
+                                            <TableCell scope="row">
+                                                {fld.attribute}
+                                            </TableCell>
+                                            <TableCell align="center">{fld.datatype}</TableCell>
+                                            <TableCell align="left">
+                                                <Stack direction="row-reverse" spacing={1}>
+                                                    <Button variant="contained"
+                                                            color="error"
+                                                            onClick={() => handleRemoveField(index)}>
+                                                        <RemoveIcon/>
+                                                    </Button>
+                                                    <Button variant="outlined" onClick={() => handleEditField(index)}>
+                                                        <EditIcon/>
+                                                    </Button>
+                                                </Stack>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                }
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                 </Stack>
             </DialogContent>
             <DialogActions>
