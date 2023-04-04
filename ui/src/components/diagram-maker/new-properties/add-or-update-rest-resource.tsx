@@ -29,10 +29,10 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import EditIcon from "@mui/icons-material/Edit";
 
-interface ModifyRestResourceProperties {
+interface AddOrUpdateRestResourceProperties {
     isOpen: boolean;
-    onModifyRestResourceClose: () => void;
-    handleModifyRestResourceClick: (resource: Resource) => void;
+    onAddOrUpdateRestResourceClose: () => void;
+    handleAddOrUpdateRestResource: (resource: Resource) => void;
     resource: Resource;
     resourceNames: string[];
     nodeId: string;
@@ -70,11 +70,26 @@ const isEmpty = (value: string) => {
     return value === "";
 };
 
-export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
+const getFieldsCollection = (resource: Resource) => {
+    const fieldsCollection = [];
+    if (resource.fields && Object.keys(resource.fields).length > 0) {
+        // tslint:disable-next-line: forin
+        for (const key in resource.fields) {
+            if (resource.fields.hasOwnProperty(key)) {
+                fieldsCollection.push({attribute: key, datatype: resource.fields[key]});
+            }
+        }
+    }
+    console.log("fieldsCollection :", fieldsCollection);
+    console.log("name :", resource.name);
+    return fieldsCollection;
+};
+
+export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties) => {
     const [payload, setPayload] = React.useState({
-        name: props.resource?.name || "",
+        name: props.resource.name,
         fields: JSON.stringify(props.resource?.fields) || "",
-        fieldsCollection: [],
+        fieldsCollection: getFieldsCollection(props.resource),
     });
 
     // individual states for Attribute Name and Data Type
@@ -100,7 +115,7 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
     };
 
     const isEmptyField = () => {
-        if (payload.fieldsCollection.length <= 0){
+        if (payload.fieldsCollection.length <= 0) {
             return true;
         }
         // this below means there are more than 1 fields and that means field is not empty.
@@ -111,6 +126,13 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
             return isEmpty(payload.fieldsCollection[0].datatype) || isEmpty(payload.fieldsCollection[0].attribute);
         }
         return false;
+    };
+
+    const handleNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setPayload({
+            ...payload,
+            name: sanitizeString(capitalizeFirstLetter(event.target.value))
+        });
     };
 
     const handleDatatypeChange = (event: SelectChangeEvent) => {
@@ -170,20 +192,13 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
         return input.charAt(0).toUpperCase() + input.slice(1);
     };
 
-    const handleNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setPayload({
-            ...payload,
-            name: sanitizeString(capitalizeFirstLetter(event.target.value))
-        });
-    };
-
-    const handleModifyRestResourceClick = () => {
+    const addOrUpdateRestResource = () => {
         const fields = {};
         for (const fld of payload.fieldsCollection) {
             fields[fld.attribute] = fld.datatype;
         }
         const resource: Resource = {fields: JSON.parse(JSON.stringify(fields)), name: payload.name};
-        props.handleModifyRestResourceClick(resource);
+        props.handleAddOrUpdateRestResource(resource);
         setPayload({
             ...payload,
             fields: "",
@@ -193,17 +208,17 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
         setField({datatype: "", attribute: "", mode: {edit: false, index: 0}});
     };
 
-    const onClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
+    const onAddOrUpdateRestResourceClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
         // this prevents dialog box from closing.
         if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
         }
-        props.onModifyRestResourceClose();
+        props.onAddOrUpdateRestResourceClose();
     };
 
     return <React.Fragment>
-        <Dialog open={props.isOpen} onClose={onClose}>
-            <DialogTitle>Modify [REST Server] resource : {props.nodeId}</DialogTitle>
+        <Dialog open={props.isOpen} onClose={onAddOrUpdateRestResourceClose}>
+            <DialogTitle>Add or update [REST Server] resource : {props.nodeId}</DialogTitle>
             <Divider/>
             <DialogContent style={{
                 height: "500px",
@@ -326,11 +341,11 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" color="secondary" onClick={props.onModifyRestResourceClose}>Cancel</Button>
+                <Button variant="outlined" color="secondary" onClick={props.onAddOrUpdateRestResourceClose}>Cancel</Button>
                 <Button variant="contained"
                         disabled={isEmpty(payload.name) || isEmptyField()}
-                        onClick={handleModifyRestResourceClick}>
-                    Modify Resource
+                        onClick={addOrUpdateRestResource}>
+                    Add/Update Resource
                 </Button>
             </DialogActions>
         </Dialog>

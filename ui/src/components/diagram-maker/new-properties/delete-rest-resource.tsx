@@ -8,15 +8,15 @@ import React from "react";
 import {Resource} from "../models";
 
 interface DeleteRestResourceProperties {
-    open: boolean;
+    isOpen: boolean;
     resource: Resource;
     onDeleteRestResourceClose: () => void;
-    handleConfirmDeleteRestResourceClick: () => void;
+    handleDeleteRestResource: () => void;
 }
 
 export const DeleteRestResource = (props: DeleteRestResourceProperties) => {
     return <Dialog
-        open={props.open}
+        open={props.isOpen}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
     >
@@ -31,7 +31,7 @@ export const DeleteRestResource = (props: DeleteRestResourceProperties) => {
         <DialogActions>
             <Button variant="outlined" color="secondary"
                     onClick={props.onDeleteRestResourceClose}>Cancel</Button>
-            <Button variant="contained" onClick={props.handleConfirmDeleteRestResourceClick} autoFocus>
+            <Button variant="contained" onClick={props.handleDeleteRestResource} autoFocus>
                 Delete
             </Button>
         </DialogActions>

@@ -105,7 +105,7 @@ export function createNodeWithDropdown(node: DiagramMakerNode<any>, container: H
 
 export function createCircularNode(node: DiagramMakerNode<any>, container: HTMLElement, eventListener: () => void) {
     const id = node.id.substring(0, 10);
-    let modifiedState = getModifiedState();
+    const modifiedState = getModifiedState();
     // add name given by user to this node.
     const name = JSON.parse(modifiedState)?.nodes[id]?.consumerData?.name;
     let displayName;

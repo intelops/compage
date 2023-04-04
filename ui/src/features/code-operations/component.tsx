@@ -34,7 +34,8 @@ export const GenerateCode = () => {
 
     const IsAnyRequiredValueMissingInOneOfNodes = (removeUnwantedKeysGetCurrentState: any) => {
         // nodes
-        for (let key in removeUnwantedKeysGetCurrentState?.nodes) {
+        // tslint:disable-next-line: forin
+        for (const key in removeUnwantedKeysGetCurrentState?.nodes) {
             const name = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.name;
             if (!name) {
                 return true;
@@ -45,7 +46,7 @@ export const GenerateCode = () => {
             }
             // in case of compage template, resources should not be empty.
             if (isCompageTemplate(restServerConfig.template) && restServerConfig.resources.length < 1) {
-                return true
+                return true;
             }
             // TODO check later
             // const wsServerConfig: WsServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.wsServerConfig;
@@ -58,7 +59,8 @@ export const GenerateCode = () => {
             // }
         }
         // edges
-        for (let key in removeUnwantedKeysGetCurrentState?.edges) {
+        // tslint:disable-next-line: forin
+        for (const key in removeUnwantedKeysGetCurrentState?.edges) {
             const name = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData?.name;
             if (!name) {
                 return true;

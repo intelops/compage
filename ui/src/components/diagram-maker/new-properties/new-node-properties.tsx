@@ -9,7 +9,18 @@ import {getCurrentConfig, setModifiedState} from "../../../utils/localstorage-cl
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
-import {Checkbox, FormControlLabel, Stack} from "@mui/material";
+import {
+    Checkbox,
+    FormControlLabel,
+    Paper,
+    Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow
+} from "@mui/material";
 import {
     EmptyCurrentRestResource,
     EmptyGrpcServerConfig,
@@ -20,8 +31,7 @@ import {
     RestServerConfig,
     WsServerConfig
 } from "../models";
-import {ModifyRestResource} from "./modify-rest-resource";
-import DeleteIcon from '@mui/icons-material/Delete';
+import {AddOrUpdateRestResource} from "./add-or-update-rest-resource";
 import {useAppSelector} from "../../../redux/hooks";
 import {selectUploadYamlData, selectUploadYamlStatus} from "../../../features/open-api-yaml-operations/slice";
 import {updateModifiedState} from "../../../features/projects/populateModifiedState";
@@ -38,11 +48,13 @@ import {
 } from "./utils";
 import "./new-node-properties.scss";
 import {DeleteRestResource} from "./delete-rest-resource";
+import RemoveIcon from "@mui/icons-material/Remove";
+import EditIcon from "@mui/icons-material/Edit";
 
 interface NewNodePropertiesProps {
     isOpen: boolean;
     nodeId: string;
-    onClose: () => void;
+    onNodePropertiesClose: () => void;
 }
 
 
@@ -109,7 +121,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         grpcServerConfig: serverTypesConfig.grpcServerConfig || EmptyGrpcServerConfig,
         isWsServer: serverTypesConfig.isWsServer || false,
         wsServerConfig: serverTypesConfig.wsServerConfig || EmptyWsServerConfig,
-        isModifyRestResourceOpen: false,
+        isAddOrUpdateRestResourceOpen: false,
         isDeleteRestResourceOpen: false,
         currentRestResource: EmptyCurrentRestResource
     });
@@ -120,7 +132,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
 
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state with additional properties added from UI (Post node creation)
-    const handleUpdate = (event: React.MouseEvent<HTMLElement>) => {
+    const handleUpdateNode = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
         let restServerConfig: RestServerConfig;
         let grpcServerConfig: GrpcServerConfig;
@@ -192,11 +204,11 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             grpcServerConfig: EmptyGrpcServerConfig,
             restServerConfig: EmptyRestServerConfig,
             wsServerConfig: EmptyWsServerConfig,
-            isModifyRestResourceOpen: false,
+            isAddOrUpdateRestResourceOpen: false,
             isDeleteRestResourceOpen: false,
             currentRestResource: EmptyCurrentRestResource
         });
-        props.onClose();
+        props.onNodePropertiesClose();
     };
 
     const handleTemplateChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
@@ -232,7 +244,15 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const handleAddRestResourceClick = () => {
         setPayload({
             ...payload,
-            isModifyRestResourceOpen: !payload.isModifyRestResourceOpen
+            isAddOrUpdateRestResourceOpen: !payload.isAddOrUpdateRestResourceOpen
+        });
+    };
+
+    const handleEditRestResourceClick = (resource: Resource) => {
+        setPayload({
+            ...payload,
+            isAddOrUpdateRestResourceOpen: !payload.isAddOrUpdateRestResourceOpen,
+            currentRestResource: resource
         });
     };
 
@@ -248,30 +268,47 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
 
     const getExistingResources = () => {
         if (payload.restServerConfig.resources?.length > 0) {
-            const getResources = () => {
-                const resourceNames = [];
-                payload.restServerConfig.resources.forEach(resource => {
-                    resourceNames.push(resource.name);
-                });
-                return resourceNames;
-            };
-            const listItems = getResources().map((resourceName) =>
-                <li key={resourceName} className="list">
-                    {resourceName}
-                    <DeleteIcon color="error"
-                                onClick={() => {
-                                    handleDeleteRestResourceClick(resourceName);
-                                }}
-                                fontSize="small"/>
-                </li>
-            );
-
-            return <div>
+            return <>
+                <br/>
                 Existing resources :
-                <ul>
-                    {listItems}
-                </ul>
-            </div>;
+                <TableContainer component={Paper}>
+                    <Table sx={{minWidth: 400}}>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell align="left">Resource</TableCell>
+                                <TableCell align="center">Actions</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {
+                                payload.restServerConfig.resources.map((resource, index) => (
+                                    <TableRow
+                                        key={index}
+                                        sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                    >
+                                        <TableCell scope="row">
+                                            {resource.name}
+                                        </TableCell>
+                                        <TableCell align="left">
+                                            <Stack direction="row-reverse" spacing={1}>
+                                                <Button variant="contained"
+                                                        color="error"
+                                                        onClick={() => handleDeleteRestResourceClick(resource.name)}>
+                                                    <RemoveIcon/>
+                                                </Button>
+                                                <Button variant="outlined"
+                                                        onClick={() => handleEditRestResourceClick(resource)}>
+                                                    <EditIcon/>
+                                                </Button>
+                                            </Stack>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            }
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </>;
         }
 
         return "";
@@ -498,17 +535,17 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const handleModifyRestResourceClick = (resource: Resource) => {
+    const handleAddOrUpdateRestResource = (resource: Resource) => {
         const restServerConfig: RestServerConfig = payload.restServerConfig;
         restServerConfig.resources.push(resource);
         setPayload({
             ...payload,
             restServerConfig,
-            isModifyRestResourceOpen: !payload.isModifyRestResourceOpen
+            isAddOrUpdateRestResourceOpen: !payload.isAddOrUpdateRestResourceOpen
         });
     };
 
-    const handleConfirmDeleteRestResourceClick = () => {
+    const handleDeleteRestResource = () => {
         const currentRestResource = payload.currentRestResource;
         payload.restServerConfig.resources = payload.restServerConfig.resources.filter(resource => resource.name !== currentRestResource.name);
         setPayload({
@@ -525,10 +562,10 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const onModifyRestResourceClose = () => {
+    const onAddOrUpdateRestResourceClose = () => {
         setPayload({
             ...payload,
-            isModifyRestResourceOpen: !payload.isModifyRestResourceOpen
+            isAddOrUpdateRestResourceOpen: !payload.isAddOrUpdateRestResourceOpen
         });
     };
 
@@ -537,7 +574,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
         }
-        props.onClose();
+        props.onNodePropertiesClose();
     };
 
     const getResourceNames = () => {
@@ -552,17 +589,17 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     return <React.Fragment>
-        <DeleteRestResource open={payload.isDeleteRestResourceOpen}
+        <DeleteRestResource isOpen={payload.isDeleteRestResourceOpen}
                             resource={payload.currentRestResource}
                             onDeleteRestResourceClose={onDeleteRestResourceClose}
-                            handleConfirmDeleteRestResourceClick={handleConfirmDeleteRestResourceClick}/>
+                            handleDeleteRestResource={handleDeleteRestResource}/>
 
-        <ModifyRestResource isOpen={payload.isModifyRestResourceOpen}
-                            resource={payload.currentRestResource}
-                            resourceNames={getResourceNames()}
-                            onModifyRestResourceClose={onModifyRestResourceClose}
-                            nodeId={props.nodeId}
-                            handleModifyRestResourceClick={handleModifyRestResourceClick}/>
+        <AddOrUpdateRestResource isOpen={payload.isAddOrUpdateRestResourceOpen}
+                                 resource={payload.currentRestResource}
+                                 resourceNames={getResourceNames()}
+                                 onAddOrUpdateRestResourceClose={onAddOrUpdateRestResourceClose}
+                                 nodeId={props.nodeId}
+                                 handleAddOrUpdateRestResource={handleAddOrUpdateRestResource}/>
 
         <Dialog open={props.isOpen} onClose={onClose}>
             <DialogTitle>Node Properties : {props.nodeId}</DialogTitle>
@@ -594,9 +631,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         value={payload.language}
                         onChange={handleLanguageChange}
                         variant="outlined">
-                        {/*<MenuItem value="">*/}
-                        {/*    <em>Create new</em>*/}
-                        {/*</MenuItem>*/}
                         {LANGUAGES.map((language: string) => (
                             <MenuItem key={language} value={language}>
                                 {language}
@@ -630,9 +664,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
+                <Button variant="outlined" color="secondary" onClick={props.onNodePropertiesClose}>Cancel</Button>
                 <Button variant="contained"
-                        onClick={handleUpdate}
+                        onClick={handleUpdateNode}
                         disabled={payload.name === "" || payload.language === "" || uploadYamlStatus === 'loading'}>Update</Button>
             </DialogActions>
         </Dialog>

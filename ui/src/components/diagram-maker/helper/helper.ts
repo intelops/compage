@@ -68,11 +68,13 @@ export const removeUnwantedKeys = (state: string) => {
     delete stateJson?.undoHistory;
     delete stateJson.workspace;
     // nodes
-    for (let key in stateJson.nodes) {
+    // tslint:disable-next-line: forin
+    for (const key in stateJson.nodes) {
         delete stateJson.nodes[key]?.diagramMakerData;
     }
     // edges
-    for (let key in stateJson.edges) {
+    // tslint:disable-next-line: forin
+    for (const key in stateJson.edges) {
         delete stateJson.edges[key]?.diagramMakerData;
     }
     return stateJson;

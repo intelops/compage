@@ -21,7 +21,7 @@ import {
 interface NewEdgePropertiesProps {
     isOpen: boolean;
     edgeId: string;
-    onClose: () => void;
+    onEdgePropertiesClose: () => void;
 }
 
 interface ClientTypesConfig {
@@ -81,7 +81,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
 
     // TODO this is a hack as there is no EDGE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state with additional properties added from UI (Post edge creation)
-    const handleUpdate = (event: React.MouseEvent<HTMLElement>) => {
+    const handleEdgeUpdate = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
         const modifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
@@ -116,15 +116,15 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             isWsServer: false,
             wsServerPort: ""
         });
-        props.onClose();
+        props.onEdgePropertiesClose();
     };
 
-    const onClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
+    const onEdgePropertiesClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
         // this prevents dialog box from closing.
         if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
         }
-        props.onClose();
+        props.onEdgePropertiesClose();
     };
 
     const handleNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
@@ -288,7 +288,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     };
 
     return <React.Fragment>
-        <Dialog open={props.isOpen} onClose={onClose}>
+        <Dialog open={props.isOpen} onClose={onEdgePropertiesClose}>
             <DialogTitle>Edge properties : {props.edgeId}</DialogTitle>
             <Divider/>
             <DialogContent>
@@ -313,9 +313,9 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" color="secondary" onClick={props.onClose}>Cancel</Button>
+                <Button variant="outlined" color="secondary" onClick={props.onEdgePropertiesClose}>Cancel</Button>
                 <Button variant="contained"
-                        onClick={handleUpdate}
+                        onClick={handleEdgeUpdate}
                         disabled={payload.name === ""}>Update</Button>
             </DialogActions>
         </Dialog>
