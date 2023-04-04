@@ -3,6 +3,7 @@ export const BOOL = "bool";
 export const STRING = "string";
 export const FLOAT = "float";
 export const COMPLEX = "complex";
+export const STRUCT = "struct";
 
 // Go data types for custom template
 export const goDataTypes = {

@@ -2,28 +2,159 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import Divider from "@mui/material/Divider";
 import DialogContent from "@mui/material/DialogContent";
-import {Stack, TextareaAutosize} from "@mui/material";
+import {
+    FormControl,
+    InputLabel,
+    ListSubheader,
+    MenuItem,
+    Select,
+    SelectChangeEvent,
+    Stack,
+    Typography
+} from "@mui/material";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import React, {ChangeEvent} from "react";
 import {Resource} from "../models";
 import TextField from "@mui/material/TextField";
-import {isJsonString} from "../helper/utils";
 import {sanitizeString} from "../../../utils/backend-api";
+import {BOOL, COMPLEX, FLOAT, goDataTypes, INT, STRING, STRUCT} from "./go-rest-resource";
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import EditIcon from "@mui/icons-material/Edit";
 
 interface ModifyRestResourceProperties {
     isOpen: boolean;
     onModifyRestResourceClose: () => void;
     handleModifyRestResourceClick: (resource: Resource) => void;
     resource: Resource;
+    resourceNames: string[];
     nodeId: string;
 }
 
+const getCustomStructs = (resourceNames: string[]) => {
+    if (resourceNames.length > 0) {
+        const structDataTypes = {
+            [STRUCT]: resourceNames
+        };
+        return structDataTypes[STRUCT].map((type: string) => <MenuItem key={type}
+                                                                       value={type}> {type} </MenuItem>);
+    }
+    return undefined;
+};
+
+export const dataTypesParser = (datatype: string) => {
+    switch (datatype) {
+        case INT:
+            return goDataTypes[INT].map((type: string) => <MenuItem key={type} value={type}> {type} </MenuItem>);
+        case FLOAT:
+            return goDataTypes[FLOAT].map((type: string) => <MenuItem key={type} value={type}> {type} </MenuItem>);
+        case COMPLEX:
+            return goDataTypes[COMPLEX].map((type: string) => <MenuItem key={type} value={type}> {type} </MenuItem>);
+        case BOOL:
+            return goDataTypes[BOOL].map((type: string) => <MenuItem key={type} value={type}> {type} </MenuItem>);
+        case STRING:
+            return goDataTypes[STRING].map((type: string) => <MenuItem key={type} value={type}> {type} </MenuItem>);
+        default:
+            break;
+    }
+};
+
+const isEmpty = (value: string) => {
+    return value === "";
+};
+
 export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
-    const [data, setData] = React.useState({
+    const [payload, setPayload] = React.useState({
         name: props.resource?.name || "",
         fields: JSON.stringify(props.resource?.fields) || "",
+        fieldsCollection: [],
     });
+
+    // individual states for Attribute Name and Data Type
+    const [field, setField] = React.useState({
+        attribute: "",
+        datatype: "",
+        mode: {
+            index: 0,
+            edit: false
+        }
+    });
+
+    // Styles for select field in MUI
+    const ITEM_HEIGHT = 45;
+    const ITEM_PADDING_TOP = 4;
+    const MenuProps = {
+        PaperProps: {
+            style: {
+                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+                width: 120,
+            },
+        },
+    };
+
+    const isEmptyField = () => {
+        // this below means there are more than 1 fields and that means field is not empty.
+        if (payload.fieldsCollection.length > 1 || payload.fieldsCollection.length <= 0) {
+            return false;
+        }
+        if (payload.fieldsCollection.length === 1) {
+            return isEmpty(payload.fieldsCollection[0].datatype) || isEmpty(payload.fieldsCollection[0].attribute);
+        }
+        return false;
+    };
+
+    const handleDatatypeChange = (event: SelectChangeEvent) => {
+        setField({
+            ...field,
+            datatype: event.target.value as string
+        });
+    };
+
+    const handleAttributeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setField({
+            ...field,
+            attribute: event.target.value
+        });
+    };
+
+    const handleAddField = () => {
+        if (field.attribute && field.datatype) {
+            if (field.mode.edit) {
+                payload.fieldsCollection.splice(field.mode.index, 1);
+            }
+            payload.fieldsCollection.push({attribute: field.attribute, datatype: field.datatype});
+            setPayload({...payload});
+            setField({attribute: "", datatype: "", mode: {edit: false, index: 0}});
+        }
+    };
+
+    const handleEditField = (index: number) => {
+        console.log(payload.fieldsCollection[index]);
+        setField({
+            attribute: payload.fieldsCollection[index].attribute,
+            datatype: payload.fieldsCollection[index].datatype,
+            // set the index and mode as true
+            mode: {edit: true, index}
+        });
+    };
+
+    const handleRemoveField = (index: number) => {
+        if (payload.fieldsCollection.length > 1) {
+            if (index <= payload.fieldsCollection.length) {
+                payload.fieldsCollection.splice(index, 1);
+                const fieldsCollection = payload.fieldsCollection;
+                setPayload({...payload, fieldsCollection});
+            }
+        } else if (payload.fieldsCollection.length > 0) {
+            const fieldsCollection = [];
+            setPayload({...payload, fieldsCollection});
+        }
+    };
+
+    const isAddButtonDisabled = () => {
+        return isEmpty(field.attribute) || isEmpty(field.datatype);
+    };
 
     // first letter of the Resource should always be capital.
     const capitalizeFirstLetter = (input: string) => {
@@ -31,27 +162,26 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
     };
 
     const handleNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setData({
-            ...data,
+        setPayload({
+            ...payload,
             name: sanitizeString(capitalizeFirstLetter(event.target.value))
         });
     };
 
-    const handleFieldsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setData({
-            ...data,
-            fields: event.target.value
-        });
-    };
-
     const handleModifyRestResourceClick = () => {
-        const resource: Resource = {fields: JSON.parse(data.fields), name: data.name};
+        const fields = {};
+        for (const fld of payload.fieldsCollection) {
+            fields[fld.attribute] = fld.datatype;
+        }
+        const resource: Resource = {fields: JSON.parse(JSON.stringify(fields)), name: payload.name};
         props.handleModifyRestResourceClick(resource);
-        setData({
-            ...data,
+        setPayload({
+            ...payload,
             fields: "",
-            name: ""
+            name: "",
+            fieldsCollection: []
         });
+        setField({datatype: "", attribute: "", mode: {edit: false, index: 0}});
     };
 
     const onClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
@@ -78,29 +208,102 @@ export const ModifyRestResource = (props: ModifyRestResourceProperties) => {
                         id="name"
                         label="Name"
                         type="text"
-                        value={data.name}
+                        value={payload.name}
                         onChange={handleNameChange}
                         variant="outlined"
                     />
-                    <TextareaAutosize
-                        aria-label="fields"
-                        placeholder="Fields"
-                        maxRows={6}
-                        minRows={5}
-                        required
-                        id="fields"
-                        value={data.fields}
-                        onChange={handleFieldsChange}
-                    />
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                        <TextField
+                            required
+                            size="medium"
+                            margin="dense"
+                            id="attribute"
+                            label="Attribute"
+                            type="text"
+                            value={field.attribute}
+                            onChange={handleAttributeChange}
+                            variant="outlined"
+                        />
+                        <FormControl sx={{m: 1, minWidth: 120}}>
+                            <InputLabel id="datatype-select-input">Data Type</InputLabel>
+                            <Select
+                                labelId="datatype-select-input"
+                                id="grouped-select"
+                                label="Data Type"
+                                defaultValue=""
+                                value={field.datatype}
+                                onChange={(e) => {
+                                    handleDatatypeChange(e);
+                                }}
+                                MenuProps={MenuProps}
+                            >
+                                <ListSubheader color="primary">INT</ListSubheader>
+                                {
+                                    dataTypesParser(INT)
+                                }
+                                <Divider />
+                                <ListSubheader color="primary">FLOAT</ListSubheader>
+                                {
+                                    dataTypesParser(FLOAT)
+                                }
+                                <Divider />
+                                <ListSubheader color="primary">COMPLEX</ListSubheader>
+                                {
+                                    dataTypesParser(COMPLEX)
+                                }
+                                <Divider />
+                                <ListSubheader color="primary">BOOL</ListSubheader>
+                                {
+                                    dataTypesParser(BOOL)
+                                }
+                                <Divider />
+                                <ListSubheader color="primary">STRING</ListSubheader>
+                                {
+                                    dataTypesParser(STRING)
+                                }
+                                <Divider />
+                                <ListSubheader color="primary">STRUCT</ListSubheader>
+                                {getCustomStructs(props.resourceNames)}
+                            </Select>
+                        </FormControl>
+                        <Stack direction="row">
+                            <Button onClick={() => handleAddField()}
+                                    disabled={isAddButtonDisabled()}>
+                                <AddIcon/>
+                            </Button>
+                        </Stack>
+                    </Stack>
+                    <hr/>
+                    <br/>
+                    Existing Fields:
+                    <Stack direction="column" spacing={1}>
+                        {
+                            payload.fieldsCollection.map((fld, index) => {
+                                return <React.Fragment key={index}>
+                                    <Stack direction="row" spacing={1}>
+                                        <Typography>
+                                            {fld.attribute}
+                                        </Typography>
+                                        <Typography>
+                                            {fld.datatype}
+                                        </Typography>
+                                        <Button onClick={() => handleEditField(index)}>
+                                            <EditIcon/>
+                                        </Button>
+                                        <Button onClick={() => handleRemoveField(index)}>
+                                            <RemoveIcon/>
+                                        </Button>
+                                    </Stack>
+                                </React.Fragment>;
+                            })
+                        }
+                    </Stack>
                 </Stack>
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary" onClick={props.onModifyRestResourceClose}>Cancel</Button>
                 <Button variant="contained"
-                        disabled={data.name === ""
-                            || !isJsonString(data.fields)
-                            // TODO below is now working
-                            || Object.keys(data.fields).length === 0}
+                        disabled={isEmpty(payload.name) || isEmptyField()}
                         onClick={handleModifyRestResourceClick}>
                     Modify Resource
                 </Button>

@@ -540,6 +540,17 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         props.onClose();
     };
 
+    const getResourceNames = () => {
+        if (payload.restServerConfig.resources.length > 0) {
+            const resourceNames = [];
+            payload.restServerConfig.resources.forEach(resource => {
+                resourceNames.push(resource.name);
+            });
+            return resourceNames;
+        }
+        return [];
+    };
+
     return <React.Fragment>
         <DeleteRestResource open={payload.isDeleteRestResourceOpen}
                             resource={payload.currentRestResource}
@@ -548,6 +559,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
 
         <ModifyRestResource isOpen={payload.isModifyRestResourceOpen}
                             resource={payload.currentRestResource}
+                            resourceNames={getResourceNames()}
                             onModifyRestResourceClose={onModifyRestResourceClose}
                             nodeId={props.nodeId}
                             handleModifyRestResourceClick={handleModifyRestResourceClick}/>
