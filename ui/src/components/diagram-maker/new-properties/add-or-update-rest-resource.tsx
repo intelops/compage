@@ -85,7 +85,11 @@ const getFieldsCollection = (resource: Resource) => {
 
 export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties) => {
     const [payload, setPayload] = React.useState({
-        name: props.resource.name,
+        name: {
+            value: props.resource.name,
+            error: false,
+            errorMessage: ''
+        },
         fields: JSON.stringify(props.resource?.fields) || "",
         fieldsCollection: getFieldsCollection(props.resource),
     });
@@ -127,13 +131,14 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
     };
 
     const handleNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const sanitizeName = sanitizeString(capitalizeFirstLetter(event.target.value));
-        if (props.resourceNames.includes(sanitizeName)) {
-            console.log("duplicateName");
-        }
+        const {name, value} = event.target;
+        const sanitizeName = sanitizeString(capitalizeFirstLetter(value));
         setPayload({
             ...payload,
-            name: sanitizeName
+            [name]: {
+                ...payload[name],
+                value: sanitizeName,
+            }
         });
     };
 
@@ -145,6 +150,10 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
     };
 
     const handleAttributeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const {name, value} = event.target;
+        console.log("name:", name);
+        console.log("value:", value);
+        // TODO add validation
         setField({
             ...field,
             attribute: event.target.value
@@ -194,20 +203,68 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
         return input.charAt(0).toUpperCase() + input.slice(1);
     };
 
+    const isValid = () => {
+        const pld = Object.keys(payload);
+        let newPayload = {...payload};
+        let hasErrors = false;
+        // tslint:disable-next-line: prefer-for-of
+        for (let index = 0; index < pld.length; index++) {
+            const currentField = pld[index];
+            const currentValue = payload[currentField].value;
+            // check for empty name
+            if (currentValue === '') {
+                hasErrors = true;
+                newPayload = {
+                    ...newPayload,
+                    [currentField]: {
+                        ...newPayload[currentField],
+                        error: true,
+                        errorMessage: "You must have a name for resource."
+                    }
+                };
+            }
+            // check for duplicate resource name
+            // tslint:disable-next-line: prefer-for-of
+            for (let i = 0; i < props.resourceNames.length; i++) {
+                if (!props.resource.name && props.resourceNames[i] === currentValue) {
+                    hasErrors = true;
+                    newPayload = {
+                        ...newPayload,
+                        [currentField]: {
+                            ...newPayload[currentField],
+                            error: true,
+                            errorMessage: 'You must have a unique name for resource.'
+                        }
+                    };
+                }
+            }
+        }
+        if (hasErrors) {
+            setPayload(newPayload);
+        }
+        return !hasErrors;
+    };
+
     const addOrUpdateRestResource = () => {
         const fields = {};
         for (const fld of payload.fieldsCollection) {
             fields[fld.attribute] = fld.datatype;
         }
-        const resource: Resource = {fields: JSON.parse(JSON.stringify(fields)), name: payload.name};
-        props.handleAddOrUpdateRestResource(resource);
-        setPayload({
-            ...payload,
-            fields: "",
-            name: "",
-            fieldsCollection: []
-        });
-        setField({datatype: "", attribute: "", mode: {edit: false, index: 0}});
+        const resource: Resource = {fields: JSON.parse(JSON.stringify(fields)), name: payload.name.value};
+        if (isValid()) {
+            props.handleAddOrUpdateRestResource(resource);
+            setPayload({
+                ...payload,
+                fields: "",
+                name: {
+                    value: '',
+                    error: false,
+                    errorMessage: ''
+                },
+                fieldsCollection: []
+            });
+            setField({datatype: "", attribute: "", mode: {edit: false, index: 0}});
+        }
     };
 
     const onAddOrUpdateRestResourceClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
@@ -234,7 +291,10 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
                         id="name"
                         label="Name"
                         type="text"
-                        value={payload.name}
+                        name="name"
+                        value={payload.name.value}
+                        error={payload.name.error}
+                        helperText={payload.name.error && payload.name.errorMessage}
                         onChange={handleNameChange}
                         variant="outlined"
                     />
@@ -246,6 +306,7 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
                             id="attribute"
                             label="Attribute"
                             type="text"
+                            name="attribute"
                             value={field.attribute}
                             onChange={handleAttributeChange}
                             variant="outlined"
@@ -257,6 +318,7 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
                                 id="grouped-select"
                                 label="Data Type"
                                 defaultValue=""
+                                name="datatype"
                                 value={field.datatype}
                                 onChange={(e) => {
                                     handleDatatypeChange(e);
@@ -299,11 +361,11 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
                             </Button>
                         </Stack>
                     </Stack>
-                    <hr/>
+                    <br/>
                     <br/>
                     Existing Fields:
                     <TableContainer component={Paper}>
-                        <Table sx={{minWidth: 450}}>
+                        <Table sx={{minWidth: "450px"}}>
                             <TableHead>
                                 <TableRow>
                                     <TableCell align="left">Attribute</TableCell>
@@ -340,13 +402,16 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
                             </TableBody>
                         </Table>
                     </TableContainer>
+                    <span style={{
+                        alignSelf: "center"
+                    }}>{payload.fieldsCollection.length < 1 ? "No fields" : ""}</span>
                 </Stack>
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary"
                         onClick={props.onAddOrUpdateRestResourceClose}>Cancel</Button>
                 <Button variant="contained"
-                        disabled={isEmpty(payload.name) || isEmptyField()}
+                        disabled={isEmpty(payload.name.value) || isEmptyField()}
                         onClick={addOrUpdateRestResource}>
                     {
                         props.resource.name ? <>Update Resource</> : <>Add Resource</>

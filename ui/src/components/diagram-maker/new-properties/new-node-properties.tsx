@@ -294,12 +294,12 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                                         </TableCell>
                                         <TableCell align="left">
                                             <Stack direction="row-reverse" spacing={1}>
-                                                <Button variant="contained"
+                                                <Button variant="text"
                                                         color="error"
                                                         onClick={() => handleDeleteRestResourceClick(resource.name)}>
                                                     <RemoveIcon/>
                                                 </Button>
-                                                <Button variant="outlined"
+                                                <Button variant="text"
                                                         onClick={() => handleEditRestResourceClick(resource)}>
                                                     <EditIcon/>
                                                 </Button>
