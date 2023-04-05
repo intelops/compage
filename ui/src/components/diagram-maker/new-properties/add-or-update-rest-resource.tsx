@@ -67,7 +67,7 @@ export const dataTypesParser = (datatype: string) => {
 };
 
 const isEmpty = (value: string) => {
-    return value === "";
+    return value === '';
 };
 
 const getFieldsCollection = (resource: Resource) => {
@@ -90,14 +90,18 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
             error: false,
             errorMessage: ''
         },
-        fields: JSON.stringify(props.resource?.fields) || "",
+        fields: JSON.stringify(props.resource?.fields) || '',
         fieldsCollection: getFieldsCollection(props.resource),
     });
 
     // individual states for Attribute Name and Data Type
     const [field, setField] = React.useState({
-        attribute: "",
-        datatype: "",
+        attribute: {
+            value: '',
+            error: false,
+            errorMessage: ''
+        },
+        datatype: '',
         mode: {
             index: 0,
             edit: false
@@ -151,30 +155,40 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
 
     const handleAttributeChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const {name, value} = event.target;
-        console.log("name:", name);
-        console.log("value:", value);
-        // TODO add validation
         setField({
             ...field,
-            attribute: event.target.value
+            [name]: {
+                ...field[name],
+                value,
+            }
         });
     };
 
     const handleAddField = () => {
-        if (field.attribute && field.datatype) {
+        if (field.attribute && field.datatype && isAttributeValid()) {
             if (field.mode.edit) {
                 payload.fieldsCollection.splice(field.mode.index, 1);
             }
-            payload.fieldsCollection.push({attribute: field.attribute, datatype: field.datatype});
+            payload.fieldsCollection.push({attribute: field.attribute.value, datatype: field.datatype});
             setPayload({...payload});
-            setField({attribute: "", datatype: "", mode: {edit: false, index: 0}});
+            setField({
+                attribute: {
+                    value: '',
+                    error: false,
+                    errorMessage: ''
+                }, datatype: '', mode: {edit: false, index: 0}
+            });
         }
     };
 
     const handleEditField = (index: number) => {
-        console.log(payload.fieldsCollection[index]);
         setField({
-            attribute: payload.fieldsCollection[index].attribute,
+            attribute: {
+                ...field,
+                value: payload.fieldsCollection[index].attribute,
+                errorMessage: '',
+                error: false
+            },
             datatype: payload.fieldsCollection[index].datatype,
             // set the index and mode as true
             mode: {edit: true, index}
@@ -195,7 +209,7 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
     };
 
     const isAddButtonDisabled = () => {
-        return isEmpty(field.attribute) || isEmpty(field.datatype);
+        return isEmpty(field.attribute.value) || isEmpty(field.datatype);
     };
 
     // first letter of the Resource should always be capital.
@@ -203,10 +217,59 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
         return input.charAt(0).toUpperCase() + input.slice(1);
     };
 
+    const isAttributeValid = () => {
+        let newField = {...field};
+        // check for empty name
+        if (field.attribute.value === '') {
+            newField = {
+                ...newField,
+                attribute: {
+                    ...newField.attribute,
+                    error: true,
+                    errorMessage: "You must have a name for field."
+                }
+            };
+            setField(newField);
+            return false;
+        } else {
+            // check for invalid names for fields.
+            const regex = new RegExp("^[a-zA-Z_$][a-zA-Z_$0-9]*$");
+            if (!regex.test(field.attribute.value)) {
+                newField = {
+                    ...newField,
+                    attribute: {
+                        ...newField.attribute,
+                        error: true,
+                        errorMessage: 'You must have a valid name for field.'
+                    }
+                };
+                setField(newField);
+                return false;
+            }
+
+            // check for duplicate fields in fieldsCollection.
+            // tslint:disable-next-line: prefer-for-of
+            for (let i = 0; i < payload.fieldsCollection.length; i++) {
+                if (!field.mode.edit && payload.fieldsCollection[i].attribute === field.attribute.value) {
+                    newField = {
+                        ...newField,
+                        attribute: {
+                            ...newField.attribute,
+                            error: true,
+                            errorMessage: 'You must have a unique field in the resource.'
+                        }
+                    };
+                    setField(newField);
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+
     const isNameValid = () => {
         let newPayload = {...payload};
         let hasErrors = false;
-        // tslint:disable-next-line: prefer-for-of
         // check for empty name
         if (payload.name.value === '') {
             hasErrors = true;
@@ -252,7 +315,7 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
             props.handleAddOrUpdateRestResource(resource);
             setPayload({
                 ...payload,
-                fields: "",
+                fields: '',
                 name: {
                     value: '',
                     error: false,
@@ -260,7 +323,15 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
                 },
                 fieldsCollection: []
             });
-            setField({datatype: "", attribute: "", mode: {edit: false, index: 0}});
+            setField({
+                datatype: '',
+                attribute: {
+                    value: '',
+                    error: false,
+                    errorMessage: ''
+                },
+                mode: {edit: false, index: 0}
+            });
         }
     };
 
@@ -304,7 +375,9 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
                             label="Attribute"
                             type="text"
                             name="attribute"
-                            value={field.attribute}
+                            value={field.attribute.value}
+                            error={field.attribute.error}
+                            helperText={field.attribute.error && field.attribute.errorMessage}
                             onChange={handleAttributeChange}
                             variant="outlined"
                         />
@@ -314,7 +387,7 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
                                 labelId="datatype-select-input"
                                 id="grouped-select"
                                 label="Data Type"
-                                defaultValue=""
+                                defaultValue=''
                                 name="datatype"
                                 value={field.datatype}
                                 onChange={(e) => {
@@ -383,12 +456,13 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
                                             <TableCell align="center">{fld.datatype}</TableCell>
                                             <TableCell align="left">
                                                 <Stack direction="row-reverse" spacing={1}>
-                                                    <Button variant="contained"
+                                                    <Button variant="text"
                                                             color="error"
                                                             onClick={() => handleRemoveField(index)}>
                                                         <RemoveIcon/>
                                                     </Button>
-                                                    <Button variant="outlined" onClick={() => handleEditField(index)}>
+                                                    <Button variant="text"
+                                                            onClick={() => handleEditField(index)}>
                                                         <EditIcon/>
                                                     </Button>
                                                 </Stack>
@@ -401,7 +475,7 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
                     </TableContainer>
                     <span style={{
                         alignSelf: "center"
-                    }}>{payload.fieldsCollection.length < 1 ? "No fields" : ""}</span>
+                    }}>{payload.fieldsCollection.length < 1 ? "No fields" : ''}</span>
                 </Stack>
             </DialogContent>
             <DialogActions>
