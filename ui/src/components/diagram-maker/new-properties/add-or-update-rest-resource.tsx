@@ -269,10 +269,8 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
 
     const isNameValid = () => {
         let newPayload = {...payload};
-        let hasErrors = false;
         // check for empty name
         if (payload.name.value === '') {
-            hasErrors = true;
             newPayload = {
                 ...newPayload,
                 name: {
@@ -281,12 +279,13 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
                     errorMessage: "You must have a name for resource."
                 }
             };
+            setPayload(newPayload);
+            return false;
         } else {
             // check for duplicate resource name only when name has any value in it.
             // tslint:disable-next-line: prefer-for-of
             for (let i = 0; i < props.resourceNames.length; i++) {
                 if (!props.resource.name && props.resourceNames[i] === payload.name.value) {
-                    hasErrors = true;
                     newPayload = {
                         ...newPayload,
                         name: {
@@ -295,14 +294,28 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
                             errorMessage: 'You must have a unique name for resource.'
                         }
                     };
-                    break;
+                    setPayload(newPayload);
+                    return false;
                 }
             }
+
+            // check for invalid names for fields.
+            // removed _ from regex as we dont want users to have names starting with _.
+            const regex = new RegExp("^[a-zA-Z$][a-zA-Z$0-9]*$");
+            if (!regex.test(payload.name.value)) {
+                newPayload = {
+                    ...newPayload,
+                    name: {
+                        ...newPayload.name,
+                        error: true,
+                        errorMessage: 'You must have a valid name for resource.'
+                    }
+                };
+                setPayload(newPayload);
+                return false;
+            }
         }
-        if (hasErrors) {
-            setPayload(newPayload);
-        }
-        return !hasErrors;
+        return true;
     };
 
     const addOrUpdateRestResource = () => {

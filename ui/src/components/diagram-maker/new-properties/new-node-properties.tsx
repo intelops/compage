@@ -113,8 +113,12 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     }
     const serverTypesConfig: ServerTypesConfig = getServerTypesConfig(parsedModifiedState, props.nodeId);
     const [payload, setPayload] = React.useState({
-        name: parsedModifiedState.nodes[props.nodeId]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.name : "",
-        language: parsedModifiedState.nodes[props.nodeId]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.language : "",
+        name: {
+            value: parsedModifiedState.nodes[props.nodeId]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.name : '',
+            error: false,
+            errorMessage: ''
+        },
+        language: parsedModifiedState.nodes[props.nodeId]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.language : '',
         isRestServer: serverTypesConfig.isRestServer || false,
         restServerConfig: serverTypesConfig.restServerConfig || EmptyRestServerConfig,
         isGrpcServer: serverTypesConfig.isGrpcServer || false,
@@ -127,6 +131,60 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         currentRestResource: EmptyCurrentRestResource
     });
 
+    const isNameValid = () => {
+        let newPayload = {...payload};
+        // check for empty name
+        if (payload.name.value === '') {
+            newPayload = {
+                ...newPayload,
+                name: {
+                    ...newPayload.name,
+                    error: true,
+                    errorMessage: "You must have a name for Node."
+                }
+            };
+            setPayload(newPayload);
+            return false;
+        } else {
+            // check for duplicate node name only when name has any value in it.
+            const modifiedState = getParsedModifiedState();
+            // tslint:disable-next-line: forin
+            for (const key in modifiedState.nodes) {
+                const node = modifiedState.nodes[key];
+                console.log("modifiedState.nodes :", node);
+                if (props.nodeId !== key
+                    && node.consumerData.name === payload.name.value) {
+                    newPayload = {
+                        ...newPayload,
+                        name: {
+                            ...newPayload.name,
+                            error: true,
+                            errorMessage: 'You must have a unique name for node.'
+                        }
+                    };
+                    setPayload(newPayload);
+                    return false;
+                }
+            }
+
+            // check for invalid names for fields.
+            const regex = new RegExp("^[a-zA-Z_$][a-zA-Z_$0-9]*$");
+            if (!regex.test(payload.name.value)) {
+                newPayload = {
+                    ...newPayload,
+                    name: {
+                        ...newPayload.name,
+                        error: true,
+                        errorMessage: 'You must have a valid name for node.'
+                    }
+                };
+                setPayload(newPayload);
+                return false;
+            }
+        }
+        return true;
+    };
+
     const getPort = (template: string, port: string) => {
         return isCompageTemplate(template) ? port || "8080" : "8080";
     };
@@ -135,82 +193,88 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     // update state with additional properties added from UI (Post node creation)
     const handleUpdateNode = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        let restServerConfig: RestServerConfig;
-        let grpcServerConfig: GrpcServerConfig;
-        let wsServerConfig: WsServerConfig;
+        if (isNameValid()) {
+            let restServerConfig: RestServerConfig;
+            let grpcServerConfig: GrpcServerConfig;
+            let wsServerConfig: WsServerConfig;
 
-        if (payload.isRestServer) {
-            restServerConfig = {
-                framework: payload.restServerConfig.framework,
-                port: getPort(payload.restServerConfig.template, payload.restServerConfig.port),
-                template: payload.restServerConfig.template,
-            };
-            if (isCompageTemplate(payload.restServerConfig.template)) {
-                restServerConfig.resources = payload.restServerConfig.resources;
-            } else {
-                restServerConfig.resources = [];
-                restServerConfig.openApiFileYamlContent = uploadYamlData.content;
+            if (payload.isRestServer) {
+                restServerConfig = {
+                    framework: payload.restServerConfig.framework,
+                    port: getPort(payload.restServerConfig.template, payload.restServerConfig.port),
+                    template: payload.restServerConfig.template,
+                };
+                if (isCompageTemplate(payload.restServerConfig.template)) {
+                    restServerConfig.resources = payload.restServerConfig.resources;
+                } else {
+                    restServerConfig.resources = [];
+                    restServerConfig.openApiFileYamlContent = uploadYamlData.content;
+                }
             }
-        }
-        if (payload.isGrpcServer) {
-            grpcServerConfig = {
-                framework: payload.grpcServerConfig.framework,
-                port: payload.grpcServerConfig.port,
-                resources: []
-            };
-        }
-        if (payload.isWsServer) {
-            wsServerConfig = {
-                framework: payload.wsServerConfig.framework,
-                port: payload.wsServerConfig.port,
-                resources: []
-            };
-        }
+            if (payload.isGrpcServer) {
+                grpcServerConfig = {
+                    framework: payload.grpcServerConfig.framework,
+                    port: payload.grpcServerConfig.port,
+                    resources: []
+                };
+            }
+            if (payload.isWsServer) {
+                wsServerConfig = {
+                    framework: payload.wsServerConfig.framework,
+                    port: payload.wsServerConfig.port,
+                    resources: []
+                };
+            }
 
-        const modifiedState = getParsedModifiedState();
-        // update modifiedState with current fields on dialog box
-        // P.S. - We will have the fields in consumerData which are on dialogBox, so we can assign them directly. We also refer the older values when payload state is initialized, so the older values will be persisted as they are if not changed.
-        if (!(props.nodeId in modifiedState.nodes)) {
-            // adding consumerData to new node in modifiedState
-            modifiedState.nodes[props.nodeId] = {
-                consumerData: {
-                    name: payload.name,
+            const modifiedState = getParsedModifiedState();
+            // update modifiedState with current fields on dialog box
+            // P.S. - We will have the fields in consumerData which are on dialogBox, so we can assign them directly. We also refer the older values when payload state is initialized, so the older values will be persisted as they are if not changed.
+            if (!(props.nodeId in modifiedState.nodes)) {
+                // adding consumerData to new node in modifiedState
+                modifiedState.nodes[props.nodeId] = {
+                    consumerData: {
+                        name: payload.name.value,
+                        language: payload.language,
+                        restServerConfig,
+                        grpcServerConfig,
+                        wsServerConfig,
+                    }
+                };
+            } else {
+                // adding consumerData to existing node in modifiedState
+                modifiedState.nodes[props.nodeId].consumerData = {
+                    name: payload.name.value,
                     language: payload.language,
                     restServerConfig,
                     grpcServerConfig,
                     wsServerConfig,
-                }
-            };
-        } else {
-            // adding consumerData to existing node in modifiedState
-            modifiedState.nodes[props.nodeId].consumerData = {
-                name: payload.name,
-                language: payload.language,
-                restServerConfig,
-                grpcServerConfig,
-                wsServerConfig,
-            };
+                };
+            }
+            // image to node display
+            // const nodeElement = document.getElementById(props.nodeId);
+            // nodeElement.style.backgroundImage = `url('${payload.url}')`;
+            // update modifiedState in the localstorage
+            setModifiedState(JSON.stringify(modifiedState));
+            setPayload({
+                name: {
+                    value: '',
+                    error: false,
+                    errorMessage: ''
+                },
+                language: '',
+                isGrpcServer: false,
+                isRestServer: false,
+                isWsServer: false,
+                grpcServerConfig: EmptyGrpcServerConfig,
+                restServerConfig: EmptyRestServerConfig,
+                wsServerConfig: EmptyWsServerConfig,
+                isAddRestResourceOpen: false,
+                isUpdateRestResourceOpen: false,
+                isDeleteRestResourceOpen: false,
+                currentRestResource: EmptyCurrentRestResource
+            });
+            props.onNodePropertiesClose();
         }
-        // image to node display
-        // const nodeElement = document.getElementById(props.nodeId);
-        // nodeElement.style.backgroundImage = `url('${payload.url}')`;
-        // update modifiedState in the localstorage
-        setModifiedState(JSON.stringify(modifiedState));
-        setPayload({
-            name: "",
-            language: "",
-            isGrpcServer: false,
-            isRestServer: false,
-            isWsServer: false,
-            grpcServerConfig: EmptyGrpcServerConfig,
-            restServerConfig: EmptyRestServerConfig,
-            wsServerConfig: EmptyWsServerConfig,
-            isAddRestResourceOpen: false,
-            isUpdateRestResourceOpen: false,
-            isDeleteRestResourceOpen: false,
-            currentRestResource: EmptyCurrentRestResource
-        });
-        props.onNodePropertiesClose();
     };
 
     const handleTemplateChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
@@ -223,9 +287,14 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const handleNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const {name, value} = event.target;
+        const sanitizeName = sanitizeString(value);
         setPayload({
             ...payload,
-            name: sanitizeString(event.target.value)
+            [name]: {
+                ...payload[name],
+                value: sanitizeName,
+            }
         });
     };
 
@@ -314,7 +383,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             </>;
         }
 
-        return "";
+        return '';
     };
 
     const getTemplateContent = () => {
@@ -331,7 +400,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 select
                 margin="dense"
                 id="template"
-                defaultValue=""
+                defaultValue=''
                 label="Template"
                 type="text"
                 value={payload.restServerConfig.template}
@@ -346,7 +415,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 }
             </TextField>;
         }
-        return "";
+        return '';
     };
 
     const getFrameworkContent = () => {
@@ -367,7 +436,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 margin="dense"
                 id="restFramework"
                 label="Framework"
-                defaultValue=""
+                defaultValue=''
                 type="text"
                 value={payload.restServerConfig.framework}
                 onChange={handleRestServerConfigFrameworkChange}
@@ -379,7 +448,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 ))}
             </TextField>;
         }
-        return "";
+        return '';
     };
 
     const getPortContent = () => {
@@ -396,7 +465,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 variant="outlined"
             />;
         }
-        return "";
+        return '';
     };
 
     const getResourcesContent = () => {
@@ -425,7 +494,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 {getResourcesContent()}
             </React.Fragment>;
         }
-        return "";
+        return '';
     };
 
     const getRestServerCheck = () => {
@@ -481,7 +550,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 />
             </React.Fragment>;
         }
-        return "";
+        return '';
     };
 
     const getGrpcServerCheck = () => {
@@ -530,7 +599,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 />
             </React.Fragment>;
         }
-        return "";
+        return '';
     };
 
     const getWsServerCheck = () => {
@@ -652,7 +721,10 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                             id="name"
                             label="Name of Component"
                             type="text"
-                            value={payload.name}
+                            name="name"
+                            value={payload.name.value}
+                            error={payload.name.error}
+                            helperText={payload.name.error && payload.name.errorMessage}
                             onChange={handleNameChange}
                             variant="outlined"
                         />
@@ -703,7 +775,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     <Button variant="outlined" color="secondary" onClick={props.onNodePropertiesClose}>Cancel</Button>
                     <Button variant="contained"
                             onClick={handleUpdateNode}
-                            disabled={payload.name === "" || payload.language === "" || uploadYamlStatus === 'loading'}>Update</Button>
+                            disabled={payload.name.value === '' || payload.language === '' || uploadYamlStatus === 'loading'}>Update Node</Button>
                 </DialogActions>
             </Dialog>
         )}

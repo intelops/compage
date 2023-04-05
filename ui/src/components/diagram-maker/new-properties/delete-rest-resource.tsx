@@ -31,7 +31,9 @@ export const DeleteRestResource = (props: DeleteRestResourceProperties) => {
         <DialogActions>
             <Button variant="outlined" color="secondary"
                     onClick={props.onDeleteRestResourceClose}>Cancel</Button>
-            <Button variant="contained" onClick={props.handleDeleteRestResource} autoFocus>
+            <Button color="error"
+                    variant="contained"
+                    onClick={props.handleDeleteRestResource} autoFocus>
                 Delete
             </Button>
         </DialogActions>
