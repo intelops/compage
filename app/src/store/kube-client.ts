@@ -1,8 +1,18 @@
 import * as k8s from "@kubernetes/client-node";
 
 import {client} from "../app";
-import {Resource, ResourceList} from "./models";
+import {
+    project_group,
+    project_plural,
+    project_version,
+    Resource,
+    ResourceList,
+    user_group,
+    user_plural,
+    user_version
+} from "./models";
 import Logger from "../util/logger";
+import config from "../util/constants";
 
 export const initializeKubeClient = () => {
     const kubeConfig = new k8s.KubeConfig();
@@ -151,6 +161,39 @@ export const listObjects = async ({
             // Logger.info("error while listing custom object : ", e?.body?.reason)
             const resources: ResourceList = {apiVersion: "", items: [], kind: "", metadata: undefined}
             return resources
+        }
+    }
+}
+
+export const checkIfCrdsInstalled = async () => {
+    interface Crd {
+        group: string;
+        version: string;
+        plural: string;
+    }
+
+    const projectCrd: Crd = {
+        group: project_group,
+        version: project_version,
+        plural: project_plural
+    };
+    const userCrd: Crd = {group: user_group, version: user_version, plural: user_plural};
+    const crds = [projectCrd, userCrd];
+    for (let i = 0; i <= crds.length; i++) {
+        try {
+            const object = await client.listNamespacedCustomObject(
+                crds[i].group,
+                crds[i].version,
+                config.system_namespace,
+                crds[i].plural,
+                "true",
+                false,
+                "",
+                "");
+            return JSON.parse(JSON.stringify(object.body))
+        } catch (e: any) {
+            Logger.debug("error while listing custom object : ", e?.body)
+            throw e;
         }
     }
 }

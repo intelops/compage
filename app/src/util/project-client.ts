@@ -1,7 +1,6 @@
 import {initializeEmptyProjectEntity, ProjectEntity, Repository} from "../routes/models";
 
 import {project_group, project_kind, project_version, ProjectResource, ProjectResourceSpec} from "../store/models";
-import {NAMESPACE} from "./constants";
 import {
     createProjectResource,
     deleteProjectResource,
@@ -10,6 +9,7 @@ import {
     patchProjectResource
 } from "../store/project-store";
 import Logger from "./logger";
+import config from "./constants";
 
 // convertProjectEntityToProjectResourceSpec creates projectResourceSpec on k8s cluster.
 const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: string, projectEntity: ProjectEntity) => {
@@ -72,7 +72,7 @@ const convertListOfProjectResourceToListOfProjectEntity = (projectResources: Pro
 
 // getProjects returns all projects for userName supplied
 export const listProjects = async (userName: string) => {
-    let listOfProjectResource = await listProjectResources(NAMESPACE, "userName=" + userName);
+    let listOfProjectResource = await listProjectResources(config.system_namespace, "userName=" + userName);
     if (listOfProjectResource) {
         return convertListOfProjectResourceToListOfProjectEntity(JSON.parse(JSON.stringify(listOfProjectResource)));
     }
@@ -81,9 +81,9 @@ export const listProjects = async (userName: string) => {
 
 // deleteProject deletes project for userName and projectId supplied
 export const deleteProject = async (userName: string, projectId: string) => {
-    const projectResource = await getProjectResource(NAMESPACE, projectId);
+    const projectResource = await getProjectResource(config.system_namespace, projectId);
     if (projectResource?.metadata?.labels?.userName === userName) {
-        await deleteProjectResource(NAMESPACE, projectId);
+        await deleteProjectResource(config.system_namespace, projectId);
         return true
     }
     return false;
@@ -93,7 +93,7 @@ export const deleteProject = async (userName: string, projectId: string) => {
 export const getProject = async (userName: string, projectId: string) => {
     // TODO I may need to apply labelSelector here - below impl is done temporarily.
     // currently added filter post projects retrieval(It can be slower if there are too many projects with same name.)
-    const projectResource = await getProjectResource(NAMESPACE, projectId);
+    const projectResource = await getProjectResource(config.system_namespace, projectId);
     if (projectResource?.metadata?.labels?.userName === userName) {
         return convertProjectResourceToProjectEntity(projectResource)
     }
@@ -109,7 +109,7 @@ const prepareProjectResource = (projectId: string, userName: string, projectReso
         spec: projectResourceSpec,
         metadata: {
             name: projectId,
-            namespace: NAMESPACE,
+            namespace: config.system_namespace,
             labels: {
                 userName: userName
             }
@@ -167,12 +167,12 @@ export const createProject = async (userName: string, projectEntity: ProjectEnti
     const projectId = generateProjectId(userName, projectEntity.displayName);
     const projectResourceSpec = convertProjectEntityToProjectResourceSpec(projectId, userName, projectEntity);
     const projectResource = prepareProjectResource(projectId, userName, projectResourceSpec);
-    return convertProjectResourceToProjectEntity(await createProjectResource(NAMESPACE, JSON.stringify(projectResource)));
+    return convertProjectResourceToProjectEntity(await createProjectResource(config.system_namespace, JSON.stringify(projectResource)));
 }
 
 // updateProject updates projectResource on k8s cluster.
 export const updateProject = async (projectId: string, userName: string, projectEntity: ProjectEntity) => {
-    const existingProjectResource = await getProjectResource(NAMESPACE, projectId);
+    const existingProjectResource = await getProjectResource(config.system_namespace, projectId);
     // if some user is trying to modify the project not owned by him, reject it.
     if (existingProjectResource?.metadata?.labels?.userName !== userName) {
         return initializeEmptyProjectEntity();
@@ -190,7 +190,7 @@ export const updateProject = async (projectId: string, userName: string, project
 
         // send spec only as the called method considers updating specs only.
         // existingProjectResource.metadata.name = projectId here
-        const patchedProjectResource = await patchProjectResource(NAMESPACE, existingProjectResource.metadata.name, JSON.stringify(existingProjectResource.spec));
+        const patchedProjectResource = await patchProjectResource(config.system_namespace, existingProjectResource.metadata.name, JSON.stringify(existingProjectResource.spec));
         Logger.debug(patchedProjectResource);
 
         if (patchedProjectResource.apiVersion) {

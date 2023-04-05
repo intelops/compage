@@ -6,7 +6,7 @@ import codeOperationsRouter from "./routes/code-operations";
 import authRouter from "./routes/auth";
 import config from "./util/constants";
 import projectsRouter from "./routes/projects";
-import {initializeKubeClient} from "./store/kube-client";
+import {checkIfCrdsInstalled, initializeKubeClient} from "./store/kube-client";
 import "@kubernetes/client-node";
 import openApiYamlRouter from "./routes/open-api-yaml";
 import Logger from "./util/logger";
@@ -52,6 +52,15 @@ app.use(routes);
 
 app.get("*", (req, res) => {
     return res.status(200).json("you have reached default route");
+});
+
+// check if there is a valid kubernetes cluster and crds installed on it.
+checkIfCrdsInstalled().then(resources => {
+    Logger.info("connection to K8s cluster is successful and it seems that crds are installed too.");
+}).catch(e => {
+    Logger.error("It seems that crds are not yet installed, please check if you have applied crds");
+    Logger.debug(e);
+    process.exit(0);
 });
 
 app.listen(parseInt(<string>config.server_port), "0.0.0.0", () => {

@@ -11,7 +11,7 @@ import {cloneExistingProjectFromGitServer, CloneExistingProjectFromGitServerRequ
 import {GenerateCodeError, GenerateCodeRequest, GenerateCodeResponse, Project} from "./models";
 import {requireUserNameMiddleware} from "../middlewares/auth";
 import {getProjectResource, patchProjectResource} from "../store/project-store";
-import {NAMESPACE, X_USER_NAME_HEADER} from "../util/constants";
+import config, {X_USER_NAME_HEADER} from "../util/constants";
 import {OldVersion} from "../store/models";
 import Logger from "../util/logger";
 
@@ -44,7 +44,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
     }
 
     // retrieve project from k8s
-    const projectResource = await getProjectResource(NAMESPACE, projectId);
+    const projectResource = await getProjectResource(config.system_namespace, projectId);
     if (!projectResource.apiVersion) {
         const message = `unable to generate code, no project found for id: ${projectId}`
         return resource.status(500).json(getGenerateCodeError(message));
@@ -191,7 +191,7 @@ codeOperationsRouter.post("/generate_code", requireUserNameMiddleware, async (re
                 projectResource.spec.version = nextVersion(projectResource.spec.version);
                 projectResource.spec.oldVersions.push(oldVersion);
             }
-            const patchedProjectResource = await patchProjectResource(NAMESPACE, projectId, JSON.stringify(projectResource.spec))
+            const patchedProjectResource = await patchProjectResource(config.system_namespace, projectId, JSON.stringify(projectResource.spec))
             if (patchedProjectResource.apiVersion) {
                 // send status back to ui
                 const message = `successfully generated project for ${projectResource.spec.displayName}[${projectResource.metadata.name}] and saved in repository '${projectResource.spec.repository?.name}'.`
