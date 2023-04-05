@@ -203,39 +203,36 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
         return input.charAt(0).toUpperCase() + input.slice(1);
     };
 
-    const isValid = () => {
-        const pld = Object.keys(payload);
+    const isNameValid = () => {
         let newPayload = {...payload};
         let hasErrors = false;
         // tslint:disable-next-line: prefer-for-of
-        for (let index = 0; index < pld.length; index++) {
-            const currentField = pld[index];
-            const currentValue = payload[currentField].value;
-            // check for empty name
-            if (currentValue === '') {
-                hasErrors = true;
-                newPayload = {
-                    ...newPayload,
-                    [currentField]: {
-                        ...newPayload[currentField],
-                        error: true,
-                        errorMessage: "You must have a name for resource."
-                    }
-                };
-            }
-            // check for duplicate resource name
+        // check for empty name
+        if (payload.name.value === '') {
+            hasErrors = true;
+            newPayload = {
+                ...newPayload,
+                name: {
+                    ...newPayload.name,
+                    error: true,
+                    errorMessage: "You must have a name for resource."
+                }
+            };
+        } else {
+            // check for duplicate resource name only when name has any value in it.
             // tslint:disable-next-line: prefer-for-of
             for (let i = 0; i < props.resourceNames.length; i++) {
-                if (!props.resource.name && props.resourceNames[i] === currentValue) {
+                if (!props.resource.name && props.resourceNames[i] === payload.name.value) {
                     hasErrors = true;
                     newPayload = {
                         ...newPayload,
-                        [currentField]: {
-                            ...newPayload[currentField],
+                        name: {
+                            ...newPayload.name,
                             error: true,
                             errorMessage: 'You must have a unique name for resource.'
                         }
                     };
+                    break;
                 }
             }
         }
@@ -251,7 +248,7 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
             fields[fld.attribute] = fld.datatype;
         }
         const resource: Resource = {fields: JSON.parse(JSON.stringify(fields)), name: payload.name.value};
-        if (isValid()) {
+        if (isNameValid()) {
             props.handleAddOrUpdateRestResource(resource);
             setPayload({
                 ...payload,
