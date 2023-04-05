@@ -80,8 +80,6 @@ const getFieldsCollection = (resource: Resource) => {
             }
         }
     }
-    console.log("fieldsCollection :", fieldsCollection);
-    console.log("name :", resource.name);
     return fieldsCollection;
 };
 
@@ -129,9 +127,13 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
     };
 
     const handleNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const sanitizeName = sanitizeString(capitalizeFirstLetter(event.target.value));
+        if (props.resourceNames.includes(sanitizeName)) {
+            console.log("duplicateName");
+        }
         setPayload({
             ...payload,
-            name: sanitizeString(capitalizeFirstLetter(event.target.value))
+            name: sanitizeName
         });
     };
 
@@ -341,11 +343,14 @@ export const AddOrUpdateRestResource = (props: AddOrUpdateRestResourceProperties
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" color="secondary" onClick={props.onAddOrUpdateRestResourceClose}>Cancel</Button>
+                <Button variant="outlined" color="secondary"
+                        onClick={props.onAddOrUpdateRestResourceClose}>Cancel</Button>
                 <Button variant="contained"
                         disabled={isEmpty(payload.name) || isEmptyField()}
                         onClick={addOrUpdateRestResource}>
-                    Add/Update Resource
+                    {
+                        props.resource.name ? <>Update Resource</> : <>Add Resource</>
+                    }
                 </Button>
             </DialogActions>
         </Dialog>

@@ -121,7 +121,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         grpcServerConfig: serverTypesConfig.grpcServerConfig || EmptyGrpcServerConfig,
         isWsServer: serverTypesConfig.isWsServer || false,
         wsServerConfig: serverTypesConfig.wsServerConfig || EmptyWsServerConfig,
-        isAddOrUpdateRestResourceOpen: false,
+        isAddRestResourceOpen: false,
+        isUpdateRestResourceOpen: false,
         isDeleteRestResourceOpen: false,
         currentRestResource: EmptyCurrentRestResource
     });
@@ -204,7 +205,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             grpcServerConfig: EmptyGrpcServerConfig,
             restServerConfig: EmptyRestServerConfig,
             wsServerConfig: EmptyWsServerConfig,
-            isAddOrUpdateRestResourceOpen: false,
+            isAddRestResourceOpen: false,
+            isUpdateRestResourceOpen: false,
             isDeleteRestResourceOpen: false,
             currentRestResource: EmptyCurrentRestResource
         });
@@ -244,14 +246,15 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const handleAddRestResourceClick = () => {
         setPayload({
             ...payload,
-            isAddOrUpdateRestResourceOpen: !payload.isAddOrUpdateRestResourceOpen
+            isAddRestResourceOpen: !payload.isAddRestResourceOpen,
+            currentRestResource: EmptyCurrentRestResource
         });
     };
 
     const handleEditRestResourceClick = (resource: Resource) => {
         setPayload({
             ...payload,
-            isAddOrUpdateRestResourceOpen: !payload.isAddOrUpdateRestResourceOpen,
+            isUpdateRestResourceOpen: !payload.isUpdateRestResourceOpen,
             currentRestResource: resource
         });
     };
@@ -555,11 +558,19 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
 
     const handleAddOrUpdateRestResource = (resource: Resource) => {
         const restServerConfig: RestServerConfig = payload.restServerConfig;
-        restServerConfig.resources.push(resource);
+        // the below check is to identify if the rest resource is added or updated.
+        if (payload.isUpdateRestResourceOpen) {
+            // remove the old resource while updating
+            payload.restServerConfig.resources = payload.restServerConfig.resources.filter(res => res.name !== resource.name);
+            restServerConfig.resources.push(resource);
+            payload.isUpdateRestResourceOpen = false;
+        } else if (payload.isAddRestResourceOpen) {
+            payload.isAddRestResourceOpen = false;
+            restServerConfig.resources.push(resource);
+        }
         setPayload({
             ...payload,
             restServerConfig,
-            isAddOrUpdateRestResourceOpen: !payload.isAddOrUpdateRestResourceOpen
         });
     };
 
@@ -581,9 +592,13 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const onAddOrUpdateRestResourceClose = () => {
+        if (payload.isAddRestResourceOpen) {
+            payload.isAddRestResourceOpen = false;
+        } else if (payload.isUpdateRestResourceOpen) {
+            payload.isUpdateRestResourceOpen = false;
+        }
         setPayload({
             ...payload,
-            isAddOrUpdateRestResourceOpen: !payload.isAddOrUpdateRestResourceOpen
         });
     };
 
@@ -613,8 +628,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                                 onDeleteRestResourceClose={onDeleteRestResourceClose}
                                 handleDeleteRestResource={handleDeleteRestResource}/>
         )}
-        {payload.isAddOrUpdateRestResourceOpen && (
-            <AddOrUpdateRestResource isOpen={payload.isAddOrUpdateRestResourceOpen}
+        {(payload.isAddRestResourceOpen || payload.isUpdateRestResourceOpen) && (
+            <AddOrUpdateRestResource isOpen={payload.isAddRestResourceOpen || payload.isUpdateRestResourceOpen}
                                      resource={payload.currentRestResource}
                                      resourceNames={getResourceNames()}
                                      onAddOrUpdateRestResourceClose={onAddOrUpdateRestResourceClose}
