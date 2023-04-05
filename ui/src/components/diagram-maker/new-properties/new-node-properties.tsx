@@ -314,6 +314,71 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return "";
     };
 
+    const getTemplateContent = () => {
+        let templates;
+        if (payload.language === GO) {
+            templates = [COMPAGE, OPENAPI];
+        } else {
+            templates = [OPENAPI];
+        }
+        if (templates.length > 0) {
+            return <TextField
+                required
+                size="medium"
+                select
+                margin="dense"
+                id="template"
+                defaultValue=""
+                label="Template"
+                type="text"
+                value={payload.restServerConfig.template}
+                onChange={handleTemplateChange}
+                variant="outlined">
+                {
+                    templates.map((template: string) => (
+                        <MenuItem key={template} value={template}>
+                            {template}
+                        </MenuItem>
+                    ))
+                }
+            </TextField>;
+        }
+        return "";
+    };
+
+    const getFrameworkContent = () => {
+        // create language:frameworks map based on template chosen
+        let map;
+        if (isCompageTemplate(payload.restServerConfig.template)) {
+            map = new Map(Object.entries(COMPAGE_LANGUAGE_FRAMEWORKS));
+        } else {
+            map = new Map(Object.entries(OPENAPI_LANGUAGE_FRAMEWORKS));
+        }
+        const frameworks = map.get(payload.language) || [];
+
+        if (frameworks.length > 0) {
+            return <TextField
+                required
+                size="medium"
+                select
+                margin="dense"
+                id="restFramework"
+                label="Framework"
+                defaultValue=""
+                type="text"
+                value={payload.restServerConfig.framework}
+                onChange={handleRestServerConfigFrameworkChange}
+                variant="outlined">
+                {frameworks.map((framework: string) => (
+                    <MenuItem key={framework} value={framework}>
+                        {framework}
+                    </MenuItem>
+                ))}
+            </TextField>;
+        }
+        return "";
+    };
+
     const getPortContent = () => {
         if (isCompageTemplate(payload.restServerConfig.template)) {
             return <TextField
@@ -350,56 +415,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
 
     const getRestServerConfig = () => {
         if (payload.isRestServer) {
-            let templates;
-            if (payload.language === GO) {
-                templates = [COMPAGE, OPENAPI];
-            } else {
-                templates = [OPENAPI];
-            }
-            // create language:frameworks map based on template chosen
-            let map;
-            if (isCompageTemplate(payload.restServerConfig.template)) {
-                map = new Map(Object.entries(COMPAGE_LANGUAGE_FRAMEWORKS));
-            } else {
-                map = new Map(Object.entries(OPENAPI_LANGUAGE_FRAMEWORKS));
-            }
-            const frameworks = map.get(payload.language) || [];
-
             return <React.Fragment>
-                <TextField
-                    required
-                    size="medium"
-                    select
-                    margin="dense"
-                    id="template"
-                    label="Template for Component"
-                    type="text"
-                    value={payload.restServerConfig.template}
-                    onChange={handleTemplateChange}
-                    variant="outlined">
-                    {templates.map((template: string) => (
-                        <MenuItem key={template} value={template}>
-                            {template}
-                        </MenuItem>
-                    ))}
-                </TextField>
-                <TextField
-                    required
-                    size="medium"
-                    select
-                    margin="dense"
-                    id="restFramework"
-                    label="Framework"
-                    type="text"
-                    value={payload.restServerConfig.framework}
-                    onChange={handleRestServerConfigFrameworkChange}
-                    variant="outlined">
-                    {frameworks.map((framework: string) => (
-                        <MenuItem key={framework} value={framework}>
-                            {framework}
-                        </MenuItem>
-                    ))}
-                </TextField>
+                {getTemplateContent()}
+                {getFrameworkContent()}
                 {getPortContent()}
                 {getResourcesContent()}
             </React.Fragment>;
@@ -589,86 +607,90 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     return <React.Fragment>
-        <DeleteRestResource isOpen={payload.isDeleteRestResourceOpen}
-                            resource={payload.currentRestResource}
-                            onDeleteRestResourceClose={onDeleteRestResourceClose}
-                            handleDeleteRestResource={handleDeleteRestResource}/>
-
-        <AddOrUpdateRestResource isOpen={payload.isAddOrUpdateRestResourceOpen}
-                                 resource={payload.currentRestResource}
-                                 resourceNames={getResourceNames()}
-                                 onAddOrUpdateRestResourceClose={onAddOrUpdateRestResourceClose}
-                                 nodeId={props.nodeId}
-                                 handleAddOrUpdateRestResource={handleAddOrUpdateRestResource}/>
-
-        <Dialog open={props.isOpen} onClose={onClose}>
-            <DialogTitle>Node Properties : {props.nodeId}</DialogTitle>
-            <Divider/>
-            <DialogContent style={{
-                height: "500px",
-                width: "450px"
-            }}>
-                <Stack direction="column" spacing={2}>
-                    <TextField
-                        required
-                        size="medium"
-                        margin="dense"
-                        id="name"
-                        label="Name of Component"
-                        type="text"
-                        value={payload.name}
-                        onChange={handleNameChange}
-                        variant="outlined"
-                    />
-                    <TextField
-                        required
-                        size="medium"
-                        select
-                        margin="dense"
-                        id="language"
-                        label="Language"
-                        type="text"
-                        value={payload.language}
-                        onChange={handleLanguageChange}
-                        variant="outlined">
-                        {LANGUAGES.map((language: string) => (
-                            <MenuItem key={language} value={language}>
-                                {language}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                    <Stack style={{
-                        padding: "10px",
-                        borderRadius: "15px",
-                        border: payload.isRestServer ? '1px solid #dadada' : ''
-                    }} direction="column" spacing={2}>
-                        {getRestServerCheck()}
-                        {getRestServerConfig()}
+        {payload.isDeleteRestResourceOpen && (
+            <DeleteRestResource isOpen={payload.isDeleteRestResourceOpen}
+                                resource={payload.currentRestResource}
+                                onDeleteRestResourceClose={onDeleteRestResourceClose}
+                                handleDeleteRestResource={handleDeleteRestResource}/>
+        )}
+        {payload.isAddOrUpdateRestResourceOpen && (
+            <AddOrUpdateRestResource isOpen={payload.isAddOrUpdateRestResourceOpen}
+                                     resource={payload.currentRestResource}
+                                     resourceNames={getResourceNames()}
+                                     onAddOrUpdateRestResourceClose={onAddOrUpdateRestResourceClose}
+                                     nodeId={props.nodeId}
+                                     handleAddOrUpdateRestResource={handleAddOrUpdateRestResource}/>
+        )}
+        {props.isOpen && (
+            <Dialog open={props.isOpen} onClose={onClose}>
+                <DialogTitle>Node Properties : {props.nodeId}</DialogTitle>
+                <Divider/>
+                <DialogContent style={{
+                    height: "500px",
+                    width: "450px"
+                }}>
+                    <Stack direction="column" spacing={2}>
+                        <TextField
+                            required
+                            size="medium"
+                            margin="dense"
+                            id="name"
+                            label="Name of Component"
+                            type="text"
+                            value={payload.name}
+                            onChange={handleNameChange}
+                            variant="outlined"
+                        />
+                        <TextField
+                            required
+                            size="medium"
+                            select
+                            margin="dense"
+                            id="language"
+                            label="Language"
+                            type="text"
+                            value={payload.language}
+                            onChange={handleLanguageChange}
+                            variant="outlined">
+                            {LANGUAGES.map((language: string) => (
+                                <MenuItem key={language} value={language}>
+                                    {language}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                        <Stack style={{
+                            padding: "10px",
+                            borderRadius: "15px",
+                            border: payload.isRestServer ? '1px solid #dadada' : ''
+                        }} direction="column" spacing={2}>
+                            {getRestServerCheck()}
+                            {getRestServerConfig()}
+                        </Stack>
+                        <Stack style={{
+                            padding: "10px",
+                            borderRadius: "15px",
+                            border: payload.isGrpcServer ? '1px solid #dadada' : ''
+                        }} direction="column" spacing={2}>
+                            {/*{getGrpcServerCheck()}*/}
+                            {/*{getGrpcServerConfig()}*/}
+                        </Stack>
+                        <Stack style={{
+                            padding: "10px",
+                            borderRadius: "15px",
+                            border: payload.isWsServer ? '1px solid #dadada' : ''
+                        }} direction="column" spacing={2}>
+                            {/*{getWsServerCheck()}*/}
+                            {/*{getWsServerConfig()}*/}
+                        </Stack>
                     </Stack>
-                    <Stack style={{
-                        padding: "10px",
-                        borderRadius: "15px",
-                        border: payload.isGrpcServer ? '1px solid #dadada' : ''
-                    }} direction="column" spacing={2}>
-                        {/*{getGrpcServerCheck()}*/}
-                        {/*{getGrpcServerConfig()}*/}
-                    </Stack>
-                    <Stack style={{
-                        padding: "10px",
-                        borderRadius: "15px",
-                        border: payload.isWsServer ? '1px solid #dadada' : ''
-                    }} direction="column" spacing={2}>
-                        {/*{getWsServerCheck()}*/}
-                        {/*{getWsServerConfig()}*/}
-                    </Stack>
-                </Stack>
-            </DialogContent>
-            <DialogActions>
-                <Button variant="outlined" color="secondary" onClick={props.onNodePropertiesClose}>Cancel</Button>
-                <Button variant="contained"
-                        onClick={handleUpdateNode}
-                        disabled={payload.name === "" || payload.language === "" || uploadYamlStatus === 'loading'}>Update</Button>
-            </DialogActions>
-        </Dialog>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" color="secondary" onClick={props.onNodePropertiesClose}>Cancel</Button>
+                    <Button variant="contained"
+                            onClick={handleUpdateNode}
+                            disabled={payload.name === "" || payload.language === "" || uploadYamlStatus === 'loading'}>Update</Button>
+                </DialogActions>
+            </Dialog>
+        )}
     </React.Fragment>;
 };
