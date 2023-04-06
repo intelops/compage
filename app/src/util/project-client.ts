@@ -122,7 +122,7 @@ const prepareProjectResource = (projectId: string, userName: string, projectReso
 const lengthOfChars = 5;
 
 const containsSpecialChars = (character: string) => {
-    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':'\\|,.<>\/?~]/;
+    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':\\|,.<>\/?~]/;
     return specialChars.test(character);
 };
 
