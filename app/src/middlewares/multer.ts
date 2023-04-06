@@ -1,7 +1,7 @@
 import multer from 'multer';
 import {v4} from 'uuid';
 import path from 'path';
-import * as os from "os";
+import * as os from 'os';
 
 const storage = multer.diskStorage({
     destination: os.tmpdir(),

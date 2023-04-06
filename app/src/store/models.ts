@@ -1,4 +1,4 @@
-import {Repository, User} from "../routes/models";
+import {Repository, User} from '../routes/models';
 
 export interface Resource {
     apiVersion: string;
@@ -38,7 +38,7 @@ export interface ProjectResourceMetadata {
     namespace: string;
     labels: {
         userName: string;
-    }
+    };
 }
 
 export interface UserResourceSpec {
@@ -77,13 +77,13 @@ export interface UserResourceList {
 }
 
 // user
-export const user_group = "compage.intelops.github.com";
-export const user_version = "v1alpha1";
-export const user_plural = "users";
-export const user_kind = "User"
+export const USER_GROUP = 'compage.intelops.github.com';
+export const USER_VERSION = 'v1alpha1';
+export const USER_PLURAL = 'users';
+export const USER_KIND = 'User';
 
 // project
-export const project_group = "compage.intelops.github.com";
-export const project_version = "v1alpha1";
-export const project_plural = "projects";
-export const project_kind = "Project"
+export const PROJECT_GROUP = 'compage.intelops.github.com';
+export const PROJECT_VERSION = 'v1alpha1';
+export const PROJECT_PLURAL = 'projects';
+export const PROJECT_KIND = 'Project';

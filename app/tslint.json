@@ -1,8 +1,7 @@
 {
-  "defaultSeverity": "error",
+  "defaultSeverity": "warn",
   "extends": [
-    "tslint:recommended",
-    "tslint-config-prettier"
+    "tslint:recommended"
   ],
   "jsRules": {},
   "rules": {
@@ -16,6 +15,10 @@
     "member-access": [
       true,
       "no-public"
+    ],
+    "quotemark": [
+      true,
+      "single"
     ]
   },
   "rulesDirectory": []

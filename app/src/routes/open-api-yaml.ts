@@ -1,19 +1,19 @@
-import {requireUserNameMiddleware} from "../middlewares/auth";
-import {Request, Response, Router} from "express";
-import {X_USER_NAME_HEADER} from "../util/constants";
-import multer from "../middlewares/multer";
-import * as fs from "fs";
-import {ProjectEntity, UploadYamlError, UploadYamlRequest, UploadYamlResponse} from "./models";
-import {getProject} from "../util/project-client";
-import Logger from "../util/logger";
+import {requireUserNameMiddleware} from '../middlewares/auth';
+import {Request, Response, Router} from 'express';
+import {X_USER_NAME_HEADER} from '../util/constants';
+import multer from '../middlewares/multer';
+import * as fs from 'fs';
+import {ProjectEntity, UploadYamlError, UploadYamlRequest, UploadYamlResponse} from './models';
+import {getProject} from '../util/project-client';
+import Logger from '../util/logger';
 
 const openApiYamlRouter = Router();
 
 // uploads openApiYaml file
-openApiYamlRouter.post("/upload", requireUserNameMiddleware, multer.single('file'), async (request: Request, response: Response) => {
+openApiYamlRouter.post('/upload', requireUserNameMiddleware, multer.single('file'), async (request: Request, response: Response) => {
     const userName = request.header(X_USER_NAME_HEADER);
     const uploadYamlRequest: UploadYamlRequest = request.body;
-    let projectEntity: ProjectEntity = await getProject(<string>userName, uploadYamlRequest.projectId);
+    const projectEntity: ProjectEntity = await getProject(userName as string, uploadYamlRequest.projectId);
     // projectEntity is not present on server side (which is hardly true, unless someone has deleted the project from backend while the user is logged in.)
     if (projectEntity.id.length === 0) {
         return response.status(404).json();
@@ -23,15 +23,15 @@ openApiYamlRouter.post("/upload", requireUserNameMiddleware, multer.single('file
             const content = fs.readFileSync(request.file.path, 'utf8');
             // delete file once content is extracted
             fs.rmSync(request.file.path);
-            const message = `File got uploaded.`;
-            Logger.info(message);
+            const msg = `File got uploaded.`;
+            Logger.info(msg);
             // TODO the upload happens so quickly that artificial delay is required and it will help for better experience.
             await new Promise(r => setTimeout(r, 1000));
-            return response.status(200).json(getUploadYamlResponse(uploadYamlRequest.projectId, uploadYamlRequest.nodeId, content, message));
+            return response.status(200).json(getUploadYamlResponse(uploadYamlRequest.projectId, uploadYamlRequest.nodeId, content, msg));
         } catch (error) {
-            const message = `File couldn't be uploaded due to : ${error}`;
-            Logger.error(message);
-            return response.status(500).json(getUploadYamlError(message));
+            const msg = `File couldn't be uploaded due to : ${error}`;
+            Logger.error(msg);
+            return response.status(500).json(getUploadYamlError(msg));
         }
     }
     const message = `File couldn't be uploaded.`;
@@ -41,20 +41,20 @@ openApiYamlRouter.post("/upload", requireUserNameMiddleware, multer.single('file
 
 const getUploadYamlError = (message: string) => {
     const uploadYamlError: UploadYamlError = {
-        message: message,
-    }
+        message,
+    };
     return uploadYamlError;
-}
+};
 
 const getUploadYamlResponse = (projectId: string, nodeId: string, content: string, message: string
 ) => {
     const uploadYamlResponse: UploadYamlResponse = {
-        projectId: projectId,
-        nodeId: nodeId,
-        content: content,
-        message: message,
-    }
+        projectId,
+        nodeId,
+        content,
+        message,
+    };
     return uploadYamlResponse;
-}
+};
 
 export default openApiYamlRouter;

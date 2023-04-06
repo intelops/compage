@@ -1,8 +1,8 @@
 import {simpleGit, SimpleGit, SimpleGitOptions} from 'simple-git';
-import * as fs from "fs";
-import {gitOperations} from "./common";
-import {Repository} from "../../routes/models";
-import Logger from "../logger";
+import * as fs from 'fs';
+import {gitOperations} from './common';
+import {Repository} from '../../routes/models';
+import Logger from '../logger';
 
 export interface PushToExistingProjectOnGitServerRequest {
     projectVersion: string;
@@ -35,4 +35,4 @@ export const pushToExistingProjectOnGitServer = async (pushToExistingProjectOnGi
 
     // add, commit and push
     return await gitOperations(git, pushToExistingProjectOnGitServerRequest.repository, pushToExistingProjectOnGitServerRequest.projectVersion);
-}
+};

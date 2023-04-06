@@ -1,5 +1,5 @@
-import axios from "axios";
-import {getToken} from "./user-client";
+import axios from 'axios';
+import {getToken} from './user-client';
 
 const ACCEPT = `application/vnd.github+json`;
 const USER_REPO_URL = `https://api.github.com/user/repos`;
@@ -11,24 +11,24 @@ export const createRepository = async (userName: string, repositoryName: string,
             Accept: ACCEPT,
             Authorization: `Bearer ${await getToken(userName)}`,
         },
-        url: USER_REPO_URL, method: "POST", data: {
+        url: USER_REPO_URL, method: 'POST', data: {
             name: repositoryName,
-            description: description,
+            description,
             private: true,
         }
     });
-}
+};
 
 export const listRepositories = async (userName: string) => {
     return axios({
         headers: {
             Accept: ACCEPT,
-            Authorization: `Bearer ${await getToken(<string>userName)}`,
+            Authorization: `Bearer ${await getToken(userName as string)}`,
         },
         url: USER_REPO_URL,
-        method: "GET"
-    })
-}
+        method: 'GET'
+    });
+};
 
 export const commitCompageJson = async (userName: string,
                                         email: string,
@@ -42,26 +42,26 @@ export const commitCompageJson = async (userName: string,
             Authorization: `Bearer ${await getToken(userName)}`,
         },
         url: `${REPO_URL}/${userName}/${repositoryName}/contents/.compage/config.json`,
-        method: "PUT",
+        method: 'PUT',
         data: {
-            message: message,
-            content: content,
+            message,
+            content,
             committer: {
                 name: userName,
-                email: email
+                email
             },
-            sha: sha
+            sha
         }
-    })
-}
+    });
+};
 
 export const pullCompageJson = async (userName: string, repositoryName: string) => {
     return axios({
         headers: {
             Accept: ACCEPT,
-            Authorization: `Bearer ${await getToken(<string>userName)}`,
+            Authorization: `Bearer ${await getToken(userName as string)}`,
         },
         url: `${REPO_URL}/${userName}/${repositoryName}/contents/.compage/config.json`,
-        method: "GET",
-    })
-}
+        method: 'GET',
+    });
+};

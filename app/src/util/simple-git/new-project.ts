@@ -1,7 +1,7 @@
-import {simpleGit, SimpleGit, SimpleGitOptions} from "simple-git";
-import {gitOperations} from "./common";
-import {Repository} from "../../routes/models";
-import Logger from "../logger";
+import {simpleGit, SimpleGit, SimpleGitOptions} from 'simple-git';
+import {gitOperations} from './common';
+import {Repository} from '../../routes/models';
+import Logger from '../logger';
 
 export interface PushNewProjectToGitServerRequest {
     projectVersion: string;
@@ -23,15 +23,15 @@ export const pushNewProjectToGitServer = async (pushNewProjectToGitServerRequest
     // when setting all options in a single object
     const git: SimpleGit = simpleGit(options);
 
-    let error: string = "";
+    let error: string = '';
 
     // initialize git
     await git.init().then(
         (success: any) => {
-            Logger.debug("git init succeeded");
+            Logger.debug('git init succeeded');
         }, (failure: any) => {
-            Logger.debug('git init failed : ', failure);
-            error = "git init failed" + failure;
+            Logger.debug(`git init failed: ${failure}`);
+            error = `git init failed: ${failure}`;
         });
     if (error.length > 0) {
         return error;
@@ -47,10 +47,10 @@ export const pushNewProjectToGitServer = async (pushNewProjectToGitServerRequest
     // Add remote repository url as origin to repository
     await git.addRemote('origin', gitServerUrl).then(
         (success: any) => {
-            Logger.debug("git remote add origin succeeded");
+            Logger.debug('git remote add origin succeeded');
         }, (failure: any) => {
-            Logger.debug('git remote add origin failed : ', failure);
-            error = "git remote add origin failed" + failure;
+            Logger.debug(`git remote add origin failed : ${failure}`);
+            error = `git remote add origin failed : ${failure}`;
         });
     if (error.length > 0) {
         return error;
@@ -58,4 +58,4 @@ export const pushNewProjectToGitServer = async (pushNewProjectToGitServerRequest
 
     // add, commit and push
     return await gitOperations(git, pushNewProjectToGitServerRequest.repository, pushNewProjectToGitServerRequest.projectVersion);
-}
+};

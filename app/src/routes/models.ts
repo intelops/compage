@@ -7,21 +7,21 @@ export interface Resource {
 interface RestServerConfig {
     template: string;
     port: string;
-    framework?: string
+    framework?: string;
     resources?: Resource[];
     openApiFileYamlContent?: string;
 }
 
 export interface GrpcServerConfig {
     port: string;
-    framework?: string
+    framework?: string;
     resources?: Resource[];
     protoFileContent?: string;
 }
 
 export interface WsServerConfig {
     port: string;
-    framework?: string
+    framework?: string;
     resources?: Resource[];
 }
 
@@ -36,9 +36,9 @@ export interface NodeConsumerData {
 }
 
 export interface CompageNode {
-    id: string,
-    typeId: string,
-    consumerData: NodeConsumerData
+    id: string;
+    typeId: string;
+    consumerData: NodeConsumerData;
 }
 
 export interface RestClientConfig {
@@ -168,21 +168,21 @@ export interface DeleteProjectError {
 }
 
 export const initializeEmptyProjectEntity = () => {
-    const repository: Repository = {branch: "", name: ""};
-    const user: User = {email: "", name: ""};
+    const repository: Repository = {branch: '', name: ''};
+    const user: User = {email: '', name: ''};
     const json: CompageJson = {
         edges: new Map<string, CompageEdge>(),
         nodes: new Map<string, CompageNode>(),
-        version: ""
+        version: ''
     };
     const projectEntity: ProjectEntity = {
-        displayName: "",
-        id: "",
+        displayName: '',
+        id: '',
         metadata: new Map<string, string>(),
-        repository: repository,
-        user: user,
-        version: "",
-        json: json
-    }
-    return projectEntity
-}
+        repository,
+        user,
+        version: '',
+        json
+    };
+    return projectEntity;
+};

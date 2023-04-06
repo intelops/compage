@@ -1,22 +1,22 @@
-import {initializeEmptyProjectEntity, ProjectEntity, Repository} from "../routes/models";
+import {initializeEmptyProjectEntity, ProjectEntity, Repository} from '../routes/models';
 
-import {project_group, project_kind, project_version, ProjectResource, ProjectResourceSpec} from "../store/models";
+import {PROJECT_GROUP, PROJECT_KIND, PROJECT_VERSION, ProjectResource, ProjectResourceSpec} from '../store/models';
 import {
     createProjectResource,
     deleteProjectResource,
     getProjectResource,
     listProjectResources,
     patchProjectResource
-} from "../store/project-store";
-import Logger from "./logger";
-import config from "./constants";
+} from '../store/project-store';
+import Logger from './logger';
+import config from './constants';
 
 // convertProjectEntityToProjectResourceSpec creates projectResourceSpec on k8s cluster.
 const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: string, projectEntity: ProjectEntity) => {
-    let repository: Repository = {
-        branch: "",
-        name: "",
-    }
+    const repository: Repository = {
+        branch: '',
+        name: '',
+    };
 
     // if repository name is not set, add displayName as repository name.
     if (!projectEntity.repository?.name) {
@@ -25,9 +25,9 @@ const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: 
         repository.name = projectEntity.repository.name;
     }
 
-    // if branch is not set, add "compage" as default branch.
+    // if branch is not set, add 'compage' as default branch.
     if (!projectEntity.repository?.branch) {
-        repository.branch = "compage";
+        repository.branch = 'compage';
     } else {
         repository.branch = projectEntity.repository.branch;
     }
@@ -38,12 +38,12 @@ const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: 
         metadata: JSON.stringify(projectEntity.metadata),
         user: projectEntity.user,
         json: JSON.stringify(projectEntity.json),
-        repository: repository,
+        repository,
         version: projectEntity.version,
         oldVersions: []
-    }
-    return projectResourceSpec
-}
+    };
+    return projectResourceSpec;
+};
 
 // convertProjectResourceToProjectEntity converts projectResource to projectEntity
 const convertProjectResourceToProjectEntity = (projectResource: ProjectResource) => {
@@ -56,38 +56,39 @@ const convertProjectResourceToProjectEntity = (projectResource: ProjectResource)
         user: projectResource.spec.user,
         version: projectResource.spec.version,
         json: JSON.parse(projectResource.spec.json) || {}
-    }
-    return projectEntity
-}
+    };
+    return projectEntity;
+};
 
 // convertListOfProjectResourceToListOfProjectEntity converts projectResourceList to ProjectEntityList
 const convertListOfProjectResourceToListOfProjectEntity = (projectResources: ProjectResource[]) => {
-    let projectEntities: ProjectEntity[] = []
+    const projectEntities: ProjectEntity[] = [];
+    // tslint:disable-next-line: prefer-for-of
     for (let i = 0; i < projectResources.length; i++) {
-        const projectEntity = convertProjectResourceToProjectEntity(projectResources[i])
-        projectEntities.push(projectEntity)
+        const projectEntity = convertProjectResourceToProjectEntity(projectResources[i]);
+        projectEntities.push(projectEntity);
     }
-    return projectEntities
-}
+    return projectEntities;
+};
 
 // getProjects returns all projects for userName supplied
 export const listProjects = async (userName: string) => {
-    let listOfProjectResource = await listProjectResources(config.system_namespace, "userName=" + userName);
+    const listOfProjectResource = await listProjectResources(config.system_namespace, 'userName=' + userName);
     if (listOfProjectResource) {
         return convertListOfProjectResourceToListOfProjectEntity(JSON.parse(JSON.stringify(listOfProjectResource)));
     }
     return [];
-}
+};
 
 // deleteProject deletes project for userName and projectId supplied
 export const deleteProject = async (userName: string, projectId: string) => {
     const projectResource = await getProjectResource(config.system_namespace, projectId);
     if (projectResource?.metadata?.labels?.userName === userName) {
         await deleteProjectResource(config.system_namespace, projectId);
-        return true
+        return true;
     }
     return false;
-}
+};
 
 // getProject returns project for userName and projectId supplied
 export const getProject = async (userName: string, projectId: string) => {
@@ -95,35 +96,35 @@ export const getProject = async (userName: string, projectId: string) => {
     // currently added filter post projects retrieval(It can be slower if there are too many projects with same name.)
     const projectResource = await getProjectResource(config.system_namespace, projectId);
     if (projectResource?.metadata?.labels?.userName === userName) {
-        return convertProjectResourceToProjectEntity(projectResource)
+        return convertProjectResourceToProjectEntity(projectResource);
     }
     return initializeEmptyProjectEntity();
-}
+};
 
 // prepareProjectResource prepares ProjectResource containing the project details.
 const prepareProjectResource = (projectId: string, userName: string, projectResourceSpec: ProjectResourceSpec) => {
     // create projectResource
     const projectResource: ProjectResource = {
-        apiVersion: project_group + "/" + project_version,
-        kind: project_kind,
+        apiVersion: PROJECT_GROUP + '/' + PROJECT_VERSION,
+        kind: PROJECT_KIND,
         spec: projectResourceSpec,
         metadata: {
             name: projectId,
             namespace: config.system_namespace,
             labels: {
-                userName: userName
+                userName
             }
         }
-    }
-    return projectResource
-}
+    };
+    return projectResource;
+};
 
 const lengthOfChars = 5;
 
 const containsSpecialChars = (character: string) => {
-    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':'\\|,.<>\/?~]/;
     return specialChars.test(character);
-}
+};
 
 export const getSanitizedName = (name: string) => {
     const sanitizedName = name.substring(0, lengthOfChars);
@@ -133,7 +134,7 @@ export const getSanitizedName = (name: string) => {
         // remove last character in sanitizedUserName.
         const slicedSanitizedName = name.slice(0, sanitizedName.length - 1);
         // append x to make it 5 characters string.
-        return slicedSanitizedName + "x";
+        return slicedSanitizedName + 'x';
     }
     return sanitizedName;
 };
@@ -151,16 +152,16 @@ const generateProjectId = (userName: string, projectName: string) => {
     if (projectName.length > lengthOfChars) {
         sanitizedProjectName = getSanitizedName(projectName);
     } else {
-        let appended = "";
+        let appended = '';
         const count = lengthOfChars - projectName.length;
         for (let i = 0; i < count; i++) {
-            appended += "x";
+            appended += 'x';
         }
         sanitizedProjectName = getSanitizedName(projectName) + appended;
     }
 
-    return sanitizedUserName.toLowerCase() + "-" + sanitizedProjectName.toLowerCase() + "-" + (Math.floor(Math.random() * 90000) + 10000);
-}
+    return sanitizedUserName.toLowerCase() + '-' + sanitizedProjectName.toLowerCase() + '-' + (Math.floor(Math.random() * 90000) + 10000);
+};
 
 // createProject creates projectResource on k8s cluster.
 export const createProject = async (userName: string, projectEntity: ProjectEntity) => {
@@ -168,7 +169,7 @@ export const createProject = async (userName: string, projectEntity: ProjectEnti
     const projectResourceSpec = convertProjectEntityToProjectResourceSpec(projectId, userName, projectEntity);
     const projectResource = prepareProjectResource(projectId, userName, projectResourceSpec);
     return convertProjectResourceToProjectEntity(await createProjectResource(config.system_namespace, JSON.stringify(projectResource)));
-}
+};
 
 // updateProject updates projectResource on k8s cluster.
 export const updateProject = async (projectId: string, userName: string, projectEntity: ProjectEntity) => {
@@ -198,4 +199,4 @@ export const updateProject = async (projectId: string, userName: string, project
         }
     }
     return initializeEmptyProjectEntity();
-}
+};
