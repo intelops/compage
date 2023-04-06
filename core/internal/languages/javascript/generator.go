@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/intelops/compage/core/internal/languages"
+	"github.com/intelops/compage/core/internal/languages/javascript/integrations/docker"
 	"github.com/intelops/compage/core/internal/languages/javascript/integrations/kubernetes"
 	"github.com/intelops/compage/core/internal/languages/templates"
 	log "github.com/sirupsen/logrus"
@@ -41,6 +42,13 @@ func Generate(ctx context.Context) error {
 	// k8s files need to be generated for the whole project so, it should be here.
 	m := getIntegrationsCopier(javascriptValues)
 
+	// dockerfile needs to be generated for the whole project so, it should be here.
+	dockerCopier := m["docker"].(*docker.Copier)
+	if err := dockerCopier.CreateDockerFile(); err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+
 	k8sCopier := m["k8s"].(*kubernetes.Copier)
 	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
 		log.Debugf("err : %s", err)
@@ -59,10 +67,14 @@ func getIntegrationsCopier(javascriptValues Values) map[string]interface{} {
 	serverPort := javascriptValues.JavaScriptNode.RestConfig.Server.Port
 	path := GetJavaScriptTemplatesRootPath()
 
+	// create javascript specific dockerCopier
+	dockerCopier := docker.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
+
 	// create javascript specific k8sCopier
 	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
 
 	return map[string]interface{}{
-		"k8s": k8sCopier,
+		"docker": dockerCopier,
+		"k8s":    k8sCopier,
 	}
 }
