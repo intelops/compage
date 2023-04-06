@@ -49,8 +49,8 @@ export const pushNewProjectToGitServer = async (pushNewProjectToGitServerRequest
         (success: any) => {
             Logger.debug('git remote add origin succeeded');
         }, (failure: any) => {
-            Logger.debug(`git remote add origin failed : ${failure}`);
-            error = `git remote add origin failed : ${failure}`;
+            Logger.debug(`git remote add origin failed: ${failure}`);
+            error = `git remote add origin failed: ${failure}`;
         });
     if (error.length > 0) {
         return error;

@@ -42,8 +42,8 @@ export const deleteObject = async ({
             name
         );
     } catch (e: any) {
-        Logger.debug('error while deleting custom object : ', e?.body);
-        // Logger.info('error while getting custom object : ', e?.body?.reason)
+        Logger.debug(`error while deleting custom object: ${e}`);
+        // Logger.info('error while getting custom object: ', e?.body?.reason)
     }
 };
 
@@ -64,8 +64,8 @@ export const getObject = async ({
         const resource: Resource = JSON.parse(JSON.stringify(object.body));
         return resource;
     } catch (e: any) {
-        Logger.debug('error while getting custom object : ', e?.body);
-        // Logger.info('error while getting custom object : ', e?.body?.reason)
+        Logger.debug(`error while getting custom object: ${e}`);
+        // Logger.info('error while getting custom object: ', e?.body?.reason)
         const resource: Resource = {apiVersion: '', kind: '', metadata: undefined, spec: undefined};
         return resource;
     }
@@ -90,8 +90,8 @@ export const patchObject = async ({
         const resource: Resource = JSON.parse(JSON.stringify(object.body));
         return resource;
     } catch (e: any) {
-        Logger.debug('error while patching custom object : ', e?.body);
-        // Logger.info('error while patching custom object : ', e?.body?.reason);
+        Logger.debug(`error while patching custom object: ${e}`);
+        // Logger.info(`error while patching custom object: ${e?.body?.reason}`);
         const resource: Resource = {apiVersion: '', kind: '', metadata: undefined, spec: undefined};
         return resource;
     }
@@ -114,8 +114,8 @@ export const createObject = async ({
         const resource: Resource = JSON.parse(JSON.stringify(object.body));
         return resource;
     } catch (e: any) {
-        Logger.debug('error while creating custom object : ', e);
-        // Logger.info('error while creating custom object : ', e?.body?.reason);
+        Logger.debug(`error while creating custom object: ${e}`);
+        // Logger.info(`error while creating custom object: ${e?.body?.reason}`);
         const resource: Resource = {apiVersion: '', kind: '', metadata: undefined, spec: undefined};
         return resource;
     }
@@ -144,8 +144,8 @@ export const listObjects = async ({
             const resources: ResourceList = JSON.parse(JSON.stringify(object.body));
             return resources;
         } catch (e: any) {
-            Logger.debug('error while listing custom object : ', e?.body);
-            // Logger.info('error while listing custom object : ', e?.body?.reason)
+            Logger.debug(`error while listing custom object: ${e?.body}`);
+            // Logger.info(`error while listing custom object: ${e?.body?.reason}`)
             const resources: ResourceList = {apiVersion: '', items: [], kind: '', metadata: undefined};
             return resources;
         }
@@ -160,8 +160,8 @@ export const listObjects = async ({
             const resources: ResourceList = JSON.parse(JSON.stringify(object.body));
             return resources;
         } catch (e: any) {
-            Logger.debug('error while listing custom object : ', e?.body);
-            // Logger.info('error while listing custom object : ', e?.body?.reason);
+            Logger.debug(`error while listing custom object: ${e?.body}`);
+            // Logger.info(`error while listing custom object: ${e?.body?.reason}`);
             const resources: ResourceList = {apiVersion: '', items: [], kind: '', metadata: undefined};
             return resources;
         }
@@ -173,7 +173,7 @@ export const checkIfSystemNamespaceExists = async () => {
         const object = await coreV1ApiClient.listNamespace();
         return JSON.parse(JSON.stringify(object.body));
     } catch (e: any) {
-        Logger.debug('error while listing namespace : ', e?.body);
+        Logger.debug(`error while listing namespace: ${e?.body}`);
         throw e;
     }
 };
@@ -205,7 +205,7 @@ export const checkIfCrdsInstalled = async () => {
                 '');
             return JSON.parse(JSON.stringify(object.body));
         } catch (e: any) {
-            Logger.debug('error while listing custom object : ', e?.body);
+            Logger.debug(`error while listing custom object: ${e?.body}`);
             throw e;
         }
     }

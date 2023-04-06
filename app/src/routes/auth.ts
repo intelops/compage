@@ -35,7 +35,7 @@ authRouter.post('/authenticate', async (req, res) => {
         }).then((resp) => {
             setToken(resp.data.login, resp.data.email, accessToken as string).then(userResource => {
                 if (userResource.apiVersion) {
-                    Logger.info(userResource.metadata.name + ' user updated');
+                    Logger.info(`${userResource.metadata.name} user updated`);
                     return res.status(200).json(resp.data);
                 } else {
                     Logger.info(`${resp.data.login} user couldn't be updated`);

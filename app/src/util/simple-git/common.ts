@@ -10,8 +10,8 @@ export const gitOperations = async (git: SimpleGit, repository: Repository, proj
             (success: any) => {
                 Logger.debug('git add succeeded');
             }, (failure: any) => {
-                Logger.debug('git add failed : ', failure);
-                error = 'git add failed' + failure;
+                Logger.debug(`git add failed: ${failure}`);
+                error = `git add failed: ${failure}`;
             });
     if (error.length > 0) {
         return error;
@@ -23,8 +23,8 @@ export const gitOperations = async (git: SimpleGit, repository: Repository, proj
             (success: any) => {
                 Logger.debug('git commit succeeded');
             }, (failure: any) => {
-                Logger.debug('git commit failed : ', failure);
-                error = 'git commit failed' + failure;
+                Logger.debug(`git commit failed: ${failure}`);
+                error = `git commit failed: ${failure}`;
             });
     if (error.length > 0) {
         return error;
@@ -36,8 +36,8 @@ export const gitOperations = async (git: SimpleGit, repository: Repository, proj
             (success: any) => {
                 Logger.debug('git checkoutLocalBranch succeeded');
             }, (failure: any) => {
-                Logger.debug('git checkoutLocalBranch failed : ', failure);
-                error = 'git checkoutLocalBranch failed' + failure;
+                Logger.debug(`git checkoutLocalBranch failed: ${failure}`);
+                error = `git checkoutLocalBranch failed: ${failure}`;
             });
     if (error.length > 0) {
         return error;
@@ -48,8 +48,8 @@ export const gitOperations = async (git: SimpleGit, repository: Repository, proj
         .then((success: any) => {
             Logger.debug('git push succeeded');
         }, (failure: any) => {
-            Logger.debug('git push failed : ', failure);
-            error = 'git push failed' + failure;
+            Logger.debug(`git push failed: ${failure}`);
+            error = `git push failed: ${failure}`;
         });
     return error;
 };

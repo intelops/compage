@@ -22,7 +22,7 @@ if (!process.env.NODE_ENV) {
     process.env.NODE_ENV = 'development';
 }
 
-Logger.info('process.env.NODE_ENV: ' + process.env.NODE_ENV || 'development');
+Logger.info(`process.env.NODE_ENV:  ${process.env.NODE_ENV || 'development'}`);
 const isDevelopment = (process.env.NODE_ENV === 'development');
 let config: Config;
 if (isDevelopment) {

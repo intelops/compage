@@ -28,8 +28,8 @@ export const cloneExistingProjectFromGitServer = async (cloneExistingProjectFrom
         (success: any) => {
             Logger.debug('git clone succeeded');
         }, (failure: any) => {
-            Logger.debug('git clone failed : ', failure);
-            error = 'git clone failed' + failure;
+            Logger.debug(`git clone failed: ${failure}`);
+            error = `git clone failed: ${failure}`;
         });
     return error;
 };
