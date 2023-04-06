@@ -168,7 +168,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             }
 
             // check for invalid names for fields.
-            const regex = new RegExp("^[a-zA-Z_$][a-zA-Z_$0-9]*$");
+            const regex = new RegExp("^[a-zA-Z-$][a-zA-Z-_$0-9]*$");
             if (!regex.test(payload.name.value)) {
                 newPayload = {
                     ...newPayload,
