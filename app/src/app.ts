@@ -11,8 +11,9 @@ import '@kubernetes/client-node';
 import openApiYamlRouter from './routes/open-api-yaml';
 import Logger from './util/logger';
 import morganMiddleware from './util/morganMiddleware';
+import k8sOpsRouter from './routes/k8s-ops';
 
-export const {customObjectsApiClient, coreV1ApiClient} = initializeKubeClient();
+export const {customObjectsApiClient, coreV1ApiClient, currentContext} = initializeKubeClient();
 
 const app: Application = express();
 
@@ -44,6 +45,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 const routes = Router();
+routes.use('/k8s_ops', k8sOpsRouter);
 routes.use('/projects', projectsRouter);
 routes.use('/code_operations', codeOperationsRouter);
 routes.use('/auth', authRouter);

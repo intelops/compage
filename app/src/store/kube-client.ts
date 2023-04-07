@@ -1,6 +1,6 @@
 import * as k8s from '@kubernetes/client-node';
 
-import {coreV1ApiClient, customObjectsApiClient} from '../app';
+import {coreV1ApiClient, currentContext, customObjectsApiClient} from '../app';
 import {
     PROJECT_GROUP,
     PROJECT_PLURAL,
@@ -23,7 +23,8 @@ export const initializeKubeClient = () => {
     }
     return {
         customObjectsApiClient: kubeConfig.makeApiClient(k8s.CustomObjectsApi),
-        coreV1ApiClient: kubeConfig.makeApiClient(k8s.CoreV1Api)
+        coreV1ApiClient: kubeConfig.makeApiClient(k8s.CoreV1Api),
+        currentContext: kubeConfig.currentContext
     };
 };
 
@@ -208,5 +209,14 @@ export const checkIfCrdsInstalled = async () => {
             Logger.debug(`error while listing custom object: ${e?.body}`);
             throw e;
         }
+    }
+};
+
+export const getCurrentContext = async () => {
+    try {
+        return currentContext;
+    } catch (e: any) {
+        Logger.debug(`error while retrieving context: ${e?.body}`);
+        throw e;
     }
 };

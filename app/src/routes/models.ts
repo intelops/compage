@@ -110,6 +110,19 @@ export interface UploadYamlError {
     message: string;
 }
 
+export interface K8sOpsRequest {
+}
+
+// This type describes the response object structure:
+export interface K8sOpsResponse {
+    contextName: string;
+}
+
+// This type describes the error object structure:
+export interface K8sOpsError {
+    message: string;
+}
+
 // ProjectEntity is for transferring info about projects from client to server
 export interface ProjectEntity {
     id: string;
