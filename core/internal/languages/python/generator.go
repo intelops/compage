@@ -55,12 +55,12 @@ func getIntegrationsCopier(pythonValues Values) map[string]interface{} {
 	repositoryName := pythonValues.Values.Get(languages.RepositoryName)
 	nodeName := pythonValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := pythonValues.Values.NodeDirectoryName
-	isServer := pythonValues.PythonNode.RestConfig.Server != nil
-	serverPort := pythonValues.PythonNode.RestConfig.Server.Port
+	isRestServer := pythonValues.PythonNode.RestConfig.Server != nil
+	restServerPort := pythonValues.PythonNode.RestConfig.Server.Port
 	path := GetPythonTemplatesRootPath()
 
 	// create python specific k8sCopier
-	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
+	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	return map[string]interface{}{
 		"k8s": k8sCopier,

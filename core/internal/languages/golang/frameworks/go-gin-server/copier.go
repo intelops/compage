@@ -32,15 +32,15 @@ type Copier struct {
 	NodeDirectoryName string
 	TemplatesRootPath string
 	Data              map[string]interface{}
-	IsServer          bool
-	IsClient          bool
-	Port              string
+	IsRestServer      bool
+	IsRestClient      bool
+	RestServerPort    string
 	Resources         []node.Resource
-	Clients           []languages.RestClient
+	RestClients       []languages.RestClient
 	PluralizeClient   *pluralize.Client
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isServer bool, serverPort string, resources []node.Resource, clients []languages.RestClient) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, resources []node.Resource, restClients []languages.RestClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
 
@@ -52,7 +52,7 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	}
 
 	// set all resources for main.go.tmpl
-	if isServer {
+	if isRestServer {
 		type resourceData struct {
 			ResourceNamePlural string
 			ResourceName       string
@@ -63,21 +63,21 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 			resourcesData = append(resourcesData, resourceData{ResourceName: r.Name, ResourceNamePlural: pluralizeClient.Plural(strings.ToLower(r.Name))})
 		}
 		data["Resources"] = resourcesData
-		data["ServerPort"] = serverPort
-		data["IsServer"] = isServer
+		data["RestServerPort"] = restServerPort
+		data["IsRestServer"] = isRestServer
 	}
-	// if clients slice has elements
-	isClient := len(clients) > 0
-	data["IsClient"] = isClient
+	// if restClients slice has elements
+	isRestClient := len(restClients) > 0
+	data["IsRestClient"] = isRestClient
 
 	return &Copier{
 		TemplatesRootPath: templatesRootPath,
 		NodeDirectoryName: nodeDirectoryName,
 		Data:              data,
-		IsServer:          isServer,
-		IsClient:          isClient,
+		IsRestServer:      isRestServer,
+		IsRestClient:      isRestClient,
 		Resources:         resources,
-		Clients:           clients,
+		RestClients:       restClients,
 		PluralizeClient:   pluralizeClient,
 	}
 }
@@ -160,13 +160,13 @@ func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 }
 
 // copyRestClientResourceFiles copies rest client files from template and renames them as per client config.
-func (c Copier) copyRestClientResourceFiles(client languages.RestClient) error {
+func (c Copier) copyRestClientResourceFiles(restClient languages.RestClient) error {
 	/// add resource specific data to map in c needed for templates.
-	c.Data["ClientPort"] = client.Port
-	c.Data["ClientServiceName"] = client.ExternalNode
+	c.Data["RestClientPort"] = restClient.Port
+	c.Data["RestClientServiceName"] = restClient.ExternalNode
 
-	// copy client files to generated project.
-	targetResourceClientFileName := c.NodeDirectoryName + RestClientPath + "/" + client.ExternalNode + "-" + ClientFile
+	// copy restClient files to generated project.
+	targetResourceClientFileName := c.NodeDirectoryName + RestClientPath + "/" + restClient.ExternalNode + "-" + ClientFile
 	_, err := utils.CopyFile(targetResourceClientFileName, c.TemplatesRootPath+RestClientPath+"/"+ClientFile)
 	if err != nil {
 		return err
@@ -206,7 +206,7 @@ func (c Copier) CreateRestConfigs() error {
 // CreateRestServer creates/copies relevant files to generated project
 func (c Copier) CreateRestServer() error {
 	// if the node is server, add server code
-	if c.IsServer {
+	if c.IsRestServer {
 		// create directories for controller, service, dao, models
 		if err := c.createRestServerDirectories(); err != nil {
 			return err
@@ -224,14 +224,14 @@ func (c Copier) CreateRestServer() error {
 // CreateRestClients creates/copies relevant files to generated project
 func (c Copier) CreateRestClients() error {
 	// if the node is client, add client code
-	if c.IsClient {
+	if c.IsRestClient {
 		// create directories for client
 		if err := c.createRestClientDirectories(); err != nil {
 			return err
 		}
 
 		// copy files with respect to the names of resources
-		for _, client := range c.Clients {
+		for _, client := range c.RestClients {
 			if err := c.copyRestClientResourceFiles(client); err != nil {
 				return err
 			}

@@ -83,13 +83,13 @@ func getGoGinServerCopier(goValues GoValues) *go_gin_server.Copier {
 	repositoryName := goValues.Values.Get(languages.RepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := goValues.Values.NodeDirectoryName
-	isServer := goValues.LGoLangNode.RestConfig.Server != nil
-	serverPort := goValues.LGoLangNode.RestConfig.Server.Port
+	isRestServer := goValues.LGoLangNode.RestConfig.Server != nil
+	restServerPort := goValues.LGoLangNode.RestConfig.Server.Port
 	resources := goValues.LGoLangNode.RestConfig.Server.Resources
 	clients := goValues.LGoLangNode.RestConfig.Clients
 	path := GetGoTemplatesRootPath() + "/frameworks/" + GoGinServerFramework
 	// create golang specific copier
-	copier := go_gin_server.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort, resources, clients)
+	copier := go_gin_server.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, resources, clients)
 	return copier
 }
 
@@ -98,15 +98,15 @@ func getIntegrationsCopier(goValues GoValues) map[string]interface{} {
 	repositoryName := goValues.Values.Get(languages.RepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := goValues.Values.NodeDirectoryName
-	isServer := goValues.LGoLangNode.RestConfig.Server != nil
-	serverPort := goValues.LGoLangNode.RestConfig.Server.Port
+	isRestServer := goValues.LGoLangNode.RestConfig.Server != nil
+	restServerPort := goValues.LGoLangNode.RestConfig.Server.Port
 	path := GetGoTemplatesRootPath()
 
 	// create golang specific dockerCopier
-	dockerCopier := docker.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
+	dockerCopier := docker.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	// create golang specific k8sCopier
-	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
+	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	return map[string]interface{}{
 		"docker": dockerCopier,

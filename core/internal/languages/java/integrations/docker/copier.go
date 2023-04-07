@@ -17,12 +17,13 @@ type Copier struct {
 	RestServerPort    string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath, generatedJarName string, isRestServer bool, restServerPort string) *Copier {
 	// populate map to replace templates
 	data := map[string]interface{}{
-		"RepositoryName": repositoryName,
-		"NodeName":       strings.ToLower(nodeName),
-		"UserName":       userName,
+		"RepositoryName":   repositoryName,
+		"NodeName":         strings.ToLower(nodeName),
+		"UserName":         userName,
+		"GeneratedJarName": generatedJarName,
 	}
 
 	if isRestServer {

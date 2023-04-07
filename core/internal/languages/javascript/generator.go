@@ -63,15 +63,15 @@ func getIntegrationsCopier(javascriptValues Values) map[string]interface{} {
 	repositoryName := javascriptValues.Values.Get(languages.RepositoryName)
 	nodeName := javascriptValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := javascriptValues.Values.NodeDirectoryName
-	isServer := javascriptValues.JavaScriptNode.RestConfig.Server != nil
-	serverPort := javascriptValues.JavaScriptNode.RestConfig.Server.Port
+	isRestServer := javascriptValues.JavaScriptNode.RestConfig.Server != nil
+	restServerPort := javascriptValues.JavaScriptNode.RestConfig.Server.Port
 	path := GetJavaScriptTemplatesRootPath()
 
 	// create javascript specific dockerCopier
-	dockerCopier := docker.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
+	dockerCopier := docker.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	// create javascript specific k8sCopier
-	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
+	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	return map[string]interface{}{
 		"docker": dockerCopier,

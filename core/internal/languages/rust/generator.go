@@ -55,12 +55,12 @@ func getIntegrationsCopier(rustValues Values) map[string]interface{} {
 	repositoryName := rustValues.Values.Get(languages.RepositoryName)
 	nodeName := rustValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := rustValues.Values.NodeDirectoryName
-	isServer := rustValues.RustNode.RestConfig.Server != nil
-	serverPort := rustValues.RustNode.RestConfig.Server.Port
+	isRestServer := rustValues.RustNode.RestConfig.Server != nil
+	restServerPort := rustValues.RustNode.RestConfig.Server.Port
 	path := GetRustTemplatesRootPath()
 
 	// create rust specific copier
-	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
+	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	return map[string]interface{}{
 		"k8s": k8sCopier,

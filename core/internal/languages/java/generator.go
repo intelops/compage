@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/intelops/compage/core/internal/languages"
+	"github.com/intelops/compage/core/internal/languages/java/integrations/docker"
 	"github.com/intelops/compage/core/internal/languages/java/integrations/kubernetes"
 	"github.com/intelops/compage/core/internal/languages/templates"
 	log "github.com/sirupsen/logrus"
@@ -41,6 +42,13 @@ func Generate(ctx context.Context) error {
 	// k8s files need to be generated for the whole project so, it should be here.
 	m := getIntegrationsCopier(javaValues)
 
+	// dockerfile needs to be generated for the whole project so, it should be here.
+	dockerCopier := m["docker"].(*docker.Copier)
+	if err := dockerCopier.CreateDockerFile(); err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+
 	k8sCopier := m["k8s"].(*kubernetes.Copier)
 	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
 		log.Debugf("err : %s", err)
@@ -55,14 +63,27 @@ func getIntegrationsCopier(javaValues Values) map[string]interface{} {
 	repositoryName := javaValues.Values.Get(languages.RepositoryName)
 	nodeName := javaValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := javaValues.Values.NodeDirectoryName
-	isServer := javaValues.JavaNode.RestConfig.Server != nil
-	serverPort := javaValues.JavaNode.RestConfig.Server.Port
+	isRestServer := javaValues.JavaNode.RestConfig.Server != nil
+	restServerPort := javaValues.JavaNode.RestConfig.Server.Port
 	path := GetJavaTemplatesRootPath()
+	// extract generatedJar name
+	generatedJarName := ""
+	if javaValues.JavaNode.RestConfig.Server.Framework == Spring {
+		generatedJarName = "openapi-spring-1.0.0.jar"
+	} else if javaValues.JavaNode.RestConfig.Server.Framework == LJavaUndertowServer {
+		generatedJarName = "openapi-undertow-server-1.0.0.jar"
+	} else if javaValues.JavaNode.RestConfig.Server.Framework == LJavaMicronautServer {
+		generatedJarName = "openapi-micronaut-1.0.0.jar"
+	}
+
+	// create java specific dockerCopier
+	dockerCopier := docker.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, generatedJarName, isRestServer, restServerPort)
 
 	// create java specific k8sCopier
-	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isServer, serverPort)
+	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	return map[string]interface{}{
-		"k8s": k8sCopier,
+		"docker": dockerCopier,
+		"k8s":    k8sCopier,
 	}
 }

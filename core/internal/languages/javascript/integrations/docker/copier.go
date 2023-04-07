@@ -13,11 +13,11 @@ type Copier struct {
 	NodeDirectoryName string
 	TemplatesRootPath string
 	Data              map[string]interface{}
-	IsServer          bool
-	Port              string
+	IsRestServer      bool
+	RestServerPort    string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isServer bool, serverPort string) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string) *Copier {
 	// populate map to replace templates
 	data := map[string]interface{}{
 		"RepositoryName": repositoryName,
@@ -25,17 +25,16 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 		"UserName":       userName,
 	}
 
-	// set all resources for main.go.tmpl
-	if isServer {
-		data["ServerPort"] = serverPort
-		data["IsServer"] = isServer
+	if isRestServer {
+		data["RestServerPort"] = restServerPort
+		data["IsRestServer"] = isRestServer
 	}
 
 	return &Copier{
 		TemplatesRootPath: templatesRootPath,
 		NodeDirectoryName: nodeDirectoryName,
-		IsServer:          isServer,
-		Port:              serverPort,
+		IsRestServer:      isRestServer,
+		RestServerPort:    restServerPort,
 		Data:              data,
 	}
 }

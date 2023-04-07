@@ -8,6 +8,13 @@ import (
 // TemplatesPath directory of template files
 const TemplatesPath = "templates/compage-template-java"
 
+var LJavaPlayFramework = "java-play-framework"
+var LJavaMicronautServer = "java-micronaut-server"
+var Spring = "spring"
+var LJavaUndertowServer = "java-undertow-server"
+
+var OpenApiSupportedFrameworks = []string{LJavaMicronautServer, Spring, LJavaUndertowServer, LJavaPlayFramework}
+
 var templatesRootPath = utils.GetProjectRootPath(TemplatesPath)
 
 // LJavaNode language specific struct.
