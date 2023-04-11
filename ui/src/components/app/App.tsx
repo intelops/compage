@@ -17,6 +17,7 @@ import {
 } from "../../features/projects/slice";
 import {selectGenerateCodeStatus} from "../../features/code-operations/slice";
 import {selectUploadYamlStatus} from "../../features/open-api-yaml-operations/slice";
+import {selectGetCurrentContextStatus} from "../../features/k8s-operations/slice";
 
 export const App = () => {
     const createProjectStatus = useAppSelector(selectCreateProjectStatus);
@@ -26,6 +27,7 @@ export const App = () => {
     const updateProjectStatus = useAppSelector(selectUpdateProjectStatus);
     const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
     const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
+    const getCurrentContextStatus = useAppSelector(selectGetCurrentContextStatus);
 
     const isActive = () => {
         return createProjectStatus === 'loading'
@@ -34,7 +36,8 @@ export const App = () => {
             || updateProjectStatus === 'loading'
             || uploadYamlStatus === 'loading'
             || generateCodeStatus === 'loading'
-            || existsProjectStatus === 'loading';
+            || existsProjectStatus === 'loading'
+            || getCurrentContextStatus === 'loading';
     };
 
     return <LoadingOverlay

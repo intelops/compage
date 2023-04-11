@@ -102,7 +102,8 @@ export const GenerateCode = () => {
         <>
             <Button style={{
                 width: "200px"
-            }} variant="contained" disabled={isDisabled()} onClick={handleGenerateCodeClick}>
+            }} variant="contained" disabled={isDisabled() || generateCodeStatus === "loading"}
+                    onClick={handleGenerateCodeClick}>
                 {generateCodeStatus === "loading"
                     ? "Generating Code"
                     : "Generate Code"}

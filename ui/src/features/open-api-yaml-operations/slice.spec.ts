@@ -1,6 +1,6 @@
-import codeOperationsReducer, {OpenApiYamlOperationsState} from './slice';
+import openApiYamlOperationsReducer, {OpenApiYamlOperationsState} from './slice';
 
-describe('codeOperations reducer', () => {
+describe('openApiYaml reducer', () => {
     const initialState: OpenApiYamlOperationsState = {
         uploadYaml: {
             data: {},
@@ -10,7 +10,7 @@ describe('codeOperations reducer', () => {
     };
 
     it('should handle initial state', () => {
-        expect(codeOperationsReducer(undefined, {type: 'unknown'})).toEqual({
+        expect(openApiYamlOperationsReducer(undefined, {type: 'unknown'})).toEqual({
             generateCode: {
                 data: {},
                 status: 'idle',

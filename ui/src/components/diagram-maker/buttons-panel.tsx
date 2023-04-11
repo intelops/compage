@@ -50,6 +50,15 @@ export const ButtonsPanel = () => {
             <GenerateCode></GenerateCode>
         </Grid>
         <hr/>
+        {/* TODO we don't need this at this point*/}
+        {/*<Grid item style={{*/}
+        {/*    alignItems: "center",*/}
+        {/*    display: "flex",*/}
+        {/*    flexDirection: "column"*/}
+        {/*}}>*/}
+        {/*    <K8sOperations></K8sOperations>*/}
+        {/*</Grid>*/}
+        {/*<hr/>*/}
         <Grid item style={{
             alignItems: "center",
             display: "flex",
@@ -58,7 +67,7 @@ export const ButtonsPanel = () => {
             <SwitchProject handleClose={handleClose} isOpen={data.isOpen}></SwitchProject>
             <Button style={{
                 width: "200px"
-            }} variant="contained" onClick={handleSwitchProjectClick}>
+            }} variant="contained" disabled={data.isOpen} onClick={handleSwitchProjectClick}>
                 Switch Project
             </Button>
         </Grid>

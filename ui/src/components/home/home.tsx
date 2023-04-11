@@ -14,6 +14,8 @@ import {SwitchProject} from "../../features/projects/switch-project";
 import {getCurrentUserName} from "../../utils/sessionstorage-client";
 import {GetProjectRequest} from "../../features/projects/model";
 import {existsProjectAsync} from "../../features/projects/async-apis/existsProject";
+import {getCurrentContextAsync} from "../../features/k8s-operations/async-apis/getCurrentContext";
+import {GetCurrentContextRequest} from "../../features/k8s-operations/model";
 
 const isSameUser = () => {
     const currentProjectDetails = getCurrentProjectDetails();
@@ -49,6 +51,8 @@ export const Home = () => {
                 id: userNameAndProjectAndVersion[1]
             };
             dispatch(existsProjectAsync(getProjectRequest));
+            const getCurrentProjectContext: GetCurrentContextRequest = {};
+            dispatch(getCurrentContextAsync(getCurrentProjectContext));
         }
     }, [dispatch]);
 

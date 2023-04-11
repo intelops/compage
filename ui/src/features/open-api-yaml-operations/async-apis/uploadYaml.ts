@@ -4,7 +4,7 @@ import {uploadYaml} from "../api";
 import {toastr} from 'react-redux-toastr';
 
 export const uploadYamlAsync = createAsyncThunk<UploadYamlResponse, UploadYamlRequest, { rejectValue: UploadYamlError }>(
-    'open-api-yaml-operations/upload',
+    'open-api-yaml-operations/uploadYaml',
     async (uploadYamlRequest: UploadYamlRequest, thunkApi) => {
         return uploadYaml(uploadYamlRequest).then(response => {
             // Check if status is not okay:

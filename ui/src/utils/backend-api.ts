@@ -8,6 +8,14 @@ export const sanitizeString = (input: string) => {
     return input.split(" ").join("_");
 };
 
+export const K8sOperationsBackendApi = () => {
+    const path = "/k8s_operations";
+    return axios.create({
+        baseURL: config.backend_base_url + path,
+        headers: getHeaders()
+    });
+};
+
 export const AuthBackendApi = () => {
     const path = "/auth";
     return axios.create({

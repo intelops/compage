@@ -13,6 +13,7 @@ import authReducer from "../features/auth/slice";
 import {unauthenticatedMiddleware} from "./unauthenticatedMiddleware";
 import {RESET_STATE_ACTION_TYPE} from "./reset-state-action";
 import openApiYamlOperationsReducer from "../features/open-api-yaml-operations/slice";
+import k8sOperationsReducer from "../features/k8s-operations/slice";
 
 const rootPersistConfig = {
     key: 'root',
@@ -26,6 +27,7 @@ const authenticationPersistConfig = {
 };
 
 const persistedRootReducer = combineReducers({
+    k8sOperations: persistReducer(rootPersistConfig, k8sOperationsReducer),
     openApiYamlOperations: persistReducer(rootPersistConfig, openApiYamlOperationsReducer),
     codeOperations: persistReducer(rootPersistConfig, codeOperationsReducer),
     projects: persistReducer(rootPersistConfig, projectsReducer),

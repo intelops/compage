@@ -18,8 +18,8 @@ const initialState: OpenApiYamlOperationsState = {
     }
 };
 
-export const openApiYamlSlice = createSlice({
-    name: 'openApiYamlSlice',
+export const openApiYamlOperationsSlice = createSlice({
+    name: 'openApiYamlOperations',
     initialState,
     reducers: {},
     extraReducers: (builder) => {
@@ -41,4 +41,4 @@ export const selectUploadYamlData = (state: RootState) => state.openApiYamlOpera
 export const selectUploadYamlError = (state: RootState) => state.openApiYamlOperations.uploadYaml.error;
 export const selectUploadYamlStatus = (state: RootState) => state.openApiYamlOperations.uploadYaml.status;
 
-export default openApiYamlSlice.reducer;
+export default openApiYamlOperationsSlice.reducer;

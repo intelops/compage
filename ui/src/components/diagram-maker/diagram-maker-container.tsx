@@ -60,7 +60,7 @@ import {ButtonsPanel} from "./buttons-panel";
 import {UpdateProjectRequest} from "../../features/projects/model";
 import {updateProjectAsync} from "../../features/projects/async-apis/updateProject";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
-import {selectGetProjectData} from "../../features/projects/slice";
+import {selectGetProjectData, selectUpdateProjectStatus} from "../../features/projects/slice";
 import {cleanse, removeUnwantedKeys} from "./helper/helper";
 import * as _ from "lodash";
 import Box from "@mui/material/Box";
@@ -95,6 +95,8 @@ export const DiagramMakerContainer = ({
     const diagramMakerRef = useRef() as any;
     const dispatch = useAppDispatch();
     const getProjectData = useAppSelector(selectGetProjectData);
+    const updateProjectStatus = useAppSelector(selectUpdateProjectStatus);
+
     const navigate = useNavigate();
 
     // handle ctrl+s in window
@@ -512,8 +514,8 @@ export const DiagramMakerContainer = ({
             }}>
                 <Button style={{
                     width: "200px"
-                }} variant="contained" onClick={handleSaveProjectClick}>
-                    Save Project
+                }} variant="contained" disabled={updateProjectStatus === 'loading'} onClick={handleSaveProjectClick}>
+                    Update Changes
                 </Button>
             </Grid>
             <hr/>
