@@ -110,16 +110,16 @@ export interface UploadYamlError {
     message: string;
 }
 
-export interface K8sOpsRequest {
+export interface GetCurrentContextRequest {
 }
 
 // This type describes the response object structure:
-export interface K8sOpsResponse {
+export interface GetCurrentContextResponse {
     contextName: string;
 }
 
 // This type describes the error object structure:
-export interface K8sOpsError {
+export interface GetCurrentContextError {
     message: string;
 }
 
