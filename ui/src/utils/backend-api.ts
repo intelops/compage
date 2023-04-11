@@ -9,7 +9,7 @@ export const sanitizeString = (input: string) => {
 };
 
 export const K8sOperationsBackendApi = () => {
-    const path = "/k8s_operations";
+    const path = "/k8s";
     return axios.create({
         baseURL: config.backend_base_url + path,
         headers: getHeaders()
@@ -25,7 +25,7 @@ export const AuthBackendApi = () => {
 };
 
 export const CodeOperationsBackendApi = () => {
-    const path = "/code_operations";
+    const path = "/code";
     return axios.create({
         baseURL: config.backend_base_url + path,
         headers: getHeaders()
@@ -33,7 +33,7 @@ export const CodeOperationsBackendApi = () => {
 };
 
 export const OpenApiYamlOperationsBackendApi = () => {
-    const path = "/open_api_yaml_operations";
+    const path = "/openapi";
     return axios.create({
         baseURL: config.backend_base_url + path,
         headers: getHeaders()

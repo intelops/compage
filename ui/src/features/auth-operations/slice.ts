@@ -33,8 +33,8 @@ export const authSlice = createSlice({
     },
 });
 
-export const selectAuthData = (state: RootState) => state.auth.data;
-export const selectAuthError = (state: RootState) => state.auth.error;
-export const selectAuthStatus = (state: RootState) => state.auth.status;
+export const selectAuthData = (state: RootState) => state.authOperations.data;
+export const selectAuthError = (state: RootState) => state.authOperations.error;
+export const selectAuthStatus = (state: RootState) => state.authOperations.status;
 
 export default authSlice.reducer;

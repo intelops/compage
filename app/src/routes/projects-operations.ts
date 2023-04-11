@@ -13,10 +13,10 @@ import {
 import {commitCompageJson, createRepository, pullCompageJson} from '../util/github-client';
 import Logger from '../util/logger';
 
-const projectsRouter = Router();
+const projectsOperationsRouter = Router();
 
 // delete project by id for given user
-projectsRouter.delete('/:id', requireUserNameMiddleware, async (request: Request, response: Response) => {
+projectsOperationsRouter.delete('/:id', requireUserNameMiddleware, async (request: Request, response: Response) => {
     const userName = request.header(X_USER_NAME_HEADER);
     const projectId = request.params.id;
     const isDeleted = await deleteProject(userName as string, projectId);
@@ -31,7 +31,7 @@ projectsRouter.delete('/:id', requireUserNameMiddleware, async (request: Request
 });
 
 // get project by id for given user
-projectsRouter.get('/:id', requireUserNameMiddleware, async (request: Request, response: Response) => {
+projectsOperationsRouter.get('/:id', requireUserNameMiddleware, async (request: Request, response: Response) => {
     const userName = request.header(X_USER_NAME_HEADER);
     const projectId = request.params.id;
     const projectEntity: ProjectEntity = await getProject(userName as string, projectId);
@@ -43,13 +43,13 @@ projectsRouter.get('/:id', requireUserNameMiddleware, async (request: Request, r
 });
 
 // list all projects for given user
-projectsRouter.get('/', requireUserNameMiddleware, async (request: Request, response: Response) => {
+projectsOperationsRouter.get('/', requireUserNameMiddleware, async (request: Request, response: Response) => {
     const userName = request.header(X_USER_NAME_HEADER);
     return response.status(200).json(await listProjects(userName as string));
 });
 
 // create project with details given in request
-projectsRouter.post('/', requireUserNameMiddleware, async (request: Request, response: Response) => {
+projectsOperationsRouter.post('/', requireUserNameMiddleware, async (request: Request, response: Response) => {
     const userName = request.header(X_USER_NAME_HEADER);
     const projectEntity: ProjectEntity = request.body;
     const savedProjectEntity: ProjectEntity = await createProject(userName as string, projectEntity);
@@ -63,7 +63,7 @@ projectsRouter.post('/', requireUserNameMiddleware, async (request: Request, res
 });
 
 // update project with details given in request
-projectsRouter.put('/:id', requireUserNameMiddleware, async (request: Request, response: Response) => {
+projectsOperationsRouter.put('/:id', requireUserNameMiddleware, async (request: Request, response: Response) => {
     const userName = request.header(X_USER_NAME_HEADER);
     const projectId = request.params.id;
     const projectEntity: ProjectEntity = request.body;
@@ -222,4 +222,4 @@ const getDeleteProjectError = (message: string) => {
     return deleteProjectError;
 };
 
-export default projectsRouter;
+export default projectsOperationsRouter;

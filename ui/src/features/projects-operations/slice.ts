@@ -63,7 +63,7 @@ const initialState: ProjectState = {
 };
 
 export const projectsSlice = createSlice({
-    name: 'projects',
+    name: 'projectsOperations',
     initialState,
     reducers: {},
     extraReducers: (builder) => {
@@ -124,24 +124,24 @@ export const projectsSlice = createSlice({
     },
 });
 
-export const selectCreateProjectData = (state: RootState) => state.projects.createProject.data;
-export const selectCreateProjectError = (state: RootState) => state.projects.createProject.error;
-export const selectCreateProjectStatus = (state: RootState) => state.projects.createProject.status;
+export const selectCreateProjectData = (state: RootState) => state.projectsOperations.createProject.data;
+export const selectCreateProjectError = (state: RootState) => state.projectsOperations.createProject.error;
+export const selectCreateProjectStatus = (state: RootState) => state.projectsOperations.createProject.status;
 
-export const selectListProjectsData = (state: RootState) => state.projects.listProjects.data;
-export const selectListProjectsError = (state: RootState) => state.projects.listProjects.error;
-export const selectListProjectsStatus = (state: RootState) => state.projects.listProjects.status;
+export const selectListProjectsData = (state: RootState) => state.projectsOperations.listProjects.data;
+export const selectListProjectsError = (state: RootState) => state.projectsOperations.listProjects.error;
+export const selectListProjectsStatus = (state: RootState) => state.projectsOperations.listProjects.status;
 
-export const selectGetProjectData = (state: RootState) => state.projects.getProject.data;
-export const selectGetProjectError = (state: RootState) => state.projects.getProject.error;
-export const selectGetProjectStatus = (state: RootState) => state.projects.getProject.status;
+export const selectGetProjectData = (state: RootState) => state.projectsOperations.getProject.data;
+export const selectGetProjectError = (state: RootState) => state.projectsOperations.getProject.error;
+export const selectGetProjectStatus = (state: RootState) => state.projectsOperations.getProject.status;
 
-export const selectExistsProjectData = (state: RootState) => state.projects.existsProject.data;
-export const selectExistsProjectError = (state: RootState) => state.projects.existsProject.error;
-export const selectExistsProjectStatus = (state: RootState) => state.projects.existsProject.status;
+export const selectExistsProjectData = (state: RootState) => state.projectsOperations.existsProject.data;
+export const selectExistsProjectError = (state: RootState) => state.projectsOperations.existsProject.error;
+export const selectExistsProjectStatus = (state: RootState) => state.projectsOperations.existsProject.status;
 
-export const selectUpdateProjectData = (state: RootState) => state.projects.updateProject.data;
-export const selectUpdateProjectError = (state: RootState) => state.projects.updateProject.error;
-export const selectUpdateProjectStatus = (state: RootState) => state.projects.updateProject.status;
+export const selectUpdateProjectData = (state: RootState) => state.projectsOperations.updateProject.data;
+export const selectUpdateProjectError = (state: RootState) => state.projectsOperations.updateProject.error;
+export const selectUpdateProjectStatus = (state: RootState) => state.projectsOperations.updateProject.status;
 
 export default projectsSlice.reducer;

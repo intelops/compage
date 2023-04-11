@@ -6,7 +6,7 @@ import {getCurrentContext} from "../api";
 export const getCurrentContextAsync = createAsyncThunk<GetCurrentContextResponse, GetCurrentContextRequest, {
     rejectValue: GetCurrentContextError
 }>(
-    'k8s-operations/getCurrentContext',
+    'k8s/getCurrentContext',
     async (getCurrentContextRequest: GetCurrentContextRequest, thunkApi) => {
         return getCurrentContext().then(response => {
             // Check if status is not okay:

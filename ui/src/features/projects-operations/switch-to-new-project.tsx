@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectCreateProjectStatus, selectListProjectsData} from './slice';
 import Button from "@mui/material/Button";
 import {CreateProjectRequest, Repository, User} from "./model";
-import {selectAuthData} from "../auth/slice";
+import {selectAuthData} from "../auth-operations/slice";
 import {Navigate} from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import {Stack} from "@mui/material";

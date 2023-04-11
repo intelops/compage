@@ -9,13 +9,13 @@ import {
 } from "../../utils/localstorage-client";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {DiagramMakerContainer} from "../diagram-maker/diagram-maker-container";
-import {selectAuthData} from "../../features/auth/slice";
-import {SwitchProject} from "../../features/projects/switch-project";
+import {selectAuthData} from "../../features/auth-operations/slice";
+import {SwitchProject} from "../../features/projects-operations/switch-project";
 import {getCurrentUserName} from "../../utils/sessionstorage-client";
-import {GetProjectRequest} from "../../features/projects/model";
-import {existsProjectAsync} from "../../features/projects/async-apis/existsProject";
-import {getCurrentContextAsync} from "../../features/k8s-operations/async-apis/getCurrentContext";
+import {GetProjectRequest} from "../../features/projects-operations/model";
+import {existsProjectAsync} from "../../features/projects-operations/async-apis/existsProject";
 import {GetCurrentContextRequest} from "../../features/k8s-operations/model";
+import {getCurrentContextAsync} from "../../features/k8s-operations/async-apis/getCurrentContext";
 
 const isSameUser = () => {
     const currentProjectDetails = getCurrentProjectDetails();

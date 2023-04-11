@@ -2,7 +2,7 @@ import {useNavigate} from "react-router-dom";
 import React, {useState} from "react";
 import {Grid} from "@mui/material";
 import {GenerateCode} from "../../features/code-operations/component";
-import {SwitchProject} from "../../features/projects/switch-project";
+import {SwitchProject} from "../../features/projects-operations/switch-project";
 import Button from "@mui/material/Button";
 
 // const resetState = () => {

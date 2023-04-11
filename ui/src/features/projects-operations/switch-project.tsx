@@ -2,7 +2,7 @@ import React, {ChangeEvent, useState} from 'react';
 
 import {useAppSelector} from '../../redux/hooks';
 import Button from "@mui/material/Button";
-import {selectAuthData} from "../auth/slice";
+import {selectAuthData} from "../auth-operations/slice";
 import {Navigate, useNavigate} from "react-router-dom";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";

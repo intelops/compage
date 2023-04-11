@@ -5,7 +5,7 @@ import {selectGenerateCodeStatus} from './slice';
 import Button from "@mui/material/Button";
 import {generateCodeAsync} from "./async-apis/generateCode";
 import {getCurrentProjectDetails, getCurrentState} from "../../utils/localstorage-client";
-import {selectGetProjectData, selectUpdateProjectData} from "../projects/slice";
+import {selectGetProjectData, selectUpdateProjectData} from "../projects-operations/slice";
 import {removeUnwantedKeys} from "../../components/diagram-maker/helper/helper";
 import * as _ from "lodash";
 import {RestClientConfig, RestServerConfig} from "../../components/diagram-maker/models";

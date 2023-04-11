@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.scss';
 import {BrowserRouter, Link, Route, Routes} from "react-router-dom";
-import {Login} from "../../features/auth/component";
+import {Login} from "../../features/auth-operations/component";
 import {Home} from "../home/home";
 import Header from "../navbar/header";
 import {Account} from "../account/account";
@@ -14,7 +14,7 @@ import {
     selectGetProjectStatus,
     selectListProjectsStatus,
     selectUpdateProjectStatus
-} from "../../features/projects/slice";
+} from "../../features/projects-operations/slice";
 import {selectGenerateCodeStatus} from "../../features/code-operations/slice";
 import {selectUploadYamlStatus} from "../../features/open-api-yaml-operations/slice";
 import {selectGetCurrentContextStatus} from "../../features/k8s-operations/slice";

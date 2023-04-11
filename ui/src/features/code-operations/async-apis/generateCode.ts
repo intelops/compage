@@ -2,13 +2,13 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {GenerateCodeError, GenerateCodeRequest, GenerateCodeResponse} from "../model";
 import {generateCode} from "../api";
 import {toastr} from 'react-redux-toastr';
-import {GetProjectRequest, GetProjectResponse} from "../../projects/model";
-import {getProject} from "../../projects/api";
+import {GetProjectRequest, GetProjectResponse} from "../../projects-operations/model";
+import {getProject} from "../../projects-operations/api";
 import {setCurrentConfig, setCurrentProjectDetails, setCurrentState} from "../../../utils/localstorage-client";
-import {updateModifiedState} from "../../projects/populateModifiedState";
+import {updateModifiedState} from "../../projects-operations/populateModifiedState";
 
 export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, GenerateCodeRequest, { rejectValue: GenerateCodeError }>(
-    'code-operations/generateCode',
+    'code/generateCode',
     async (generateCodeRequest: GenerateCodeRequest, thunkApi) => {
         const retrieveProjectToUpdateState = (request: GenerateCodeRequest) => {
             const getProjectRequest: GetProjectRequest = {

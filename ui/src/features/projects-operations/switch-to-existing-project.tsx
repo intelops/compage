@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectGetProjectStatus, selectListProjectsData, selectListProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
 import {GetProjectRequest, ListProjectsRequest, ListProjectsResponse} from "./model";
-import {selectAuthData} from "../auth/slice";
+import {selectAuthData} from "../auth-operations/slice";
 import {Navigate} from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";

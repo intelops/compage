@@ -34,7 +34,7 @@ import {
 import {AddOrUpdateRestResource} from "./add-or-update-rest-resource";
 import {useAppSelector} from "../../../redux/hooks";
 import {selectUploadYamlData, selectUploadYamlStatus} from "../../../features/open-api-yaml-operations/slice";
-import {updateModifiedState} from "../../../features/projects/populateModifiedState";
+import {updateModifiedState} from "../../../features/projects-operations/populateModifiedState";
 import {sanitizeString} from "../../../utils/backend-api";
 import {UploadYaml} from "../../../features/open-api-yaml-operations/component";
 import {

@@ -21,7 +21,7 @@ const codeOperationsRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
 
 // generateCode (grpc calls to core)
-codeOperationsRouter.post('/generate_code', requireUserNameMiddleware, async (request, resource) => {
+codeOperationsRouter.post('/generate', requireUserNameMiddleware, async (request, resource) => {
     // TODO the below || op is not required, as the check is already done in middleware.
     const userName = request.header(X_USER_NAME_HEADER) || '';
     const generateCodeRequest: GenerateCodeRequest = request.body;
@@ -205,7 +205,7 @@ codeOperationsRouter.post('/generate_code', requireUserNameMiddleware, async (re
 });
 
 // updateProject (grpc calls to core)
-codeOperationsRouter.post('/re_generate_code', requireUserNameMiddleware, async (req, res) => {
+codeOperationsRouter.post('/regenerate', requireUserNameMiddleware, async (req, res) => {
     const {repositoryName, json, projectName, userName} = req.body;
     try {
         const payload = {

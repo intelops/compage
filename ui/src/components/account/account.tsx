@@ -9,12 +9,14 @@ import Typography from '@mui/material/Typography';
 import {red} from '@mui/material/colors';
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {Navigate} from "react-router-dom";
-import {selectAuthData} from "../../features/auth/slice";
-import {selectListProjectsData} from "../../features/projects/slice";
-import {ListProjectsRequest} from "../../features/projects/model";
-import {listProjectsAsync} from "../../features/projects/async-apis/listProjects";
+import {selectAuthData} from "../../features/auth-operations/slice";
+import {selectListProjectsData} from "../../features/projects-operations/slice";
+import {ListProjectsRequest} from "../../features/projects-operations/model";
+import {listProjectsAsync} from "../../features/projects-operations/async-apis/listProjects";
 import Box from '@mui/material/Box';
 import {Stack} from "@mui/material";
+import {GetCurrentContextRequest} from "../../features/k8s-operations/model";
+import {getCurrentContextAsync} from "../../features/k8s-operations/async-apis/getCurrentContext";
 
 export const Account = () => {
     const authData = useAppSelector(selectAuthData);
@@ -37,6 +39,8 @@ export const Account = () => {
         // dispatch listProjects
         const listProjectsRequest: ListProjectsRequest = {};
         dispatch(listProjectsAsync(listProjectsRequest));
+        const getCurrentProjectContext: GetCurrentContextRequest = {};
+        dispatch(getCurrentContextAsync(getCurrentProjectContext));
     }, [dispatch]);
 
     if (!authData.login) {

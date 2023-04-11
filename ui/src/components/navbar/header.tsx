@@ -11,7 +11,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Logo from "../../logo.png";
 import {useAppSelector} from "../../redux/hooks";
 import {Link, useNavigate} from "react-router-dom";
-import {selectAuthData} from "../../features/auth/slice";
+import {selectAuthData} from "../../features/auth-operations/slice";
 import {getCurrentProjectDetails} from "../../utils/localstorage-client";
 import {selectGetCurrentContextData} from "../../features/k8s-operations/slice";
 

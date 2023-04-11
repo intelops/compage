@@ -3,12 +3,12 @@ import 'dotenv/config';
 import bodyParser from 'body-parser';
 import helmet from 'helmet';
 import codeOperationsRouter from './routes/code-operations';
-import authRouter from './routes/auth';
+import authOperationsRouter from './routes/auth-operations';
 import config from './util/constants';
-import projectsRouter from './routes/projects';
+import projectsOperationsRouter from './routes/projects-operations';
 import {checkIfCrdsInstalled, checkIfSystemNamespaceExists, initializeKubeClient} from './store/kube-client';
 import '@kubernetes/client-node';
-import openApiYamlRouter from './routes/open-api-yaml';
+import openApiYamlOperationsRouter from './routes/open-api-yaml-operations';
 import Logger from './util/logger';
 import morganMiddleware from './util/morganMiddleware';
 import k8sOperationsRouter from './routes/k8s-operations';
@@ -45,11 +45,11 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 const routes = Router();
-routes.use('/k8s_operations', k8sOperationsRouter);
-routes.use('/projects', projectsRouter);
-routes.use('/code_operations', codeOperationsRouter);
-routes.use('/auth', authRouter);
-routes.use('/open_api_yaml_operations', openApiYamlRouter);
+routes.use('/k8s', k8sOperationsRouter);
+routes.use('/projects', projectsOperationsRouter);
+routes.use('/code', codeOperationsRouter);
+routes.use('/auth', authOperationsRouter);
+routes.use('/openapi', openApiYamlOperationsRouter);
 app.use(routes);
 
 app.get('*', (req, res) => {

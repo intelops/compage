@@ -7,13 +7,13 @@ import {requireUserNameMiddleware} from '../middlewares/auth';
 import {LoginError} from './models';
 import Logger from '../util/logger';
 
-const authRouter = Router();
+const authOperationsRouter = Router();
 
 const getBasicAuthenticationPair = () => {
     return btoa(config.client_id + ':' + config.client_secret);
 };
 
-authRouter.post('/authenticate', async (req, res) => {
+authOperationsRouter.post('/login', async (req, res) => {
     const {code} = req.body;
     // Request to exchange code for an access token
     axios({
@@ -50,7 +50,7 @@ authRouter.post('/authenticate', async (req, res) => {
     });
 });
 
-authRouter.get('/logout', requireUserNameMiddleware, async (req, res) => {
+authOperationsRouter.get('/logout', requireUserNameMiddleware, async (req, res) => {
     const {userName} = req.query;
     const bearerToken = `${getBasicAuthenticationPair()}`;
     const accessToken = await getToken(userName as string);
@@ -74,7 +74,7 @@ authRouter.get('/logout', requireUserNameMiddleware, async (req, res) => {
     });
 });
 
-authRouter.get('/check_token', requireUserNameMiddleware, async (req, res) => {
+authOperationsRouter.get('/check_token', requireUserNameMiddleware, async (req, res) => {
     const {userName} = req.query;
     axios({
         headers: {
@@ -96,7 +96,7 @@ authRouter.get('/check_token', requireUserNameMiddleware, async (req, res) => {
     });
 });
 
-export default authRouter;
+export default authOperationsRouter;
 
 const getLoginError = (error: string): LoginError => {
     return {message: error};

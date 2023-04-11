@@ -7,10 +7,10 @@ import {ProjectEntity, UploadYamlError, UploadYamlRequest, UploadYamlResponse} f
 import {getProject} from '../util/project-client';
 import Logger from '../util/logger';
 
-const openApiYamlRouter = Router();
+const openApiYamlOperationsRouter = Router();
 
 // uploads openApiYaml file
-openApiYamlRouter.post('/upload', requireUserNameMiddleware, multer.single('file'), async (request: Request, response: Response) => {
+openApiYamlOperationsRouter.post('/upload', requireUserNameMiddleware, multer.single('file'), async (request: Request, response: Response) => {
     const userName = request.header(X_USER_NAME_HEADER);
     const uploadYamlRequest: UploadYamlRequest = request.body;
     const projectEntity: ProjectEntity = await getProject(userName as string, uploadYamlRequest.projectId);
@@ -57,4 +57,4 @@ const getUploadYamlResponse = (projectId: string, nodeId: string, content: strin
     return uploadYamlResponse;
 };
 
-export default openApiYamlRouter;
+export default openApiYamlOperationsRouter;

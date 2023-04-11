@@ -8,8 +8,8 @@ import {FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE} from "reduxjs-toolkit
 import {reducer as toastrReducer} from 'react-redux-toastr';
 import {Action, Reducer} from "redux";
 import codeOperationsReducer from "../features/code-operations/slice";
-import projectsReducer from "../features/projects/slice";
-import authReducer from "../features/auth/slice";
+import projectsReducer from "../features/projects-operations/slice";
+import authReducer from "../features/auth-operations/slice";
 import {unauthenticatedMiddleware} from "./unauthenticatedMiddleware";
 import {RESET_STATE_ACTION_TYPE} from "./reset-state-action";
 import openApiYamlOperationsReducer from "../features/open-api-yaml-operations/slice";
@@ -30,8 +30,8 @@ const persistedRootReducer = combineReducers({
     k8sOperations: persistReducer(rootPersistConfig, k8sOperationsReducer),
     openApiYamlOperations: persistReducer(rootPersistConfig, openApiYamlOperationsReducer),
     codeOperations: persistReducer(rootPersistConfig, codeOperationsReducer),
-    projects: persistReducer(rootPersistConfig, projectsReducer),
-    auth: persistReducer(authenticationPersistConfig, authReducer),
+    projectsOperations: persistReducer(rootPersistConfig, projectsReducer),
+    authOperations: persistReducer(authenticationPersistConfig, authReducer),
     toastr: toastrReducer,
 });
 
