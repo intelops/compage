@@ -3,10 +3,20 @@ package test
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"reflect"
+	"runtime"
 	"testing"
 	"time"
 
 	"github.com/intelops/compage/core/internal/utils"
+)
+
+var (
+	_, b, _, _ = runtime.Caller(0)
+
+	// root folder of this project
+	root = filepath.Join(filepath.Dir(b), "../..")
 )
 
 func TestGetProjectRootPath(t *testing.T) {
@@ -17,15 +27,15 @@ func TestGetProjectRootPath(t *testing.T) {
 	testcases := []TestCases{
 		{
 			name:   "test",
-			result: "/home/dell/Desktop/intelops/compage/core/test",
+			result: root + "/core/test",
 		},
 		{
 			name:   "",
-			result: "/home/dell/Desktop/intelops/compage/core/",
+			result: root + "/core/",
 		},
 		{
 			name:   "main",
-			result: "/home/dell/Desktop/intelops/compage/core/main",
+			result: root + "/core/main",
 		},
 	}
 	for _, testcase := range testcases {
@@ -122,6 +132,242 @@ func TestCreateDirectories(t *testing.T) {
 	}
 }
 
+func TestCopyFiles(t *testing.T) {
+	type args struct {
+		destDirectory string
+		srcDirectory  string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			name: fmt.Sprintf("Testing the copy files from %v ", "api/v1"),
+			args: args{
+				destDirectory: "./copy",
+				srcDirectory:  "../api/v1/",
+			},
+			wantErr: false,
+		},
+		{
+			name: fmt.Sprintf("Testing the copy files from %v ", "api/v1"),
+			args: args{
+				destDirectory: "../../testcopy",
+				srcDirectory:  "../api/v1/",
+			},
+			wantErr: false,
+		},
+		{
+			// Negative case
+			name: fmt.Sprintf("Throws an error as the folder is %v ", "Empty"),
+			args: args{
+				destDirectory: "",
+				srcDirectory:  "",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := utils.CopyFiles(tt.args.destDirectory, tt.args.srcDirectory); (err != nil) != tt.wantErr {
+				t.Errorf("CopyFiles() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			// Added a sleep before
+			time.Sleep(5 * time.Second)
+			os.RemoveAll(tt.args.destDirectory)
+		})
+	}
+}
+
+func TestCopyFilesAndDirs(t *testing.T) {
+	type args struct {
+		destDirectory string
+		srcDirectory  string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			name: fmt.Sprintf("Testing the copy files from %v ", "api/v1"),
+			args: args{
+				destDirectory: "./copy",
+				srcDirectory:  "../api/",
+			},
+			wantErr: false,
+		},
+		{
+			name: fmt.Sprintf("Testing the copy files from %v ", "api/v1"),
+			args: args{
+				destDirectory: "../testcopy",
+				srcDirectory:  "../api/",
+			},
+			wantErr: false,
+		},
+		{
+			// Negative case
+			name: fmt.Sprintf("Throws an error as the folder is %v ", "Empty"),
+			args: args{
+				destDirectory: "",
+				srcDirectory:  "",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := utils.CopyFilesAndDirs(tt.args.destDirectory, tt.args.srcDirectory); (err != nil) != tt.wantErr {
+				t.Errorf("CopyFilesAndDirs() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			// Added a sleep before
+			if tt.args.destDirectory != "" || tt.args.srcDirectory != "" {
+				time.Sleep(5 * time.Second)
+				os.RemoveAll(tt.args.destDirectory)
+			}
+		})
+	}
+}
+
+func TestCopyAllInSrcDirToDestDir(t *testing.T) {
+	type args struct {
+		destDirectory string
+		srcDirectory  string
+		copyNestedDir bool
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			name: fmt.Sprintf("Testing the copy files from %v ", "root/internal"),
+			args: args{
+				destDirectory: "./copy",
+				srcDirectory:  "../internal/",
+				copyNestedDir: true,
+			},
+			wantErr: false,
+		},
+		{
+			name: fmt.Sprintf("Testing the copy files from %v ", "rootpath"),
+			args: args{
+				destDirectory: "../testcopy",
+				srcDirectory:  "../",
+				copyNestedDir: false,
+			},
+			wantErr: false,
+		},
+		{
+			// Negative case
+			name: fmt.Sprintf("Throws an error as the folder is %v ", "Empty"),
+			args: args{
+				destDirectory: "",
+				srcDirectory:  "",
+				copyNestedDir: false,
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := utils.CopyAllInSrcDirToDestDir(tt.args.destDirectory, tt.args.srcDirectory, tt.args.copyNestedDir); (err != nil) != tt.wantErr {
+				t.Errorf("CopyAllInSrcDirToDestDir() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.args.destDirectory != "" || tt.args.srcDirectory != "" {
+				time.Sleep(5 * time.Second)
+				os.RemoveAll(tt.args.destDirectory)
+			}
+		})
+	}
+}
+
+func TestCopyFile(t *testing.T) {
+	// Function helps to convert file to no of bytes
+	countBytes := func(path string) int64 {
+
+		info, err := os.Stat(path)
+		if err != nil {
+			return -1
+		}
+		return int64(info.Size())
+	}
+	type args struct {
+		destFilePath string
+		srcFilePath  string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    int64
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			name: fmt.Sprintf("Testing the copy file from %v ", "api/v1"),
+			args: args{
+				destFilePath: "./project.proto",
+				srcFilePath:  "../api/v1/project.proto",
+			},
+			want:    countBytes("../api/v1/project.proto"),
+			wantErr: false,
+		},
+		{
+			name: fmt.Sprintf("Testing the copy file from %v ", "api/v1"),
+			args: args{
+				destFilePath: "../project.proto",
+				srcFilePath:  "../api/v1/project.proto",
+			},
+			want:    countBytes("../api/v1/project.proto"),
+			wantErr: false,
+		},
+		{
+			// Negative case
+			name: fmt.Sprintf("Throws an error as the folder is %v ", "Empty"),
+			args: args{
+				destFilePath: "",
+				srcFilePath:  "",
+			},
+			want:    0,
+			wantErr: true,
+		},
+		{
+			// Negative case
+			name: fmt.Sprintf("Throws an error as the folder is %v ", "Empty"),
+			args: args{
+				destFilePath: "./copy.txt",
+				srcFilePath:  "",
+			},
+			want:    0,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := utils.CopyFile(tt.args.destFilePath, tt.args.srcFilePath)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CopyFile() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("CopyFile() = %v, want %v", got, tt.want)
+			}
+			if tt.want == -1 {
+				t.Errorf("Error occurred while reading file %v", tt.args.srcFilePath)
+			}
+			if tt.args.destFilePath != "" || tt.args.srcFilePath != "" {
+				time.Sleep(5 * time.Second)
+				os.RemoveAll(tt.args.destFilePath)
+			}
+		})
+
+	}
+}
+
 func TestIgnorablePaths(t *testing.T) {
 	type args struct {
 		path string
@@ -165,6 +411,38 @@ func TestIgnorablePaths(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := utils.IgnorablePaths(tt.args.path); got != tt.want {
 				t.Errorf("IgnorablePaths() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+
+func TestGetDirectoriesAndFilePaths(t *testing.T) {
+
+	type args struct {
+		templatesPath string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []string
+		want1   []string
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1, err := utils.GetDirectoriesAndFilePaths(tt.args.templatesPath)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetDirectoriesAndFilePaths() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetDirectoriesAndFilePaths() got = %v, want %v", got, tt.want)
+			}
+			if !reflect.DeepEqual(got1, tt.want1) {
+				t.Errorf("GetDirectoriesAndFilePaths() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}
