@@ -471,7 +471,6 @@ func TestGetDirectoriesAndFilePaths(t *testing.T) {
 				strArr: dir,
 				strArr1: fp,
 		})
-		fmt.Println(testCases)
 	}
 
 	// fmt.Println(s1, s2)
