@@ -418,10 +418,63 @@ func TestIgnorablePaths(t *testing.T) {
 
 
 func TestGetDirectoriesAndFilePaths(t *testing.T) {
+	contains := func(filePaths []string, filePathName string) bool {
+		for _, f := range filePaths {
+			if f == filePathName {
+				return true
+			}
+		}
+		return false
+	}
+	getDirectoriesAndFilePaths := func (templatesPath string) ([]string, []string, error)  {
+	var directories []string
+	var filePaths []string
 
+	// Get all directories on /templates and check if there's repeated files
+	err := filepath.Walk(templatesPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			// Is file
+			filename := info.Name()
+			hasRepeatedFilePaths := contains(filePaths, path)
+			if hasRepeatedFilePaths {
+				return fmt.Errorf("you can't have repeated template files: %s", filename)
+			}
+			filePaths = append(filePaths, path)
+		} else {
+			// Is directory
+			directories = append(directories, path)
+		}
+
+		return nil
+	})
+	return directories, filePaths, err
+	}
 	type args struct {
 		templatesPath string
 	}
+	type arr struct{
+		strArr []string
+		strArr1 []string
+	}
+	paths := []string{
+		"../test",
+		"../api/v1",
+		"",
+	}
+	var testCases []arr;
+	for _, path := range paths{
+		dir, fp , _ := getDirectoriesAndFilePaths(path)
+		testCases = append(testCases, arr{
+				strArr: dir,
+				strArr1: fp,
+		})
+		fmt.Println(testCases)
+	}
+
+	// fmt.Println(s1, s2)
 	tests := []struct {
 		name    string
 		args    args
@@ -430,6 +483,33 @@ func TestGetDirectoriesAndFilePaths(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
+		{
+			name: fmt.Sprintf("Checks the folder is %v ", paths[0]),
+			args: args{
+				templatesPath: paths[0],
+			},
+			want: testCases[0].strArr,
+			want1: testCases[0].strArr1,
+			wantErr: false,
+		},
+		{
+			name: fmt.Sprintf("Throws an error as the folder is %v ", paths[1]),
+			args: args{
+				templatesPath: paths[1],
+			},
+			want: testCases[1].strArr,
+			want1: testCases[1].strArr1,
+			wantErr: false,
+		},
+		{
+			name: fmt.Sprintf("Throws an error as the folder is %v ", paths[2]),
+			args: args{
+				templatesPath: paths[2],
+			},
+			want: testCases[2].strArr,
+			want1: testCases[2].strArr1,
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
