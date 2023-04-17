@@ -7,7 +7,6 @@ import (
 	"reflect"
 	"runtime"
 	"testing"
-	"time"
 
 	"github.com/intelops/compage/core/internal/utils"
 )
@@ -126,7 +125,7 @@ func TestCreateDirectories(t *testing.T) {
 			if err := utils.CreateDirectories(tt.args.dirName); (err != nil) != tt.wantErr {
 				t.Errorf("CreateDirectories() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			time.Sleep(5 * time.Second)
+			//time.Sleep(5 * time.Second)
 			os.Remove(tt.args.dirName)
 		})
 	}
@@ -175,7 +174,7 @@ func TestCopyFiles(t *testing.T) {
 				t.Errorf("CopyFiles() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			// Added a sleep before
-			time.Sleep(5 * time.Second)
+			//time.Sleep(5 * time.Second)
 			os.RemoveAll(tt.args.destDirectory)
 		})
 	}
@@ -225,7 +224,7 @@ func TestCopyFilesAndDirs(t *testing.T) {
 			}
 			// Added a sleep before
 			if tt.args.destDirectory != "" || tt.args.srcDirectory != "" {
-				time.Sleep(5 * time.Second)
+				//time.Sleep(5 * time.Second)
 				os.RemoveAll(tt.args.destDirectory)
 			}
 		})
@@ -279,7 +278,7 @@ func TestCopyAllInSrcDirToDestDir(t *testing.T) {
 				t.Errorf("CopyAllInSrcDirToDestDir() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if tt.args.destDirectory != "" || tt.args.srcDirectory != "" {
-				time.Sleep(5 * time.Second)
+				//time.Sleep(5 * time.Second)
 				os.RemoveAll(tt.args.destDirectory)
 			}
 		})
@@ -360,7 +359,7 @@ func TestCopyFile(t *testing.T) {
 				t.Errorf("Error occurred while reading file %v", tt.args.srcFilePath)
 			}
 			if tt.args.destFilePath != "" || tt.args.srcFilePath != "" {
-				time.Sleep(5 * time.Second)
+				//time.Sleep(5 * time.Second)
 				os.RemoveAll(tt.args.destFilePath)
 			}
 		})
