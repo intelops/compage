@@ -7,5 +7,5 @@
 /app/scratch/
 /core/core
 /.idea
-mm.yaml
 /core/openapitools.json
+/core/coverage.out
