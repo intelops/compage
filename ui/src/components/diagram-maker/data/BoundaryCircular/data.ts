@@ -1,3 +1,4 @@
+/* tslint:disable:no-empty */
 import {DiagramMakerData, EditorMode, PositionAnchor} from 'diagram-maker';
 
 export const getData = (parentWidth, parentHeight, currentConfig: string) => {
