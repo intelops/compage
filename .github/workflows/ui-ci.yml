@@ -1,0 +1,39 @@
+name: ui-ci
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: '**/ui/package-lock.json'
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          **/ui/node_modules
+        key: ${{ runner.os }}-${{ hashFiles('**/ui/package-lock.json') }}
+    - name: Install dependencies
+      run: |
+        cd ui
+        npm install
+        cd ..
+    - name: Run linting checks
+      run: |
+        cd app
+        npm run lint
+        cd ..
