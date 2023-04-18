@@ -1,3 +1,4 @@
+/* tslint:disable:no-string-literal */
 import React, {ChangeEvent} from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";

@@ -34,6 +34,6 @@ jobs:
         cd ..
     - name: Run linting checks
       run: |
-        cd app
+        cd ui
         npm run lint
         cd ..
