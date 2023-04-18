@@ -4,13 +4,13 @@ run:
 linters:
   disable-all:  true
   enable:
-    - deadcode
+#    - deadcode
     - gosimple
     - govet
     - ineffassign
     - misspell
-#    - unused
-    - varcheck
+    - unused
+#    - varcheck
     - staticcheck
     - errcheck
     # - goimports

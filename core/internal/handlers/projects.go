@@ -25,12 +25,12 @@ func Handle(coreProject *core.Project) error {
 	}
 
 	// Iterate over all nodes and generate code for all nodes.
-	compageJson := coreProject.CompageJson
-	for _, compageNode := range compageJson.Nodes {
+	compageJSON := coreProject.CompageJSON
+	for _, compageNode := range compageJSON.Nodes {
 		log.Debugf("processing node ID : %s ", compageNode.ID)
 
 		// convert node to languageNode
-		languageNode, err := languages.NewLanguageNode(compageJson, compageNode)
+		languageNode, err := languages.NewLanguageNode(compageJSON, compageNode)
 		if err != nil {
 			// return errors like certain protocols aren't yet supported
 			log.Debugf("err : %s", err)
@@ -41,7 +41,7 @@ func Handle(coreProject *core.Project) error {
 		languageCtx := languages.AddValuesToContext(context.Background(), coreProject, languageNode)
 
 		// extract nodeDirectoryName for formatter
-		values := languageCtx.Value(languages.LanguageContextVars).(languages.Values)
+		values := languageCtx.Value(languages.ContextKeyLanguageContextVars).(languages.Values)
 		nodeDirectoryName := values.NodeDirectoryName
 
 		// create node directory in projectDirectory depicting a subproject

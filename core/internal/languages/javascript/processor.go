@@ -6,7 +6,7 @@ import (
 )
 
 func Process(ctx context.Context) error {
-	javascriptValues := ctx.Value(ContextVars).(Values)
+	javascriptValues := ctx.Value(contextKeyJavaScriptContextVars).(Values)
 
 	// fills default config for javascript
 	if err := javascriptValues.JavaScriptNode.FillDefaults(); err != nil {

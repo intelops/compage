@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          submodules: recursive
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -31,7 +33,6 @@ jobs:
       - name: Test
         run: |
           cd core
-          go test -v ./... -race -coverprofile=coverage.out -covermode=atomic
           go test -v ./... -race -coverprofile=coverage.out -coverpkg=./... -covermode=atomic
           cd ..
       - name: Upload coverage to Codecov

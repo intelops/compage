@@ -6,7 +6,7 @@ import (
 )
 
 func Process(ctx context.Context) error {
-	rubyValues := ctx.Value(ContextVars).(Values)
+	rubyValues := ctx.Value(contextKeyRubyContextVars).(Values)
 
 	// fills default config for ruby
 	if err := rubyValues.RubyNode.FillDefaults(); err != nil {

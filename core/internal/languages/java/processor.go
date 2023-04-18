@@ -6,7 +6,7 @@ import (
 )
 
 func Process(ctx context.Context) error {
-	javaValues := ctx.Value(ContextVars).(Values)
+	javaValues := ctx.Value(contextKeyJavaContextVars).(Values)
 
 	// fills default config for java
 	if err := javaValues.JavaNode.FillDefaults(); err != nil {

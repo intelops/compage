@@ -5,7 +5,15 @@ import (
 	"github.com/intelops/compage/core/internal/languages"
 )
 
-const GoContextVars = "GoContextVars"
+type contextKey string
+
+func (c contextKey) String() string {
+	return string(c)
+}
+
+var (
+	contextKeyGoContextVars = contextKey("GoContextVars")
+)
 
 type GoValues struct {
 	Values      *languages.Values
@@ -13,7 +21,7 @@ type GoValues struct {
 }
 
 func AddValuesToContext(ctx context.Context) context.Context {
-	values := ctx.Value(languages.LanguageContextVars).(languages.Values)
+	values := ctx.Value(languages.ContextKeyLanguageContextVars).(languages.Values)
 	v := GoValues{
 		Values: &values,
 		LGoLangNode: &LGolangNode{
@@ -21,5 +29,5 @@ func AddValuesToContext(ctx context.Context) context.Context {
 		},
 	}
 
-	return context.WithValue(ctx, GoContextVars, v)
+	return context.WithValue(ctx, contextKeyGoContextVars, v)
 }

@@ -6,7 +6,7 @@ import (
 )
 
 func Process(ctx context.Context) error {
-	pythonValues := ctx.Value(ContextVars).(Values)
+	pythonValues := ctx.Value(contextKeyPythonContextVars).(Values)
 
 	// fills default config for python
 	if err := pythonValues.PythonNode.FillDefaults(); err != nil {

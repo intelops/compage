@@ -6,7 +6,7 @@ import (
 )
 
 func Process(ctx context.Context) error {
-	rustValues := ctx.Value(ContextVars).(Values)
+	rustValues := ctx.Value(contextKeyRustContextVars).(Values)
 
 	// fills default config for rust
 	if err := rustValues.RustNode.FillDefaults(); err != nil {

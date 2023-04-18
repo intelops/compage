@@ -1,4 +1,4 @@
-package go_gin_server
+package goginserver
 
 import (
 	"github.com/gertd/go-pluralize"

@@ -13,29 +13,29 @@ import (
 // Generate generates rust specific code according to config passed
 func Generate(ctx context.Context) error {
 	// extract node
-	rustValues := ctx.Value(ContextVars).(Values)
+	rustValues := ctx.Value(contextKeyRustContextVars).(Values)
 	n := rustValues.RustNode
 	// rest config
 	if n.RestConfig != nil {
 		// check for the templates
-		if n.RestConfig.Server.Template == templates.OpenApi {
+		if n.RestConfig.Server.Template == templates.OpenAPI {
 			// add code to generate with openapi
-			// check if OpenApiFileYamlContent contains value.
-			if len(n.RestConfig.Server.OpenApiFileYamlContent) < 1 {
-				return errors.New("at least rest-config needs to be provided, OpenApiFileYamlContent is empty")
+			// check if OpenAPIFileYamlContent contains value.
+			if len(n.RestConfig.Server.OpenAPIFileYamlContent) < 1 {
+				return errors.New("at least rest-config needs to be provided, OpenAPIFileYamlContent is empty")
 			}
-			if err := languages.ProcessOpenApiTemplate(ctx); err != nil {
+			if err := languages.ProcessOpenAPITemplate(ctx); err != nil {
 				return err
 			}
 		}
 	}
 	// grpc config
 	if n.GrpcConfig != nil {
-		return errors.New(fmt.Sprintf("unsupported protocol %s for language %s", "grpc", n.Language))
+		return fmt.Errorf("unsupported protocol %s for language %s", "grpc", n.Language)
 	}
 	// ws config
 	if n.WsConfig != nil {
-		return errors.New(fmt.Sprintf("unsupported protocol %s for language %s", "ws", n.Language))
+		return fmt.Errorf("unsupported protocol %s for language %s", "ws", n.Language)
 	}
 
 	// k8s files need to be generated for the whole project so, it should be here.

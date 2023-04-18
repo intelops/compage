@@ -13,7 +13,7 @@ var LJavaMicronautServer = "java-micronaut-server"
 var Spring = "spring"
 var LJavaUndertowServer = "java-undertow-server"
 
-var OpenApiSupportedFrameworks = []string{LJavaMicronautServer, Spring, LJavaUndertowServer, LJavaPlayFramework}
+var OpenAPISupportedFrameworks = []string{LJavaMicronautServer, Spring, LJavaUndertowServer, LJavaPlayFramework}
 
 var templatesRootPath = utils.GetProjectRootPath(TemplatesPath)
 

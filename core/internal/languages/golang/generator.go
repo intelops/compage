@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/intelops/compage/core/internal/languages"
-	"github.com/intelops/compage/core/internal/languages/golang/frameworks/go-gin-server"
+	goginserver "github.com/intelops/compage/core/internal/languages/golang/frameworks/go-gin-server"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/docker"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/kubernetes"
 	"github.com/intelops/compage/core/internal/languages/templates"
@@ -15,7 +15,7 @@ import (
 // Generate generates golang specific code according to config passed
 func Generate(ctx context.Context) error {
 	// extract goNode
-	goValues := ctx.Value(GoContextVars).(GoValues)
+	goValues := ctx.Value(contextKeyGoContextVars).(GoValues)
 	n := goValues.LGoLangNode
 	// rest config
 	if n.RestConfig != nil {
@@ -33,30 +33,30 @@ func Generate(ctx context.Context) error {
 					return err
 				}
 			} else {
-				return errors.New(fmt.Sprintf("unsupported framework %s  for template %s for language %s", n.RestConfig.Server.Framework, n.RestConfig.Server.Template, n.Language))
+				return fmt.Errorf("unsupported framework %s  for template %s for language %s", n.RestConfig.Server.Framework, n.RestConfig.Server.Template, n.Language)
 			}
 		} else {
-			if n.RestConfig.Server.Template != templates.OpenApi {
+			if n.RestConfig.Server.Template != templates.OpenAPI {
 				// call openapi generator
-				return errors.New(fmt.Sprintf("unsupported template %s for language %s", n.RestConfig.Server.Template, n.Language))
+				return fmt.Errorf("unsupported template %s for language %s", n.RestConfig.Server.Template, n.Language)
 			}
-			// check if OpenApiFileYamlContent contains value.
-			if len(n.RestConfig.Server.OpenApiFileYamlContent) < 1 {
-				return errors.New("at least rest-config needs to be provided, OpenApiFileYamlContent is empty")
+			// check if OpenAPIFileYamlContent contains value.
+			if len(n.RestConfig.Server.OpenAPIFileYamlContent) < 1 {
+				return errors.New("at least rest-config needs to be provided, OpenAPIFileYamlContent is empty")
 			}
 
-			if err := languages.ProcessOpenApiTemplate(ctx); err != nil {
+			if err := languages.ProcessOpenAPITemplate(ctx); err != nil {
 				return err
 			}
 		}
 	}
 	// grpc config
 	if n.GrpcConfig != nil {
-		return errors.New(fmt.Sprintf("unsupported protocol %s for language %s", "grpc", n.Language))
+		return fmt.Errorf("unsupported protocol %s for language %s", "grpc", n.Language)
 	}
 	// ws config
 	if n.WsConfig != nil {
-		return errors.New(fmt.Sprintf("unsupported protocol %s for language %s", "ws", n.Language))
+		return fmt.Errorf("unsupported protocol %s for language %s", "ws", n.Language)
 	}
 
 	m := getIntegrationsCopier(goValues)
@@ -78,7 +78,7 @@ func Generate(ctx context.Context) error {
 	return nil
 }
 
-func getGoGinServerCopier(goValues GoValues) *go_gin_server.Copier {
+func getGoGinServerCopier(goValues GoValues) *goginserver.Copier {
 	userName := goValues.Values.Get(languages.UserName)
 	repositoryName := goValues.Values.Get(languages.RepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
@@ -89,7 +89,7 @@ func getGoGinServerCopier(goValues GoValues) *go_gin_server.Copier {
 	clients := goValues.LGoLangNode.RestConfig.Clients
 	path := GetGoTemplatesRootPath() + "/frameworks/" + GoGinServerFramework
 	// create golang specific copier
-	copier := go_gin_server.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, resources, clients)
+	copier := goginserver.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, resources, clients)
 	return copier
 }
 

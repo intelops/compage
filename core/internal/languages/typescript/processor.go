@@ -6,7 +6,7 @@ import (
 )
 
 func Process(ctx context.Context) error {
-	typescriptValues := ctx.Value(ContextVars).(Values)
+	typescriptValues := ctx.Value(contextKeyTypeScriptContextVars).(Values)
 
 	// fills default config for typescript
 	if err := typescriptValues.TypeScriptNode.FillDefaults(); err != nil {
