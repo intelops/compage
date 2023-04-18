@@ -1,6 +1,6 @@
 // templates
 export const COMPAGE = "compage";
-export const OPENAPI = "openApi";
+export const OPENAPI = "openAPI";
 
 // languages
 export const GO = "go";

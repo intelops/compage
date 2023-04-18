@@ -49,13 +49,13 @@ func ProcessOpenAPITemplate(ctx context.Context) error {
 	// generate code by openapi.yaml
 	if err0 := runOpenAPIGenerator("generate", "-i", fileName, "-g", strings.ToLower(values.LanguageNode.RestConfig.Server.Framework), "-o", values.NodeDirectoryName, "--git-user-id", values.TemplateVars[UserName], "--git-repo-id", values.TemplateVars[RepositoryName]+"/"+values.LanguageNode.Name); err0 != nil {
 		log.Debugf("err : %s", err0)
-		return errors.New("something happened while running openApi generator")
+		return errors.New("something happened while running openAPI generator")
 	}
 
 	// generate documentation for the code
 	if err1 := runOpenAPIGenerator("generate", "-i", fileName, "-g", "dynamic-html", "-o", values.NodeDirectoryName+"/gen/docs", "--git-user-id", values.TemplateVars[UserName], "--git-repo-id", values.TemplateVars[RepositoryName]+"/"+values.LanguageNode.Name); err1 != nil {
 		log.Debugf("err : %s", err1)
-		return errors.New("something happened while running openApi generator for documentation")
+		return errors.New("something happened while running openAPI generator for documentation")
 	}
 	return nil
 }
