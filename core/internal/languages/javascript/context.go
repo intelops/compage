@@ -5,7 +5,15 @@ import (
 	"github.com/intelops/compage/core/internal/languages"
 )
 
-const ContextVars = "ContextVars"
+type contextKey string
+
+func (c contextKey) String() string {
+	return string(c)
+}
+
+var (
+	contextKeyJavaScriptContextVars = contextKey("JavaScriptContextVars")
+)
 
 type Values struct {
 	Values         *languages.Values
@@ -13,7 +21,7 @@ type Values struct {
 }
 
 func AddValuesToContext(ctx context.Context) context.Context {
-	values := ctx.Value(languages.LanguageContextVars).(languages.Values)
+	values := ctx.Value(languages.ContextKeyLanguageContextVars).(languages.Values)
 	v := Values{
 		Values: &values,
 		JavaScriptNode: &LJavaScriptNode{
@@ -21,5 +29,5 @@ func AddValuesToContext(ctx context.Context) context.Context {
 		},
 	}
 
-	return context.WithValue(ctx, ContextVars, v)
+	return context.WithValue(ctx, contextKeyJavaScriptContextVars, v)
 }

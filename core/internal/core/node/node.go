@@ -30,8 +30,8 @@ type RestServerConfig struct {
 	Port      string     `json:"port"`
 	Framework string     `json:"framework"`
 	Resources []Resource `json:"resources"`
-	// OpenApiFileYamlContent holds openApiFileYamlContent
-	OpenApiFileYamlContent string `json:"openApiFileYamlContent,omitempty"`
+	// OpenAPIFileYamlContent holds openAPIFileYamlContent
+	OpenAPIFileYamlContent string `json:"openAPIFileYamlContent,omitempty"`
 }
 
 type GrpcServerConfig struct {

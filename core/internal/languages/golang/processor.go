@@ -6,7 +6,7 @@ import (
 )
 
 func Process(ctx context.Context) error {
-	golangValues := ctx.Value(GoContextVars).(GoValues)
+	golangValues := ctx.Value(contextKeyGoContextVars).(GoValues)
 
 	// fills default config for golang
 	if err := golangValues.LGoLangNode.FillDefaults(); err != nil {

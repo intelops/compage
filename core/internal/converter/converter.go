@@ -33,7 +33,7 @@ func GetEdges(edges interface{}) interface{} {
 	return ""
 }
 
-// ConvertMap converts compageJson structure to {edges: [], nodes:[]}
+// ConvertMap converts compageJSON structure to {edges: [], nodes:[]}
 func ConvertMap(x map[string]interface{}) map[string]interface{} {
 	// convert key-value based edges to edges Slice
 	if x["edges"] != nil {
@@ -46,8 +46,8 @@ func ConvertMap(x map[string]interface{}) map[string]interface{} {
 	return x
 }
 
-// GetCompageJson converts json string to CompageJson struct
-func GetCompageJson(jsonString string) (*core.CompageJson, error) {
+// GetCompageJSON converts json string to CompageJSON struct
+func GetCompageJSON(jsonString string) (*core.CompageJSON, error) {
 	x := map[string]interface{}{}
 	if err := json.Unmarshal([]byte(jsonString), &x); err != nil {
 		return nil, err
@@ -57,23 +57,23 @@ func GetCompageJson(jsonString string) (*core.CompageJson, error) {
 	if err1 != nil {
 		return nil, err1
 	}
-	compageJson := &core.CompageJson{}
-	if err2 := json.Unmarshal(convertedXBytes, compageJson); err2 != nil {
+	compageJSON := &core.CompageJSON{}
+	if err2 := json.Unmarshal(convertedXBytes, compageJSON); err2 != nil {
 		return nil, err2
 	}
 
-	// Validate compageJson
-	if err3 := validate(compageJson); err3 != nil {
+	// Validate compageJSON
+	if err3 := validate(compageJSON); err3 != nil {
 		return nil, err3
 	}
 
-	return compageJson, nil
+	return compageJSON, nil
 }
 
 // validate validates edges and nodes in compage json.
-func validate(compageJson *core.CompageJson) error {
+func validate(compageJSON *core.CompageJSON) error {
 	// validations on node fields and setting default values.
-	for _, n := range compageJson.Nodes {
+	for _, n := range compageJSON.Nodes {
 		// name can't be empty for node
 		if n.ConsumerData.Name == "" {
 			return fmt.Errorf("name should not be empty")

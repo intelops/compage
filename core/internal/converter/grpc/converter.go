@@ -9,13 +9,13 @@ import (
 
 // GetProject converts *project.GenerateCodeRequest to *core.Project
 func GetProject(input *project.GenerateCodeRequest) (*core.Project, error) {
-	compageJson, err := converter.GetCompageJson(input.Json)
+	compageJSON, err := converter.GetCompageJSON(input.Json)
 	if err != nil {
 		return nil, err
 	}
 
 	return &core.Project{
-		CompageJson:    compageJson,
+		CompageJSON:    compageJSON,
 		Name:           input.ProjectName,
 		RepositoryName: input.RepositoryName,
 		UserName:       input.UserName,
