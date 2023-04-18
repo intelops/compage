@@ -56,37 +56,43 @@ app.get('*', (req, res) => {
     return res.status(200).json('you have reached default route');
 });
 
-// check if there is a valid kubernetes cluster and crds installed on it.
-checkIfCrdsInstalled().then(resources => {
-    Logger.info('connection to K8s cluster is successful and it seems that crds are installed too.');
-}).catch(e => {
-    Logger.error('It seems that crds are not yet installed, please check if you have applied crds');
-    Logger.debug(e);
-    process.exit(0);
-});
-
-// check if there is a system namespace exists.
-checkIfSystemNamespaceExists().then(namespaces => {
-    let hasFound = false;
-    // tslint:disable-next-line: prefer-for-of
-    for (let i = 0; i < namespaces.items.length; i++) {
-        if (namespaces.items[i].metadata.name === config.system_namespace) {
-            hasFound = true;
-            break;
-        }
-    }
-    if (!hasFound) {
-        Logger.error(`It seems that system namespace doesn't exist, please check if you have created namespace with name ${config.system_namespace}`);
+const isTest = (process.env.NODE_ENV === 'test');
+if (!isTest) {
+    // check if there is a valid kubernetes cluster and crds installed on it.
+    checkIfCrdsInstalled().then(resources => {
+        Logger.debug(resources);
+        Logger.info('connection to K8s cluster is successful and it seems that crds are installed too.');
+    }).catch(e => {
+        Logger.error('It seems that crds are not yet installed, please check if you have applied crds');
+        Logger.debug(e);
         process.exit(0);
-    } else {
-        Logger.info(`The namespace '${config.system_namespace}' exists on the cluster, good to go.`);
-    }
-}).catch(e => {
-    Logger.error(`It seems that system namespace doesn't exist, please check if you have created namespace with name ${config.system_namespace}`);
-    Logger.debug(e);
-    process.exit(0);
-});
+    });
+
+    // check if there is a system namespace exists.
+    checkIfSystemNamespaceExists().then(namespaces => {
+        let hasFound = false;
+        // tslint:disable-next-line: prefer-for-of
+        for (let i = 0; i < namespaces.items.length; i++) {
+            if (namespaces.items[i].metadata.name === config.system_namespace) {
+                hasFound = true;
+                break;
+            }
+        }
+        if (!hasFound) {
+            Logger.error(`It seems that system namespace doesn't exist, please check if you have created namespace with name ${config.system_namespace}`);
+            process.exit(0);
+        } else {
+            Logger.info(`The namespace '${config.system_namespace}' exists on the cluster, good to go.`);
+        }
+    }).catch(e => {
+        Logger.error(`It seems that system namespace doesn't exist, please check if you have created namespace with name ${config.system_namespace}`);
+        Logger.debug(e);
+        process.exit(0);
+    });
+}
 
 app.listen(parseInt(config.server_port as string, 10), '0.0.0.0', () => {
     Logger.info(`Server is up and running @ http://0.0.0.0:${config.server_port}`);
 });
+
+export default app;
