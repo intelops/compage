@@ -27,11 +27,15 @@ jobs:
           path: |
             **/app/node_modules
           key: ${{ runner.os }}-${{ hashFiles('**/app/package-lock.json') }}
-
       - name: Install dependencies
         run: |
           cd app
           npm install
+          cd ..
+      - name: Run linting checks
+        run: |
+          cd app
+          npm run lint
           cd ..
       - name: Run the tests and generate coverage report
         run: |
@@ -44,7 +48,7 @@ jobs:
           files: ./app/coverage/coverage-final.json
           flags: app
           token: ${{secrets.CODECOV_TOKEN}}
-      - name: Build
+      - name: Build app code
         run: |
           cd app
           npm run build --if-present

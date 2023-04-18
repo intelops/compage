@@ -9,3 +9,4 @@
 /.idea
 /core/openapitools.json
 /core/coverage.out
+/app/coverage

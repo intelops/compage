@@ -24,6 +24,7 @@ if (!process.env.NODE_ENV) {
 
 Logger.info(`process.env.NODE_ENV:  ${process.env.NODE_ENV || 'development'}`);
 const isDevelopment = (process.env.NODE_ENV === 'development');
+const isTest = (process.env.NODE_ENV === 'test');
 let config: Config;
 if (isDevelopment) {
     // use verbose logging
@@ -44,6 +45,19 @@ if (isDevelopment) {
         compage_core_url: process.env.COMPAGE_CORE_URL,
         // system_namespace
         system_namespace: process.env.SYSTEM_NAMESPACE || 'compage'
+    };
+} else if (isTest) {
+    config = {
+        // app server config
+        server_port: 5000,
+        // github config
+        client_id: "xxxxxx",
+        redirect_uri: "xxxxxx",
+        client_secret: "xxxxxx",
+        // core url
+        compage_core_url: "localhost:50001",
+        // system_namespace
+        system_namespace: 'compage'
     };
 } else {
     let GITHUB_APP_CLIENT_ID;

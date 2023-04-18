@@ -1,8 +1,8 @@
 import {requireUserNameMiddleware} from '../middlewares/auth';
 import {Request, Response, Router} from 'express';
 import {GetCurrentContextResponse, GetCurrentContextError} from './models';
-import {getCurrentContext} from "../store/kube-client";
-import Logger from "../util/logger";
+import {getCurrentContext} from '../store/kube-client';
+import Logger from '../util/logger';
 
 const k8sOperationsRouter = Router();
 
