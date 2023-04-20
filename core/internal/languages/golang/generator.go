@@ -7,6 +7,7 @@ import (
 	"github.com/intelops/compage/core/internal/languages"
 	goginserver "github.com/intelops/compage/core/internal/languages/golang/frameworks/go-gin-server"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/docker"
+	"github.com/intelops/compage/core/internal/languages/golang/integrations/githubactions"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/kubernetes"
 	"github.com/intelops/compage/core/internal/languages/templates"
 	log "github.com/sirupsen/logrus"
@@ -75,6 +76,12 @@ func Generate(ctx context.Context) error {
 		return err
 	}
 
+	// githubActions files need to be generated for the whole project so, it should be here.
+	githubActionsCopier := m["githubActions"].(*githubactions.Copier)
+	if err := githubActionsCopier.CreateYamls(); err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
 	return nil
 }
 
@@ -108,8 +115,12 @@ func getIntegrationsCopier(goValues GoValues) map[string]interface{} {
 	// create golang specific k8sCopier
 	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
+	// create golang specific k8sCopier
+	githubActionsCopier := githubactions.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path)
+
 	return map[string]interface{}{
-		"docker": dockerCopier,
-		"k8s":    k8sCopier,
+		"docker":        dockerCopier,
+		"k8s":           k8sCopier,
+		"githubActions": githubActionsCopier,
 	}
 }
