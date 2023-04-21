@@ -117,7 +117,7 @@ func getIntegrationsCopier(goValues GoValues) map[string]interface{} {
 	// create golang specific k8sCopier
 	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
-	// create golang specific k8sCopier
+	// create golang specific githubActionsCopier
 	githubActionsCopier := githubactions.NewCopier(userName, repositoryName, projectDirectoryName, nodeName, nodeDirectoryName, path)
 
 	return map[string]interface{}{
