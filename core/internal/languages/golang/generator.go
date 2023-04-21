@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/intelops/compage/core/internal/languages"
 	goginserver "github.com/intelops/compage/core/internal/languages/golang/frameworks/go-gin-server"
+	"github.com/intelops/compage/core/internal/languages/golang/integrations/devspace"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/docker"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/githubactions"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/kubernetes"
@@ -83,6 +84,14 @@ func Generate(ctx context.Context) error {
 		log.Debugf("err : %s", err)
 		return err
 	}
+
+	// devspace.yaml and devspace_start.sh need to be generated for the whole project so, it should be here.
+	devspaceCopier := m["devspace"].(*devspace.Copier)
+	if err := devspaceCopier.CreateDevspaceConfigs(); err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -120,9 +129,13 @@ func getIntegrationsCopier(goValues GoValues) map[string]interface{} {
 	// create golang specific githubActionsCopier
 	githubActionsCopier := githubactions.NewCopier(userName, repositoryName, projectDirectoryName, nodeName, nodeDirectoryName, path)
 
+	// create golang specific devspaceCopier
+	devspaceCopier := devspace.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+
 	return map[string]interface{}{
 		"docker":        dockerCopier,
 		"k8s":           k8sCopier,
 		"githubActions": githubActionsCopier,
+		"devspace":      devspaceCopier,
 	}
 }
