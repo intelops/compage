@@ -10,6 +10,7 @@ import (
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/githubactions"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/kubernetes"
 	"github.com/intelops/compage/core/internal/languages/templates"
+	"github.com/intelops/compage/core/internal/utils"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -108,6 +109,7 @@ func getIntegrationsCopier(goValues GoValues) map[string]interface{} {
 	isRestServer := goValues.LGoLangNode.RestConfig.Server != nil
 	restServerPort := goValues.LGoLangNode.RestConfig.Server.Port
 	path := GetGoTemplatesRootPath()
+	projectDirectoryName := utils.GetProjectDirectoryName(goValues.Values.ProjectName)
 
 	// create golang specific dockerCopier
 	dockerCopier := docker.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
@@ -116,7 +118,7 @@ func getIntegrationsCopier(goValues GoValues) map[string]interface{} {
 	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	// create golang specific k8sCopier
-	githubActionsCopier := githubactions.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path)
+	githubActionsCopier := githubactions.NewCopier(userName, repositoryName, projectDirectoryName, nodeName, nodeDirectoryName, path)
 
 	return map[string]interface{}{
 		"docker":        dockerCopier,
