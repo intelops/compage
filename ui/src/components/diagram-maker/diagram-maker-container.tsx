@@ -430,10 +430,7 @@ export const DiagramMakerContainer = ({
             setCurrentState(JSON.parse(diagramMaker.state));
             const prepareUpdateProjectRequest = () => {
                 const uPR: UpdateProjectRequest = {
-                    displayName: getProjectData.displayName,
-                    repository: getProjectData.repository,
-                    user: getProjectData.user,
-                    version: getProjectData.version,
+                    version: userNameAndProjectAndVersion[2],
                     id: userNameAndProjectAndVersion[1],
                     json: JSON.parse(getCurrentState())
                 };

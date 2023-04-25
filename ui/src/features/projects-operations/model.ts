@@ -3,11 +3,11 @@ import {CompageJson} from "../../components/diagram-maker/models";
 
 export interface ProjectEntity {
     id: string;
-    displayName: string;
+    displayName?: string;
     version: string;
-    user: User;
-    json: CompageJson;
-    repository: Repository;
+    user?: User;
+    json?: CompageJson;
+    repository?: Repository;
     // TODO temporary made optional.
     metadata?: Map<string, string>;
 }
