@@ -97,7 +97,7 @@ func CopyFile(destFilePath, srcFilePath string) (int64, error) {
 
 // IgnorablePaths ignores a few directories.
 func IgnorablePaths(path string) bool {
-	return strings.Contains(path, ".git") || strings.Contains(path, ".idea")
+	return strings.HasSuffix(path, ".git") || strings.HasSuffix(path, ".idea")
 }
 
 // GetDirectoriesAndFilePaths returns files and directories in given path or error.
