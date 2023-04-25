@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/intelops/compage/core/internal/core"
 	"github.com/intelops/compage/core/internal/integrations/deepsource"
+	"github.com/intelops/compage/core/internal/integrations/readme"
 	"github.com/intelops/compage/core/internal/languages"
 	"github.com/intelops/compage/core/internal/languages/golang"
 	"github.com/intelops/compage/core/internal/languages/java"
@@ -106,6 +107,12 @@ func Handle(coreProject *core.Project) error {
 	// add deepsource at project level
 	deepSourceCopier := deepsource.NewCopier(coreProject)
 	if err := deepSourceCopier.CreateDeepSourceFiles(); err != nil {
+		return err
+	}
+
+	// add README.md at project level
+	readMeCopier := readme.NewCopier(coreProject)
+	if err := readMeCopier.CreateReadMeFile(); err != nil {
 		return err
 	}
 
