@@ -45,3 +45,11 @@ jobs:
         run: cosign verify ${{ env.REGISTRY }}/${{ github.repository }}/app:${{ env.RELEASE_VERSION }} --certificate-identity ${{ env.GH_URL }}/${{ github.repository }}/.github/workflows/app-release.yml@refs/tags/${{ env.RELEASE_VERSION }}  --certificate-oidc-issuer https://token.actions.githubusercontent.com
         env:
           COSIGN_EXPERIMENTAL: 1
+      - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Graph
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          format: 'github'
+          output: 'dependency-results.sbom.json'
+          image-ref: '.'
+          github-pat: ${{ secrets.GH_TOKEN }} # or ${{ secrets.github_pat_name }} if you're using a PAT
