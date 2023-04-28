@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/intelops/compage/core/internal/languages"
+	"github.com/intelops/compage/core/internal/languages/python/integrations/devspace"
 	"github.com/intelops/compage/core/internal/languages/python/integrations/kubernetes"
 	"github.com/intelops/compage/core/internal/languages/templates"
 	log "github.com/sirupsen/logrus"
@@ -47,6 +48,13 @@ func Generate(ctx context.Context) error {
 		return err
 	}
 
+	// devspace.yaml and devspace_start.sh need to be generated for the whole project so, it should be here.
+	devspaceCopier := m["devspace"].(*devspace.Copier)
+	if err := devspaceCopier.CreateDevspaceConfigs(); err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -62,7 +70,11 @@ func getIntegrationsCopier(pythonValues Values) map[string]interface{} {
 	// create python specific k8sCopier
 	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
+	// create python specific devspaceCopier
+	devspaceCopier := devspace.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+
 	return map[string]interface{}{
-		"k8s": k8sCopier,
+		"k8s":      k8sCopier,
+		"devspace": devspaceCopier,
 	}
 }
