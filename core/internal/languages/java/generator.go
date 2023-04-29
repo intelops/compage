@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/intelops/compage/core/internal/languages"
+	"github.com/intelops/compage/core/internal/languages/java/integrations/devspace"
 	"github.com/intelops/compage/core/internal/languages/java/integrations/docker"
 	"github.com/intelops/compage/core/internal/languages/java/integrations/kubernetes"
 	"github.com/intelops/compage/core/internal/languages/templates"
@@ -55,6 +56,13 @@ func Generate(ctx context.Context) error {
 		return err
 	}
 
+	// devspace.yaml and devspace_start.sh need to be generated for the whole project so, it should be here.
+	devspaceCopier := m["devspace"].(*devspace.Copier)
+	if err := devspaceCopier.CreateDevspaceConfigs(); err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -82,8 +90,12 @@ func getIntegrationsCopier(javaValues Values) map[string]interface{} {
 	// create java specific k8sCopier
 	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
+	// create java specific devspaceCopier
+	devspaceCopier := devspace.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+
 	return map[string]interface{}{
-		"docker": dockerCopier,
-		"k8s":    k8sCopier,
+		"docker":   dockerCopier,
+		"k8s":      k8sCopier,
+		"devspace": devspaceCopier,
 	}
 }
