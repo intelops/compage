@@ -6,11 +6,13 @@ on:
 jobs:
   push_to_registry:
     name: Build and push Docker image github container registry.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     permissions:
       packages: write
       id-token: write
       contents: read
+      actions: read
+      security-events: write
     env:
       REGISTRY: ghcr.io
       GH_URL: https://github.com
@@ -34,6 +36,13 @@ jobs:
           push: true
           context: ./app
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/app:${{ env.RELEASE_VERSION }}
+      - uses: goodwithtech/dockle-action@main
+        with:
+          image: ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.run_id }}
+          format: 'list'
+          exit-code: '1'
+          exit-level: 'warn'
+          ignore: 'CIS-DI-0001,DKL-DI-0006'
       - name: Install cosign
         uses: sigstore/cosign-installer@main
       - name: Sign the images

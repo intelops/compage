@@ -8,7 +8,13 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+    permissions:
+      packages: write
+      id-token: write
+      contents: write
+      security-events: write
+      actions: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -42,17 +48,31 @@ jobs:
           files: ./core/coverage.out
           flags: core
           token: ${{secrets.CODECOV_TOKEN}}
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL'
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
   publish-docker-image:
     if: gitHub.event_name != 'pull_request'
     needs: build-and-test
     env:
       REGISTRY: ghcr.io
       GH_URL: https://github.com
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     permissions:
       packages: write
       id-token: write
       contents: read
+      actions: read
+      security-events: write
     steps:
       - name: Checkout GitHub Action
         uses: actions/checkout@v3
@@ -88,6 +108,13 @@ jobs:
           labels: ${{ steps.metadata.outputs.labels }}
           # build on feature branches, push only on main branch
           push: true
+      - uses: goodwithtech/dockle-action@main
+        with:
+          image: ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.run_id }}
+          format: 'list'
+          exit-code: '1'
+          exit-level: 'warn'
+          ignore: 'CIS-DI-0001,DKL-DI-0006'
       - name: Install cosign
         uses: sigstore/cosign-installer@main
       - name: Sign the images
@@ -99,3 +126,11 @@ jobs:
         run: cosign verify ${{ env.REGISTRY }}/${{ github.repository }}/core:${{ github.run_id }} --certificate-identity ${{ env.GH_URL }}/${{ github.repository }}/.github/workflows/core-ci.yml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com
         env:
           COSIGN_EXPERIMENTAL: 1
+      - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Graph
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          format: 'github'
+          output: 'dependency-results.sbom.json'
+          image-ref: '.'
+          github-pat: ${{ secrets.GH_TOKEN }}
