@@ -12,9 +12,9 @@
 
 <h4 align="center">
 
-![app-ci](https://github.com/mahendraintelops/compage/workflows/app-ci/badge.svg)
-![core-ci](https://github.com/mahendraintelops/compage/workflows/core-ci/badge.svg)
-![ui-ci](https://github.com/mahendraintelops/compage/workflows/ui-ci/badge.svg)
+![app-ci](https://github.com/intelops/compage/workflows/app-ci/badge.svg)
+![core-ci](https://github.com/intelops/compage/workflows/core-ci/badge.svg)
+![ui-ci](https://github.com/intelops/compage/workflows/ui-ci/badge.svg)
 [![codecov](https://codecov.io/gh/intelops/compage/branch/main/graph/badge.svg?token=HZZ0196V4D)](https://codecov.io/gh/intelops/compage)
 
 [![Price](https://img.shields.io/badge/price-FREE-0098f7.svg)](https://github.com/intelops/compage/blob/main/LICENSE) [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/DeapQc22qe)
