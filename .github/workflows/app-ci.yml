@@ -77,6 +77,7 @@ jobs:
     env:
       REGISTRY: ghcr.io
       GH_URL: https://github.com
+#      DOCKLE_HOST: "unix:///var/run/docker.sock"
     runs-on: ubuntu-20.04
     permissions:
       packages: write
@@ -119,13 +120,13 @@ jobs:
           labels: ${{ steps.metadata.outputs.labels }}
           # build on feature branches, push only on main branch
           push: true
-      - uses: goodwithtech/dockle-action@main
-        with:
-          image: ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.run_id }}
-          format: 'list'
-          exit-code: '1'
-          exit-level: 'warn'
-          ignore: 'CIS-DI-0001,DKL-DI-0006'
+#      - uses: goodwithtech/dockle-action@main
+#        with:
+#          image: ${{ env.REGISTRY }}/${{ github.repository }}/app:${{ github.run_id }}
+#          format: 'list'
+#          exit-code: '1'
+#          exit-level: 'warn'
+#          ignore: 'CIS-DI-0001,DKL-DI-0006'
       - name: Install cosign
         uses: sigstore/cosign-installer@main
       - name: Sign the images

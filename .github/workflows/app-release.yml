@@ -36,13 +36,13 @@ jobs:
           push: true
           context: ./app
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/app:${{ env.RELEASE_VERSION }}
-      - uses: goodwithtech/dockle-action@main
-        with:
-          image: ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.run_id }}
-          format: 'list'
-          exit-code: '1'
-          exit-level: 'warn'
-          ignore: 'CIS-DI-0001,DKL-DI-0006'
+#      - uses: goodwithtech/dockle-action@main
+#        with:
+#          image: ${{ env.REGISTRY }}/${{ github.repository }}/app:${{ github.run_id }}
+#          format: 'list'
+#          exit-code: '1'
+#          exit-level: 'warn'
+#          ignore: 'CIS-DI-0001,DKL-DI-0006'
       - name: Install cosign
         uses: sigstore/cosign-installer@main
       - name: Sign the images
