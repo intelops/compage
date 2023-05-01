@@ -22,4 +22,4 @@ version: v0.0.1
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "v0.0.1"
-icon: https://raw.githubusercontent.com/intelops/compage/main/ui/public/compage-512x512.png
+icon: https://raw.githubusercontent.com/intelops/compage/main/images/compage-logo.svg
