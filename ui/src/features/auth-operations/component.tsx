@@ -10,7 +10,7 @@ import Card from "@mui/material/Card";
 import {Button} from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import Box from "@mui/material/Box";
-import Logo from "../../logo.png";
+import Logo from "../../compage-logo.svg";
 import {LoginRequest} from "./model";
 import {loginAsync} from "./async-apis/login";
 import {selectAuthData, selectAuthStatus} from "./slice";
@@ -45,8 +45,8 @@ export const Login = () => {
 
     return <Card sx={{width: 700}}>
         <CardHeader
-            title={"Compage"}
-            subheader={"by Intelops"}
+            title={"IntelOps"}
+            // subheader={"by Intelops"}
         />
         <CardMedia
             component="img"

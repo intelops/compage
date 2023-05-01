@@ -1,13 +1,12 @@
-<p align="center"><img src="images/compage-logo.png" width="400" alt=""></p>
+<p align="center"><img src="images/compage-logo.svg" width="400" alt=""></p>
 <p align="center"><b>Low-Code, No-Code for cloud-native</b></p>
 
 <h4 align="center">
     <a href="https://discord.gg/DeapQc22qe">Discord</a> |
     <a href="https://github.com/intelops/compage/discussions">Discussions</a> |
-    <a href="https://compage.dev?utm_source=github&utm_medium=social/">Site</a> |
-    <a href="https://docs.compage.dev?utm_source=github&utm_medium=social/">Guide</a> |
-    <a href="https://docs.compage.dev/docs/introduction">Docs</a> |
-    <a href="https://docs.compage.dev/docs/introduction/contribute?utm_source=github&utm_medium=social">Contribute</a><br/><br/>
+    <a href="https://docs.intelops.ai/1.0.0/compage/5-guides?utm_source=github&utm_medium=social/">Guide</a> |
+    <a href="https://docs.intelops.ai/1.0.0/compage">Docs</a> |
+    <a href="https://docs.intelops.ai/1.0.0/compage/6-contribution?utm_source=github&utm_medium=social">Contribute</a><br/><br/>
 </h4>
 
 <h4 align="center">

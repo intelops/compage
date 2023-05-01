@@ -6,7 +6,7 @@ markmap:
 # compage
 
 ## doc
-- [Compage Docs](https://docs.compage.dev)
+- [Compage Docs](https://docs.intelops.ai/1.0.0/compage)
 
 ## app
 - NodeJs Express Server

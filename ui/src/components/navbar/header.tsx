@@ -8,7 +8,7 @@ import Menu from '@mui/material/Menu';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import Logo from "../../logo.png";
+import Logo from "../../compage-logo.svg";
 import {useAppSelector} from "../../redux/hooks";
 import {Link, useNavigate} from "react-router-dom";
 import {selectAuthData} from "../../features/auth-operations/slice";
@@ -135,7 +135,7 @@ const Header = () => {
         return "";
     };
 
-    return <AppBar position="absolute">
+    return <AppBar position="absolute" style={{ backgroundColor: "#174985"}}>
         <Toolbar disableGutters>
             {getLogo()}
             {getCurrentProjectSelected()}
