@@ -18,7 +18,7 @@ app:
     annotations: {}
   image:
     repository: ghcr.io/intelops/compage/app
-    pullPolicy: Never
+    pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     tag: "v0.0.1"
   imagePullSecrets:
@@ -70,7 +70,7 @@ core:
     annotations: {}
   image:
     repository: ghcr.io/intelops/compage/core
-    pullPolicy: Never
+    pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     tag: "v0.0.1"
   imagePullSecrets:
@@ -121,7 +121,7 @@ ui:
     annotations: {}
   image:
     repository: ghcr.io/intelops/compage/ui
-    pullPolicy: Never
+    pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     tag: "v0.0.1"
   imagePullSecrets:

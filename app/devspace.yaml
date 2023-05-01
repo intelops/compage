@@ -43,7 +43,7 @@ deployments:
           - image: ghcr.io/intelops/compage/app
             env:
               - name: NODE_ENV
-                value: production
+                value: development
               - name: GITHUB_APP_CLIENT_ID
                 value: ${GITHUB_APP_CLIENT_ID}
               - name: GITHUB_APP_CLIENT_SECRET
@@ -80,8 +80,8 @@ dev:
       - command: git
     # Forward the following ports to be able to access your application via localhost
     ports:
-      - port: "9229"
-      - port: "5000"
+      - port: "9229:5000"
+      - port: "5000:5000"
     # Open the following URLs once they return an HTTP status code other than 502 or 503
     open:
       - url: http://localhost:5000/api

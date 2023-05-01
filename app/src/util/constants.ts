@@ -51,11 +51,11 @@ if (isDevelopment) {
         // app server config
         server_port: 5000,
         // github config
-        client_id: "xxxxxx",
-        redirect_uri: "xxxxxx",
-        client_secret: "xxxxxx",
+        client_id: 'xxxxxx',
+        redirect_uri: 'xxxxxx',
+        client_secret: 'xxxxxx',
         // core url
-        compage_core_url: "localhost:50001",
+        compage_core_url: 'localhost:50001',
         // system_namespace
         system_namespace: 'compage'
     };

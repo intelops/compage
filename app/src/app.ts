@@ -64,12 +64,17 @@ if (!isTest) {
         Logger.info('connection to K8s cluster is successful and it seems that crds are installed too.');
     }).catch(e => {
         Logger.error('It seems that crds are not yet installed, please check if you have applied crds');
-        Logger.debug(e);
+        Logger.debug(JSON.stringify(e));
         process.exit(0);
     });
 
     // check if there is a system namespace exists.
     checkIfSystemNamespaceExists().then(namespaces => {
+        Logger.debug(`Namespace list:`);
+        namespaces.items.forEach((namespace: { metadata: { name: string } }) => {
+            Logger.debug(`${JSON.stringify(namespace.metadata.name)}`);
+        });
+
         let hasFound = false;
         // tslint:disable-next-line: prefer-for-of
         for (let i = 0; i < namespaces.items.length; i++) {

@@ -35,7 +35,7 @@ const format = winston.format.combine(
 const transports = [
     new winston.transports.Console({
         // set the level here and logs at given level will be recorded.
-        level: 'info',
+        level: level(),
     }),
     new winston.transports.File({
         filename: 'logs/error.log',
@@ -45,7 +45,6 @@ const transports = [
 ];
 
 const Logger = winston.createLogger({
-    level: level(),
     levels,
     format,
     transports,

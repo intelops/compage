@@ -48,7 +48,7 @@ spec:
             periodSeconds: 30
           env:
             - name: SYSTEM_NAMESPACE
-              value: Values.systemNamespace
+              value: {{ .Values.systemNamespace }}
             - name: COMPAGE_CORE_URL
               valueFrom:
                 configMapKeyRef:

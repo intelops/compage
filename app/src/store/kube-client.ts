@@ -43,7 +43,7 @@ export const deleteObject = async ({
             name
         );
     } catch (e: any) {
-        Logger.debug(`error while deleting custom object: ${e}`);
+        Logger.debug(`error while deleting custom object: ${JSON.stringify(e?.body)}`);
         // Logger.info('error while getting custom object: ', e?.body?.reason)
     }
 };
@@ -65,7 +65,7 @@ export const getObject = async ({
         const resource: Resource = JSON.parse(JSON.stringify(object.body));
         return resource;
     } catch (e: any) {
-        Logger.debug(`error while getting custom object: ${e}`);
+        Logger.debug(`error while getting custom object: ${JSON.stringify(e?.body)}`);
         // Logger.info('error while getting custom object: ', e?.body?.reason)
         const resource: Resource = {apiVersion: '', kind: '', metadata: undefined, spec: undefined};
         return resource;
@@ -91,7 +91,7 @@ export const patchObject = async ({
         const resource: Resource = JSON.parse(JSON.stringify(object.body));
         return resource;
     } catch (e: any) {
-        Logger.debug(`error while patching custom object: ${e}`);
+        Logger.debug(`error while patching custom object: ${JSON.stringify(e?.body)}`);
         // Logger.info(`error while patching custom object: ${e?.body?.reason}`);
         const resource: Resource = {apiVersion: '', kind: '', metadata: undefined, spec: undefined};
         return resource;
@@ -145,7 +145,7 @@ export const listObjects = async ({
             const resources: ResourceList = JSON.parse(JSON.stringify(object.body));
             return resources;
         } catch (e: any) {
-            Logger.debug(`error while listing custom object: ${e?.body}`);
+            Logger.debug(`error while listing custom object: ${JSON.stringify(e?.body)}`);
             // Logger.info(`error while listing custom object: ${e?.body?.reason}`)
             const resources: ResourceList = {apiVersion: '', items: [], kind: '', metadata: undefined};
             return resources;
@@ -161,7 +161,7 @@ export const listObjects = async ({
             const resources: ResourceList = JSON.parse(JSON.stringify(object.body));
             return resources;
         } catch (e: any) {
-            Logger.debug(`error while listing custom object: ${e?.body}`);
+            Logger.debug(`error while listing custom object: ${JSON.stringify(e?.body)}`);
             // Logger.info(`error while listing custom object: ${e?.body?.reason}`);
             const resources: ResourceList = {apiVersion: '', items: [], kind: '', metadata: undefined};
             return resources;
@@ -174,7 +174,7 @@ export const checkIfSystemNamespaceExists = async () => {
         const object = await coreV1ApiClient.listNamespace();
         return JSON.parse(JSON.stringify(object.body));
     } catch (e: any) {
-        Logger.debug(`error while listing namespace: ${e?.body}`);
+        Logger.debug(`error while listing namespace: ${JSON.stringify(e?.body)}`);
         throw e;
     }
 };
@@ -206,7 +206,7 @@ export const checkIfCrdsInstalled = async () => {
                 '');
             return JSON.parse(JSON.stringify(object.body));
         } catch (e: any) {
-            Logger.debug(`error while listing custom object: ${e?.body}`);
+            Logger.debug(`error while listing custom object: ${JSON.stringify(e?.body)}`);
             throw e;
         }
     }
@@ -216,7 +216,7 @@ export const getCurrentContext = async () => {
     try {
         return currentContext;
     } catch (e: any) {
-        Logger.debug(`error while retrieving context: ${e?.body}`);
+        Logger.debug(`error while retrieving context: ${JSON.stringify(e?.body)}`);
         throw e;
     }
 };

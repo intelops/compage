@@ -19,4 +19,4 @@ COPY --from=builder /app/protobufs /server/protobufs
 
 ENV NODE_ENV=production
 EXPOSE 5000
-CMD [ "node", "dist/app.js" ]
+CMD [ "node", "dist/src/app.js" ]
