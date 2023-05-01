@@ -3,13 +3,13 @@ entries:
   compage:
   - apiVersion: v2
     appVersion: v0.0.1
-    created: "2023-05-01T15:17:29.628686634+05:30"
+    created: "2023-05-01T23:03:05.456714832+05:30"
     description: A Helm chart for Kubernetes
-    digest: 71719095775bff9da6e99d79f7985e37fb3edbe3937934934b655147e50da01a
+    digest: 465881368ade986559ce811b754b75f49626848fa8d9063c06d7121565f1ac52
     icon: https://raw.githubusercontent.com/intelops/compage/main/images/compage-logo.svg
     name: compage
     type: application
     urls:
     - compage-v0.0.1.tgz
     version: v0.0.1
-generated: "2023-05-01T15:17:29.626954957+05:30"
+generated: "2023-05-01T23:03:05.434249428+05:30"
