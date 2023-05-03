@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "compage.ui.fullname" . }}
+  labels:
+    {{- include "compage.ui.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  defaultBackend:
+    service:
+      name: {{ include "compage.ui.fullname" . }}
+      port:
+        number: {{ .Values.ui.service.port }}

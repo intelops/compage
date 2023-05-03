@@ -20,10 +20,6 @@ spec:
       labels:
         {{- include "compage.app.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.app.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       serviceAccountName: {{ include "compage.app.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.app.podSecurityContext | nindent 8 }}

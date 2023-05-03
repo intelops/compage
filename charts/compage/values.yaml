@@ -1,11 +1,10 @@
 # GitHub app configuration.
 githubApp:
   # update below value cluster's node ip and with port specified here (.Values.ui.service.nodePort)
-  redirectURI: "http://www.mycompage.dev:32222/login"
+  redirectURI: "http://localhost:32222/login"
   clientId: "XXXXX"
   clientSecret: "XXXXX"
 
-# TODO the below is not yet configurable. Code has direct references so, any change in below value will break the application.
 systemNamespace: compage
 
 app:
@@ -21,8 +20,6 @@ app:
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     tag: "v0.0.1"
-  imagePullSecrets:
-  - name: "compage-pull-secret"
   nameOverride: "app"
   fullnameOverride: ""
   podAnnotations: {}
@@ -73,8 +70,6 @@ core:
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     tag: "v0.0.1"
-  imagePullSecrets:
-  - name: "compage-pull-secret"
   nameOverride: "core"
   fullnameOverride: ""
 
@@ -124,8 +119,6 @@ ui:
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     tag: "v0.0.1"
-  imagePullSecrets:
-  - name: "compage-pull-secret"
   nameOverride: "ui"
   fullnameOverride: ""
   ingress:
@@ -145,7 +138,7 @@ ui:
     #      - chart-example.local
   compageApp:
 #   update below value cluster's node ip and with port specified here (.Values.app.service.nodePort)
-    serverUrl: http://www.mycompage.dev:31111
+    serverUrl: http://localhost:31111
   podAnnotations: {}
 
   podSecurityContext: {}
@@ -156,8 +149,7 @@ ui:
 #    runAsGroup: 65534
 
   service:
-    type: NodePort
-    nodePort: 32222
+    type: ClusterIP
     port: 80
 
   resources:

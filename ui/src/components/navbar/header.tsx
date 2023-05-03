@@ -125,6 +125,7 @@ const Header = () => {
                         component="img"
                         sx={{
                             height: 64,
+                            width: "320px"
                         }}
                         alt="Compage by IntelOps"
                         src={Logo}
@@ -135,7 +136,7 @@ const Header = () => {
         return "";
     };
 
-    return <AppBar position="absolute" style={{ backgroundColor: "#174985"}}>
+    return <AppBar position="absolute" style={{backgroundColor: "#174985"}}>
         <Toolbar disableGutters>
             {getLogo()}
             {getCurrentProjectSelected()}

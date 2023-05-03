@@ -20,13 +20,10 @@ To contribute code,
     GOFLAGS=-mod=vendor
     ```
 3. Ensure you have NodeJs(LTS >= 18.12.0) installed for Core and UI part of the compage.
-4. Ensure you have access to any Kubernetes(KinD and minikube will do too) cluster to store the compage projects and users related data on it.
+4. Ensure you have access to any Kubernetes(tested on KinD) cluster to store the compage projects and users related data on it.
    #### KinD
    - Install KinD from https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries
    - Create KinD cluster https://kind.sigs.k8s.io/docs/user/quick-start/#creating-a-cluster
-   - Check if you can access the cluster created in previous step, and you are able to list down the pods.
-   #### minikube
-   - Install and create minikube cluster from https://minikube.sigs.k8s.io/docs/start/
    - Check if you can access the cluster created in previous step, and you are able to list down the pods.
 5. Fork the project.
 6. Clone the project: `git clone https://github.com/[YOUR_USERNAME]/compage && cd compage`
@@ -58,4 +55,4 @@ The documentation is contained within `./docs` and made with Docusaurus. See the
    buf generate
    ```
 ## How K8s and GitHub are interacted with above 3 components?
-![architecture-med.png](images%2Farchitecture-med.png)
+![architecture-med.png](images/architecture-med.png)
