@@ -1,6 +1,7 @@
 package goginserver
 
 import (
+	"errors"
 	"github.com/gertd/go-pluralize"
 	"github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages"
@@ -8,7 +9,6 @@ import (
 	"github.com/intelops/compage/core/internal/utils"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-
 	"strings"
 )
 
@@ -211,7 +211,10 @@ func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 	}
 
 	// add resource specific data to map in c needed for templates.
-	c.addResourceSpecificTemplateData(resource)
+	err = c.addResourceSpecificTemplateData(resource)
+	if err != nil {
+		return err
+	}
 
 	// apply template
 	return executor.Execute(filePaths, c.Data)
@@ -236,7 +239,7 @@ func (c Copier) copyRestClientResourceFiles(restClient languages.RestClient) err
 	return executor.Execute(filePaths, c.Data)
 }
 
-func (c Copier) addResourceSpecificTemplateData(resource node.Resource) {
+func (c Copier) addResourceSpecificTemplateData(resource node.Resource) error {
 	// set resource specific key/value for data.
 	c.Data["ResourceName"] = resource.Name
 	// make every field public by making its first character capital.
@@ -246,8 +249,72 @@ func (c Copier) addResourceSpecificTemplateData(resource node.Resource) {
 		fields[key] = value
 	}
 	c.Data["Fields"] = fields
+	// db fields
+	if c.IsSqlDb {
+		createQueryColumns := map[string]string{}
+		var insertQueryColumns string
+		var insertQueryParams string
+		var insertQueryExecColumns string
+		var updateQueryColumnsAndParams string
+		var updateQueryExecColumns string
+		var getQueryScanColumns string
+
+		for key, value := range resource.Fields {
+			key = cases.Title(language.Und, cases.NoLower).String(key)
+			dbDataType, err := c.getDbDataType(value)
+			if err != nil {
+				return err
+			}
+			createQueryColumns[key] = dbDataType
+			if len(insertQueryColumns) > 0 {
+				insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
+				insertQueryParams += ", ?"
+				// m here is a model's variable
+				insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+			} else {
+				insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
+				insertQueryParams = "?"
+				// m here is a model's variable
+				insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
+			if len(updateQueryColumnsAndParams) > 0 {
+				updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
+				// m here is a model's variable
+				updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+			} else {
+				updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
+				// m here is a model's variable
+				updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
+
+			if len(getQueryScanColumns) > 0 {
+				// m here is a model's variable
+				getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key)
+			} else {
+				// m here is a model's variable
+				getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
+		}
+		// create query columns
+		c.Data["CreateQueryColumns"] = createQueryColumns
+
+		// insert query columns and params
+		c.Data["InsertQueryColumns"] = insertQueryColumns
+		c.Data["InsertQueryParams"] = insertQueryParams
+		c.Data["InsertQueryExecColumns"] = insertQueryExecColumns
+
+		// update query columns and params, execColumns
+		c.Data["UpdateQueryColumnsAndParams"] = updateQueryColumnsAndParams
+		c.Data["UpdateQueryExecColumns"] = updateQueryExecColumns
+
+		// get query columns and params
+		c.Data["GetQueryExecColumns"] = getQueryScanColumns
+	}
+
+	// Add another map for db specific fields
 	c.Data["ResourceNameSingular"] = strings.ToLower(resource.Name)
 	c.Data["ResourceNamePlural"] = c.PluralizeClient.Plural(strings.ToLower(resource.Name))
+	return nil
 }
 
 // CreateRestConfigs creates/copies relevant files to generated project
@@ -309,4 +376,99 @@ func (c Copier) CreateRootLevelFiles() error {
 		return err0
 	}
 	return executor.Execute(files, c.Data)
+}
+
+func (c Copier) getDbDataType(value string) (string, error) {
+	if c.SqlDb == Sqlite {
+		return getSqliteDataType(value), nil
+	} else if c.SqlDb == MySql {
+		return getMySqlDataType(value), nil
+	}
+	return "", errors.New("database not supported")
+}
+
+func getSqliteDataType(value string) string {
+	switch value {
+	case "int":
+		fallthrough
+	case "int16":
+		fallthrough
+	case "int32":
+		fallthrough
+	case "int64":
+		fallthrough
+	case "uint8":
+		fallthrough
+	case "uint16":
+		fallthrough
+	case "uint32":
+		fallthrough
+	case "uint64":
+		fallthrough
+	case "uint":
+		fallthrough
+	case "rune":
+		fallthrough
+	case "byte":
+		fallthrough
+	case "uintptr":
+		fallthrough
+	case "bool":
+		return "INTEGER"
+	case "float32":
+		fallthrough
+	case "float64 ":
+		fallthrough
+	case "complex64":
+		fallthrough
+	case "complex128":
+		return "REAL"
+	case "string":
+		return "TEXT"
+	default:
+		return "TEXT"
+	}
+}
+
+func getMySqlDataType(value string) string {
+	switch value {
+	case "int":
+		fallthrough
+	case "int16":
+		fallthrough
+	case "int32":
+		fallthrough
+	case "int64":
+		fallthrough
+	case "uint8":
+		fallthrough
+	case "uint16":
+		fallthrough
+	case "uint32":
+		fallthrough
+	case "uint64":
+		fallthrough
+	case "uint":
+		fallthrough
+	case "rune":
+		fallthrough
+	case "byte":
+		fallthrough
+	case "uintptr":
+		return "INT"
+	case "bool":
+		return "BOOL"
+	case "float32":
+		fallthrough
+	case "float64 ":
+		return "FLOAT"
+	case "complex64":
+		fallthrough
+	case "complex128":
+		return "DOUBLE"
+	case "string":
+		return "VARCHAR(100)"
+	default:
+		return "VARCHAR(100)"
+	}
 }

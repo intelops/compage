@@ -22,7 +22,7 @@ export const goDataTypes = {
         "byte",
         "uintptr",
     ],
-    [FLOAT]: ["float32", "float64 "],
+    [FLOAT]: ["float32", "float64"],
     [COMPLEX]: ["complex64", "complex128"],
     [BOOL]: ["bool"],
     [STRING]: ["string"],
