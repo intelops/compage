@@ -25,7 +25,7 @@ func TestGenerator(t *testing.T) {
            "sqlDb":"MySQL",
           "template": "compage",
           "resources": [
-            { "fields": { "Name": "string" }, "name": "Student" }
+            { "fields": { "Name": "string", "City": "string","Age": "int64" }, "name": "Student" }
           ]
         }
       }

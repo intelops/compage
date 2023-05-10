@@ -33,7 +33,7 @@ type RestServer struct {
 	Template  string          `json:"template"`
 	Framework string          `json:"framework"`
 	Port      string          `json:"port"`
-	SqlDb     string          `json:"sqlDb"`
+	SQLDB     string          `json:"sqlDb"`
 	Resources []node.Resource `json:"resources"`
 	// OpenAPIFileYamlContent holds openAPIFileYamlContent
 	OpenAPIFileYamlContent string `json:"openAPIFileYamlContent,omitempty"`
@@ -168,7 +168,7 @@ func GetServersForNode(nodeP *node.Node) (*Servers, error) {
 			Template:  nodeP.ConsumerData.RestServerConfig.Template,
 			Framework: nodeP.ConsumerData.RestServerConfig.Framework,
 			Port:      nodeP.ConsumerData.RestServerConfig.Port,
-			SqlDb:     nodeP.ConsumerData.RestServerConfig.SqlDb,
+			SQLDB:     nodeP.ConsumerData.RestServerConfig.SQLDB,
 		}
 		// set resources or openAPIFileYamlContent based on availability.
 		if nodeP.ConsumerData.RestServerConfig.Resources != nil && len(nodeP.ConsumerData.RestServerConfig.Resources) > 0 {
