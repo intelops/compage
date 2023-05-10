@@ -22,6 +22,7 @@ func TestGenerator(t *testing.T) {
         "restServerConfig": {
           "framework": "go-gin-server",
           "port": "3434",
+           "sqlDb":"MySQL",
           "template": "compage",
           "resources": [
             { "fields": { "Name": "string" }, "name": "Student" }
