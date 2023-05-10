@@ -8,6 +8,7 @@ interface RestServerConfig {
     template: string;
     port: string;
     framework?: string;
+    sqlDb: string;
     resources?: Resource[];
     openApiFileYamlContent?: string;
 }

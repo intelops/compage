@@ -17,6 +17,11 @@ export const COMPAGE_LANGUAGE_FRAMEWORKS = {
     [GO]: ["go-gin-server"],
 };
 
+// compage template sql_dbs supported.
+export const COMPAGE_LANGUAGE_SQL_DBS = {
+    [GO]: ["MySQL", "SQLite"],
+};
+
 // openapi template frameworks supported.
 export const OPENAPI_LANGUAGE_FRAMEWORKS = {
     [GO]: ["go-server", "go-gin-server", "go-echo-server"],

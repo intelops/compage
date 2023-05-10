@@ -29,6 +29,7 @@ type RestServerConfig struct {
 	Template  string     `json:"template"`
 	Port      string     `json:"port"`
 	Framework string     `json:"framework"`
+	SqlDb     string     `json:"sqlDb"`
 	Resources []Resource `json:"resources"`
 	// OpenAPIFileYamlContent holds openAPIFileYamlContent
 	OpenAPIFileYamlContent string `json:"openAPIFileYamlContent,omitempty"`

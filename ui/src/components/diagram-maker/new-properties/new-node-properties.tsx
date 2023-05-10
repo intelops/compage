@@ -39,7 +39,7 @@ import {sanitizeString} from "../../../utils/backend-api";
 import {UploadYaml} from "../../../features/open-api-yaml-operations/component";
 import {
     COMPAGE,
-    COMPAGE_LANGUAGE_FRAMEWORKS,
+    COMPAGE_LANGUAGE_FRAMEWORKS, COMPAGE_LANGUAGE_SQL_DBS,
     GO,
     isCompageTemplate,
     LANGUAGES,
@@ -76,6 +76,7 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
         serverTypesConfig.isRestServer = true;
         serverTypesConfig.restServerConfig = {
             framework: restServerConfig.framework,
+            sqlDb: restServerConfig.sqlDb,
             openApiFileYamlContent: restServerConfig.openApiFileYamlContent,
             port: restServerConfig.port,
             resources: restServerConfig.resources,
@@ -200,6 +201,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
 
             if (payload.isRestServer) {
                 restServerConfig = {
+                    sqlDb: payload.restServerConfig.sqlDb,
                     framework: payload.restServerConfig.framework,
                     port: getPort(payload.restServerConfig.template, payload.restServerConfig.port),
                     template: payload.restServerConfig.template,
@@ -418,6 +420,39 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return '';
     };
 
+    const getSqlDbContent = () => {
+        // create language:sqlDbs map based on template chosen
+        let map;
+        if (isCompageTemplate(payload.restServerConfig.template)) {
+            map = new Map(Object.entries(COMPAGE_LANGUAGE_SQL_DBS));
+        } else {
+            map = new Map();
+        }
+        const sqlDbs = map.get(payload.language) || [];
+
+        if (sqlDbs.length > 0) {
+            return <TextField
+                required
+                size="medium"
+                select
+                margin="dense"
+                id="restSqlDb"
+                label="Sql Database"
+                defaultValue=''
+                type="text"
+                value={payload.restServerConfig.sqlDb}
+                onChange={handleRestServerConfigSqlDbChange}
+                variant="outlined">
+                {sqlDbs.map((sqlDb: string) => (
+                    <MenuItem key={sqlDb} value={sqlDb}>
+                        {sqlDb}
+                    </MenuItem>
+                ))}
+            </TextField>;
+        }
+        return '';
+    };
+
     const getFrameworkContent = () => {
         // create language:frameworks map based on template chosen
         let map;
@@ -491,6 +526,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 {getTemplateContent()}
                 {getFrameworkContent()}
                 {getPortContent()}
+                {getSqlDbContent()}
                 {getResourcesContent()}
             </React.Fragment>;
         }
@@ -507,6 +543,15 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 />}
             />
         </React.Fragment>;
+    };
+
+    const handleRestServerConfigSqlDbChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const restServerConfig: RestServerConfig = payload.restServerConfig;
+        restServerConfig.sqlDb = event.target.value;
+        setPayload({
+            ...payload,
+            restServerConfig
+        });
     };
 
     const handleRestServerConfigFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
@@ -775,7 +820,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     <Button variant="outlined" color="secondary" onClick={props.onNodePropertiesClose}>Cancel</Button>
                     <Button variant="contained"
                             onClick={handleUpdateNode}
-                            disabled={payload.name.value === '' || payload.language === '' || uploadYamlStatus === 'loading'}>Update Node</Button>
+                            disabled={payload.name.value === '' || payload.language === '' || uploadYamlStatus === 'loading'}>Update
+                        Node</Button>
                 </DialogActions>
             </Dialog>
         )}

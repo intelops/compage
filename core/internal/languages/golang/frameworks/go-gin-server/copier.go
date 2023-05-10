@@ -16,6 +16,9 @@ const RestServerPath = "/pkg/rest/server"
 const RestClientPath = "/pkg/rest/client"
 
 const DaosPath = RestServerPath + "/daos"
+const SqlDbClientsPath = DaosPath + "/clients/sql"
+
+// const NoSqlDbClientsPath = DaosPath + "/clients/nosql"
 const ServicesPath = RestServerPath + "/services"
 const ControllersPath = RestServerPath + "/controllers"
 const ModelsPath = RestServerPath + "/models"
@@ -23,9 +26,16 @@ const ModelsPath = RestServerPath + "/models"
 const ControllerFile = "controller.go.tmpl"
 const ServiceFile = "service.go.tmpl"
 const DaoFile = "dao.go.tmpl"
+const MySqlDaoFile = "mysql-dao.go.tmpl"
+const SqliteDaoFile = "sqlite-dao.go.tmpl"
+const MySqlDbClientFile = "mysql-client.go.tmpl"
+const SqliteDbClientFile = "sqlite-client.go.tmpl"
 const ModelFile = "model.go.tmpl"
 
 const ClientFile = "client.go.tmpl"
+
+const Sqlite = "SQLite"
+const MySql = "MySQL"
 
 // Copier Language specific copier
 type Copier struct {
@@ -34,13 +44,15 @@ type Copier struct {
 	Data              map[string]interface{}
 	IsRestServer      bool
 	IsRestClient      bool
+	SqlDb             string
+	IsSqlDb           bool
 	RestServerPort    string
 	Resources         []node.Resource
 	RestClients       []languages.RestClient
 	PluralizeClient   *pluralize.Client
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, resources []node.Resource, restClients []languages.RestClient) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isSqlDb bool, sqlDb string, resources []node.Resource, restClients []languages.RestClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
 
@@ -50,7 +62,9 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 		"NodeName":       strings.ToLower(nodeName),
 		"UserName":       userName,
 	}
-
+	data["SqlDb"] = sqlDb
+	// change this to generic
+	data["IsSqlDb"] = isSqlDb
 	// set all resources for main.go.tmpl
 	if isRestServer {
 		type resourceData struct {
@@ -76,6 +90,8 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 		Data:              data,
 		IsRestServer:      isRestServer,
 		IsRestClient:      isRestClient,
+		SqlDb:             sqlDb,
+		IsSqlDb:           isSqlDb,
 		Resources:         resources,
 		RestClients:       restClients,
 		PluralizeClient:   pluralizeClient,
@@ -98,7 +114,6 @@ func (c Copier) createRestServerDirectories() error {
 	modelsDirectory := c.NodeDirectoryName + ModelsPath
 	servicesDirectory := c.NodeDirectoryName + ServicesPath
 	daosDirectory := c.NodeDirectoryName + DaosPath
-
 	if err := utils.CreateDirectories(controllersDirectory); err != nil {
 		return err
 	}
@@ -111,7 +126,12 @@ func (c Copier) createRestServerDirectories() error {
 	if err := utils.CreateDirectories(daosDirectory); err != nil {
 		return err
 	}
-
+	if c.IsSqlDb {
+		sqlDbClientsDirectory := c.NodeDirectoryName + SqlDbClientsPath
+		if err := utils.CreateDirectories(sqlDbClientsDirectory); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -145,12 +165,50 @@ func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 	filePaths = append(filePaths, targetResourceServiceFileName)
 
 	// copy dao files to generated project
-	targetResourceDaoFileName := c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + DaoFile
-	_, err2 := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+DaoFile)
-	if err2 != nil {
-		return err2
+	// add database config here
+	var targetResourceDaoFileName string
+	targetResourceSqlDbClientFileName := ""
+	if c.IsSqlDb {
+		if c.SqlDb == Sqlite {
+			// client files
+			targetResourceSqlDbClientFileName = c.NodeDirectoryName + SqlDbClientsPath + "/" + resourceName + "-" + SqliteDbClientFile
+			_, err2 := utils.CopyFile(targetResourceSqlDbClientFileName, c.TemplatesRootPath+SqlDbClientsPath+"/"+SqliteDbClientFile)
+			if err2 != nil {
+				return err2
+			}
+			filePaths = append(filePaths, targetResourceSqlDbClientFileName)
+			// dao files
+			targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + SqliteDaoFile
+			_, err2 = utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+SqliteDaoFile)
+			if err2 != nil {
+				return err2
+			}
+			filePaths = append(filePaths, targetResourceDaoFileName)
+		} else if c.SqlDb == MySql {
+			// client files
+			targetResourceSqlDbClientFileName = c.NodeDirectoryName + SqlDbClientsPath + "/" + resourceName + "-" + MySqlDbClientFile
+			_, err2 := utils.CopyFile(targetResourceSqlDbClientFileName, c.TemplatesRootPath+SqlDbClientsPath+"/"+MySqlDbClientFile)
+			if err2 != nil {
+				return err2
+			}
+			filePaths = append(filePaths, targetResourceSqlDbClientFileName)
+
+			// dao files
+			targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + MySqlDaoFile
+			_, err2 = utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+MySqlDaoFile)
+			if err2 != nil {
+				return err2
+			}
+			filePaths = append(filePaths, targetResourceDaoFileName)
+		}
+	} else {
+		targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + DaoFile
+		_, err2 := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+DaoFile)
+		if err2 != nil {
+			return err2
+		}
+		filePaths = append(filePaths, targetResourceDaoFileName)
 	}
-	filePaths = append(filePaths, targetResourceDaoFileName)
 
 	// add resource specific data to map in c needed for templates.
 	c.addResourceSpecificTemplateData(resource)
