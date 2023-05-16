@@ -9,8 +9,8 @@
 - Install the CRDs for projects and users (when you are running for the first time.) by firing below commands
     - `kubectl create ns compage`
     - `kubectl config set-context --current --namespace=compage`
-    - `kubectl apply -f crds/projects.yaml`
-    - `kubectl apply -f crds/users.yaml`
+    - `kubectl apply -f crds/project-crd.yaml`
+    - `kubectl apply -f crds/user-crd.yaml`
 - Check if you are able to list `projects` and `users`. You should see below just after you fire above commands for the first time.
 ```shell
   ❯ kubectl get projects -A
