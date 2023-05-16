@@ -8,6 +8,7 @@ import (
 // TemplatesPath directory of template files
 const TemplatesPath = "templates/compage-template-go"
 const GoGinServerFramework = "go-gin-server"
+const GoGrpcServerFramework = "go-grpc-server"
 
 var templatesRootPath = utils.GetProjectRootPath(TemplatesPath)
 
