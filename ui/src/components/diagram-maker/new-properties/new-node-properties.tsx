@@ -231,8 +231,10 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     sqlDb: payload.grpcServerConfig.sqlDb,
                     framework: payload.grpcServerConfig.framework,
                     port: payload.grpcServerConfig.port,
-                    resources: []
                 };
+                if (isCompageTemplate(payload.grpcServerConfig.template)) {
+                    grpcServerConfig.resources = payload.grpcServerConfig.resources;
+                }
             }
             if (payload.isWsServer) {
                 wsServerConfig = {
