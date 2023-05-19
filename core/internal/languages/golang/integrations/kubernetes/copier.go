@@ -17,9 +17,11 @@ type Copier struct {
 	Data              map[string]interface{}
 	IsRestServer      bool
 	RestServerPort    string
+	IsGrpcServer      bool
+	GrpcServerPort    string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isGrpcServer bool, grpcServerPort string) *Copier {
 	// populate map to replace templates
 	data := map[string]interface{}{
 		"RepositoryName": repositoryName,
@@ -29,14 +31,21 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 
 	if isRestServer {
 		data["RestServerPort"] = restServerPort
-		data["IsRestServer"] = isRestServer
 	}
+	data["IsRestServer"] = isRestServer
+
+	if isGrpcServer {
+		data["GrpcServerPort"] = grpcServerPort
+	}
+	data["IsGrpcServer"] = isGrpcServer
 
 	return &Copier{
 		TemplatesRootPath: templatesRootPath,
 		NodeDirectoryName: nodeDirectoryName,
 		IsRestServer:      isRestServer,
 		RestServerPort:    restServerPort,
+		IsGrpcServer:      isGrpcServer,
+		GrpcServerPort:    grpcServerPort,
 		Data:              data,
 	}
 }
@@ -49,7 +58,7 @@ func (c Copier) CreateKubernetesFiles() error {
 	}
 
 	var filePaths []string
-	if c.IsRestServer {
+	if c.IsRestServer || c.IsGrpcServer {
 		// copy service files to generated kubernetes manifests
 		targetKubernetesServiceFileName := c.NodeDirectoryName + Path + "/" + ServiceFile
 		_, err := utils.CopyFile(targetKubernetesServiceFileName, c.TemplatesRootPath+Path+"/"+ServiceFile)

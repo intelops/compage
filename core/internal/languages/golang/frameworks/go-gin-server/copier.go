@@ -239,8 +239,6 @@ func (c Copier) copyRestClientResourceFiles(restClient languages.RestClient) err
 }
 
 func (c Copier) addResourceSpecificTemplateData(resource node.Resource) error {
-	// set resource specific key/value for data.
-	c.Data["ResourceName"] = resource.Name
 	// make every field public by making its first character capital.
 	fields := map[string]string{}
 	for key, value := range resource.Fields {
@@ -310,9 +308,11 @@ func (c Copier) addResourceSpecificTemplateData(resource node.Resource) error {
 		c.Data["GetQueryExecColumns"] = getQueryScanColumns
 	}
 
-	// Add another map for db specific fields
-	c.Data["ResourceNameSingular"] = strings.ToLower(resource.Name)
-	c.Data["ResourceNamePlural"] = c.PluralizeClient.Plural(strings.ToLower(resource.Name))
+	// Add another map
+	c.Data["SmallResourceNameSingular"] = strings.ToLower(resource.Name)
+	c.Data["SmallResourceNamePlural"] = c.PluralizeClient.Plural(strings.ToLower(resource.Name))
+	c.Data["CapsResourceNameSingular"] = resource.Name
+	c.Data["CapsResourceNamePlural"] = c.PluralizeClient.Plural(resource.Name)
 	return nil
 }
 

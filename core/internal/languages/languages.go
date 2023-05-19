@@ -158,6 +158,26 @@ func NewLanguageNode(compageJSON *core.CompageJSON, node *node.Node) (*LanguageN
 		}
 	}
 
+	// check if the servers has grpc entry (if node is not server or node is not GRPC server)
+	if grpcServer, ok := (*servers)[core.Grpc]; ok {
+		// one node, one rest server
+		languageNode.GrpcConfig = &GrpcConfig{
+			Server: grpcServer.(*GrpcServer),
+		}
+	}
+
+	// check if any grpc client needs to be created
+	if grpcClients, ok := (*clients)[core.Grpc]; ok {
+		// if the component is just client and not server, languageNode.RestConfig will be nil in that case.
+		if languageNode.GrpcConfig == nil {
+			languageNode.GrpcConfig = &GrpcConfig{
+				Clients: grpcClients.([]GrpcClient),
+			}
+		} else {
+			languageNode.GrpcConfig.Clients = grpcClients.([]GrpcClient)
+		}
+	}
+
 	return languageNode, nil
 }
 
