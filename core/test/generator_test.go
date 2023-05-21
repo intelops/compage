@@ -1,10 +1,10 @@
 package test
 
 import (
+	"fmt"
 	"github.com/intelops/compage/core/gen/api/v1"
 	"github.com/intelops/compage/core/internal/converter/grpc"
 	"github.com/intelops/compage/core/internal/handlers"
-	"os"
 	"testing"
 )
 
@@ -32,15 +32,17 @@ func TestGenerator(t *testing.T) {
     }
   }
 }`
+	fmt.Println(jsonString)
+	grpcConfigJson := `{"edges":{},"nodes":{"node-b0":{"id":"node-b0","typeId":"node-type-circle","consumerData":{"nodeType":"circle","name":"student-service","language":"go","grpcServerConfig":{"template":"compage","sqlDb":"SQLite","framework":"go-grpc-server","port":"12224","resources":[{"fields":{"Name":"string","RollNumber":"int32","College":"string"},"name":"Student"}]}}}}}`
 	input := project.GenerateCodeRequest{
 		UserName:       "mahendraintelops",
 		RepositoryName: "first-project-github",
 		ProjectName:    "first-project",
-		Json:           jsonString,
+		Json:           grpcConfigJson,
 	}
-	defer func() {
-		_ = os.RemoveAll("/tmp/first-project")
-	}()
+	//defer func() {
+	//	_ = os.RemoveAll("/tmp/first-project")
+	//}()
 
 	// retrieve project struct
 	getProject, err := grpc.GetProject(&input)

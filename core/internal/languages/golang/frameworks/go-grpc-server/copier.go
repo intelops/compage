@@ -10,7 +10,10 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"strings"
+	"text/template"
 )
+
+const ApiPath = "/api/v1"
 
 const GrpcServerPath = "/pkg/grpc/server"
 const GrpcClientPath = "/pkg/grpc/client"
@@ -24,6 +27,7 @@ const ServicesPath = GrpcServerPath + "/services"
 const ControllersPath = GrpcServerPath + "/controllers"
 const ModelsPath = GrpcServerPath + "/models"
 
+const ApiProtoFile = "api.proto.tmpl"
 const ControllerFile = "controller.go.tmpl"
 const ServiceFile = "service.go.tmpl"
 const DaoFile = "dao.go.tmpl"
@@ -37,6 +41,9 @@ const ClientFile = "client.go.tmpl"
 
 const Sqlite = "SQLite"
 const MySQL = "MySQL"
+
+// count for message generation
+var count int
 
 // Copier Language specific copier
 type Copier struct {
@@ -110,10 +117,14 @@ func (c Copier) createGrpcClientDirectories() error {
 
 // createGrpcServerDirectories creates grpc server directories.
 func (c Copier) createGrpcServerDirectories() error {
+	apiDirectory := c.NodeDirectoryName + ApiPath
 	controllersDirectory := c.NodeDirectoryName + ControllersPath
 	modelsDirectory := c.NodeDirectoryName + ModelsPath
 	servicesDirectory := c.NodeDirectoryName + ServicesPath
 	daosDirectory := c.NodeDirectoryName + DaosPath
+	if err := utils.CreateDirectories(apiDirectory); err != nil {
+		return err
+	}
 	if err := utils.CreateDirectories(controllersDirectory); err != nil {
 		return err
 	}
@@ -210,6 +221,20 @@ func (c Copier) copyGrpcServerResourceFiles(resource node.Resource) error {
 		filePaths = append(filePaths, targetResourceDaoFileName)
 	}
 
+	// add api.proto file for the resource.
+	targetResourceApiFileName := c.NodeDirectoryName + ApiPath + "/" + resourceName + "-" + ApiProtoFile
+	_, err2 := utils.CopyFile(targetResourceApiFileName, c.TemplatesRootPath+ApiPath+"/"+ApiProtoFile)
+	if err2 != nil {
+		return err2
+	}
+	// this function increments message fields number (grpc message)
+	funcMap := template.FuncMap{
+		"incCount": func(count int) int {
+			return count + 2
+		},
+	}
+	filePaths = append(filePaths, targetResourceApiFileName)
+
 	// add resource specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
 	if err != nil {
@@ -217,13 +242,13 @@ func (c Copier) copyGrpcServerResourceFiles(resource node.Resource) error {
 	}
 
 	// apply template
-	return executor.Execute(filePaths, c.Data)
+	return executor.ExecuteWithFuncs(filePaths, c.Data, funcMap)
 }
 
 // copyGrpcClientResourceFiles copies grpc client files from template and renames them as per client config.
 func (c Copier) copyGrpcClientResourceFiles(grpcClient languages.GrpcClient) error {
 	/// add resource specific data to map in c needed for templates.
-	c.Data[" "] = grpcClient.Port
+	c.Data["GrpcClientPort"] = grpcClient.Port
 	c.Data["GrpcClientServiceName"] = grpcClient.ExternalNode
 
 	// copy grpcClient files to generated project.
@@ -242,11 +267,15 @@ func (c Copier) copyGrpcClientResourceFiles(grpcClient languages.GrpcClient) err
 func (c Copier) addResourceSpecificTemplateData(resource node.Resource) error {
 	// make every field public by making its first character capital.
 	fields := map[string]string{}
+	// this slice is needed for grpc resource message generation
+	var fieldNames []string
 	for key, value := range resource.Fields {
 		key = cases.Title(language.Und, cases.NoLower).String(key)
 		fields[key] = value
+		fieldNames = append(fieldNames, key)
 	}
 	c.Data["Fields"] = fields
+	c.Data["FieldNames"] = fieldNames
 	// db fields
 	if c.IsSQLDB {
 		createQueryColumns := map[string]string{}
