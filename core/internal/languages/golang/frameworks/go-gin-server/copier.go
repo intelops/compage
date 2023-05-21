@@ -67,13 +67,22 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	// set all resources for main.go.tmpl
 	if isRestServer {
 		type resourceData struct {
-			ResourceNamePlural string
-			ResourceName       string
+			SmallResourceNameSingular string
+			SmallResourceNamePlural   string
+			CapsResourceNameSingular  string
+			CapsResourceNamePlural    string
+			ResourceName              string
 		}
 
 		var resourcesData []resourceData
 		for _, r := range resources {
-			resourcesData = append(resourcesData, resourceData{ResourceName: r.Name, ResourceNamePlural: pluralizeClient.Plural(strings.ToLower(r.Name))})
+			resourcesData = append(resourcesData, resourceData{
+				ResourceName:              r.Name,
+				SmallResourceNameSingular: strings.ToLower(r.Name),
+				SmallResourceNamePlural:   pluralizeClient.Plural(strings.ToLower(r.Name)),
+				CapsResourceNameSingular:  r.Name,
+				CapsResourceNamePlural:    pluralizeClient.Plural(r.Name),
+			})
 		}
 		data["Resources"] = resourcesData
 		data["RestServerPort"] = restServerPort
