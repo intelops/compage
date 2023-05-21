@@ -10,7 +10,7 @@ import (
 )
 
 func TestRestGenerator(t *testing.T) {
-	restConfigJson := `{
+	restConfigJSON := `{
     "edges": {},
     "nodes": {
         "node-ef": {
@@ -42,7 +42,7 @@ func TestRestGenerator(t *testing.T) {
 		UserName:       "mahendraintelops",
 		RepositoryName: "first-project-github",
 		ProjectName:    "first-rest-project",
-		Json:           restConfigJson,
+		Json:           restConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-rest-project")
@@ -61,7 +61,7 @@ func TestRestGenerator(t *testing.T) {
 }
 
 func TestGrpcGenerator(t *testing.T) {
-	grpcConfigJson := `{
+	grpcConfigJSON := `{
     "edges": {},
     "nodes": {
         "node-b0": {
@@ -95,7 +95,7 @@ func TestGrpcGenerator(t *testing.T) {
 		UserName:       "mahendraintelops",
 		RepositoryName: "first-project-github",
 		ProjectName:    "first-grpc-project",
-		Json:           grpcConfigJson,
+		Json:           grpcConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-grpc-project")

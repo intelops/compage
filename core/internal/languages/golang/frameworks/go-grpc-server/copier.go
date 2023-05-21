@@ -13,7 +13,7 @@ import (
 	"text/template"
 )
 
-const ApiPath = "/api/v1"
+const APIPath = "/api/v1"
 
 const GrpcServerPath = "/pkg/grpc/server"
 const GrpcClientPath = "/pkg/grpc/client"
@@ -27,7 +27,7 @@ const ServicesPath = GrpcServerPath + "/services"
 const ControllersPath = GrpcServerPath + "/controllers"
 const ModelsPath = GrpcServerPath + "/models"
 
-const ApiProtoFile = "api.proto.tmpl"
+const APIProtoFile = "api.proto.tmpl"
 const ControllerFile = "controller.go.tmpl"
 const ServiceFile = "service.go.tmpl"
 const DaoFile = "dao.go.tmpl"
@@ -41,9 +41,6 @@ const ClientFile = "client.go.tmpl"
 
 const Sqlite = "SQLite"
 const MySQL = "MySQL"
-
-// count for message generation
-var count int
 
 // Copier Language specific copier
 type Copier struct {
@@ -117,7 +114,7 @@ func (c Copier) createGrpcClientDirectories() error {
 
 // createGrpcServerDirectories creates grpc server directories.
 func (c Copier) createGrpcServerDirectories() error {
-	apiDirectory := c.NodeDirectoryName + ApiPath
+	apiDirectory := c.NodeDirectoryName + APIPath
 	controllersDirectory := c.NodeDirectoryName + ControllersPath
 	modelsDirectory := c.NodeDirectoryName + ModelsPath
 	servicesDirectory := c.NodeDirectoryName + ServicesPath
@@ -222,8 +219,8 @@ func (c Copier) copyGrpcServerResourceFiles(resource node.Resource) error {
 	}
 
 	// add api.proto file for the resource.
-	targetResourceApiFileName := c.NodeDirectoryName + ApiPath + "/" + resourceName + "-" + ApiProtoFile
-	_, err2 := utils.CopyFile(targetResourceApiFileName, c.TemplatesRootPath+ApiPath+"/"+ApiProtoFile)
+	targetResourceAPIFileName := c.NodeDirectoryName + APIPath + "/" + resourceName + "-" + APIProtoFile
+	_, err2 := utils.CopyFile(targetResourceAPIFileName, c.TemplatesRootPath+APIPath+"/"+APIProtoFile)
 	if err2 != nil {
 		return err2
 	}
@@ -233,7 +230,7 @@ func (c Copier) copyGrpcServerResourceFiles(resource node.Resource) error {
 			return count + 2
 		},
 	}
-	filePaths = append(filePaths, targetResourceApiFileName)
+	filePaths = append(filePaths, targetResourceAPIFileName)
 
 	// add resource specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
