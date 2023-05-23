@@ -22,6 +22,7 @@ import {
     TableRow
 } from "@mui/material";
 import {
+    EmptyCurrentGrpcResource,
     EmptyCurrentRestResource,
     EmptyGrpcServerConfig,
     EmptyRestServerConfig,
@@ -39,7 +40,8 @@ import {sanitizeString} from "../../../utils/backend-api";
 import {UploadYaml} from "../../../features/open-api-yaml-operations/component";
 import {
     COMPAGE,
-    COMPAGE_LANGUAGE_FRAMEWORKS, COMPAGE_LANGUAGE_SQL_DBS,
+    COMPAGE_LANGUAGE_FRAMEWORKS, COMPAGE_LANGUAGE_GRPC_FRAMEWORKS,
+    COMPAGE_LANGUAGE_SQL_DBS,
     GO,
     isCompageTemplate,
     LANGUAGES,
@@ -50,6 +52,8 @@ import "./new-node-properties.scss";
 import {DeleteRestResource} from "./delete-rest-resource";
 import RemoveIcon from "@mui/icons-material/Remove";
 import EditIcon from "@mui/icons-material/Edit";
+import {DeleteGrpcResource} from "./delete-grpc-resource";
+import {AddOrUpdateGrpcResource} from "./add-or-update-grpc-resource";
 
 interface NewNodePropertiesProps {
     isOpen: boolean;
@@ -87,6 +91,8 @@ const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig =>
         serverTypesConfig.isGrpcServer = true;
         serverTypesConfig.grpcServerConfig = {
             framework: grpcServerConfig.framework,
+            template: grpcServerConfig.template,
+            sqlDb: grpcServerConfig.sqlDb,
             port: grpcServerConfig.port,
             protoFileContent: grpcServerConfig.protoFileContent,
             resources: grpcServerConfig.resources
@@ -126,10 +132,16 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         grpcServerConfig: serverTypesConfig.grpcServerConfig || EmptyGrpcServerConfig,
         isWsServer: serverTypesConfig.isWsServer || false,
         wsServerConfig: serverTypesConfig.wsServerConfig || EmptyWsServerConfig,
+        // rest
         isAddRestResourceOpen: false,
         isUpdateRestResourceOpen: false,
         isDeleteRestResourceOpen: false,
-        currentRestResource: EmptyCurrentRestResource
+        currentRestResource: EmptyCurrentRestResource,
+        // grpc
+        isAddGrpcResourceOpen: false,
+        isUpdateGrpcResourceOpen: false,
+        isDeleteGrpcResourceOpen: false,
+        currentGrpcResource: EmptyCurrentGrpcResource
     });
 
     const isNameValid = () => {
@@ -215,10 +227,14 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             }
             if (payload.isGrpcServer) {
                 grpcServerConfig = {
+                    template: payload.grpcServerConfig.template,
+                    sqlDb: payload.grpcServerConfig.sqlDb,
                     framework: payload.grpcServerConfig.framework,
                     port: payload.grpcServerConfig.port,
-                    resources: []
                 };
+                if (isCompageTemplate(payload.grpcServerConfig.template)) {
+                    grpcServerConfig.resources = payload.grpcServerConfig.resources;
+                }
             }
             if (payload.isWsServer) {
                 wsServerConfig = {
@@ -273,7 +289,11 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 isAddRestResourceOpen: false,
                 isUpdateRestResourceOpen: false,
                 isDeleteRestResourceOpen: false,
-                currentRestResource: EmptyCurrentRestResource
+                currentRestResource: EmptyCurrentRestResource,
+                isAddGrpcResourceOpen: false,
+                isUpdateGrpcResourceOpen: false,
+                isDeleteGrpcResourceOpen: false,
+                currentGrpcResource: EmptyCurrentGrpcResource
             });
             props.onNodePropertiesClose();
         }
@@ -285,6 +305,16 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         setPayload({
             ...payload,
             restServerConfig
+        });
+    };
+
+
+    const handleGrpcTemplateChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const grpcServerConfig: GrpcServerConfig = payload.grpcServerConfig;
+        grpcServerConfig.template = event.target.value;
+        setPayload({
+            ...payload,
+            grpcServerConfig
         });
     };
 
@@ -520,6 +550,327 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         }
     };
 
+    // grpc
+    const handleAddGrpcResourceClick = () => {
+        setPayload({
+            ...payload,
+            isAddGrpcResourceOpen: !payload.isAddGrpcResourceOpen,
+            currentGrpcResource: EmptyCurrentGrpcResource
+        });
+    };
+
+    const handleEditGrpcResourceClick = (resource: Resource) => {
+        setPayload({
+            ...payload,
+            isUpdateGrpcResourceOpen: !payload.isUpdateGrpcResourceOpen,
+            currentGrpcResource: resource
+        });
+    };
+
+    const handleDeleteGrpcResourceClick = (resourceName: string) => {
+        payload.currentGrpcResource = {
+            name: resourceName
+        };
+        setPayload({
+            ...payload,
+            isDeleteGrpcResourceOpen: !payload.isDeleteGrpcResourceOpen
+        });
+    };
+    const getExistingGrpcResources = () => {
+        if (payload.grpcServerConfig.resources?.length > 0) {
+            return <>
+                <br/>
+                Existing resources :
+                <TableContainer component={Paper}>
+                    <Table sx={{minWidth: 400}}>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell align="left">Resource</TableCell>
+                                <TableCell align="center">Actions</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {
+                                payload.grpcServerConfig.resources.map((resource, index) => (
+                                    <TableRow
+                                        key={index}
+                                        sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                    >
+                                        <TableCell scope="row">
+                                            {resource.name}
+                                        </TableCell>
+                                        <TableCell align="left">
+                                            <Stack direction="row-reverse" spacing={1}>
+                                                <Button variant="text"
+                                                        color="error"
+                                                        onClick={() => handleDeleteGrpcResourceClick(resource.name)}>
+                                                    <RemoveIcon/>
+                                                </Button>
+                                                <Button variant="text"
+                                                        onClick={() => handleEditGrpcResourceClick(resource)}>
+                                                    <EditIcon/>
+                                                </Button>
+                                            </Stack>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            }
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </>;
+        }
+
+        return '';
+    };
+
+    const getGrpcTemplateContent = () => {
+        let templates;
+        if (payload.language === GO) {
+            templates = [COMPAGE];
+        } else {
+            templates = [];
+        }
+        if (templates.length > 0) {
+            return <TextField
+                required
+                size="medium"
+                select
+                margin="dense"
+                id="grpcTemplate"
+                defaultValue=''
+                label="Template"
+                type="text"
+                value={payload.grpcServerConfig.template}
+                onChange={handleGrpcTemplateChange}
+                variant="outlined">
+                {
+                    templates.map((template: string) => (
+                        <MenuItem key={template} value={template}>
+                            {template}
+                        </MenuItem>
+                    ))
+                }
+            </TextField>;
+        }
+        return '';
+    };
+
+    const getGrpcSqlDbContent = () => {
+        // create language:sqlDbs map based on template chosen
+        let map;
+        if (isCompageTemplate(payload.grpcServerConfig.template)) {
+            map = new Map(Object.entries(COMPAGE_LANGUAGE_SQL_DBS));
+        } else {
+            map = new Map();
+        }
+        const sqlDbs = map.get(payload.language) || [];
+
+        if (sqlDbs.length > 0) {
+            return <TextField
+                required
+                size="medium"
+                select
+                margin="dense"
+                id="grpcSqlDb"
+                label="Sql Database"
+                defaultValue=''
+                type="text"
+                value={payload.grpcServerConfig.sqlDb}
+                onChange={handleGrpcServerConfigSqlDbChange}
+                variant="outlined">
+                {sqlDbs.map((sqlDb: string) => (
+                    <MenuItem key={sqlDb} value={sqlDb}>
+                        {sqlDb}
+                    </MenuItem>
+                ))}
+            </TextField>;
+        }
+        return '';
+    };
+
+    const getGrpcFrameworkContent = () => {
+        // create language:frameworks map based on template chosen
+        let map;
+        if (isCompageTemplate(payload.grpcServerConfig.template)) {
+            map = new Map(Object.entries(COMPAGE_LANGUAGE_GRPC_FRAMEWORKS));
+        } else {
+            map = new Map();
+        }
+        const frameworks = map.get(payload.language) || [];
+
+        if (frameworks.length > 0) {
+            return <TextField
+                required
+                size="medium"
+                select
+                margin="dense"
+                id="grpcFramework"
+                label="Framework"
+                defaultValue=''
+                type="text"
+                value={payload.grpcServerConfig.framework}
+                onChange={handleGrpcServerConfigFrameworkChange}
+                variant="outlined">
+                {frameworks.map((framework: string) => (
+                    <MenuItem key={framework} value={framework}>
+                        {framework}
+                    </MenuItem>
+                ))}
+            </TextField>;
+        }
+        return '';
+    };
+
+    const getGrpcPortContent = () => {
+        if (isCompageTemplate(payload.grpcServerConfig.template)) {
+            return <TextField
+                required
+                size="medium"
+                margin="dense"
+                id="grpcServerConfigPort"
+                label="Port"
+                type="number"
+                value={payload.grpcServerConfig.port}
+                onChange={handleGrpcServerConfigPortChange}
+                variant="outlined"
+            />;
+        }
+        return '';
+    };
+
+    const getGrpcResourcesContent = () => {
+        if (isCompageTemplate(payload.grpcServerConfig.template)) {
+            return <React.Fragment>
+                <Button variant="outlined" color="secondary" onClick={handleAddGrpcResourceClick}>
+                    Add Resource
+                </Button>
+                {
+                    getExistingGrpcResources()
+                }
+            </React.Fragment>;
+        }
+        return <React.Fragment>
+        </React.Fragment>;
+    };
+
+    const handleGrpcServerConfigSqlDbChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const grpcServerConfig: GrpcServerConfig = payload.grpcServerConfig;
+        grpcServerConfig.sqlDb = event.target.value;
+        setPayload({
+            ...payload,
+            grpcServerConfig
+        });
+    };
+
+    const handleGrpcServerConfigFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const grpcServerConfig: GrpcServerConfig = payload.grpcServerConfig;
+        grpcServerConfig.framework = event.target.value;
+        setPayload({
+            ...payload,
+            grpcServerConfig
+        });
+    };
+
+    const handleIsGrpcServerChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setPayload({
+            ...payload,
+            isGrpcServer: event.target.checked
+        });
+    };
+
+    const getGrpcServerConfig = () => {
+        if (payload.isGrpcServer) {
+            return <React.Fragment>
+                {getGrpcTemplateContent()}
+                {getGrpcFrameworkContent()}
+                {getGrpcPortContent()}
+                {getGrpcSqlDbContent()}
+                {getGrpcResourcesContent()}
+            </React.Fragment>;
+        }
+        return '';
+    };
+
+    const getGrpcServerCheck = () => {
+        return <React.Fragment>
+            <FormControlLabel
+                label="gRPC Server"
+                control={<Checkbox
+                    size="medium" checked={payload.isGrpcServer}
+                    onChange={handleIsGrpcServerChange}
+                />}
+            />
+        </React.Fragment>;
+    };
+
+    const handleGrpcServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const grpcServerConfig: GrpcServerConfig = payload.grpcServerConfig;
+        grpcServerConfig.port = event.target.value;
+        setPayload({
+            ...payload,
+            grpcServerConfig,
+        });
+    };
+
+
+    const handleAddOrUpdateGrpcResource = (resource: Resource) => {
+        const grpcServerConfig: RestServerConfig = payload.grpcServerConfig;
+        // the below check is to identify if the rest resource is added or updated.
+        if (payload.isUpdateGrpcResourceOpen) {
+            // remove the old resource while updating
+            payload.grpcServerConfig.resources = payload.grpcServerConfig.resources.filter(res => res.name !== resource.name);
+            grpcServerConfig.resources.push(resource);
+            payload.isUpdateGrpcResourceOpen = false;
+        } else if (payload.isAddGrpcResourceOpen) {
+            payload.isAddGrpcResourceOpen = false;
+            grpcServerConfig.resources.push(resource);
+        }
+        setPayload({
+            ...payload,
+            grpcServerConfig,
+        });
+    };
+
+    const handleDeleteGrpcResource = () => {
+        const currentGrpcResource = payload.currentGrpcResource;
+        payload.grpcServerConfig.resources = payload.grpcServerConfig.resources.filter(resource => resource.name !== currentGrpcResource.name);
+        setPayload({
+            ...payload,
+            grpcServerConfig: payload.grpcServerConfig,
+            isDeleteGrpcResourceOpen: !payload.isDeleteGrpcResourceOpen
+        });
+    };
+
+    const onDeleteGrpcResourceClose = () => {
+        setPayload({
+            ...payload,
+            isDeleteGrpcResourceOpen: !payload.isDeleteGrpcResourceOpen
+        });
+    };
+
+    const onAddOrUpdateGrpcResourceClose = () => {
+        if (payload.isAddGrpcResourceOpen) {
+            payload.isAddGrpcResourceOpen = false;
+        } else if (payload.isUpdateGrpcResourceOpen) {
+            payload.isUpdateGrpcResourceOpen = false;
+        }
+        setPayload({
+            ...payload,
+        });
+    };
+
+    const getGrpcResourceNames = () => {
+        if (payload.grpcServerConfig.resources.length > 0) {
+            const resourceNames = [];
+            payload.grpcServerConfig.resources.forEach(resource => {
+                resourceNames.push(resource.name);
+            });
+            return resourceNames;
+        }
+        return [];
+    };
+
     const getRestServerConfig = () => {
         if (payload.isRestServer) {
             return <React.Fragment>
@@ -572,55 +923,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const handleIsGrpcServerChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setPayload({
-            ...payload,
-            isGrpcServer: event.target.checked
-        });
-    };
-
-    const getGrpcServerConfig = () => {
-        if (payload.isGrpcServer) {
-            return <React.Fragment>
-                <TextField
-                    required
-                    size="medium"
-                    margin="dense"
-                    id="grpcServerConfigPort"
-                    label="Port"
-                    type="text"
-                    value={payload.grpcServerConfig.port}
-                    onChange={handleGrpcServerConfigPortChange}
-                    variant="outlined"
-                />
-            </React.Fragment>;
-        }
-        return '';
-    };
-
-    const getGrpcServerCheck = () => {
-        return <React.Fragment>
-            <FormControlLabel
-                label="gRPC Server"
-                // remove below when grpc is supported.
-                disabled
-                control={<Checkbox
-                    size="medium" checked={payload.isGrpcServer}
-                    onChange={handleIsGrpcServerChange}
-                />}
-            />
-        </React.Fragment>;
-    };
-
-    const handleGrpcServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const grpcServerConfig: GrpcServerConfig = payload.grpcServerConfig;
-        grpcServerConfig.port = event.target.value;
-        setPayload({
-            ...payload,
-            grpcServerConfig,
-        });
-    };
-
     const handleIsWsServerChange = (event: ChangeEvent<HTMLInputElement>) => {
         setPayload({
             ...payload,
@@ -651,7 +953,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return <React.Fragment>
             <FormControlLabel
                 label="WS Server"
-                // remove below when grpc is supported.
+                // remove below when ws is supported.
                 disabled
                 control={<Checkbox
                     size="medium" checked={payload.isWsServer}
@@ -750,6 +1052,20 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                                      nodeId={props.nodeId}
                                      handleAddOrUpdateRestResource={handleAddOrUpdateRestResource}/>
         )}
+        {payload.isDeleteGrpcResourceOpen && (
+            <DeleteGrpcResource isOpen={payload.isDeleteGrpcResourceOpen}
+                                resource={payload.currentGrpcResource}
+                                onDeleteGrpcResourceClose={onDeleteGrpcResourceClose}
+                                handleDeleteGrpcResource={handleDeleteGrpcResource}/>
+        )}
+        {(payload.isAddGrpcResourceOpen || payload.isUpdateGrpcResourceOpen) && (
+            <AddOrUpdateGrpcResource isOpen={payload.isAddGrpcResourceOpen || payload.isUpdateGrpcResourceOpen}
+                                     resource={payload.currentGrpcResource}
+                                     resourceNames={getGrpcResourceNames()}
+                                     onAddOrUpdateGrpcResourceClose={onAddOrUpdateGrpcResourceClose}
+                                     nodeId={props.nodeId}
+                                     handleAddOrUpdateGrpcResource={handleAddOrUpdateGrpcResource}/>
+        )}
         {props.isOpen && (
             <Dialog open={props.isOpen} onClose={onClose}>
                 <DialogTitle>Node Properties : {props.nodeId}</DialogTitle>
@@ -803,8 +1119,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                             borderRadius: "15px",
                             border: payload.isGrpcServer ? '1px solid #dadada' : ''
                         }} direction="column" spacing={2}>
-                            {/*{getGrpcServerCheck()}*/}
-                            {/*{getGrpcServerConfig()}*/}
+                            {getGrpcServerCheck()}
+                            {getGrpcServerConfig()}
                         </Stack>
                         <Stack style={{
                             padding: "10px",

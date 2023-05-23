@@ -1,4 +1,4 @@
-package goginserver
+package gogrpcserver
 
 import (
 	"errors"
@@ -10,18 +10,24 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"strings"
+	"text/template"
 )
 
-const RestServerPath = "/pkg/rest/server"
-const RestClientPath = "/pkg/rest/client"
+const APIPath = "/api/v1"
 
-const DaosPath = RestServerPath + "/daos"
+const GrpcServerPath = "/pkg/grpc/server"
+const GrpcClientPath = "/pkg/grpc/client"
+
+const DaosPath = GrpcServerPath + "/daos"
 const SQLDBClientsPath = DaosPath + "/clients/sqls"
 
-const ServicesPath = RestServerPath + "/services"
-const ControllersPath = RestServerPath + "/controllers"
-const ModelsPath = RestServerPath + "/models"
+// const NoSqlDbClientsPath = DaosPath + "/clients/nosql"
 
+const ServicesPath = GrpcServerPath + "/services"
+const ControllersPath = GrpcServerPath + "/controllers"
+const ModelsPath = GrpcServerPath + "/models"
+
+const APIProtoFile = "api.proto.tmpl"
 const ControllerFile = "controller.go.tmpl"
 const ServiceFile = "service.go.tmpl"
 const DaoFile = "dao.go.tmpl"
@@ -43,13 +49,13 @@ type Copier struct {
 	NodeDirectoryName string
 	TemplatesRootPath string
 	Data              map[string]interface{}
-	IsRestServer      bool
-	IsRestClient      bool
+	IsGrpcServer      bool
+	IsGrpcClient      bool
 	SQLDB             string
 	IsSQLDB           bool
-	RestServerPort    string
+	GrpcServerPort    string
 	Resources         []node.Resource
-	RestClients       []languages.RestClient
+	GrpcClients       []languages.GrpcClient
 	PluralizeClient   *pluralize.Client
 }
 
@@ -60,7 +66,7 @@ type resourceData struct {
 	CapsResourceNamePlural    string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isSQLDB bool, sqlDB string, resources []node.Resource, restClients []languages.RestClient) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isGrpcServer bool, grpcServerPort string, isSQLDB bool, sqlDB string, resources []node.Resource, grpcClients []languages.GrpcClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
 
@@ -73,7 +79,7 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	data["SQLDB"] = sqlDB
 	data["IsSQLDB"] = isSQLDB
 	// set all resources for main.go.tmpl
-	if isRestServer {
+	if isGrpcServer {
 		var resourcesData []resourceData
 		for _, r := range resources {
 			resourcesData = append(resourcesData, resourceData{
@@ -84,30 +90,30 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 			})
 		}
 		data["Resources"] = resourcesData
-		data["RestServerPort"] = restServerPort
-		data["IsRestServer"] = isRestServer
+		data["GrpcServerPort"] = grpcServerPort
+		data["IsGrpcServer"] = isGrpcServer
 	}
-	// if restClients slice has elements
-	isRestClient := len(restClients) > 0
-	data["IsRestClient"] = isRestClient
+	// if grpcClients slice has elements
+	isGrpcClient := len(grpcClients) > 0
+	data["IsGrpcClient"] = isGrpcClient
 
 	return &Copier{
 		TemplatesRootPath: templatesRootPath,
 		NodeDirectoryName: nodeDirectoryName,
 		Data:              data,
-		IsRestServer:      isRestServer,
-		IsRestClient:      isRestClient,
+		IsGrpcServer:      isGrpcServer,
+		IsGrpcClient:      isGrpcClient,
 		SQLDB:             sqlDB,
 		IsSQLDB:           isSQLDB,
 		Resources:         resources,
-		RestClients:       restClients,
+		GrpcClients:       grpcClients,
 		PluralizeClient:   pluralizeClient,
 	}
 }
 
-// createRestClientDirectories creates rest client directories.
-func (c Copier) createRestClientDirectories() error {
-	clientDirectory := c.NodeDirectoryName + RestClientPath
+// createGrpcClientDirectories creates grpc client directories.
+func (c Copier) createGrpcClientDirectories() error {
+	clientDirectory := c.NodeDirectoryName + GrpcClientPath
 	if err := utils.CreateDirectories(clientDirectory); err != nil {
 		return err
 	}
@@ -115,12 +121,16 @@ func (c Copier) createRestClientDirectories() error {
 	return nil
 }
 
-// createRestServerDirectories creates rest server directories.
-func (c Copier) createRestServerDirectories() error {
+// createGrpcServerDirectories creates grpc server directories.
+func (c Copier) createGrpcServerDirectories() error {
+	apiDirectory := c.NodeDirectoryName + APIPath
 	controllersDirectory := c.NodeDirectoryName + ControllersPath
 	modelsDirectory := c.NodeDirectoryName + ModelsPath
 	servicesDirectory := c.NodeDirectoryName + ServicesPath
 	daosDirectory := c.NodeDirectoryName + DaosPath
+	if err := utils.CreateDirectories(apiDirectory); err != nil {
+		return err
+	}
 	if err := utils.CreateDirectories(controllersDirectory); err != nil {
 		return err
 	}
@@ -149,8 +159,8 @@ func (c Copier) createRestServerDirectories() error {
 	return nil
 }
 
-// copyRestServerResourceFiles copies rest server resource files from template and renames them as per resource config.
-func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
+// copyGrpcServerResourceFiles copies grpc server resource files from template and renames them as per resource config.
+func (c Copier) copyGrpcServerResourceFiles(resource node.Resource) error {
 	var filePaths []string
 	resourceName := strings.ToLower(resource.Name)
 
@@ -224,6 +234,20 @@ func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 		filePaths = append(filePaths, targetResourceDaoFileName)
 	}
 
+	// add api.proto file for the resource.
+	targetResourceAPIFileName := c.NodeDirectoryName + APIPath + "/" + resourceName + "-" + APIProtoFile
+	_, err2 := utils.CopyFile(targetResourceAPIFileName, c.TemplatesRootPath+APIPath+"/"+APIProtoFile)
+	if err2 != nil {
+		return err2
+	}
+	// this function increments message fields number (grpc message)
+	funcMap := template.FuncMap{
+		"incCount": func(count int) int {
+			return count + 2
+		},
+	}
+	filePaths = append(filePaths, targetResourceAPIFileName)
+
 	// add resource specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
 	if err != nil {
@@ -231,18 +255,18 @@ func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 	}
 
 	// apply template
-	return executor.Execute(filePaths, c.Data)
+	return executor.ExecuteWithFuncs(filePaths, c.Data, funcMap)
 }
 
-// copyRestClientResourceFiles copies rest client files from template and renames them as per client config.
-func (c Copier) copyRestClientResourceFiles(restClient languages.RestClient) error {
+// copyGrpcClientResourceFiles copies grpc client files from template and renames them as per client config.
+func (c Copier) copyGrpcClientResourceFiles(grpcClient languages.GrpcClient) error {
 	/// add resource specific data to map in c needed for templates.
-	c.Data["RestClientPort"] = restClient.Port
-	c.Data["RestClientServiceName"] = restClient.ExternalNode
+	c.Data["GrpcClientPort"] = grpcClient.Port
+	c.Data["GrpcClientServiceName"] = grpcClient.ExternalNode
 
-	// copy restClient files to generated project.
-	targetResourceClientFileName := c.NodeDirectoryName + RestClientPath + "/" + restClient.ExternalNode + "-" + ClientFile
-	_, err := utils.CopyFile(targetResourceClientFileName, c.TemplatesRootPath+RestClientPath+"/"+ClientFile)
+	// copy grpcClient files to generated project.
+	targetResourceClientFileName := c.NodeDirectoryName + GrpcClientPath + "/" + grpcClient.ExternalNode + "-" + ClientFile
+	_, err := utils.CopyFile(targetResourceClientFileName, c.TemplatesRootPath+GrpcClientPath+"/"+ClientFile)
 	if err != nil {
 		return err
 	}
@@ -256,11 +280,15 @@ func (c Copier) copyRestClientResourceFiles(restClient languages.RestClient) err
 func (c Copier) addResourceSpecificTemplateData(resource node.Resource) error {
 	// make every field public by making its first character capital.
 	fields := map[string]string{}
+	// this slice is needed for grpc resource message generation
+	var fieldNames []string
 	for key, value := range resource.Fields {
 		key = cases.Title(language.Und, cases.NoLower).String(key)
 		fields[key] = value
+		fieldNames = append(fieldNames, key)
 	}
 	c.Data["Fields"] = fields
+	c.Data["FieldNames"] = fieldNames
 	// db fields
 	if c.IsSQLDB {
 		createQueryColumns := map[string]string{}
@@ -331,28 +359,28 @@ func (c Copier) addResourceSpecificTemplateData(resource node.Resource) error {
 	return nil
 }
 
-// CreateRestConfigs creates/copies relevant files to generated project
-func (c Copier) CreateRestConfigs() error {
-	if err := c.CreateRestServer(); err != nil {
+// CreateGrpcConfigs creates/copies relevant files to generated project
+func (c Copier) CreateGrpcConfigs() error {
+	if err := c.CreateGrpcServer(); err != nil {
 		return err
 	}
-	if err := c.CreateRestClients(); err != nil {
+	if err := c.CreateGrpcClients(); err != nil {
 		return err
 	}
 	return nil
 }
 
-// CreateRestServer creates/copies relevant files to generated project
-func (c Copier) CreateRestServer() error {
+// CreateGrpcServer creates/copies relevant files to generated project
+func (c Copier) CreateGrpcServer() error {
 	// if the node is server, add server code
-	if c.IsRestServer {
+	if c.IsGrpcServer {
 		// create directories for controller, service, dao, models
-		if err := c.createRestServerDirectories(); err != nil {
+		if err := c.createGrpcServerDirectories(); err != nil {
 			return err
 		}
 		// copy files with respect to the names of resources
 		for _, resource := range c.Resources {
-			if err := c.copyRestServerResourceFiles(resource); err != nil {
+			if err := c.copyGrpcServerResourceFiles(resource); err != nil {
 				return err
 			}
 		}
@@ -385,18 +413,18 @@ func (c Copier) CreateRestServer() error {
 	return nil
 }
 
-// CreateRestClients creates/copies relevant files to generated project
-func (c Copier) CreateRestClients() error {
+// CreateGrpcClients creates/copies relevant files to generated project
+func (c Copier) CreateGrpcClients() error {
 	// if the node is client, add client code
-	if c.IsRestClient {
+	if c.IsGrpcClient {
 		// create directories for client
-		if err := c.createRestClientDirectories(); err != nil {
+		if err := c.createGrpcClientDirectories(); err != nil {
 			return err
 		}
 
 		// copy files with respect to the names of resources
-		for _, client := range c.RestClients {
-			if err := c.copyRestClientResourceFiles(client); err != nil {
+		for _, client := range c.GrpcClients {
+			if err := c.copyGrpcClientResourceFiles(client); err != nil {
 				return err
 			}
 		}

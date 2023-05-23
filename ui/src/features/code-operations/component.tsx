@@ -8,7 +8,7 @@ import {getCurrentProjectDetails, getCurrentState} from "../../utils/localstorag
 import {selectGetProjectData, selectUpdateProjectData} from "../projects-operations/slice";
 import {removeUnwantedKeys} from "../../components/diagram-maker/helper/helper";
 import * as _ from "lodash";
-import {RestClientConfig, RestServerConfig} from "../../components/diagram-maker/models";
+import {GrpcServerConfig, RestClientConfig, RestServerConfig} from "../../components/diagram-maker/models";
 import {isCompageTemplate} from "../../components/diagram-maker/new-properties/utils";
 
 export const GenerateCode = () => {
@@ -32,6 +32,24 @@ export const GenerateCode = () => {
         }
     };
 
+    const isValidRestConfig = (removeUnwantedKeysGetCurrentState: any, key: string) => {
+        const restServerConfig: RestServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.restServerConfig;
+        if (!restServerConfig || Object.keys(restServerConfig).length < 1) {
+            return true;
+        }
+        // in case of compage template, resources should not be empty.
+        return isCompageTemplate(restServerConfig.template) && restServerConfig.resources.length < 1;
+    };
+
+    const isValidGrpcConfig = (removeUnwantedKeysGetCurrentState: any, key: string) => {
+        const grpcServerConfig: GrpcServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.grpcServerConfig;
+        if (!grpcServerConfig || Object.keys(grpcServerConfig).length < 1) {
+            return true;
+        }
+        // in case of compage template, resources should not be empty.
+        return isCompageTemplate(grpcServerConfig.template) && grpcServerConfig.resources.length < 1;
+    };
+
     const IsAnyRequiredValueMissingInOneOfNodes = (removeUnwantedKeysGetCurrentState: any) => {
         // nodes
         // tslint:disable-next-line: forin
@@ -40,23 +58,10 @@ export const GenerateCode = () => {
             if (!name) {
                 return true;
             }
-            const restServerConfig: RestServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.restServerConfig;
-            if (!restServerConfig || Object.keys(restServerConfig).length < 1) {
-                return true;
+            if (isValidRestConfig(removeUnwantedKeysGetCurrentState, key)
+                || isValidGrpcConfig(removeUnwantedKeysGetCurrentState, key)) {
+                return false;
             }
-            // in case of compage template, resources should not be empty.
-            if (isCompageTemplate(restServerConfig.template) && restServerConfig.resources.length < 1) {
-                return true;
-            }
-            // TODO check later
-            // const wsServerConfig: WsServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.wsServerConfig;
-            // if (!wsServerConfig || Object.keys(wsServerConfig).length < 1) {
-            //     return true;
-            // }
-            // const grpcServerConfig: GrpcServerConfig= removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.grpcServerConfig;
-            // if (!grpcServerConfig || Object.keys(grpcServerConfig).length < 1) {
-            //     return true;
-            // }
         }
         // edges
         // tslint:disable-next-line: forin

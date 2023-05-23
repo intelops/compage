@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/intelops/compage/core/internal/languages"
 	goginserver "github.com/intelops/compage/core/internal/languages/golang/frameworks/go-gin-server"
+	gogrpcserver "github.com/intelops/compage/core/internal/languages/golang/frameworks/go-grpc-server"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/devspace"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/docker"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/githubactions"
@@ -55,8 +56,27 @@ func Generate(ctx context.Context) error {
 	}
 	// grpc config
 	if n.GrpcConfig != nil {
-		return fmt.Errorf("unsupported protocol %s for language %s", "grpc", n.Language)
+		// check for the templates
+		if n.GrpcConfig.Server.Template == templates.Compage {
+			if n.GrpcConfig.Server.Framework == GoGrpcServerFramework {
+				goGrpcServerCopier := getGoGrpcServerCopier(goValues)
+				if err := goGrpcServerCopier.CreateGrpcConfigs(); err != nil {
+					log.Debugf("err : %s", err)
+					return err
+				}
+				// copy all files at root level, fire this at last
+				if err := goGrpcServerCopier.CreateRootLevelFiles(); err != nil {
+					log.Debugf("err : %s", err)
+					return err
+				}
+			} else {
+				return fmt.Errorf("unsupported framework %s  for template %s for language %s", n.GrpcConfig.Server.Framework, n.GrpcConfig.Server.Template, n.Language)
+			}
+		} else {
+			return fmt.Errorf("unsupported template %s for language %s", n.GrpcConfig.Server.Template, n.Language)
+		}
 	}
+
 	// ws config
 	if n.WsConfig != nil {
 		return fmt.Errorf("unsupported protocol %s for language %s", "ws", n.Language)
@@ -95,6 +115,23 @@ func Generate(ctx context.Context) error {
 	return nil
 }
 
+func getGoGrpcServerCopier(goValues GoValues) *gogrpcserver.Copier {
+	userName := goValues.Values.Get(languages.UserName)
+	repositoryName := goValues.Values.Get(languages.RepositoryName)
+	nodeName := goValues.Values.Get(languages.NodeName)
+	nodeDirectoryName := goValues.Values.NodeDirectoryName
+	isGrpcServer := goValues.LGoLangNode.GrpcConfig.Server != nil
+	grpcServerPort := goValues.LGoLangNode.GrpcConfig.Server.Port
+	resources := goValues.LGoLangNode.GrpcConfig.Server.Resources
+	clients := goValues.LGoLangNode.GrpcConfig.Clients
+	path := GetGoTemplatesRootPath() + "/frameworks/" + GoGrpcServerFramework
+	isSQLDB := goValues.LGoLangNode.GrpcConfig.Server.SQLDB != ""
+	sqlDB := goValues.LGoLangNode.GrpcConfig.Server.SQLDB
+	// create golang specific copier
+	copier := gogrpcserver.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isGrpcServer, grpcServerPort, isSQLDB, sqlDB, resources, clients)
+	return copier
+}
+
 func getGoGinServerCopier(goValues GoValues) *goginserver.Copier {
 	userName := goValues.Values.Get(languages.UserName)
 	repositoryName := goValues.Values.Get(languages.RepositoryName)
@@ -117,22 +154,38 @@ func getIntegrationsCopier(goValues GoValues) map[string]interface{} {
 	repositoryName := goValues.Values.Get(languages.RepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := goValues.Values.NodeDirectoryName
-	isRestServer := goValues.LGoLangNode.RestConfig.Server != nil
-	restServerPort := goValues.LGoLangNode.RestConfig.Server.Port
+	// rest
+	isRestServer := goValues.LGoLangNode.RestConfig != nil && goValues.LGoLangNode.RestConfig.Server != nil
+	var restServerPort string
+	if isRestServer {
+		restServerPort = goValues.LGoLangNode.RestConfig.Server.Port
+	} else {
+		restServerPort = ""
+	}
+
+	// grpc
+	isGrpcServer := goValues.LGoLangNode.GrpcConfig != nil && goValues.LGoLangNode.GrpcConfig.Server != nil
+	var grpcServerPort string
+	if isGrpcServer {
+		grpcServerPort = goValues.LGoLangNode.GrpcConfig.Server.Port
+	} else {
+		grpcServerPort = ""
+	}
+
 	path := GetGoTemplatesRootPath()
 	projectDirectoryName := utils.GetProjectDirectoryName(goValues.Values.ProjectName)
 
 	// create golang specific dockerCopier
-	dockerCopier := docker.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	dockerCopier := docker.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
 	// create golang specific k8sCopier
-	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
 	// create golang specific githubActionsCopier
 	githubActionsCopier := githubactions.NewCopier(userName, repositoryName, projectDirectoryName, nodeName, nodeDirectoryName, path)
 
 	// create golang specific devspaceCopier
-	devspaceCopier := devspace.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	devspaceCopier := devspace.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
 	return map[string]interface{}{
 		"docker":        dockerCopier,

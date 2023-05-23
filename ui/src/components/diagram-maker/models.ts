@@ -15,6 +15,8 @@ export interface RestServerConfig {
 
 export interface GrpcServerConfig {
     port: string;
+    template: string;
+    sqlDb?: string;
     framework?: string;
     resources?: Resource[];
     protoFileContent?: string;
@@ -91,6 +93,8 @@ export const EmptyRestServerConfig: RestServerConfig = {
 export const EmptyGrpcServerConfig: GrpcServerConfig = {
     resources: [],
     port: "",
+    template: "",
+    sqlDb: "",
     framework: "",
     protoFileContent: ""
 };
@@ -102,6 +106,11 @@ export const EmptyWsServerConfig: WsServerConfig = {
 };
 
 export const EmptyCurrentRestResource: Resource = {
+    name: "",
+    fields: new Map<string, Map<string, string>>()
+};
+
+export const EmptyCurrentGrpcResource: Resource = {
     name: "",
     fields: new Map<string, Map<string, string>>()
 };

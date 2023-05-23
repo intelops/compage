@@ -52,6 +52,8 @@ type RestClient struct {
 // GrpcServer holds information about the node's grpc server.
 type GrpcServer struct {
 	Port      string          `json:"port"`
+	Template  string          `json:"template"`
+	SQLDB     string          `json:"sqlDb"`
 	Framework string          `json:"framework"`
 	Resources []node.Resource `json:"resources"`
 	// ProtoFileContent holds protoFileContent
@@ -61,6 +63,7 @@ type GrpcServer struct {
 // GrpcClient holds information about edge between nodeA and nodeB.
 type GrpcClient struct {
 	Port         string `json:"port"`
+	Template     string `json:"template"`
 	Framework    string `json:"framework"`
 	ExternalNode string `json:"externalNode"`
 	// ProtoFileContent holds protoFileContent
@@ -155,6 +158,26 @@ func NewLanguageNode(compageJSON *core.CompageJSON, node *node.Node) (*LanguageN
 		}
 	}
 
+	// check if the servers has grpc entry (if node is not server or node is not GRPC server)
+	if grpcServer, ok := (*servers)[core.Grpc]; ok {
+		// one node, one rest server
+		languageNode.GrpcConfig = &GrpcConfig{
+			Server: grpcServer.(*GrpcServer),
+		}
+	}
+
+	// check if any grpc client needs to be created
+	if grpcClients, ok := (*clients)[core.Grpc]; ok {
+		// if the component is just client and not server, languageNode.RestConfig will be nil in that case.
+		if languageNode.GrpcConfig == nil {
+			languageNode.GrpcConfig = &GrpcConfig{
+				Clients: grpcClients.([]GrpcClient),
+			}
+		} else {
+			languageNode.GrpcConfig.Clients = grpcClients.([]GrpcClient)
+		}
+	}
+
 	return languageNode, nil
 }
 
@@ -179,8 +202,20 @@ func GetServersForNode(nodeP *node.Node) (*Servers, error) {
 		(*servers)[core.Rest] = restServer
 	}
 	if nodeP.ConsumerData.GrpcServerConfig != nil { //nolint:golint,staticcheck
-		// catch gRPC server details here
-		// TODO
+		// retrieve grpc server config and store in below variable
+		grpcServer := &GrpcServer{
+			Template:  nodeP.ConsumerData.GrpcServerConfig.Template,
+			Framework: nodeP.ConsumerData.GrpcServerConfig.Framework,
+			Port:      nodeP.ConsumerData.GrpcServerConfig.Port,
+			SQLDB:     nodeP.ConsumerData.GrpcServerConfig.SQLDB,
+		}
+		// set resources or openAPIFileYamlContent based on availability.
+		if nodeP.ConsumerData.GrpcServerConfig.Resources != nil && len(nodeP.ConsumerData.GrpcServerConfig.Resources) > 0 {
+			grpcServer.Resources = nodeP.ConsumerData.GrpcServerConfig.Resources
+		} else if len(nodeP.ConsumerData.GrpcServerConfig.ProtoFileContent) > 0 {
+			grpcServer.ProtoFileContent = nodeP.ConsumerData.GrpcServerConfig.ProtoFileContent
+		}
+		(*servers)[core.Grpc] = grpcServer
 	}
 	if nodeP.ConsumerData.WsServerConfig != nil { //nolint:golint,staticcheck
 		// catch Ws server details here

@@ -37,6 +37,8 @@ type RestServerConfig struct {
 
 type GrpcServerConfig struct {
 	Port      string     `json:"port"`
+	Template  string     `json:"template"`
+	SQLDB     string     `json:"sqlDb"`
 	Framework string     `json:"framework"`
 	Resources []Resource `json:"resources"`
 	// ProtoFileContent holds protoFileContent
