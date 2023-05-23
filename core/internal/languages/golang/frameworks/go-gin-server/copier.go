@@ -16,9 +16,8 @@ const RestServerPath = "/pkg/rest/server"
 const RestClientPath = "/pkg/rest/client"
 
 const DaosPath = RestServerPath + "/daos"
-const SQLDBClientsPath = DaosPath + "/clients/sql"
+const SQLDBClientsPath = DaosPath + "/clients/sqls"
 
-// const NoSqlDbClientsPath = DaosPath + "/clients/nosql"
 const ServicesPath = RestServerPath + "/services"
 const ControllersPath = RestServerPath + "/controllers"
 const ModelsPath = RestServerPath + "/models"
@@ -30,6 +29,8 @@ const MySQLDaoFile = "mysql-dao.go.tmpl"
 const SqliteDaoFile = "sqlite-dao.go.tmpl"
 const MySQLDBClientFile = "mysql-client.go.tmpl"
 const SqliteDBClientFile = "sqlite-client.go.tmpl"
+const MySQLDBConfigFile = "mysql.go.tmpl"
+const SqliteDBConfigFile = "sqlite.go.tmpl"
 const ModelFile = "model.go.tmpl"
 
 const ClientFile = "client.go.tmpl"
@@ -52,6 +53,13 @@ type Copier struct {
 	PluralizeClient   *pluralize.Client
 }
 
+type resourceData struct {
+	SmallResourceNameSingular string
+	SmallResourceNamePlural   string
+	CapsResourceNameSingular  string
+	CapsResourceNamePlural    string
+}
+
 func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isSQLDB bool, sqlDB string, resources []node.Resource, restClients []languages.RestClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
@@ -66,18 +74,9 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	data["IsSQLDB"] = isSQLDB
 	// set all resources for main.go.tmpl
 	if isRestServer {
-		type resourceData struct {
-			SmallResourceNameSingular string
-			SmallResourceNamePlural   string
-			CapsResourceNameSingular  string
-			CapsResourceNamePlural    string
-			ResourceName              string
-		}
-
 		var resourcesData []resourceData
 		for _, r := range resources {
 			resourcesData = append(resourcesData, resourceData{
-				ResourceName:              r.Name,
 				SmallResourceNameSingular: strings.ToLower(r.Name),
 				SmallResourceNamePlural:   pluralizeClient.Plural(strings.ToLower(r.Name)),
 				CapsResourceNameSingular:  r.Name,
@@ -139,6 +138,13 @@ func (c Copier) createRestServerDirectories() error {
 		if err := utils.CreateDirectories(sqlDBClientsDirectory); err != nil {
 			return err
 		}
+		resources := c.Data["Resources"].([]resourceData)
+		for _, r := range resources {
+			resourceClientDirectory := c.NodeDirectoryName + SQLDBClientsPath + "/" + r.SmallResourceNameSingular + "_client"
+			if err := utils.CreateDirectories(resourceClientDirectory); err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }
@@ -179,7 +185,7 @@ func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 	if c.IsSQLDB {
 		if c.SQLDB == Sqlite {
 			// client files
-			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "-" + SqliteDBClientFile
+			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "_client" + "/" + SqliteDBClientFile
 			_, err2 := utils.CopyFile(targetResourceSQLDBClientFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SqliteDBClientFile)
 			if err2 != nil {
 				return err2
@@ -348,6 +354,21 @@ func (c Copier) CreateRestServer() error {
 		for _, resource := range c.Resources {
 			if err := c.copyRestServerResourceFiles(resource); err != nil {
 				return err
+			}
+		}
+		// create sql db config file (common to all resources for specific database)
+		// No vars in config file as of now but in future they may be there.
+		if c.IsSQLDB {
+			if c.SQLDB == Sqlite {
+				var filePaths []string
+				// client files
+				targetSQLiteConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + SqliteDBConfigFile
+				_, err2 := utils.CopyFile(targetSQLiteConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SqliteDBConfigFile)
+				if err2 != nil {
+					return err2
+				}
+				filePaths = append(filePaths, targetSQLiteConfigFileName)
+				return executor.Execute(filePaths, c.Data)
 			}
 		}
 	}

@@ -4,7 +4,6 @@ import (
 	"github.com/intelops/compage/core/gen/api/v1"
 	"github.com/intelops/compage/core/internal/converter/grpc"
 	"github.com/intelops/compage/core/internal/handlers"
-	"log"
 	"os"
 	"testing"
 )
@@ -55,7 +54,6 @@ func TestRestGenerator(t *testing.T) {
 	}
 	// trigger project generation
 	if err0 := handlers.Handle(getProject); err0 != nil {
-		log.Fatal(err0)
 		t.Errorf("handlers.Handle failed %s", err0.Error())
 	}
 }
@@ -108,7 +106,6 @@ func TestGrpcGenerator(t *testing.T) {
 	}
 	// trigger project generation
 	if err0 := handlers.Handle(getProject); err0 != nil {
-		log.Fatal(err0)
 		t.Errorf("handlers.Handle failed %s", err0.Error())
 	}
 }
