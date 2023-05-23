@@ -19,7 +19,7 @@ const GrpcServerPath = "/pkg/grpc/server"
 const GrpcClientPath = "/pkg/grpc/client"
 
 const DaosPath = GrpcServerPath + "/daos"
-const SQLDBClientsPath = DaosPath + "/clients/sql"
+const SQLDBClientsPath = DaosPath + "/clients/sqls"
 
 // const NoSqlDbClientsPath = DaosPath + "/clients/nosql"
 
@@ -35,6 +35,8 @@ const MySQLDaoFile = "mysql-dao.go.tmpl"
 const SqliteDaoFile = "sqlite-dao.go.tmpl"
 const MySQLDBClientFile = "mysql-client.go.tmpl"
 const SqliteDBClientFile = "sqlite-client.go.tmpl"
+const MySQLDBConfigFile = "mysql.go.tmpl"
+const SqliteDBConfigFile = "sqlite.go.tmpl"
 const ModelFile = "model.go.tmpl"
 
 const ClientFile = "client.go.tmpl"
@@ -57,6 +59,13 @@ type Copier struct {
 	PluralizeClient   *pluralize.Client
 }
 
+type resourceData struct {
+	SmallResourceNameSingular string
+	SmallResourceNamePlural   string
+	CapsResourceNameSingular  string
+	CapsResourceNamePlural    string
+}
+
 func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isGrpcServer bool, grpcServerPort string, isSQLDB bool, sqlDB string, resources []node.Resource, grpcClients []languages.GrpcClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
@@ -71,13 +80,6 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	data["IsSQLDB"] = isSQLDB
 	// set all resources for main.go.tmpl
 	if isGrpcServer {
-		type resourceData struct {
-			SmallResourceNameSingular string
-			SmallResourceNamePlural   string
-			CapsResourceNameSingular  string
-			CapsResourceNamePlural    string
-		}
-
 		var resourcesData []resourceData
 		for _, r := range resources {
 			resourcesData = append(resourcesData, resourceData{
@@ -146,6 +148,13 @@ func (c Copier) createGrpcServerDirectories() error {
 		if err := utils.CreateDirectories(sqlDBClientsDirectory); err != nil {
 			return err
 		}
+		resources := c.Data["Resources"].([]resourceData)
+		for _, r := range resources {
+			resourceClientDirectory := c.NodeDirectoryName + SQLDBClientsPath + "/" + r.SmallResourceNameSingular + "_client"
+			if err := utils.CreateDirectories(resourceClientDirectory); err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }
@@ -186,7 +195,7 @@ func (c Copier) copyGrpcServerResourceFiles(resource node.Resource) error {
 	if c.IsSQLDB {
 		if c.SQLDB == Sqlite {
 			// client files
-			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "-" + SqliteDBClientFile
+			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "_client" + "/" + SqliteDBClientFile
 			_, err2 := utils.CopyFile(targetResourceSQLDBClientFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SqliteDBClientFile)
 			if err2 != nil {
 				return err2
@@ -201,7 +210,7 @@ func (c Copier) copyGrpcServerResourceFiles(resource node.Resource) error {
 			filePaths = append(filePaths, targetResourceDaoFileName)
 		} else if c.SQLDB == MySQL {
 			// client files
-			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "-" + MySQLDBClientFile
+			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "_client" + "/" + MySQLDBClientFile
 			_, err2 := utils.CopyFile(targetResourceSQLDBClientFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBClientFile)
 			if err2 != nil {
 				return err2
@@ -373,6 +382,31 @@ func (c Copier) CreateGrpcServer() error {
 		for _, resource := range c.Resources {
 			if err := c.copyGrpcServerResourceFiles(resource); err != nil {
 				return err
+			}
+		}
+		// create sql db config file (common to all resources for specific database)
+		// No vars in config file as of now but in future they may be there.
+		if c.IsSQLDB {
+			if c.SQLDB == Sqlite {
+				var filePaths []string
+				// client files
+				targetSQLiteConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + SqliteDBConfigFile
+				_, err2 := utils.CopyFile(targetSQLiteConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SqliteDBConfigFile)
+				if err2 != nil {
+					return err2
+				}
+				filePaths = append(filePaths, targetSQLiteConfigFileName)
+				return executor.Execute(filePaths, c.Data)
+			} else if c.SQLDB == MySQL {
+				var filePaths []string
+				// client files
+				targetMySQLConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + MySQLDBConfigFile
+				_, err2 := utils.CopyFile(targetMySQLConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBConfigFile)
+				if err2 != nil {
+					return err2
+				}
+				filePaths = append(filePaths, targetMySQLConfigFileName)
+				return executor.Execute(filePaths, c.Data)
 			}
 		}
 	}

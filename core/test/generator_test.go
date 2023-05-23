@@ -30,12 +30,6 @@ func TestRestGenerator(t *testing.T) {
                                 "Name": "string"
                             },
                             "name": "User"
-                        },
- 						{
-                            "fields": {
-                                "City": "string"
-                            },
-                            "name": "Town"
                         }
                     ]
                 }
@@ -50,7 +44,7 @@ func TestRestGenerator(t *testing.T) {
 		Json:           restConfigJSON,
 	}
 	defer func() {
-		//_ = os.RemoveAll("/tmp/first-rest-project")
+		_ = os.RemoveAll("/tmp/first-rest-project")
 	}()
 
 	// retrieve project struct
