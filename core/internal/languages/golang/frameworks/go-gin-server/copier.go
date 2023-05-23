@@ -200,7 +200,7 @@ func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 			filePaths = append(filePaths, targetResourceDaoFileName)
 		} else if c.SQLDB == MySQL {
 			// client files
-			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "-" + MySQLDBClientFile
+			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "_client" + "/" + MySQLDBClientFile
 			_, err2 := utils.CopyFile(targetResourceSQLDBClientFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBClientFile)
 			if err2 != nil {
 				return err2
@@ -368,6 +368,16 @@ func (c Copier) CreateRestServer() error {
 					return err2
 				}
 				filePaths = append(filePaths, targetSQLiteConfigFileName)
+				return executor.Execute(filePaths, c.Data)
+			} else if c.SQLDB == MySQL {
+				var filePaths []string
+				// client files
+				targetMySQLConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + MySQLDBConfigFile
+				_, err2 := utils.CopyFile(targetMySQLConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBConfigFile)
+				if err2 != nil {
+					return err2
+				}
+				filePaths = append(filePaths, targetMySQLConfigFileName)
 				return executor.Execute(filePaths, c.Data)
 			}
 		}

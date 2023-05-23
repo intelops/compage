@@ -20,16 +20,22 @@ func TestRestGenerator(t *testing.T) {
                 "name": "user-service",
                 "language": "go",
                 "restServerConfig": {
-                    "sqlDb": "SQLite",
+                    "sqlDb": "MySQL",
                     "framework": "go-gin-server",
                     "port": "3000",
                     "template": "compage",
                     "resources": [
                         {
                             "fields": {
-                                "Name": "int8"
+                                "Name": "string"
                             },
                             "name": "User"
+                        },
+ 						{
+                            "fields": {
+                                "City": "string"
+                            },
+                            "name": "Town"
                         }
                     ]
                 }
@@ -44,7 +50,7 @@ func TestRestGenerator(t *testing.T) {
 		Json:           restConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-project")
+		//_ = os.RemoveAll("/tmp/first-rest-project")
 	}()
 
 	// retrieve project struct
