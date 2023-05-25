@@ -89,7 +89,7 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 				CapsResourceNamePlural:    pluralizeClient.Plural(r.Name),
 			})
 		}
-		data["Resources"] = resourcesData
+		data["GrpcResources"] = resourcesData
 		data["GrpcServerPort"] = grpcServerPort
 		data["IsGrpcServer"] = isGrpcServer
 	}
@@ -148,7 +148,7 @@ func (c Copier) createGrpcServerDirectories() error {
 		if err := utils.CreateDirectories(sqlDBClientsDirectory); err != nil {
 			return err
 		}
-		resources := c.Data["Resources"].([]resourceData)
+		resources := c.Data["GrpcResources"].([]resourceData)
 		for _, r := range resources {
 			resourceClientDirectory := c.NodeDirectoryName + SQLDBClientsPath + "/" + r.SmallResourceNameSingular + "_client"
 			if err := utils.CreateDirectories(resourceClientDirectory); err != nil {

@@ -83,7 +83,7 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 				CapsResourceNamePlural:    pluralizeClient.Plural(r.Name),
 			})
 		}
-		data["Resources"] = resourcesData
+		data["RestResources"] = resourcesData
 		data["RestServerPort"] = restServerPort
 		data["IsRestServer"] = isRestServer
 	}
@@ -138,7 +138,7 @@ func (c Copier) createRestServerDirectories() error {
 		if err := utils.CreateDirectories(sqlDBClientsDirectory); err != nil {
 			return err
 		}
-		resources := c.Data["Resources"].([]resourceData)
+		resources := c.Data["RestResources"].([]resourceData)
 		for _, r := range resources {
 			resourceClientDirectory := c.NodeDirectoryName + SQLDBClientsPath + "/" + r.SmallResourceNameSingular + "_client"
 			if err := utils.CreateDirectories(resourceClientDirectory); err != nil {
