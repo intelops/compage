@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages"
+	common_files "github.com/intelops/compage/core/internal/languages/golang/frameworks/common-files"
 	goginserver "github.com/intelops/compage/core/internal/languages/golang/frameworks/go-gin-server"
 	gogrpcserver "github.com/intelops/compage/core/internal/languages/golang/frameworks/go-grpc-server"
-	main_go "github.com/intelops/compage/core/internal/languages/golang/frameworks/main-go"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/devspace"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/docker"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/githubactions"
@@ -84,17 +84,16 @@ func Generate(ctx context.Context) error {
 		return fmt.Errorf("unsupported protocol %s for language %s", "ws", n.Language)
 	}
 
-	m := getIntegrationsCopier(goValues)
-
-	if n.RestConfig.Server.Template == templates.Compage || n.GrpcConfig.Server.Template == templates.Compage {
-		// main.go needs to be generated for the whole project so, it should be here.
-		mainGoCopier := m["main_go"].(*main_go.Copier)
-		if err := mainGoCopier.CreateMainFile(); err != nil {
+	// common files needs to be generated for the project(custom template for rest and grpc) so, it should be here.
+	if (n.RestConfig != nil && n.RestConfig.Server != nil && n.RestConfig.Server.Template == templates.Compage) || (n.GrpcConfig != nil && n.GrpcConfig.Server != nil && n.GrpcConfig.Server.Template == templates.Compage) {
+		commonFilesCopier := getCommonFilesCopier(goValues)
+		if err := commonFilesCopier.CreateCommonFiles(); err != nil {
 			log.Debugf("err : %s", err)
 			return err
 		}
 	}
 
+	m := getIntegrationsCopier(goValues)
 	// dockerfile needs to be generated for the whole project so, it should be here.
 	dockerCopier := m["docker"].(*docker.Copier)
 	if err := dockerCopier.CreateDockerFile(); err != nil {
@@ -124,6 +123,48 @@ func Generate(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func getCommonFilesCopier(goValues GoValues) *common_files.Copier {
+	userName := goValues.Values.Get(languages.UserName)
+	repositoryName := goValues.Values.Get(languages.RepositoryName)
+	nodeName := goValues.Values.Get(languages.NodeName)
+	nodeDirectoryName := goValues.Values.NodeDirectoryName
+	path := GetGoTemplatesRootPath() + "/frameworks/" + CommonFiles
+
+	// rest
+	isRestServer := goValues.LGoLangNode.RestConfig != nil && goValues.LGoLangNode.RestConfig.Server != nil
+	var restServerPort string
+	var restResources []node.Resource
+	var restClients []languages.RestClient
+	if isRestServer {
+		restServerPort = goValues.LGoLangNode.RestConfig.Server.Port
+		restResources = goValues.LGoLangNode.RestConfig.Server.Resources
+		restClients = goValues.LGoLangNode.RestConfig.Clients
+	} else {
+		restServerPort = ""
+		restClients = []languages.RestClient{}
+		restResources = []node.Resource{}
+	}
+
+	// grpc
+	isGrpcServer := goValues.LGoLangNode.GrpcConfig != nil && goValues.LGoLangNode.GrpcConfig.Server != nil
+	var grpcServerPort string
+	var grpcResources []node.Resource
+	var grpcClients []languages.GrpcClient
+	if isGrpcServer {
+		grpcServerPort = goValues.LGoLangNode.GrpcConfig.Server.Port
+		grpcResources = goValues.LGoLangNode.GrpcConfig.Server.Resources
+		grpcClients = goValues.LGoLangNode.GrpcConfig.Clients
+	} else {
+		grpcServerPort = ""
+		grpcClients = []languages.GrpcClient{}
+		grpcResources = []node.Resource{}
+	}
+
+	// create golang specific commonFilesCopier
+	copier := common_files.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort, restResources, grpcResources, restClients, grpcClients)
+	return copier
 }
 
 func getGoGrpcServerCopier(goValues GoValues) *gogrpcserver.Copier {
@@ -168,31 +209,19 @@ func getIntegrationsCopier(goValues GoValues) map[string]interface{} {
 	// rest
 	isRestServer := goValues.LGoLangNode.RestConfig != nil && goValues.LGoLangNode.RestConfig.Server != nil
 	var restServerPort string
-	var restResources []node.Resource
-	var restClients []languages.RestClient
 	if isRestServer {
 		restServerPort = goValues.LGoLangNode.RestConfig.Server.Port
-		restResources = goValues.LGoLangNode.RestConfig.Server.Resources
-		restClients = goValues.LGoLangNode.RestConfig.Clients
 	} else {
 		restServerPort = ""
-		restClients = []languages.RestClient{}
-		restResources = []node.Resource{}
 	}
 
 	// grpc
 	isGrpcServer := goValues.LGoLangNode.GrpcConfig != nil && goValues.LGoLangNode.GrpcConfig.Server != nil
 	var grpcServerPort string
-	var grpcResources []node.Resource
-	var grpcClients []languages.GrpcClient
 	if isGrpcServer {
 		grpcServerPort = goValues.LGoLangNode.GrpcConfig.Server.Port
-		grpcResources = goValues.LGoLangNode.GrpcConfig.Server.Resources
-		grpcClients = goValues.LGoLangNode.GrpcConfig.Clients
 	} else {
 		grpcServerPort = ""
-		grpcClients = []languages.GrpcClient{}
-		grpcResources = []node.Resource{}
 	}
 
 	path := GetGoTemplatesRootPath()
@@ -210,15 +239,10 @@ func getIntegrationsCopier(goValues GoValues) map[string]interface{} {
 	// create golang specific devspaceCopier
 	devspaceCopier := devspace.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
-	mainPath := path + "/frameworks"
-	// create golang specific mainGoCopier
-	mainGoCopier := main_go.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, mainPath, isRestServer, restServerPort, isGrpcServer, grpcServerPort, restResources, grpcResources, restClients, grpcClients)
-
 	return map[string]interface{}{
 		"docker":        dockerCopier,
 		"k8s":           k8sCopier,
 		"githubActions": githubActionsCopier,
 		"devspace":      devspaceCopier,
-		"main_go":       mainGoCopier,
 	}
 }

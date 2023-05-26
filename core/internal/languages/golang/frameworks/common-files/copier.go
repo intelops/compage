@@ -1,4 +1,4 @@
-package main_go
+package commonfiles
 
 import (
 	"github.com/gertd/go-pluralize"
@@ -10,6 +10,11 @@ import (
 )
 
 const MainGoFile = "main.go.tmpl"
+const GitIgnoreFile = ".gitignore.tmpl"
+const GoSumFile = "go.sum.tmpl"
+const GoModFile = "go.mod.tmpl"
+const ReadMeMdFile = "README.md.tmpl"
+const UsefulCommandsFile = "useful-commands.tmpl"
 
 // Copier Language specific copier
 type Copier struct {
@@ -86,6 +91,8 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 		Data:              data,
 		IsGrpcServer:      isGrpcServer,
 		IsGrpcClient:      isGrpcClient,
+		GrpcServerPort:    grpcServerPort,
+		RestServerPort:    restServerPort,
 		IsRestServer:      isRestServer,
 		IsRestClient:      isRestClient,
 		GrpcResources:     grpcResources,
@@ -95,14 +102,50 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	}
 }
 
-// CreateMainFile creates/copies relevant files to generated project
-func (c Copier) CreateMainFile() error {
+// CreateCommonFiles creates/copies relevant files to generated project
+func (c Copier) CreateCommonFiles() error {
 	var filePaths []string
 	targetMainGoFileName := c.NodeDirectoryName + "/" + MainGoFile
-	_, err2 := utils.CopyFile(targetMainGoFileName, c.TemplatesRootPath+"/"+MainGoFile)
-	if err2 != nil {
-		return err2
+	_, err := utils.CopyFile(targetMainGoFileName, c.TemplatesRootPath+"/"+MainGoFile)
+	if err != nil {
+		return err
 	}
 	filePaths = append(filePaths, targetMainGoFileName)
+
+	targetReadMeMdFileName := c.NodeDirectoryName + "/" + ReadMeMdFile
+	_, err = utils.CopyFile(targetReadMeMdFileName, c.TemplatesRootPath+"/"+ReadMeMdFile)
+	if err != nil {
+		return err
+	}
+	filePaths = append(filePaths, targetReadMeMdFileName)
+
+	targetGoModFileName := c.NodeDirectoryName + "/" + GoModFile
+	_, err = utils.CopyFile(targetGoModFileName, c.TemplatesRootPath+"/"+GoModFile)
+	if err != nil {
+		return err
+	}
+	filePaths = append(filePaths, targetGoModFileName)
+
+	targetGoSumFileName := c.NodeDirectoryName + "/" + GoSumFile
+	_, err = utils.CopyFile(targetGoSumFileName, c.TemplatesRootPath+"/"+GoSumFile)
+	if err != nil {
+		return err
+	}
+	filePaths = append(filePaths, targetGoSumFileName)
+
+	targetGitIgnoreFileName := c.NodeDirectoryName + "/" + GitIgnoreFile
+	_, err = utils.CopyFile(targetGitIgnoreFileName, c.TemplatesRootPath+"/"+GitIgnoreFile)
+	if err != nil {
+		return err
+	}
+	filePaths = append(filePaths, targetGitIgnoreFileName)
+
+	targetUsefulCommandsFileName := c.NodeDirectoryName + "/" + UsefulCommandsFile
+	_, err = utils.CopyFile(targetUsefulCommandsFileName, c.TemplatesRootPath+"/"+UsefulCommandsFile)
+	if err != nil {
+		return err
+	}
+	filePaths = append(filePaths, targetUsefulCommandsFileName)
+
 	return executor.Execute(filePaths, c.Data)
 }

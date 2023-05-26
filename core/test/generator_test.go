@@ -8,6 +8,72 @@ import (
 	"testing"
 )
 
+func TestRestAndGrpcGenerator(t *testing.T) {
+	restConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-ef": {
+            "id": "node-ef",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "circle",
+                "name": "user-service",
+                "language": "go",
+				"grpcServerConfig": {
+                    "template": "compage",
+                    "sqlDb": "SQLite",
+                    "framework": "go-grpc-server",
+                    "port": "50051",
+                    "resources": [
+                        {
+                            "fields": {
+                                "Name": "string",
+                                "RollNumber": "int32",
+                                "College": "string"
+                            },
+                            "name": "Student"
+                        }
+                    ]
+                },
+                "restServerConfig": {
+                    "sqlDb": "SQLite",
+                    "framework": "go-gin-server",
+                    "port": "3000",
+                    "template": "compage",
+                    "resources": [
+                        {
+                            "fields": {
+                                "Name": "string"
+                            },
+                            "name": "User"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-rest-and-grpc-project",
+		Json:           restConfigJSON,
+	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-rest-project")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
 func TestRestGenerator(t *testing.T) {
 	restConfigJSON := `{
     "edges": {},
