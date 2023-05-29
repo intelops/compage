@@ -9,6 +9,7 @@ import (
 	common_files "github.com/intelops/compage/core/internal/languages/golang/frameworks/common-files"
 	goginserver "github.com/intelops/compage/core/internal/languages/golang/frameworks/go-gin-server"
 	gogrpcserver "github.com/intelops/compage/core/internal/languages/golang/frameworks/go-grpc-server"
+	"github.com/intelops/compage/core/internal/languages/golang/integrations/devcontainer"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/devspace"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/docker"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/githubactions"
@@ -122,6 +123,13 @@ func Generate(ctx context.Context) error {
 		return err
 	}
 
+	// devcontainer.json and Dockerfile need to be generated for the whole project so, it should be here.
+	devContainerCopier := m["devcontainer"].(*devcontainer.Copier)
+	if err := devContainerCopier.CreateDevContainerConfigs(); err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -226,6 +234,7 @@ func getIntegrationsCopier(goValues GoValues) map[string]interface{} {
 
 	path := GetGoTemplatesRootPath()
 	projectDirectoryName := utils.GetProjectDirectoryName(goValues.Values.ProjectName)
+	projectName := goValues.Values.ProjectName
 
 	// create golang specific dockerCopier
 	dockerCopier := docker.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
@@ -239,10 +248,14 @@ func getIntegrationsCopier(goValues GoValues) map[string]interface{} {
 	// create golang specific devspaceCopier
 	devspaceCopier := devspace.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
+	// create golang specific devContainerCopier
+	devContainerCopier := devcontainer.NewCopier(userName, repositoryName, projectName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
+
 	return map[string]interface{}{
 		"docker":        dockerCopier,
 		"k8s":           k8sCopier,
 		"githubActions": githubActionsCopier,
 		"devspace":      devspaceCopier,
+		"devcontainer":  devContainerCopier,
 	}
 }
