@@ -41,7 +41,7 @@ type resourceData struct {
 	CapsResourceNamePlural    string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isGrpcServer bool, grpcServerPort string, restResources []node.Resource, grpcResources []node.Resource, restClients []languages.RestClient, grpcClients []languages.GrpcClient) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isGrpcServer bool, grpcServerPort string, isRestSQLDB bool, restSqlDB string, isGrpcSQLDB bool, grpcSqlDB string, restResources []node.Resource, grpcResources []node.Resource, restClients []languages.RestClient, grpcClients []languages.GrpcClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
 
@@ -84,6 +84,16 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	// if restClients slice has elements
 	isRestClient := len(restClients) > 0
 	data["IsRestClient"] = isRestClient
+
+	data["IsRestSQLDB"] = isRestSQLDB
+	if isRestSQLDB {
+		data["RestSQLDB"] = restSqlDB
+	}
+
+	data["IsGrpcSQLDB"] = isGrpcSQLDB
+	if isGrpcSQLDB {
+		data["GrpcSQLDB"] = grpcSqlDB
+	}
 
 	return &Copier{
 		TemplatesRootPath: templatesRootPath,

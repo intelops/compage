@@ -145,12 +145,18 @@ func getCommonFilesCopier(goValues GoValues) *common_files.Copier {
 	var restServerPort string
 	var restResources []node.Resource
 	var restClients []languages.RestClient
+	var isRestSQLDB bool
+	var restSqlDB string
 	if isRestServer {
 		restServerPort = goValues.LGoLangNode.RestConfig.Server.Port
+		isRestSQLDB = goValues.LGoLangNode.RestConfig.Server.SQLDB != ""
+		restSqlDB = goValues.LGoLangNode.RestConfig.Server.SQLDB
 		restResources = goValues.LGoLangNode.RestConfig.Server.Resources
 		restClients = goValues.LGoLangNode.RestConfig.Clients
 	} else {
 		restServerPort = ""
+		isRestSQLDB = false
+		restSqlDB = ""
 		restClients = []languages.RestClient{}
 		restResources = []node.Resource{}
 	}
@@ -160,18 +166,25 @@ func getCommonFilesCopier(goValues GoValues) *common_files.Copier {
 	var grpcServerPort string
 	var grpcResources []node.Resource
 	var grpcClients []languages.GrpcClient
+	var isGrpcSQLDB bool
+	var grpcSqlDB string
+
 	if isGrpcServer {
 		grpcServerPort = goValues.LGoLangNode.GrpcConfig.Server.Port
+		isGrpcSQLDB = goValues.LGoLangNode.GrpcConfig.Server.SQLDB != ""
+		grpcSqlDB = goValues.LGoLangNode.GrpcConfig.Server.SQLDB
 		grpcResources = goValues.LGoLangNode.GrpcConfig.Server.Resources
 		grpcClients = goValues.LGoLangNode.GrpcConfig.Clients
 	} else {
 		grpcServerPort = ""
+		isGrpcSQLDB = false
+		grpcSqlDB = ""
 		grpcClients = []languages.GrpcClient{}
 		grpcResources = []node.Resource{}
 	}
 
 	// create golang specific commonFilesCopier
-	copier := common_files.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort, restResources, grpcResources, restClients, grpcClients)
+	copier := common_files.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort, isRestSQLDB, restSqlDB, isGrpcSQLDB, grpcSqlDB, restResources, grpcResources, restClients, grpcClients)
 	return copier
 }
 
