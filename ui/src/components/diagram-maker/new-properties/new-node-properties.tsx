@@ -40,7 +40,8 @@ import {sanitizeString} from "../../../utils/backend-api";
 import {UploadYaml} from "../../../features/open-api-yaml-operations/component";
 import {
     COMPAGE,
-    COMPAGE_LANGUAGE_FRAMEWORKS, COMPAGE_LANGUAGE_GRPC_FRAMEWORKS,
+    COMPAGE_LANGUAGE_FRAMEWORKS,
+    COMPAGE_LANGUAGE_GRPC_FRAMEWORKS,
     COMPAGE_LANGUAGE_SQL_DBS,
     GO,
     isCompageTemplate,
