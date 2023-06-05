@@ -246,15 +246,13 @@ func GetClientsForNode(compageJSON *core.CompageJSON, nodeP *node.Node) (*Client
 				})
 			}
 			if e.ConsumerData.GrpcClientConfig != nil {
-				//protoFileContent, framework := getProtoFileContentAndFrameworkFromNodeForEdge(e.Src, compageJSON.Nodes)
-				//grpcClients = append(grpcClients, GrpcClient{
-				//	Port:             e.ConsumerData.RestClientConfig.Port,
-				//	ExternalNode:     e.ConsumerData.ExternalNode,
-				//	Framework:        framework,
-				//	ProtoFileContent: protoFileContent,
-				//})
-				return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
-					"grpc", nodeP.ConsumerData.Language)
+				protoFileContent, framework := getProtoFileContentAndFrameworkFromNodeForEdge(e.Src, compageJSON.Nodes)
+				grpcClients = append(grpcClients, GrpcClient{
+					Port:             e.ConsumerData.GrpcClientConfig.Port,
+					ExternalNode:     e.ConsumerData.ExternalNode,
+					Framework:        framework,
+					ProtoFileContent: protoFileContent,
+				})
 			}
 			if e.ConsumerData.WsClientConfig != nil {
 				//wsClients = append(wsClients, WsClient{

@@ -261,6 +261,7 @@ func (c Copier) copyGrpcServerResourceFiles(resource node.Resource) error {
 // copyGrpcClientResourceFiles copies grpc client files from template and renames them as per client config.
 func (c Copier) copyGrpcClientResourceFiles(grpcClient languages.GrpcClient) error {
 	/// add resource specific data to map in c needed for templates.
+	// TODO grpcClient needs too many changes (like referring the .proto and generated files) we can better just have a client created for local grpcServer)
 	c.Data["GrpcClientPort"] = grpcClient.Port
 	c.Data["GrpcClientServiceName"] = grpcClient.ExternalNode
 
@@ -415,13 +416,12 @@ func (c Copier) CreateGrpcServer() error {
 
 // CreateGrpcClients creates/copies relevant files to generated project
 func (c Copier) CreateGrpcClients() error {
+	// create directories for client
+	if err := c.createGrpcClientDirectories(); err != nil {
+		return err
+	}
 	// if the node is client, add client code
 	if c.IsGrpcClient {
-		// create directories for client
-		if err := c.createGrpcClientDirectories(); err != nil {
-			return err
-		}
-
 		// copy files with respect to the names of resources
 		for _, client := range c.GrpcClients {
 			if err := c.copyGrpcClientResourceFiles(client); err != nil {
@@ -429,6 +429,12 @@ func (c Copier) CreateGrpcClients() error {
 			}
 		}
 	}
+
+	// create self client
+	if err := c.copySelfGrpcClientResourceFiles(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -452,6 +458,19 @@ func (c Copier) getDBDataType(value string) (string, error) {
 		return getMySQLDataType(value), nil
 	}
 	return "", errors.New("database not supported")
+}
+
+func (c Copier) copySelfGrpcClientResourceFiles() error {
+	targetResourceClientFileName := c.NodeDirectoryName + GrpcClientPath + "/ping-" + ClientFile
+	_, err := utils.CopyFile(targetResourceClientFileName, c.TemplatesRootPath+GrpcClientPath+"/"+ClientFile)
+	if err != nil {
+		return err
+	}
+	var filePaths []string
+	filePaths = append(filePaths, targetResourceClientFileName)
+
+	// apply template
+	return executor.Execute(filePaths, c.Data)
 }
 
 func getSqliteDataType(value string) string {

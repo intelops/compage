@@ -206,7 +206,6 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         return <React.Fragment>
             <FormControlLabel
                 label="Grpc Server"
-                disabled
                 control={<Checkbox
                     size="medium" checked={payload.isGrpcServer}
                     onChange={handleIsGrpcServerChange}
@@ -230,6 +229,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                 id="grpcServerPort"
                 label="Grpc Server Port"
                 type="text"
+                disabled
                 value={payload.grpcServerPort}
                 onChange={handleGrpcServerPortChange}
                 variant="outlined"
