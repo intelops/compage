@@ -6,6 +6,8 @@ import (
 	"github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages"
 	"github.com/intelops/compage/core/internal/languages/executor"
+	commonUtils "github.com/intelops/compage/core/internal/languages/utils"
+
 	"github.com/intelops/compage/core/internal/utils"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -419,95 +421,9 @@ func (c Copier) CreateRootLevelFiles() error {
 
 func (c Copier) getDBDataType(value string) (string, error) {
 	if c.SQLDB == Sqlite {
-		return getSqliteDataType(value), nil
+		return commonUtils.GetSqliteDataType(value), nil
 	} else if c.SQLDB == MySQL {
-		return getMySQLDataType(value), nil
+		return commonUtils.GetMySQLDataType(value), nil
 	}
 	return "", errors.New("database not supported")
-}
-
-func getSqliteDataType(value string) string {
-	switch value {
-	case "int":
-		fallthrough
-	case "int16":
-		fallthrough
-	case "int32":
-		fallthrough
-	case "int64":
-		fallthrough
-	case "uint8":
-		fallthrough
-	case "uint16":
-		fallthrough
-	case "uint32":
-		fallthrough
-	case "uint64":
-		fallthrough
-	case "uint":
-		fallthrough
-	case "rune":
-		fallthrough
-	case "byte":
-		fallthrough
-	case "uintptr":
-		fallthrough
-	case "bool":
-		return "INTEGER"
-	case "float32":
-		fallthrough
-	case "float64 ":
-		fallthrough
-	case "complex64":
-		fallthrough
-	case "complex128":
-		return "REAL"
-	case "string":
-		return "TEXT"
-	default:
-		return "TEXT"
-	}
-}
-
-func getMySQLDataType(value string) string {
-	switch value {
-	case "int":
-		fallthrough
-	case "int16":
-		fallthrough
-	case "int32":
-		fallthrough
-	case "int64":
-		fallthrough
-	case "uint8":
-		fallthrough
-	case "uint16":
-		fallthrough
-	case "uint32":
-		fallthrough
-	case "uint64":
-		fallthrough
-	case "uint":
-		fallthrough
-	case "rune":
-		fallthrough
-	case "byte":
-		fallthrough
-	case "uintptr":
-		return "INT"
-	case "bool":
-		return "BOOL"
-	case "float32":
-		fallthrough
-	case "float64 ":
-		return "FLOAT"
-	case "complex64":
-		fallthrough
-	case "complex128":
-		return "DOUBLE"
-	case "string":
-		return "VARCHAR(100)"
-	default:
-		return "VARCHAR(100)"
-	}
 }
