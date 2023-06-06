@@ -147,7 +147,7 @@ func TestGrpcGenerator(t *testing.T) {
                                 "RollNumber": "int32",
                                 "College": "string"
                             },
-                            "name": "Student"
+                            "name": "StudentModel"
                         }
                     ]
                 }

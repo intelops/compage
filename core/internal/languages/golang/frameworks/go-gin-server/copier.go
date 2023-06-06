@@ -3,6 +3,7 @@ package goginserver
 import (
 	"errors"
 	"github.com/gertd/go-pluralize"
+	"github.com/iancoleman/strcase"
 	"github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages"
 	"github.com/intelops/compage/core/internal/languages/executor"
@@ -56,10 +57,12 @@ type Copier struct {
 }
 
 type resourceData struct {
-	SmallResourceNameSingular string
-	SmallResourceNamePlural   string
-	CapsResourceNameSingular  string
-	CapsResourceNamePlural    string
+	SmallKebabCaseResourceNameSingular string
+	SmallSnakeCaseResourceNameSingular string
+	SmallResourceNameSingular          string
+	SmallResourceNamePlural            string
+	CapsResourceNameSingular           string
+	CapsResourceNamePlural             string
 }
 
 func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isSQLDB bool, sqlDB string, resources []node.Resource, restClients []languages.RestClient) *Copier {
@@ -78,11 +81,14 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	if isRestServer {
 		var resourcesData []resourceData
 		for _, r := range resources {
+			lowerCamelResourceName := strcase.ToLowerCamel(r.Name)
 			resourcesData = append(resourcesData, resourceData{
-				SmallResourceNameSingular: strings.ToLower(r.Name),
-				SmallResourceNamePlural:   pluralizeClient.Plural(strings.ToLower(r.Name)),
-				CapsResourceNameSingular:  r.Name,
-				CapsResourceNamePlural:    pluralizeClient.Plural(r.Name),
+				SmallKebabCaseResourceNameSingular: strcase.ToKebab(r.Name),
+				SmallSnakeCaseResourceNameSingular: strcase.ToSnake(r.Name),
+				SmallResourceNameSingular:          lowerCamelResourceName,
+				SmallResourceNamePlural:            pluralizeClient.Plural(lowerCamelResourceName),
+				CapsResourceNameSingular:           r.Name,
+				CapsResourceNamePlural:             pluralizeClient.Plural(r.Name),
 			})
 		}
 		data["RestResources"] = resourcesData
@@ -135,6 +141,7 @@ func (c Copier) createRestServerDirectories() error {
 	if err := utils.CreateDirectories(daosDirectory); err != nil {
 		return err
 	}
+	// create directories for every resource's db client.
 	if c.IsSQLDB {
 		sqlDBClientsDirectory := c.NodeDirectoryName + SQLDBClientsPath
 		if err := utils.CreateDirectories(sqlDBClientsDirectory); err != nil {
@@ -142,7 +149,7 @@ func (c Copier) createRestServerDirectories() error {
 		}
 		resources := c.Data["RestResources"].([]resourceData)
 		for _, r := range resources {
-			resourceClientDirectory := c.NodeDirectoryName + SQLDBClientsPath + "/" + r.SmallResourceNameSingular + "_client"
+			resourceClientDirectory := c.NodeDirectoryName + SQLDBClientsPath + "/" + r.SmallKebabCaseResourceNameSingular + "-client"
 			if err := utils.CreateDirectories(resourceClientDirectory); err != nil {
 				return err
 			}
@@ -154,7 +161,7 @@ func (c Copier) createRestServerDirectories() error {
 // copyRestServerResourceFiles copies rest server resource files from template and renames them as per resource config.
 func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 	var filePaths []string
-	resourceName := strings.ToLower(resource.Name)
+	resourceName := strcase.ToKebab(resource.Name)
 
 	// copy controller files to generated project
 	targetResourceControllerFileName := c.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + ControllerFile
@@ -187,7 +194,7 @@ func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 	if c.IsSQLDB {
 		if c.SQLDB == Sqlite {
 			// client files
-			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "_client" + "/" + SqliteDBClientFile
+			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "-client" + "/" + SqliteDBClientFile
 			_, err2 := utils.CopyFile(targetResourceSQLDBClientFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SqliteDBClientFile)
 			if err2 != nil {
 				return err2
@@ -202,7 +209,7 @@ func (c Copier) copyRestServerResourceFiles(resource node.Resource) error {
 			filePaths = append(filePaths, targetResourceDaoFileName)
 		} else if c.SQLDB == MySQL {
 			// client files
-			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "_client" + "/" + MySQLDBClientFile
+			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "-client" + "/" + MySQLDBClientFile
 			_, err2 := utils.CopyFile(targetResourceSQLDBClientFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBClientFile)
 			if err2 != nil {
 				return err2
@@ -325,9 +332,12 @@ func (c Copier) addResourceSpecificTemplateData(resource node.Resource) error {
 		c.Data["GetQueryExecColumns"] = getQueryScanColumns
 	}
 
-	// Add another map
-	c.Data["SmallResourceNameSingular"] = strings.ToLower(resource.Name)
-	c.Data["SmallResourceNamePlural"] = c.PluralizeClient.Plural(strings.ToLower(resource.Name))
+	lowerCamelResourceName := strcase.ToLowerCamel(resource.Name)
+	// Add another map with below keys at root level (this is for specific resource for this iteration)
+	c.Data["SmallKebabCaseResourceNameSingular"] = strcase.ToKebab(resource.Name)
+	c.Data["SmallSnakeCaseResourceNameSingular"] = strcase.ToSnake(resource.Name)
+	c.Data["SmallResourceNameSingular"] = lowerCamelResourceName
+	c.Data["SmallResourceNamePlural"] = c.PluralizeClient.Plural(lowerCamelResourceName)
 	c.Data["CapsResourceNameSingular"] = resource.Name
 	c.Data["CapsResourceNamePlural"] = c.PluralizeClient.Plural(resource.Name)
 	return nil
