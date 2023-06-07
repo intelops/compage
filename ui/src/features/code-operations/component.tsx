@@ -9,7 +9,7 @@ import {selectGetProjectData, selectUpdateProjectData} from "../projects-operati
 import {removeUnwantedKeys} from "../../components/diagram-maker/helper/helper";
 import * as _ from "lodash";
 import {GrpcServerConfig, RestClientConfig, RestServerConfig} from "../../components/diagram-maker/models";
-import {isCompageTemplate} from "../../components/diagram-maker/new-properties/utils";
+import {isCompageTemplate} from "../../components/diagram-maker/node-properties/utils";
 
 export const GenerateCode = () => {
     const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
