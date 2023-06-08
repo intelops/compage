@@ -24,13 +24,13 @@ import {
 import {
     EmptyCurrentGrpcResource,
     EmptyCurrentRestResource,
-    EmptyGrpcServerConfig,
-    EmptyRestServerConfig,
-    EmptyWsServerConfig,
-    GrpcServerConfig,
+    EmptyGrpcConfig,
+    EmptyRestConfig,
+    EmptyWsConfig,
+    GrpcConfig,
     Resource,
-    RestServerConfig,
-    WsServerConfig
+    RestConfig,
+    WsConfig
 } from "../models";
 import {AddOrUpdateRestResource} from "./add-or-update-rest-resource";
 import {useAppSelector} from "../../../redux/hooks";
@@ -63,51 +63,61 @@ interface NewNodePropertiesProps {
 }
 
 
-interface ServerTypesConfig {
+interface NodeTypesConfig {
     isRestServer?: boolean;
-    restServerConfig?: RestServerConfig;
+    restConfig?: RestConfig;
     isGrpcServer?: boolean;
-    grpcServerConfig?: GrpcServerConfig;
+    grpcConfig?: GrpcConfig;
     isWsServer?: boolean;
-    wsServerConfig?: WsServerConfig;
+    wsConfig?: WsConfig;
 }
 
-const getServerTypesConfig = (parsedModifiedState, nodeId): ServerTypesConfig => {
-    const restServerConfig: RestServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.restServerConfig;
-    const grpcServerConfig: GrpcServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.grpcServerConfig;
-    const wsServerConfig: WsServerConfig = parsedModifiedState.nodes[nodeId]?.consumerData.wsServerConfig;
-    const serverTypesConfig: ServerTypesConfig = {};
-    if (restServerConfig && Object.keys(restServerConfig).length > 0) {
-        serverTypesConfig.isRestServer = true;
-        serverTypesConfig.restServerConfig = {
-            framework: restServerConfig.framework,
-            sqlDb: restServerConfig.sqlDb,
-            openApiFileYamlContent: restServerConfig.openApiFileYamlContent,
-            port: restServerConfig.port,
-            resources: restServerConfig.resources,
-            template: restServerConfig.template
+const getNodeTypesConfig = (parsedModifiedState, nodeId): NodeTypesConfig => {
+    const restConfig: RestConfig = parsedModifiedState.nodes[nodeId]?.consumerData.restConfig;
+    const grpcConfig: GrpcConfig = parsedModifiedState.nodes[nodeId]?.consumerData.grpcConfig;
+    const wsConfig: WsConfig = parsedModifiedState.nodes[nodeId]?.consumerData.wsConfig;
+    const nodeTypesConfig: NodeTypesConfig = {};
+    if (restConfig && Object.keys(restConfig).length > 0) {
+        nodeTypesConfig.isRestServer = true;
+        nodeTypesConfig.restConfig = {
+            server: {
+                framework: restConfig.server.framework,
+                sqlDb: restConfig.server.sqlDb,
+                openApiFileYamlContent: restConfig.server.openApiFileYamlContent,
+                port: restConfig.server.port,
+                resources: restConfig.server.resources,
+            },
+            template: restConfig.template,
+            clients: restConfig.clients
         };
     }
-    if (grpcServerConfig && Object.keys(grpcServerConfig).length > 0) {
-        serverTypesConfig.isGrpcServer = true;
-        serverTypesConfig.grpcServerConfig = {
-            framework: grpcServerConfig.framework,
-            template: grpcServerConfig.template,
-            sqlDb: grpcServerConfig.sqlDb,
-            port: grpcServerConfig.port,
-            protoFileContent: grpcServerConfig.protoFileContent,
-            resources: grpcServerConfig.resources
+    if (grpcConfig && Object.keys(grpcConfig).length > 0) {
+        nodeTypesConfig.isGrpcServer = true;
+        nodeTypesConfig.grpcConfig = {
+            template: grpcConfig.template,
+            server: {
+                framework: grpcConfig.server.framework,
+                sqlDb: grpcConfig.server.sqlDb,
+                port: grpcConfig.server.port,
+                protoFileContent: grpcConfig.server.protoFileContent,
+                resources: grpcConfig.server.resources
+            },
+            clients: grpcConfig.clients
         };
     }
-    if (wsServerConfig && Object.keys(wsServerConfig).length > 0) {
-        serverTypesConfig.isWsServer = true;
-        serverTypesConfig.wsServerConfig = {
-            framework: wsServerConfig.framework,
-            port: wsServerConfig.port,
-            resources: wsServerConfig.resources
+    if (wsConfig && Object.keys(wsConfig).length > 0) {
+        nodeTypesConfig.isWsServer = true;
+        nodeTypesConfig.wsConfig = {
+            server: {
+                framework: wsConfig.server.framework,
+                port: wsConfig.server.port,
+                resources: wsConfig.server.resources
+            },
+            template: wsConfig.template,
+            clients: wsConfig.clients
         };
     }
-    return serverTypesConfig;
+    return nodeTypesConfig;
 };
 
 export const NewNodeProperties = (props: NewNodePropertiesProps) => {
@@ -119,7 +129,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         updateModifiedState(JSON.parse(getCurrentConfig()));
         parsedModifiedState = getParsedModifiedState();
     }
-    const serverTypesConfig: ServerTypesConfig = getServerTypesConfig(parsedModifiedState, props.nodeId);
+    const nodeTypesConfig: NodeTypesConfig = getNodeTypesConfig(parsedModifiedState, props.nodeId);
     const [payload, setPayload] = React.useState({
         name: {
             value: parsedModifiedState.nodes[props.nodeId]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.name : '',
@@ -127,12 +137,12 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             errorMessage: ''
         },
         language: parsedModifiedState.nodes[props.nodeId]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.language : '',
-        isRestServer: serverTypesConfig.isRestServer || false,
-        restServerConfig: serverTypesConfig.restServerConfig || EmptyRestServerConfig,
-        isGrpcServer: serverTypesConfig.isGrpcServer || false,
-        grpcServerConfig: serverTypesConfig.grpcServerConfig || EmptyGrpcServerConfig,
-        isWsServer: serverTypesConfig.isWsServer || false,
-        wsServerConfig: serverTypesConfig.wsServerConfig || EmptyWsServerConfig,
+        isRestServer: nodeTypesConfig.isRestServer || false,
+        restConfig: nodeTypesConfig.restConfig || EmptyRestConfig,
+        isGrpcServer: nodeTypesConfig.isGrpcServer || false,
+        grpcConfig: nodeTypesConfig.grpcConfig || EmptyGrpcConfig,
+        isWsServer: nodeTypesConfig.isWsServer || false,
+        wsConfig: nodeTypesConfig.wsConfig || EmptyWsConfig,
         // rest
         isAddRestResourceOpen: false,
         isUpdateRestResourceOpen: false,
@@ -208,40 +218,50 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const handleUpdateNode = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
         if (isNameValid()) {
-            let restServerConfig: RestServerConfig;
-            let grpcServerConfig: GrpcServerConfig;
-            let wsServerConfig: WsServerConfig;
+            let restConfig: RestConfig;
+            let grpcConfig: GrpcConfig;
+            let wsConfig: WsConfig;
 
             if (payload.isRestServer) {
-                restServerConfig = {
-                    sqlDb: payload.restServerConfig.sqlDb,
-                    framework: payload.restServerConfig.framework,
-                    port: getPort(payload.restServerConfig.template, payload.restServerConfig.port),
-                    template: payload.restServerConfig.template,
+                restConfig = {
+                    server: {
+                        sqlDb: payload.restConfig.server.sqlDb,
+                        framework: payload.restConfig.server.framework,
+                        port: getPort(payload.restConfig.template, payload.restConfig.server.port),
+                    },
+                    template: payload.restConfig.template,
+                    clients: payload.restConfig.clients
                 };
-                if (isCompageTemplate(payload.restServerConfig.template)) {
-                    restServerConfig.resources = payload.restServerConfig.resources;
+                if (isCompageTemplate(payload.restConfig.template)) {
+                    restConfig.server.resources = payload.restConfig.server.resources;
                 } else {
-                    restServerConfig.resources = [];
-                    restServerConfig.openApiFileYamlContent = uploadYamlData.content;
+                    restConfig.server.resources = [];
+                    restConfig.server.openApiFileYamlContent = uploadYamlData.content;
                 }
             }
             if (payload.isGrpcServer) {
-                grpcServerConfig = {
-                    template: payload.grpcServerConfig.template,
-                    sqlDb: payload.grpcServerConfig.sqlDb,
-                    framework: payload.grpcServerConfig.framework,
-                    port: payload.grpcServerConfig.port,
+                grpcConfig = {
+                    template: payload.grpcConfig.template,
+                    server: {
+                        sqlDb: payload.grpcConfig.server.sqlDb,
+                        framework: payload.grpcConfig.server.framework,
+                        port: payload.grpcConfig.server.port,
+                    },
+                    clients: payload.grpcConfig.clients
                 };
-                if (isCompageTemplate(payload.grpcServerConfig.template)) {
-                    grpcServerConfig.resources = payload.grpcServerConfig.resources;
+                if (isCompageTemplate(payload.grpcConfig.template)) {
+                    grpcConfig.server.resources = payload.grpcConfig.server.resources;
                 }
             }
             if (payload.isWsServer) {
-                wsServerConfig = {
-                    framework: payload.wsServerConfig.framework,
-                    port: payload.wsServerConfig.port,
-                    resources: []
+                wsConfig = {
+                    template: payload.wsConfig.template,
+                    server: {
+                        framework: payload.wsConfig.server.framework,
+                        port: payload.wsConfig.server.port,
+                        resources: []
+                    },
+                    clients: payload.wsConfig.clients
                 };
             }
 
@@ -254,9 +274,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     consumerData: {
                         name: payload.name.value,
                         language: payload.language,
-                        restServerConfig,
-                        grpcServerConfig,
-                        wsServerConfig,
+                        restConfig,
+                        grpcConfig,
+                        wsConfig,
                     }
                 };
             } else {
@@ -264,9 +284,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 modifiedState.nodes[props.nodeId].consumerData = {
                     name: payload.name.value,
                     language: payload.language,
-                    restServerConfig,
-                    grpcServerConfig,
-                    wsServerConfig,
+                    restConfig,
+                    grpcConfig,
+                    wsConfig,
                 };
             }
             // image to node display
@@ -284,9 +304,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 isGrpcServer: false,
                 isRestServer: false,
                 isWsServer: false,
-                grpcServerConfig: EmptyGrpcServerConfig,
-                restServerConfig: EmptyRestServerConfig,
-                wsServerConfig: EmptyWsServerConfig,
+                grpcConfig: EmptyGrpcConfig,
+                restConfig: EmptyRestConfig,
+                wsConfig: EmptyWsConfig,
                 isAddRestResourceOpen: false,
                 isUpdateRestResourceOpen: false,
                 isDeleteRestResourceOpen: false,
@@ -301,21 +321,21 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const handleTemplateChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const restServerConfig: RestServerConfig = payload.restServerConfig;
-        restServerConfig.template = event.target.value;
+        const restConfig: RestConfig = payload.restConfig;
+        restConfig.template = event.target.value;
         setPayload({
             ...payload,
-            restServerConfig
+            restConfig
         });
     };
 
 
     const handleGrpcTemplateChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const grpcServerConfig: GrpcServerConfig = payload.grpcServerConfig;
-        grpcServerConfig.template = event.target.value;
+        const grpcConfig: GrpcConfig = payload.grpcConfig;
+        grpcConfig.template = event.target.value;
         setPayload({
             ...payload,
-            grpcServerConfig
+            grpcConfig
         });
     };
 
@@ -372,10 +392,10 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const getExistingResources = () => {
-        if (payload.restServerConfig.resources?.length > 0) {
+        if (payload.restConfig.server.resources?.length > 0) {
             return <>
                 <br/>
-                Existing resources :
+                Existing REST resources :
                 <TableContainer component={Paper}>
                     <Table sx={{minWidth: 400}}>
                         <TableHead>
@@ -386,7 +406,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         </TableHead>
                         <TableBody>
                             {
-                                payload.restServerConfig.resources.map((resource, index) => (
+                                payload.restConfig.server.resources.map((resource, index) => (
                                     <TableRow
                                         key={index}
                                         sx={{'&:last-child td, &:last-child th': {border: 0}}}
@@ -436,7 +456,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 defaultValue=''
                 label="Template"
                 type="text"
-                value={payload.restServerConfig.template}
+                value={payload.restConfig.template}
                 onChange={handleTemplateChange}
                 variant="outlined">
                 {
@@ -454,7 +474,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const getSqlDbContent = () => {
         // create language:sqlDbs map based on template chosen
         let map;
-        if (isCompageTemplate(payload.restServerConfig.template)) {
+        if (isCompageTemplate(payload.restConfig.template)) {
             map = new Map(Object.entries(COMPAGE_LANGUAGE_SQL_DBS));
         } else {
             map = new Map();
@@ -471,8 +491,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 label="Sql Database"
                 defaultValue=''
                 type="text"
-                value={payload.restServerConfig.sqlDb}
-                onChange={handleRestServerConfigSqlDbChange}
+                value={payload.restConfig.server.sqlDb}
+                onChange={handleRestConfigServerSqlDbChange}
                 variant="outlined">
                 {sqlDbs.map((sqlDb: string) => (
                     <MenuItem key={sqlDb} value={sqlDb}>
@@ -487,7 +507,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const getFrameworkContent = () => {
         // create language:frameworks map based on template chosen
         let map;
-        if (isCompageTemplate(payload.restServerConfig.template)) {
+        if (isCompageTemplate(payload.restConfig.template)) {
             map = new Map(Object.entries(COMPAGE_LANGUAGE_FRAMEWORKS));
         } else {
             map = new Map(Object.entries(OPENAPI_LANGUAGE_FRAMEWORKS));
@@ -504,8 +524,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 label="Framework"
                 defaultValue=''
                 type="text"
-                value={payload.restServerConfig.framework}
-                onChange={handleRestServerConfigFrameworkChange}
+                value={payload.restConfig.server.framework}
+                onChange={handleRestConfigServerFrameworkChange}
                 variant="outlined">
                 {frameworks.map((framework: string) => (
                     <MenuItem key={framework} value={framework}>
@@ -518,16 +538,16 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const getPortContent = () => {
-        if (isCompageTemplate(payload.restServerConfig.template)) {
+        if (isCompageTemplate(payload.restConfig.template)) {
             return <TextField
                 required
                 size="medium"
                 margin="dense"
-                id="restServerConfigPort"
+                id="restConfigPort"
                 label="Port"
                 type="number"
-                value={payload.restServerConfig.port}
-                onChange={handleRestServerConfigPortChange}
+                value={payload.restConfig.server.port}
+                onChange={handleRestConfigServerPortChange}
                 variant="outlined"
             />;
         }
@@ -535,7 +555,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const getResourcesContent = () => {
-        if (isCompageTemplate(payload.restServerConfig.template)) {
+        if (isCompageTemplate(payload.restConfig.template)) {
             return <React.Fragment>
                 <Button variant="outlined" color="secondary" onClick={handleAddRestResourceClick}>
                     Add Resource
@@ -578,10 +598,10 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
     const getExistingGrpcResources = () => {
-        if (payload.grpcServerConfig.resources?.length > 0) {
+        if (payload.grpcConfig.server.resources?.length > 0) {
             return <>
                 <br/>
-                Existing resources :
+                Existing gRPC resources :
                 <TableContainer component={Paper}>
                     <Table sx={{minWidth: 400}}>
                         <TableHead>
@@ -592,7 +612,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         </TableHead>
                         <TableBody>
                             {
-                                payload.grpcServerConfig.resources.map((resource, index) => (
+                                payload.grpcConfig.server.resources.map((resource, index) => (
                                     <TableRow
                                         key={index}
                                         sx={{'&:last-child td, &:last-child th': {border: 0}}}
@@ -642,7 +662,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 defaultValue=''
                 label="Template"
                 type="text"
-                value={payload.grpcServerConfig.template}
+                value={payload.grpcConfig.template}
                 onChange={handleGrpcTemplateChange}
                 variant="outlined">
                 {
@@ -660,7 +680,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const getGrpcSqlDbContent = () => {
         // create language:sqlDbs map based on template chosen
         let map;
-        if (isCompageTemplate(payload.grpcServerConfig.template)) {
+        if (isCompageTemplate(payload.grpcConfig.template)) {
             map = new Map(Object.entries(COMPAGE_LANGUAGE_SQL_DBS));
         } else {
             map = new Map();
@@ -677,8 +697,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 label="Sql Database"
                 defaultValue=''
                 type="text"
-                value={payload.grpcServerConfig.sqlDb}
-                onChange={handleGrpcServerConfigSqlDbChange}
+                value={payload.grpcConfig.server.sqlDb}
+                onChange={handleGrpcConfigServerSqlDbChange}
                 variant="outlined">
                 {sqlDbs.map((sqlDb: string) => (
                     <MenuItem key={sqlDb} value={sqlDb}>
@@ -693,7 +713,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const getGrpcFrameworkContent = () => {
         // create language:frameworks map based on template chosen
         let map;
-        if (isCompageTemplate(payload.grpcServerConfig.template)) {
+        if (isCompageTemplate(payload.grpcConfig.template)) {
             map = new Map(Object.entries(COMPAGE_LANGUAGE_GRPC_FRAMEWORKS));
         } else {
             map = new Map();
@@ -710,8 +730,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 label="Framework"
                 defaultValue=''
                 type="text"
-                value={payload.grpcServerConfig.framework}
-                onChange={handleGrpcServerConfigFrameworkChange}
+                value={payload.grpcConfig.server.framework}
+                onChange={handleGrpcConfigServerFrameworkChange}
                 variant="outlined">
                 {frameworks.map((framework: string) => (
                     <MenuItem key={framework} value={framework}>
@@ -724,16 +744,16 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const getGrpcPortContent = () => {
-        if (isCompageTemplate(payload.grpcServerConfig.template)) {
+        if (isCompageTemplate(payload.grpcConfig.template)) {
             return <TextField
                 required
                 size="medium"
                 margin="dense"
-                id="grpcServerConfigPort"
+                id="grpcConfigPort"
                 label="Port"
                 type="number"
-                value={payload.grpcServerConfig.port}
-                onChange={handleGrpcServerConfigPortChange}
+                value={payload.grpcConfig.server.port}
+                onChange={handleGrpcConfigServerPortChange}
                 variant="outlined"
             />;
         }
@@ -741,7 +761,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const getGrpcResourcesContent = () => {
-        if (isCompageTemplate(payload.grpcServerConfig.template)) {
+        if (isCompageTemplate(payload.grpcConfig.template)) {
             return <React.Fragment>
                 <Button variant="outlined" color="secondary" onClick={handleAddGrpcResourceClick}>
                     Add Resource
@@ -755,21 +775,21 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         </React.Fragment>;
     };
 
-    const handleGrpcServerConfigSqlDbChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const grpcServerConfig: GrpcServerConfig = payload.grpcServerConfig;
-        grpcServerConfig.sqlDb = event.target.value;
+    const handleGrpcConfigServerSqlDbChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const grpcConfig: GrpcConfig = payload.grpcConfig;
+        grpcConfig.server.sqlDb = event.target.value;
         setPayload({
             ...payload,
-            grpcServerConfig
+            grpcConfig
         });
     };
 
-    const handleGrpcServerConfigFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const grpcServerConfig: GrpcServerConfig = payload.grpcServerConfig;
-        grpcServerConfig.framework = event.target.value;
+    const handleGrpcConfigServerFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const grpcConfig: GrpcConfig = payload.grpcConfig;
+        grpcConfig.server.framework = event.target.value;
         setPayload({
             ...payload,
-            grpcServerConfig
+            grpcConfig
         });
     };
 
@@ -780,7 +800,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const getGrpcServerConfig = () => {
+    const getGrpcConfig = () => {
         if (payload.isGrpcServer) {
             return <React.Fragment>
                 {getGrpcTemplateContent()}
@@ -805,40 +825,40 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         </React.Fragment>;
     };
 
-    const handleGrpcServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const grpcServerConfig: GrpcServerConfig = payload.grpcServerConfig;
-        grpcServerConfig.port = event.target.value;
+    const handleGrpcConfigServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const grpcConfig: GrpcConfig = payload.grpcConfig;
+        grpcConfig.server.port = event.target.value;
         setPayload({
             ...payload,
-            grpcServerConfig,
+            grpcConfig,
         });
     };
 
 
     const handleAddOrUpdateGrpcResource = (resource: Resource) => {
-        const grpcServerConfig: RestServerConfig = payload.grpcServerConfig;
+        const grpcConfig: GrpcConfig = payload.grpcConfig;
         // the below check is to identify if the rest resource is added or updated.
         if (payload.isUpdateGrpcResourceOpen) {
             // remove the old resource while updating
-            payload.grpcServerConfig.resources = payload.grpcServerConfig.resources.filter(res => res.name !== resource.name);
-            grpcServerConfig.resources.push(resource);
+            grpcConfig.server.resources = grpcConfig.server.resources.filter(res => res.name !== resource.name);
+            grpcConfig.server.resources.push(resource);
             payload.isUpdateGrpcResourceOpen = false;
         } else if (payload.isAddGrpcResourceOpen) {
             payload.isAddGrpcResourceOpen = false;
-            grpcServerConfig.resources.push(resource);
+            grpcConfig.server.resources.push(resource);
         }
         setPayload({
             ...payload,
-            grpcServerConfig,
+            grpcConfig,
         });
     };
 
     const handleDeleteGrpcResource = () => {
         const currentGrpcResource = payload.currentGrpcResource;
-        payload.grpcServerConfig.resources = payload.grpcServerConfig.resources.filter(resource => resource.name !== currentGrpcResource.name);
+        payload.grpcConfig.server.resources = payload.grpcConfig.server.resources.filter(resource => resource.name !== currentGrpcResource.name);
         setPayload({
             ...payload,
-            grpcServerConfig: payload.grpcServerConfig,
+            grpcConfig: payload.grpcConfig,
             isDeleteGrpcResourceOpen: !payload.isDeleteGrpcResourceOpen
         });
     };
@@ -862,9 +882,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const getGrpcResourceNames = () => {
-        if (payload.grpcServerConfig.resources.length > 0) {
+        if (payload.grpcConfig.server.resources.length > 0) {
             const resourceNames = [];
-            payload.grpcServerConfig.resources.forEach(resource => {
+            payload.grpcConfig.server.resources.forEach(resource => {
                 resourceNames.push(resource.name);
             });
             return resourceNames;
@@ -872,7 +892,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return [];
     };
 
-    const getRestServerConfig = () => {
+    const getRestConfig = () => {
         if (payload.isRestServer) {
             return <React.Fragment>
                 {getTemplateContent()}
@@ -897,30 +917,30 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         </React.Fragment>;
     };
 
-    const handleRestServerConfigSqlDbChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const restServerConfig: RestServerConfig = payload.restServerConfig;
-        restServerConfig.sqlDb = event.target.value;
+    const handleRestConfigServerSqlDbChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const restConfig: RestConfig = payload.restConfig;
+        restConfig.server.sqlDb = event.target.value;
         setPayload({
             ...payload,
-            restServerConfig
+            restConfig
         });
     };
 
-    const handleRestServerConfigFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const restServerConfig: RestServerConfig = payload.restServerConfig;
-        restServerConfig.framework = event.target.value;
+    const handleRestConfigServerFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const restConfig: RestConfig = payload.restConfig;
+        restConfig.server.framework = event.target.value;
         setPayload({
             ...payload,
-            restServerConfig
+            restConfig
         });
     };
 
-    const handleRestServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const restServerConfig: RestServerConfig = payload.restServerConfig;
-        restServerConfig.port = event.target.value;
+    const handleRestConfigServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const restConfig: RestConfig = payload.restConfig;
+        restConfig.server.port = event.target.value;
         setPayload({
             ...payload,
-            restServerConfig
+            restConfig
         });
     };
 
@@ -931,18 +951,18 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const getWsServerConfig = () => {
+    const getWsConfig = () => {
         if (payload.isWsServer) {
             return <React.Fragment>
                 <TextField
                     required
                     size="medium"
                     margin="dense"
-                    id="wsServerConfigPort"
+                    id="wsConfigPort"
                     label="Port"
                     type="text"
-                    value={payload.wsServerConfig.port}
-                    onChange={handleWsServerConfigPortChange}
+                    value={payload.wsConfig.server.port}
+                    onChange={handleWsConfigServerPortChange}
                     variant="outlined"
                 />
             </React.Fragment>;
@@ -964,39 +984,39 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         </React.Fragment>;
     };
 
-    const handleWsServerConfigPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const wsServerConfig: WsServerConfig = payload.wsServerConfig;
-        wsServerConfig.port = event.target.value;
+    const handleWsConfigServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const wsConfig: WsConfig = payload.wsConfig;
+        wsConfig.server.port = event.target.value;
         setPayload({
             ...payload,
-            wsServerConfig
+            wsConfig
         });
     };
 
     const handleAddOrUpdateRestResource = (resource: Resource) => {
-        const restServerConfig: RestServerConfig = payload.restServerConfig;
+        const restConfig: RestConfig = payload.restConfig;
         // the below check is to identify if the rest resource is added or updated.
         if (payload.isUpdateRestResourceOpen) {
             // remove the old resource while updating
-            payload.restServerConfig.resources = payload.restServerConfig.resources.filter(res => res.name !== resource.name);
-            restServerConfig.resources.push(resource);
+            restConfig.server.resources = restConfig.server.resources.filter(res => res.name !== resource.name);
+            restConfig.server.resources.push(resource);
             payload.isUpdateRestResourceOpen = false;
         } else if (payload.isAddRestResourceOpen) {
             payload.isAddRestResourceOpen = false;
-            restServerConfig.resources.push(resource);
+            restConfig.server.resources.push(resource);
         }
         setPayload({
             ...payload,
-            restServerConfig,
+            restConfig,
         });
     };
 
     const handleDeleteRestResource = () => {
         const currentRestResource = payload.currentRestResource;
-        payload.restServerConfig.resources = payload.restServerConfig.resources.filter(resource => resource.name !== currentRestResource.name);
+        payload.restConfig.server.resources = payload.restConfig.server.resources.filter(resource => resource.name !== currentRestResource.name);
         setPayload({
             ...payload,
-            restServerConfig: payload.restServerConfig,
+            restConfig: payload.restConfig,
             isDeleteRestResourceOpen: !payload.isDeleteRestResourceOpen
         });
     };
@@ -1028,9 +1048,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const getResourceNames = () => {
-        if (payload.restServerConfig.resources.length > 0) {
+        if (payload.restConfig.server.resources.length > 0) {
             const resourceNames = [];
-            payload.restServerConfig.resources.forEach(resource => {
+            payload.restConfig.server.resources.forEach(resource => {
                 resourceNames.push(resource.name);
             });
             return resourceNames;
@@ -1113,7 +1133,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                             border: payload.isRestServer ? '1px solid #dadada' : ''
                         }} direction="column" spacing={2}>
                             {getRestServerCheck()}
-                            {getRestServerConfig()}
+                            {getRestConfig()}
                         </Stack>
                         <Stack style={{
                             padding: "10px",
@@ -1121,7 +1141,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                             border: payload.isGrpcServer ? '1px solid #dadada' : ''
                         }} direction="column" spacing={2}>
                             {getGrpcServerCheck()}
-                            {getGrpcServerConfig()}
+                            {getGrpcConfig()}
                         </Stack>
                         <Stack style={{
                             padding: "10px",
@@ -1129,7 +1149,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                             border: payload.isWsServer ? '1px solid #dadada' : ''
                         }} direction="column" spacing={2}>
                             {/*{getWsServerCheck()}*/}
-                            {/*{getWsServerConfig()}*/}
+                            {/*{getWsConfig()}*/}
                         </Stack>
                     </Stack>
                 </DialogContent>

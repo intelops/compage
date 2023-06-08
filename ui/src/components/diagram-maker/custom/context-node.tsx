@@ -1,7 +1,7 @@
 import React from 'react';
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
-import {CompageNode, EmptyGrpcServerConfig, EmptyRestServerConfig, EmptyWsServerConfig} from "../models";
+import {CompageNode, EmptyGrpcConfig, EmptyRestConfig, EmptyWsConfig} from "../models";
 
 interface ContextNodeProps {
     id: string | undefined;
@@ -13,12 +13,12 @@ export const ContextNode = (props: ContextNodeProps) => {
     const [payload] = React.useState({
         name: node?.consumerData.name !== undefined ? node.consumerData.name : "",
         language: node?.consumerData.language !== undefined ? node.consumerData.language : "",
-        // restServerConfig to be generated
-        restServerConfig: node?.consumerData.restServerConfig !== undefined ? node.consumerData.restServerConfig : EmptyRestServerConfig,
-        // grpcServerConfig to be generated
-        grpcServerConfig: node?.consumerData.grpcServerConfig !== undefined ? node.consumerData.grpcServerConfig : EmptyGrpcServerConfig,
+        // restConfig to be generated
+        restConfig: node?.consumerData.restConfig !== undefined ? node.consumerData.restConfig : EmptyRestConfig,
+        // grpcConfig to be generated
+        grpcConfig: node?.consumerData.grpcConfig !== undefined ? node.consumerData.grpcConfig : EmptyGrpcConfig,
         // wsServerType to be generated
-        wsServerConfig: node?.consumerData.wsServerConfig !== undefined ? node.consumerData.wsServerConfig : EmptyWsServerConfig,
+        wsConfig: node?.consumerData.wsConfig !== undefined ? node.consumerData.wsConfig : EmptyWsConfig,
     });
 
     if (!props.id) {
@@ -41,22 +41,22 @@ export const ContextNode = (props: ContextNodeProps) => {
     };
 
     const getTemplate = () => {
-        if (payload.restServerConfig.template) {
-            return <><strong>Template</strong>: {payload.restServerConfig.template}</>;
+        if (payload.restConfig.template) {
+            return <><strong>Template</strong>: {payload.restConfig.template}</>;
         }
         return "";
     };
 
     const getFramework = () => {
-        if (payload.restServerConfig.framework) {
-            return <><strong>Framework</strong>: {payload.restServerConfig.framework}</>;
+        if (payload.restConfig.server.framework) {
+            return <><strong>Framework</strong>: {payload.restConfig.server.framework}</>;
         }
         return "";
     };
 
     const getPort = () => {
-        if (payload.restServerConfig.port) {
-            return <><strong>Port</strong>: {payload.restServerConfig.port}</>;
+        if (payload.restConfig.server.port) {
+            return <><strong>Port</strong>: {payload.restConfig.server.port}</>;
         }
         return "";
     };

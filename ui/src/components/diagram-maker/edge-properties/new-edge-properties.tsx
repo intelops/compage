@@ -10,14 +10,7 @@ import {getCurrentConfig, setModifiedState} from "../../../utils/localstorage-cl
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
-import {
-    GrpcClientConfig,
-    GrpcServerConfig,
-    RestClientConfig,
-    RestServerConfig,
-    WsClientConfig,
-    WsServerConfig
-} from "../models";
+import {CompageEdge, CompageNode, GrpcClient, GrpcConfig, RestClient, RestConfig, WsClient, WsConfig} from "../models";
 
 interface NewEdgePropertiesProps {
     isOpen: boolean;
@@ -32,43 +25,54 @@ interface ClientTypesConfig {
     grpcServerPort?: string;
     isWsServer?: boolean;
     wsServerPort?: string;
+    externalNode?: string;
 }
 
 const getClientTypesConfig = (parsedModifiedState, edgeId): ClientTypesConfig => {
-    const clientTypesConfig = {};
-    // rest
-    const restClientConfig: RestClientConfig = parsedModifiedState.edges[edgeId]?.consumerData?.restClientConfig;
-    if (restClientConfig && Object.keys(restClientConfig).length > 0) {
-        clientTypesConfig["isRestServer"] = true;
-        clientTypesConfig["restServerPort"] = restClientConfig.port;
-    }
-    // grpc
-    const grpcClientConfig: GrpcClientConfig = parsedModifiedState.edges[edgeId]?.consumerData?.grpcClientConfig;
-    if (grpcClientConfig && Object.keys(grpcClientConfig).length > 0) {
-        clientTypesConfig["isGrpcServer"] = true;
-        clientTypesConfig["grpcServerPort"] = grpcClientConfig.port;
-    }
-    // ws
-    const wsClientConfig: WsClientConfig = parsedModifiedState.edges[edgeId]?.consumerData?.wsClientConfig;
-    if (wsClientConfig && Object.keys(wsClientConfig).length > 0) {
-        clientTypesConfig["isWsServer"] = true;
-        clientTypesConfig["wsServerPort"] = wsClientConfig.port;
-    }
+    // read node's clients array and get these values
+    const clientTypesConfig: ClientTypesConfig = {};
+    const edge: CompageEdge = parsedModifiedState.edges[edgeId];
+    const destNode: CompageNode = parsedModifiedState.nodes[edge.dest];
+    const srcNode: CompageNode = parsedModifiedState.nodes[edge.src];
 
+    // rest - extract clients in dest node
+    const restClients: RestClient[] = destNode?.consumerData?.restConfig.clients;
+    if (restClients && restClients.length > 0) {
+        for (const restClient of restClients) {
+            if (srcNode.consumerData.name === restClient.externalNode) {
+                clientTypesConfig.isRestServer = true;
+                clientTypesConfig.restServerPort = srcNode.consumerData.restConfig.server.port;
+            }
+        }
+    }
+    // grpc - extract clients in dest node
+    const grpcClients: GrpcClient[] = destNode?.consumerData?.grpcConfig.clients;
+    if (grpcClients && grpcClients.length > 0) {
+        for (const grpcClient of grpcClients) {
+            if (srcNode.consumerData.name === grpcClient.externalNode) {
+                clientTypesConfig.isGrpcServer = true;
+                clientTypesConfig.grpcServerPort = srcNode.consumerData.grpcConfig.server.port;
+            }
+        }
+    }
+    // ws - extract clients in dest node
+    const wsClients: WsClient[] = destNode?.consumerData?.wsConfig.clients;
+    if (wsClients && wsClients.length > 0) {
+        for (const wsClient of wsClients) {
+            if (srcNode.consumerData.name === wsClient.externalNode) {
+                clientTypesConfig.isWsServer = true;
+                clientTypesConfig.wsServerPort = srcNode.consumerData.wsConfig.server.port;
+            }
+        }
+    }
     return clientTypesConfig;
-};
-
-const getExternalNode = (edgeId: string) => {
-    const parsedModifiedState = getParsedModifiedState();
-    const parsedConfig = JSON.parse(getCurrentConfig());
-    const nodeId = parsedConfig.edges[edgeId].src;
-    return parsedModifiedState.nodes[nodeId].consumerData.name;
 };
 
 export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     const parsedModifiedState = getParsedModifiedState();
     const parsedCurrentConfig = JSON.parse(getCurrentConfig());
     const clientTypesConfig: ClientTypesConfig = getClientTypesConfig(parsedModifiedState, props.edgeId);
+
 
     const [payload, setPayload] = React.useState({
         name: parsedModifiedState.edges[props.edgeId]?.consumerData.name !== undefined ? parsedModifiedState.edges[props.edgeId].consumerData.name : "",
@@ -78,6 +82,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         grpcServerPort: clientTypesConfig.grpcServerPort,
         isWsServer: clientTypesConfig.isWsServer || false,
         wsServerPort: clientTypesConfig.wsServerPort,
+        externalNode: clientTypesConfig.externalNode,
     });
 
     // TODO this is a hack as there is no EDGE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
@@ -94,16 +99,53 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             };
         }
 
-        modifiedState.edges[props.edgeId]["consumerData"]["name"] = payload.name;
-        modifiedState.edges[props.edgeId]["consumerData"]["externalNode"] = getExternalNode(props.edgeId);
+        // TODO issue may occur if the object is cloned in ts instead of reference.
+        const edge: CompageEdge = modifiedState.edges[props.edgeId];
+        const dstNode: CompageNode = modifiedState.nodes[edge.dest];
+
+        edge.consumerData.name = payload.name;
+        // get dest node and add details to it.
         if (payload.isRestServer) {
-            modifiedState.edges[props.edgeId]["consumerData"]["restClientConfig"] = {port: payload.restServerPort};
+            const restClient: RestClient = {
+                externalNode: payload.externalNode,
+                port: payload.restServerPort,
+            };
+            for (let i = 0; i < dstNode.consumerData.restConfig.clients.length; i++) {
+                // search for old restClient and delete it.
+                if (dstNode.consumerData.restConfig.clients[i].externalNode === payload.externalNode) {
+                    dstNode.consumerData.restConfig.clients.splice(i, 1);
+                    break;
+                }
+            }
+            dstNode.consumerData.restConfig.clients.push(restClient);
         }
         if (payload.isGrpcServer) {
-            modifiedState.edges[props.edgeId]["consumerData"]["grpcClientConfig"] = {port: payload.grpcServerPort};
+            const grpcClient: GrpcClient = {
+                externalNode: payload.externalNode,
+                port: payload.grpcServerPort,
+            };
+            for (let i = 0; i < dstNode.consumerData.grpcConfig.clients.length; i++) {
+                // search for old grpcClient and delete it.
+                if (dstNode.consumerData.grpcConfig.clients[i].externalNode === payload.externalNode) {
+                    dstNode.consumerData.grpcConfig.clients.splice(i, 1);
+                    break;
+                }
+            }
+            dstNode.consumerData.grpcConfig.clients.push(grpcClient);
         }
         if (payload.isWsServer) {
-            modifiedState.edges[props.edgeId]["consumerData"]["wsClientConfig"] = {port: payload.wsServerPort};
+            const wsClient: WsClient = {
+                externalNode: payload.externalNode,
+                port: payload.wsServerPort,
+            };
+            for (let i = 0; i < dstNode.consumerData.wsConfig.clients.length; i++) {
+                // search for old wsClient and delete it.
+                if (dstNode.consumerData.wsConfig.clients[i].externalNode === payload.externalNode) {
+                    dstNode.consumerData.wsConfig.clients.splice(i, 1);
+                    break;
+                }
+            }
+            dstNode.consumerData.wsConfig.clients.push(wsClient);
         }
 
         // update modifiedState in the localstorage
@@ -115,7 +157,8 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             isGrpcServer: false,
             grpcServerPort: "",
             isWsServer: false,
-            wsServerPort: ""
+            wsServerPort: "",
+            externalNode: ""
         });
         props.onEdgePropertiesClose();
     };
@@ -132,13 +175,6 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         setPayload({
             ...payload,
             name: event.target.value
-        });
-    };
-
-    const handleRestServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setPayload({
-            ...payload,
-            restServerPort: event.target.value
         });
     };
 
@@ -164,10 +200,12 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     const getRestServerPort = () => {
         if (payload.isRestServer) {
             // retrieve port from src node.
-            const srcNode = parsedCurrentConfig.edges[props.edgeId].src;
-            const restServerConfig: RestServerConfig = parsedModifiedState.nodes[srcNode]?.consumerData?.restServerConfig;
-            if (restServerConfig && restServerConfig.port) {
-                payload.restServerPort = restServerConfig.port;
+            const srcNodeId = parsedCurrentConfig.edges[props.edgeId].src;
+            const srcNode: CompageNode = parsedModifiedState.nodes[srcNodeId];
+            const restConfig: RestConfig = srcNode?.consumerData?.restConfig;
+            if (restConfig && restConfig.server.port) {
+                payload.restServerPort = restConfig.server.port;
+                payload.externalNode = srcNode.consumerData.name;
             } else {
                 // this is a default port for every project generated by openapi-generator
                 payload.restServerPort = "8080";
@@ -181,18 +219,10 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                 type="text"
                 disabled
                 value={payload.restServerPort}
-                onChange={handleRestServerPortChange}
                 variant="outlined"
             />;
         }
         return "";
-    };
-
-    const handleGrpcServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setPayload({
-            ...payload,
-            grpcServerPort: event.target.value
-        });
     };
 
     const handleIsGrpcServerChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -217,10 +247,11 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     const getGrpcServerPort = () => {
         if (payload.isGrpcServer) {
             // retrieve port from src node.
-            const srcNode = parsedCurrentConfig.edges[props.edgeId].src;
-            const grpcServerConfig: GrpcServerConfig = parsedModifiedState.nodes[srcNode]?.consumerData?.grpcServerConfig;
-            if (grpcServerConfig && Object.keys(grpcServerConfig).length > 0) {
-                payload.grpcServerPort = grpcServerConfig.port;
+            const srcNodeId: string = parsedCurrentConfig.edges[props.edgeId].src;
+            const srcNode: CompageNode = parsedModifiedState.nodes[srcNodeId];
+            const grpcConfig: GrpcConfig = srcNode?.consumerData?.grpcConfig;
+            if (grpcConfig && Object.keys(grpcConfig).length > 0) {
+                payload.grpcServerPort = grpcConfig.server.port;
             }
             return <TextField
                 required
@@ -231,18 +262,10 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                 type="text"
                 disabled
                 value={payload.grpcServerPort}
-                onChange={handleGrpcServerPortChange}
                 variant="outlined"
             />;
         }
         return "";
-    };
-
-    const handleWsServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setPayload({
-            ...payload,
-            wsServerPort: event.target.value
-        });
     };
 
     const handleIsWsServerChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -269,9 +292,9 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         if (payload.isWsServer) {
             // retrieve port from src node.
             const srcNode = parsedCurrentConfig.edges[props.edgeId].src;
-            const wsServerConfig: WsServerConfig = parsedModifiedState.nodes[srcNode]?.consumerData?.wsServerConfig;
-            if (wsServerConfig && Object.keys(wsServerConfig).length > 0) {
-                payload.wsServerPort = wsServerConfig.port;
+            const wsConfig: WsConfig = parsedModifiedState.nodes[srcNode]?.consumerData?.wsConfig;
+            if (wsConfig && Object.keys(wsConfig).length > 0) {
+                payload.wsServerPort = wsConfig.server.port;
             }
             return <TextField
                 required
@@ -281,7 +304,6 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                 label="Port"
                 type="text"
                 value={payload.wsServerPort}
-                onChange={handleWsServerPortChange}
                 variant="outlined"
             />;
         }

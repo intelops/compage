@@ -8,7 +8,7 @@ import {getCurrentProjectDetails, getCurrentState} from "../../utils/localstorag
 import {selectGetProjectData, selectUpdateProjectData} from "../projects-operations/slice";
 import {removeUnwantedKeys} from "../../components/diagram-maker/helper/helper";
 import * as _ from "lodash";
-import {GrpcServerConfig, RestClientConfig, RestServerConfig} from "../../components/diagram-maker/models";
+import {CompageEdge, CompageNode, GrpcConfig, RestClient, RestConfig} from "../../components/diagram-maker/models";
 import {isCompageTemplate} from "../../components/diagram-maker/node-properties/utils";
 
 export const GenerateCode = () => {
@@ -33,25 +33,35 @@ export const GenerateCode = () => {
     };
 
     const isValidRestConfig = (removeUnwantedKeysGetCurrentState: any, key: string) => {
-        const restServerConfig: RestServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.restServerConfig;
-        if (!restServerConfig || Object.keys(restServerConfig).length < 1) {
+        const restConfig: RestConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.restConfig;
+        if (!restConfig || Object.keys(restConfig).length < 1) {
             return true;
         }
         // in case of compage template, resources should not be empty.
-        return isCompageTemplate(restServerConfig.template) && restServerConfig.resources.length < 1;
+        return isCompageTemplate(restConfig.template) && restConfig.server.resources.length < 1;
     };
 
     const isValidGrpcConfig = (removeUnwantedKeysGetCurrentState: any, key: string) => {
-        const grpcServerConfig: GrpcServerConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.grpcServerConfig;
-        if (!grpcServerConfig || Object.keys(grpcServerConfig).length < 1) {
+        const grpcConfig: GrpcConfig = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.grpcConfig;
+        if (!grpcConfig || Object.keys(grpcConfig).length < 1) {
             return true;
         }
         // in case of compage template, resources should not be empty.
-        return isCompageTemplate(grpcServerConfig.template) && grpcServerConfig.resources.length < 1;
+        return isCompageTemplate(grpcConfig.template) && grpcConfig.server.resources.length < 1;
     };
 
     const IsAnyRequiredValueMissingInOneOfNodes = (removeUnwantedKeysGetCurrentState: any) => {
         // nodes
+        const isTheNodeDestinationInAnyOfEdges = (node: CompageNode, edges: CompageEdge[]) => {
+            // iterate over edges and find if the node is in dest in any of the edges.
+            for (const edge of edges) {
+                if (edge.dest === node.id) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
         // tslint:disable-next-line: forin
         for (const key in removeUnwantedKeysGetCurrentState?.nodes) {
             const name = removeUnwantedKeysGetCurrentState.nodes[key]?.consumerData?.name;
@@ -62,17 +72,21 @@ export const GenerateCode = () => {
                 || isValidGrpcConfig(removeUnwantedKeysGetCurrentState, key)) {
                 return false;
             }
+
+            // rest, similar checks need to be added below for grpc and ws.
+            const compageNode: CompageNode = removeUnwantedKeysGetCurrentState.nodes[key];
+            if (isTheNodeDestinationInAnyOfEdges(removeUnwantedKeysGetCurrentState.nodes[key], removeUnwantedKeysGetCurrentState.edges)) {
+                const restClients: RestClient[] = compageNode?.consumerData?.restConfig.clients;
+                if (!restClients || restClients.length < 1) {
+                    return true;
+                }
+            }
         }
         // edges
         // tslint:disable-next-line: forin
         for (const key in removeUnwantedKeysGetCurrentState?.edges) {
             const name = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData?.name;
             if (!name) {
-                return true;
-            }
-            // rest, similar checks need to be added below for grpc and ws.
-            const restClientConfig: RestClientConfig = removeUnwantedKeysGetCurrentState.edges[key]?.consumerData?.restClientConfig;
-            if (!restClientConfig || Object.keys(restClientConfig).length < 1) {
                 return true;
             }
         }

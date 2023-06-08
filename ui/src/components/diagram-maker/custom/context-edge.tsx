@@ -1,7 +1,15 @@
 import React from 'react';
 import Divider from "@mui/material/Divider";
 import {getParsedModifiedState} from "../helper/helper";
-import {CompageEdge, EmptyGrpcServerConfig, EmptyRestServerConfig, EmptyWsServerConfig} from "../models";
+import {
+    CompageEdge,
+    CompageNode,
+    EmptyGrpcConfig,
+    EmptyRestConfig,
+    EmptyWsConfig,
+    GrpcClient,
+    RestClient, WsClient
+} from "../models";
 
 interface ContextEdgeProps {
     id: string | undefined;
@@ -10,16 +18,57 @@ interface ContextEdgeProps {
 export const ContextEdge = (props: ContextEdgeProps) => {
     const parsedModifiedState = getParsedModifiedState();
     const edge: CompageEdge = parsedModifiedState.edges[props.id];
+    const destNode: CompageNode = parsedModifiedState.nodes[edge.dest];
+    const srcNode: CompageNode = parsedModifiedState.nodes[edge.src];
+
+    const getRestPort = () => {
+        const restClients: RestClient[] = destNode?.consumerData?.restConfig.clients;
+        if (restClients && restClients.length > 0) {
+            for (const restClient of restClients) {
+                if (srcNode.consumerData.name === restClient.externalNode) {
+                    return srcNode.consumerData.restConfig.server.port;
+                }
+            }
+        }
+        return EmptyRestConfig;
+    };
+    const getGrpcPort = () => {
+        const grpcClients: GrpcClient[] = destNode?.consumerData?.grpcConfig.clients;
+        if (grpcClients && grpcClients.length > 0) {
+            for (const grpcClient of grpcClients) {
+                if (srcNode.consumerData.name === grpcClient.externalNode) {
+                    return srcNode.consumerData.grpcConfig.server.port;
+                }
+            }
+        }
+        return EmptyGrpcConfig;
+    };
+    const getWsPort = () => {
+        const wsClients: WsClient[] = destNode?.consumerData?.wsConfig.clients;
+        if (wsClients && wsClients.length > 0) {
+            for (const wsClient of wsClients) {
+                if (srcNode.consumerData.name === wsClient.externalNode) {
+                    return srcNode.consumerData.wsConfig.server.port;
+                }
+            }
+        }
+        return EmptyWsConfig;
+    };
+    const getExternalNodeName = () => {
+        return srcNode.consumerData.name;
+    };
+
     const [payload] = React.useState({
         name: edge?.consumerData.name !== undefined ? edge.consumerData.name : "",
         port: edge?.consumerData.name !== undefined ? edge.consumerData.name : "",
-        // restClientConfig
-        restClientConfig: edge?.consumerData.restClientConfig !== undefined ? edge.consumerData.restClientConfig : EmptyRestServerConfig,
-        // grpcClientConfig
-        grpcClientConfig: edge?.consumerData.grpcClientConfig !== undefined ? edge.consumerData.grpcClientConfig : EmptyGrpcServerConfig,
-        // wsServerType
-        wsClientConfig: edge?.consumerData.wsClientConfig !== undefined ? edge.consumerData.wsClientConfig : EmptyWsServerConfig,
-        externalNode: edge?.consumerData.externalNode !== undefined ? edge.consumerData.externalNode : "",
+        // restPort
+        restPort: getRestPort(),
+        // grpcPort
+        grpcPort: getGrpcPort(),
+        // wsPort
+        wsPort: getWsPort(),
+        // externalName
+        externalNode: getExternalNodeName(),
     });
 
     if (!props.id) {
@@ -34,22 +83,22 @@ export const ContextEdge = (props: ContextEdgeProps) => {
     };
 
     const getRestClientPort = () => {
-        if (payload.restClientConfig.port) {
-            return <><strong>Port(REST)</strong> : {payload.restClientConfig.port}</>;
+        if (payload.restPort) {
+            return <><strong>Port(REST)</strong> : {payload.restPort}</>;
         }
         return "";
     };
 
     const getGrpcClientPort = () => {
-        if (payload.grpcClientConfig.port) {
-            return <><strong>Port(gRPC)</strong> : {payload.grpcClientConfig.port}</>;
+        if (payload.grpcPort) {
+            return <><strong>Port(gRPC)</strong> : {payload.grpcPort}</>;
         }
         return "";
     };
 
     const getWsClientPort = () => {
-        if (payload.wsClientConfig.port) {
-            return <><strong>Port(WS)</strong> : {payload.wsClientConfig.port}</>;
+        if (payload.wsPort) {
+            return <><strong>Port(WS)</strong> : {payload.wsPort}</>;
         }
         return "";
     };
@@ -66,8 +115,6 @@ export const ContextEdge = (props: ContextEdgeProps) => {
             <strong>Edge </strong>: {props.id}
             <Divider/>
             {getName()}
-            <br/>
-            {getExternalNode()}
             <br/>
             {getRestClientPort()}
             <br/>
