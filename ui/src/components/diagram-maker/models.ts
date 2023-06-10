@@ -17,14 +17,14 @@ export interface RestConfig {
 }
 
 export interface RestClient {
-    externalNode: string;
+    sourceNodeName: string;
     port: string;
 }
 
 export interface GrpcConfig {
     template: string;
     server: {
-        port: string;
+        port?: string;
         sqlDb?: string;
         framework?: string;
         resources?: Resource[];
@@ -34,7 +34,7 @@ export interface GrpcConfig {
 }
 
 export interface GrpcClient {
-    externalNode: string;
+    sourceNodeName: string;
     port: string;
 }
 
@@ -49,7 +49,7 @@ export interface WsConfig {
 }
 
 export interface WsClient {
-    externalNode: string;
+    sourceNodeName: string;
     port: string;
 }
 

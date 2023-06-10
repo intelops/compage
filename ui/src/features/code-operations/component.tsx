@@ -8,7 +8,7 @@ import {getCurrentProjectDetails, getCurrentState} from "../../utils/localstorag
 import {selectGetProjectData, selectUpdateProjectData} from "../projects-operations/slice";
 import {removeUnwantedKeys} from "../../components/diagram-maker/helper/helper";
 import * as _ from "lodash";
-import {CompageEdge, CompageNode, GrpcConfig, RestClient, RestConfig} from "../../components/diagram-maker/models";
+import {CompageNode, GrpcConfig, RestClient, RestConfig} from "../../components/diagram-maker/models";
 import {isCompageTemplate} from "../../components/diagram-maker/node-properties/utils";
 
 export const GenerateCode = () => {
@@ -47,18 +47,19 @@ export const GenerateCode = () => {
             return true;
         }
         // in case of compage template, resources should not be empty.
-        return isCompageTemplate(grpcConfig.template) && grpcConfig.server.resources.length < 1;
+        return isCompageTemplate(grpcConfig.template) && grpcConfig?.server?.resources?.length < 1;
     };
 
     const IsAnyRequiredValueMissingInOneOfNodes = (removeUnwantedKeysGetCurrentState: any) => {
         // nodes
-        const isTheNodeDestinationInAnyOfEdges = (node: CompageNode, edges: CompageEdge[]) => {
-            // iterate over edges and find if the node is in dest in any of the edges.
-            for (const edge of edges) {
-                if (edge.dest === node.id) {
-                    return true;
-                }
-            }
+        const isTheNodeDestinationInAnyOfEdges = (node: CompageNode, edges: any) => {
+            // TODO add the above check again later
+            // // iterate over edges and find if the node is in dest in any of the edges.
+            // for (const edge of edges) {
+            //     if (edge.dest === node.id) {
+            //         return true;
+            //     }
+            // }
             return false;
         };
 

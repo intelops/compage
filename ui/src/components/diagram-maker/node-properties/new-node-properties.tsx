@@ -73,11 +73,11 @@ interface NodeTypesConfig {
 }
 
 const getNodeTypesConfig = (parsedModifiedState, nodeId): NodeTypesConfig => {
-    const restConfig: RestConfig = parsedModifiedState.nodes[nodeId]?.consumerData.restConfig;
-    const grpcConfig: GrpcConfig = parsedModifiedState.nodes[nodeId]?.consumerData.grpcConfig;
-    const wsConfig: WsConfig = parsedModifiedState.nodes[nodeId]?.consumerData.wsConfig;
+    const restConfig: RestConfig = parsedModifiedState.nodes[nodeId]?.consumerData?.restConfig;
+    const grpcConfig: GrpcConfig = parsedModifiedState.nodes[nodeId]?.consumerData?.grpcConfig;
+    const wsConfig: WsConfig = parsedModifiedState.nodes[nodeId]?.consumerData?.wsConfig;
     const nodeTypesConfig: NodeTypesConfig = {};
-    if (restConfig && Object.keys(restConfig).length > 0) {
+    if (restConfig && Object.keys(restConfig).length > 0 && Object.keys(restConfig?.server).length > 0) {
         nodeTypesConfig.isRestServer = true;
         nodeTypesConfig.restConfig = {
             server: {
@@ -91,7 +91,7 @@ const getNodeTypesConfig = (parsedModifiedState, nodeId): NodeTypesConfig => {
             clients: restConfig.clients
         };
     }
-    if (grpcConfig && Object.keys(grpcConfig).length > 0) {
+    if (grpcConfig && Object.keys(grpcConfig).length > 0 && Object.keys(grpcConfig?.server).length > 0) {
         nodeTypesConfig.isGrpcServer = true;
         nodeTypesConfig.grpcConfig = {
             template: grpcConfig.template,
@@ -105,7 +105,7 @@ const getNodeTypesConfig = (parsedModifiedState, nodeId): NodeTypesConfig => {
             clients: grpcConfig.clients
         };
     }
-    if (wsConfig && Object.keys(wsConfig).length > 0) {
+    if (wsConfig && Object.keys(wsConfig).length > 0 && Object.keys(wsConfig?.server).length > 0) {
         nodeTypesConfig.isWsServer = true;
         nodeTypesConfig.wsConfig = {
             server: {
@@ -175,7 +175,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             // tslint:disable-next-line: forin
             for (const key in modifiedState.nodes) {
                 const node = modifiedState.nodes[key];
-                console.log("modifiedState.nodes :", node);
                 if (props.nodeId !== key
                     && node.consumerData.name === payload.name.value) {
                     newPayload = {
