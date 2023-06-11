@@ -27,7 +27,7 @@ func Generate(ctx context.Context) error {
 	// rest config
 	if n.RestConfig != nil {
 		// check for the templates
-		if n.RestConfig.Server.Template == templates.Compage {
+		if n.RestConfig.Server != nil && n.RestConfig.Template == templates.Compage {
 			if n.RestConfig.Server.Framework == GoGinServerFramework {
 				goGinServerCopier := getGoGinServerCopier(goValues)
 				if err := goGinServerCopier.CreateRestConfigs(); err != nil {
@@ -40,12 +40,12 @@ func Generate(ctx context.Context) error {
 					return err
 				}
 			} else {
-				return fmt.Errorf("unsupported framework %s  for template %s for language %s", n.RestConfig.Server.Framework, n.RestConfig.Server.Template, n.Language)
+				return fmt.Errorf("unsupported framework %s  for template %s for language %s", n.RestConfig.Server.Framework, n.RestConfig.Template, n.Language)
 			}
 		} else {
-			if n.RestConfig.Server.Template != templates.OpenAPI {
+			if n.RestConfig.Template != templates.OpenAPI {
 				// call openapi generator
-				return fmt.Errorf("unsupported template %s for language %s", n.RestConfig.Server.Template, n.Language)
+				return fmt.Errorf("unsupported template %s for language %s", n.RestConfig.Template, n.Language)
 			}
 			// check if OpenAPIFileYamlContent contains value.
 			if len(n.RestConfig.Server.OpenAPIFileYamlContent) < 1 {
@@ -60,7 +60,7 @@ func Generate(ctx context.Context) error {
 	// grpc config
 	if n.GrpcConfig != nil {
 		// check for the templates
-		if n.GrpcConfig.Server.Template == templates.Compage {
+		if n.GrpcConfig.Server != nil && n.GrpcConfig.Template == templates.Compage {
 			if n.GrpcConfig.Server.Framework == GoGrpcServerFramework {
 				goGrpcServerCopier := getGoGrpcServerCopier(goValues)
 				if err := goGrpcServerCopier.CreateGrpcConfigs(); err != nil {
@@ -73,10 +73,10 @@ func Generate(ctx context.Context) error {
 					return err
 				}
 			} else {
-				return fmt.Errorf("unsupported framework %s  for template %s for language %s", n.GrpcConfig.Server.Framework, n.GrpcConfig.Server.Template, n.Language)
+				return fmt.Errorf("unsupported framework %s  for template %s for language %s", n.GrpcConfig.Server.Framework, n.GrpcConfig.Template, n.Language)
 			}
 		} else {
-			return fmt.Errorf("unsupported template %s for language %s", n.GrpcConfig.Server.Template, n.Language)
+			return fmt.Errorf("unsupported template %s for language %s", n.GrpcConfig.Template, n.Language)
 		}
 	}
 
@@ -86,7 +86,7 @@ func Generate(ctx context.Context) error {
 	}
 
 	// common files needs to be generated for the project(custom template for rest and grpc) so, it should be here.
-	if (n.RestConfig != nil && n.RestConfig.Server != nil && n.RestConfig.Server.Template == templates.Compage) || (n.GrpcConfig != nil && n.GrpcConfig.Server != nil && n.GrpcConfig.Server.Template == templates.Compage) {
+	if (n.RestConfig != nil && n.RestConfig.Server != nil && n.RestConfig.Template == templates.Compage) || (n.GrpcConfig != nil && n.GrpcConfig.Server != nil && n.GrpcConfig.Template == templates.Compage) {
 		commonFilesCopier := getCommonFilesCopier(goValues)
 		if err := commonFilesCopier.CreateCommonFiles(); err != nil {
 			log.Debugf("err : %s", err)
@@ -143,8 +143,8 @@ func getCommonFilesCopier(goValues GoValues) *common_files.Copier {
 	// rest
 	isRestServer := goValues.LGoLangNode.RestConfig != nil && goValues.LGoLangNode.RestConfig.Server != nil
 	var restServerPort string
-	var restResources []node.Resource
-	var restClients []languages.RestClient
+	var restResources []*core_node.Resource
+	var restClients []*core_node.RestClient
 	var isRestSQLDB bool
 	var restSQLDB string
 	if isRestServer {
@@ -157,15 +157,15 @@ func getCommonFilesCopier(goValues GoValues) *common_files.Copier {
 		restServerPort = ""
 		isRestSQLDB = false
 		restSQLDB = ""
-		restClients = []languages.RestClient{}
-		restResources = []node.Resource{}
+		restClients = []*core_node.RestClient{}
+		restResources = []*core_node.Resource{}
 	}
 
 	// grpc
 	isGrpcServer := goValues.LGoLangNode.GrpcConfig != nil && goValues.LGoLangNode.GrpcConfig.Server != nil
 	var grpcServerPort string
-	var grpcResources []node.Resource
-	var grpcClients []languages.GrpcClient
+	var grpcResources []*core_node.Resource
+	var grpcClients []*core_node.GrpcClient
 	var isGrpcSQLDB bool
 	var grpcSQLDB string
 
@@ -179,8 +179,8 @@ func getCommonFilesCopier(goValues GoValues) *common_files.Copier {
 		grpcServerPort = ""
 		isGrpcSQLDB = false
 		grpcSQLDB = ""
-		grpcClients = []languages.GrpcClient{}
-		grpcResources = []node.Resource{}
+		grpcClients = []*core_node.GrpcClient{}
+		grpcResources = []*core_node.Resource{}
 	}
 
 	// create golang specific commonFilesCopier

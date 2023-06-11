@@ -5,7 +5,6 @@ import (
 	"github.com/gertd/go-pluralize"
 	"github.com/iancoleman/strcase"
 	"github.com/intelops/compage/core/internal/core/node"
-	"github.com/intelops/compage/core/internal/languages"
 	"github.com/intelops/compage/core/internal/languages/executor"
 	commonUtils "github.com/intelops/compage/core/internal/languages/utils"
 	"github.com/intelops/compage/core/internal/utils"
@@ -56,8 +55,8 @@ type Copier struct {
 	SQLDB             string
 	IsSQLDB           bool
 	GrpcServerPort    string
-	Resources         []node.Resource
-	GrpcClients       []languages.GrpcClient
+	Resources         []*core_node.Resource
+	GrpcClients       []*core_node.GrpcClient
 	PluralizeClient   *pluralize.Client
 }
 
@@ -70,7 +69,7 @@ type resourceData struct {
 	CapsResourceNamePlural             string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isGrpcServer bool, grpcServerPort string, isSQLDB bool, sqlDB string, resources []node.Resource, grpcClients []languages.GrpcClient) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isGrpcServer bool, grpcServerPort string, isSQLDB bool, sqlDB string, resources []*core_node.Resource, grpcClients []*core_node.GrpcClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
 
@@ -168,7 +167,7 @@ func (c Copier) createGrpcServerDirectories() error {
 }
 
 // copyGrpcServerResourceFiles copies grpc server resource files from template and renames them as per resource config.
-func (c Copier) copyGrpcServerResourceFiles(resource node.Resource) error {
+func (c Copier) copyGrpcServerResourceFiles(resource *core_node.Resource) error {
 	var filePaths []string
 	resourceName := strcase.ToKebab(resource.Name)
 
@@ -267,14 +266,14 @@ func (c Copier) copyGrpcServerResourceFiles(resource node.Resource) error {
 }
 
 // copyGrpcClientResourceFiles copies grpc client files from template and renames them as per client config.
-func (c Copier) copyGrpcClientResourceFiles(grpcClient languages.GrpcClient) error {
+func (c Copier) copyGrpcClientResourceFiles(grpcClient *core_node.GrpcClient) error {
 	/// add resource specific data to map in c needed for templates.
 	// TODO grpcClient needs too many changes (like referring the .proto and generated files) we can better just have a client created for local grpcServer)
 	c.Data["GrpcClientPort"] = grpcClient.Port
-	c.Data["GrpcClientServiceName"] = grpcClient.ExternalNode
+	c.Data["GrpcClientServiceName"] = grpcClient.SourceNodeName
 
 	// copy grpcClient files to generated project.
-	targetResourceClientFileName := c.NodeDirectoryName + GrpcClientPath + "/" + grpcClient.ExternalNode + "-" + ClientFile
+	targetResourceClientFileName := c.NodeDirectoryName + GrpcClientPath + "/" + grpcClient.SourceNodeName + "-" + ClientFile
 	_, err := utils.CopyFile(targetResourceClientFileName, c.TemplatesRootPath+GrpcClientPath+"/"+ClientFile)
 	if err != nil {
 		return err
@@ -286,7 +285,7 @@ func (c Copier) copyGrpcClientResourceFiles(grpcClient languages.GrpcClient) err
 	return executor.Execute(filePaths, c.Data)
 }
 
-func (c Copier) addResourceSpecificTemplateData(resource node.Resource) error {
+func (c Copier) addResourceSpecificTemplateData(resource *core_node.Resource) error {
 	// make every field public by making its first character capital.
 	fields := map[string]string{}
 	// this slice is needed for grpc resource message generation

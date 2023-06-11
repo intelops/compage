@@ -18,7 +18,7 @@ func Generate(ctx context.Context) error {
 	// rest config
 	if n.RestConfig != nil {
 		// check for the templates
-		if n.RestConfig.Server.Template == templates.OpenAPI {
+		if n.RestConfig.Template == templates.OpenAPI {
 			// add code to generate with openapi
 			// check if OpenAPIFileYamlContent contains value.
 			if len(n.RestConfig.Server.OpenAPIFileYamlContent) < 1 {

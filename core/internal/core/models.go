@@ -28,9 +28,9 @@ type Project struct {
 // CompageJSON has all edges and nodes
 type CompageJSON struct {
 	// Linkages (connection details) between Nodes
-	Edges []*edge.Edge `json:"edges"`
+	Edges []*core_edge.Edge `json:"edges"`
 	// Nodes represent components and has details of the component.
-	Nodes []*node.Node `json:"nodes"`
+	Nodes []*core_node.Node `json:"nodes"`
 }
 
 // Rest Protocol

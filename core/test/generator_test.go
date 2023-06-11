@@ -8,44 +8,104 @@ import (
 	"testing"
 )
 
-func TestRestAndGrpcGenerator(t *testing.T) {
+func TestRestAndGrpcGeneratorV2(t *testing.T) {
 	restConfigJSON := `{
-    "edges": {},
+    "edges": {
+        "edge-75": {
+            "dest": "node-54",
+            "id": "edge-75",
+            "src": "node-db",
+            "consumerData": {
+                "name": "final-to-finalv2"
+            }
+        }
+    },
     "nodes": {
-        "node-ef": {
-            "id": "node-ef",
+        "node-db": {
+            "id": "node-db",
             "typeId": "node-type-circle",
             "consumerData": {
-                "nodeType": "circle",
-                "name": "user-service",
+                "nodeType": "node-type-circle",
+                "name": "final-service",
                 "language": "go",
-				"grpcServerConfig": {
+                "restConfig": {
+                    "server": {
+                        "sqlDb": "SQLite",
+                        "framework": "go-gin-server",
+                        "port": "3400",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": "string"
+                                },
+                                "name": "Final"
+                            }
+                        ]
+                    },
+                    "template": "compage"
+                },
+                "grpcConfig": {
+                    "server": {
+                        "sqlDb": "SQLite",
+                        "framework": "go-grpc-server",
+                        "port": "32212",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": "string"
+                                },
+                                "name": "FinalGrpc"
+                            }
+                        ]
+                    },
+                    "template": "compage"
+                }
+            }
+        },
+        "node-54": {
+            "id": "node-54",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "node-type-circle",
+                "name": "final-service-v2",
+                "language": "go",
+                "grpcConfig": {
+                    "server": {
+                        "sqlDb": "SQLite",
+                        "framework": "go-grpc-server",
+                        "port": "34533",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": "string"
+                                },
+                                "name": "FinalV2"
+                            }
+                        ]
+                    },
                     "template": "compage",
-                    "sqlDb": "SQLite",
-                    "framework": "go-grpc-server",
-                    "port": "50051",
-                    "resources": [
+                    "clients": [
                         {
-                            "fields": {
-                                "Name": "string",
-                                "RollNumber": "int32",
-                                "College": "string"
-                            },
-                            "name": "Student"
+                            "sourceNodeName": "final-service",
+                            "sourceNodeId": "node-db",
+                            "port": "32212"
                         }
                     ]
                 },
-                "restServerConfig": {
-                    "sqlDb": "SQLite",
-                    "framework": "go-gin-server",
-                    "port": "3000",
+                "restConfig": {
                     "template": "compage",
-                    "resources": [
+                    "server": {
+                        "resources": [],
+                        "port": "",
+                        "framework": "",
+                        "sqlDb": "",
+                        "openApiFileYamlContent": ""
+                    },
+                    "clients": [
                         {
-                            "fields": {
-                                "Name": "string"
-                            },
-                            "name": "User"
+                            "sourceNodeName": "final-service",
+                            "sourceNodeId": "node-db",
+                            "port": "3400"
                         }
                     ]
                 }
@@ -56,8 +116,78 @@ func TestRestAndGrpcGenerator(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		UserName:       "mahendraintelops",
 		RepositoryName: "first-project-github",
-		ProjectName:    "first-rest-and-grpc-project",
+		ProjectName:    "first-rest-and-grpc-project-v2",
 		Json:           restConfigJSON,
+	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-rest-and-grpc-project-v2")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
+func TestRestAndGrpcGenerator(t *testing.T) {
+	restAndGrpcConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-ef": {
+            "id": "node-ef",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "circle",
+                "name": "user-service",
+                "language": "go",
+				"grpcConfig": {
+                    "server": {
+                        "sqlDb": "SQLite",
+                        "framework": "go-grpc-server",
+                        "port": "50052",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": "string",
+                                    "RollNumber": "int32",
+                                    "College": "string"
+                                },
+                                "name": "StudentModel"
+                            }
+                        ]
+                    },
+                    "template": "compage"
+                },
+                "restConfig": {
+                    "server": {
+                        "sqlDb": "SQLite",
+                        "framework": "go-gin-server",
+                        "port": "1337",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": "string"
+                                },
+                                "name": "User"
+                            }
+                        ]
+                    },
+                    "template": "compage"
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-rest-and-grpc-project",
+		Json:           restAndGrpcConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-rest-project")
@@ -85,19 +215,21 @@ func TestRestGenerator(t *testing.T) {
                 "nodeType": "circle",
                 "name": "user-service",
                 "language": "go",
-                "restServerConfig": {
-                    "sqlDb": "MySQL",
-                    "framework": "go-gin-server",
-                    "port": "3000",
-                    "template": "compage",
-                    "resources": [
-                        {
-                            "fields": {
-                                "Name": "string"
-                            },
-                            "name": "User"
-                        }
-                    ]
+ 				"restConfig": {
+                    "server": {
+                        "sqlDb": "SQLite",
+                        "framework": "go-gin-server",
+                        "port": "1337",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": "string"
+                                },
+                                "name": "User"
+                            }
+                        ]
+                    },
+                    "template": "compage"
                 }
             }
         }
@@ -135,21 +267,23 @@ func TestGrpcGenerator(t *testing.T) {
                 "nodeType": "circle",
                 "name": "student-service",
                 "language": "go",
-                "grpcServerConfig": {
-                    "template": "compage",
-                    "sqlDb": "SQLite",
-                    "framework": "go-grpc-server",
-                    "port": "50051",
-                    "resources": [
-                        {
-                            "fields": {
-                                "Name": "string",
-                                "RollNumber": "int32",
-                                "College": "string"
-                            },
-                            "name": "StudentModel"
-                        }
-                    ]
+                "grpcConfig": {
+                    "server": {
+                        "sqlDb": "SQLite",
+                        "framework": "go-grpc-server",
+                        "port": "50052",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": "string",
+                                    "RollNumber": "int32",
+                                    "College": "string"
+                                },
+                                "name": "StudentModel"
+                            }
+                        ]
+                    },
+                    "template": "compage"
                 }
             }
         }

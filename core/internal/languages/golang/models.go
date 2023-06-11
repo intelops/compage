@@ -20,14 +20,6 @@ type LGolangNode struct {
 
 // FillDefaults constructor function
 func (n *LGolangNode) FillDefaults() error {
-	if n.RestConfig != nil {
-		for _, client := range n.RestConfig.Clients {
-			// set the default framework.
-			if client.Framework == "" {
-				client.Framework = GoGinServerFramework
-			}
-		}
-	}
 	return nil
 }
 

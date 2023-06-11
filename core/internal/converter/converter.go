@@ -83,8 +83,8 @@ func validate(compageJSON *core.CompageJSON) error {
 			n.ConsumerData.Language = languages.Go
 		}
 		// set default template as compage
-		if n.ConsumerData.RestServerConfig != nil && n.ConsumerData.RestServerConfig.Template == "" {
-			n.ConsumerData.RestServerConfig.Template = templates.Compage
+		if n.ConsumerData.RestConfig != nil && n.ConsumerData.RestConfig.Template == "" {
+			n.ConsumerData.RestConfig.Template = templates.Compage
 		}
 	}
 

@@ -17,12 +17,6 @@ type LPythonNode struct {
 
 // FillDefaults constructor function
 func (n *LPythonNode) FillDefaults() error {
-	for _, client := range n.RestConfig.Clients {
-		// set the default framework.
-		if client.Framework == "" {
-			client.Framework = "python-flask"
-		}
-	}
 	return nil
 }
 
