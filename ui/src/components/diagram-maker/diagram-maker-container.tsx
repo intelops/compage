@@ -346,12 +346,42 @@ export const DiagramMakerContainer = ({
                         && "payload" in diagramMakerAction) {
                         if (diagramMakerAction.payload["typeId"] === "node-type-rectangle") {
                             diagramMakerAction.payload["consumerData"] = {
-                                "nodeType": "rectangle",
+                                "nodeType": "node-type-rectangle",
                             };
                         }
                         if (diagramMakerAction.payload["typeId"] === "node-type-circle") {
                             diagramMakerAction.payload["consumerData"] = {
-                                "nodeType": "circle",
+                                "nodeType": "node-type-circle",
+                            };
+                        }
+                        if (diagramMakerAction.payload["typeId"] === "node-type-rectangle-top-bottom") {
+                            diagramMakerAction.payload["consumerData"] = {
+                                "nodeType": "node-type-rectangle-top-bottom",
+                            };
+                        }
+                        if (diagramMakerAction.payload["typeId"] === "node-type-start") {
+                            diagramMakerAction.payload["consumerData"] = {
+                                "nodeType": "node-type-start",
+                            };
+                        }
+                        if (diagramMakerAction.payload["typeId"] === "node-type-end") {
+                            diagramMakerAction.payload["consumerData"] = {
+                                "nodeType": "node-type-end",
+                            };
+                        }
+                        if (diagramMakerAction.payload["typeId"] === "node-type-start-top-bottom") {
+                            diagramMakerAction.payload["consumerData"] = {
+                                "nodeType": "node-type-start-top-bottom",
+                            };
+                        }
+                        if (diagramMakerAction.payload["typeId"] === "node-type-end-top-bottom") {
+                            diagramMakerAction.payload["consumerData"] = {
+                                "nodeType": "node-type-end-top-bottom",
+                            };
+                        }
+                        if (diagramMakerAction.payload["typeId"] === "node-type-dead") {
+                            diagramMakerAction.payload["consumerData"] = {
+                                "nodeType": "node-type-dead",
                             };
                         }
                         diagramMakerAction.payload["id"] = diagramMakerAction.payload["id"].substring(3, 10);

@@ -10,9 +10,19 @@ import {getCurrentConfig, setModifiedState} from "../../../utils/localstorage-cl
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
-import {CompageEdge, CompageNode, GrpcClient, GrpcConfig, RestClient, RestConfig, WsClient, WsConfig} from "../models";
-import {updateModifiedState} from "../../../features/projects-operations/populateModifiedState";
-import {COMPAGE} from "../node-properties/utils";
+import {
+    CompageEdge,
+    CompageNode,
+    EmptyGrpcConfig,
+    EmptyRestConfig,
+    EmptyWsConfig,
+    GrpcClient,
+    GrpcConfig,
+    RestClient,
+    RestConfig,
+    WsClient,
+    WsConfig
+} from "../models";
 
 interface NewEdgePropertiesProps {
     isOpen: boolean;
@@ -28,6 +38,7 @@ interface ClientTypesConfig {
     isWsServer?: boolean;
     wsServerPort?: string;
     sourceNodeName?: string;
+    sourceNodeId?: string;
 }
 
 const getClientTypesConfig = (parsedCurrentConfig, parsedModifiedState, edgeId): ClientTypesConfig => {
@@ -36,14 +47,18 @@ const getClientTypesConfig = (parsedCurrentConfig, parsedModifiedState, edgeId):
     const edgeConfig: CompageEdge = parsedCurrentConfig.edges[edgeId];
     const destNode: CompageNode = parsedModifiedState.nodes[edgeConfig?.dest];
     const srcNode: CompageNode = parsedModifiedState.nodes[edgeConfig?.src];
+    const srcNodeConfig: CompageNode = parsedCurrentConfig.nodes[edgeConfig?.src];
+
     if (srcNode && destNode) {
         // rest - extract clients in dest node
         const restClients: RestClient[] = destNode?.consumerData?.restConfig?.clients;
         if (restClients && restClients.length > 0) {
             for (const restClient of restClients) {
-                if (srcNode.consumerData.name === restClient.sourceNodeName) {
+                if (srcNodeConfig.id === restClient.sourceNodeId) {
                     clientTypesConfig.isRestServer = true;
                     clientTypesConfig.restServerPort = srcNode?.consumerData?.restConfig?.server?.port;
+                    clientTypesConfig.sourceNodeId = srcNodeConfig?.id;
+                    clientTypesConfig.sourceNodeName = srcNode?.consumerData?.name;
                 }
             }
         }
@@ -51,9 +66,11 @@ const getClientTypesConfig = (parsedCurrentConfig, parsedModifiedState, edgeId):
         const grpcClients: GrpcClient[] = destNode?.consumerData?.grpcConfig?.clients;
         if (grpcClients && grpcClients.length > 0) {
             for (const grpcClient of grpcClients) {
-                if (srcNode.consumerData.name === grpcClient.sourceNodeName) {
+                if (srcNodeConfig.id === grpcClient.sourceNodeId) {
                     clientTypesConfig.isGrpcServer = true;
                     clientTypesConfig.grpcServerPort = srcNode?.consumerData?.grpcConfig?.server?.port;
+                    clientTypesConfig.sourceNodeId = srcNodeConfig?.id;
+                    clientTypesConfig.sourceNodeName = srcNode?.consumerData?.name;
                 }
             }
         }
@@ -61,9 +78,11 @@ const getClientTypesConfig = (parsedCurrentConfig, parsedModifiedState, edgeId):
         const wsClients: WsClient[] = destNode?.consumerData?.wsConfig?.clients;
         if (wsClients && wsClients.length > 0) {
             for (const wsClient of wsClients) {
-                if (srcNode.consumerData.name === wsClient.sourceNodeName) {
+                if (srcNodeConfig.id === wsClient.sourceNodeId) {
                     clientTypesConfig.isWsServer = true;
                     clientTypesConfig.wsServerPort = srcNode?.consumerData?.wsConfig?.server?.port;
+                    clientTypesConfig.sourceNodeId = srcNodeConfig?.id;
+                    clientTypesConfig.sourceNodeName = srcNode?.consumerData?.name;
                 }
             }
         }
@@ -73,12 +92,12 @@ const getClientTypesConfig = (parsedCurrentConfig, parsedModifiedState, edgeId):
 
 export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     const parsedCurrentConfig = JSON.parse(getCurrentConfig());
-    let parsedModifiedState = getParsedModifiedState();
-    // sometimes the parsedModifiedState is empty so, recreate it.
-    if (Object.keys(parsedModifiedState.edges).length < 1) {
-        updateModifiedState(JSON.parse(getCurrentConfig()));
-        parsedModifiedState = getParsedModifiedState();
-    }
+    const parsedModifiedState = getParsedModifiedState();
+    // TODO sometimes the parsedModifiedState is empty so, recreate it. this breaks, recreates the modifiedState, need to check.
+    // if (Object.keys(parsedModifiedState.edges).length < 1) {
+    //     updateModifiedState(parsedCurrentConfig);
+    //     parsedModifiedState = getParsedModifiedState();
+    // }
     const modifiedEdgeState: CompageEdge = parsedModifiedState.edges[props.edgeId];
 
     const clientTypesConfig: ClientTypesConfig = getClientTypesConfig(parsedCurrentConfig, parsedModifiedState, props.edgeId);
@@ -92,83 +111,129 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         isWsServer: clientTypesConfig.isWsServer || false,
         wsServerPort: clientTypesConfig.wsServerPort,
         sourceNodeName: clientTypesConfig.sourceNodeName,
+        sourceNodeId: clientTypesConfig.sourceNodeId,
     });
 
     // TODO this is a hack as there is no EDGE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
     // update state with additional properties added from UI (Post edge creation)
     const handleEdgeUpdate = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        const modifiedState = getParsedModifiedState();
         // update modifiedState with current fields on dialog box
         // P.S. - We will have the fields in consumerData which are on dialogBox, so we can assign them directly. We also refer the older values when payload state is initialized, so the older values will be persisted as they are if not changed.
-        if (!(props.edgeId in modifiedState.edges)) {
-            // adding consumerData to new edge in modifiedState
-            modifiedState.edges[props.edgeId] = {
+        if (!(props.edgeId in parsedModifiedState.edges)) {
+            // adding consumerData to new edge in parsedModifiedState
+            parsedModifiedState.edges[props.edgeId] = {
                 consumerData: {},
             };
         }
 
-        // referring edge from config here instead of modifiedState as the modifiedState doesn't have a src and dest.
+        // referring edge from config here instead of parsedModifiedState as the parsedModifiedState doesn't have a src and dest.
         const edgeConfig: CompageEdge = parsedCurrentConfig.edges[props.edgeId];
-        const modifiedEdgeState: CompageEdge = modifiedState.edges[props.edgeId];
-        const dstNode: CompageNode = modifiedState.nodes[edgeConfig.dest];
+        const dstNode: CompageNode = parsedModifiedState.nodes[edgeConfig.dest];
         modifiedEdgeState.consumerData.name = payload.name;
         // get dest node and add details to it.
         if (payload.isRestServer) {
-            const restClient: RestClient = {
-                sourceNodeName: payload.sourceNodeName,
-                port: payload.restServerPort,
-            };
-            for (let i = 0; i < dstNode?.consumerData?.restConfig?.clients.length; i++) {
-                // search for old restClient and delete it.
-                if (dstNode.consumerData?.restConfig?.clients[i].sourceNodeName === payload.sourceNodeName) {
-                    dstNode.consumerData?.restConfig?.clients.splice(i, 1);
-                    break;
+            if (payload.sourceNodeId && payload.sourceNodeName && payload.restServerPort) {
+                const restClient: RestClient = {
+                    sourceNodeName: payload.sourceNodeName,
+                    sourceNodeId: payload.sourceNodeId,
+                    port: payload.restServerPort,
+                };
+                for (let i = 0; i < dstNode?.consumerData?.restConfig?.clients?.length; i++) {
+                    // search for old restClient and delete it.
+                    if (dstNode?.consumerData?.restConfig?.clients[i]?.sourceNodeId === payload.sourceNodeId) {
+                        dstNode?.consumerData?.restConfig?.clients.splice(i, 1);
+                        break;
+                    }
+                }
+                if (dstNode?.consumerData?.restConfig) {
+                    dstNode?.consumerData?.restConfig?.clients.push(restClient);
+                } else {
+                    if (dstNode && dstNode.consumerData) {
+                        dstNode.consumerData.restConfig = EmptyRestConfig;
+                    } else {
+                        dstNode.consumerData = {
+                            name: "",
+                            annotations: new Map<string, string>(),
+                            metadata: new Map<string, string>(),
+                            language: "",
+                            restConfig: EmptyRestConfig
+                        };
+                    }
+                    // push the client now.
+                    dstNode?.consumerData?.restConfig?.clients.push(restClient);
                 }
             }
-            dstNode?.consumerData?.restConfig?.clients.push(restClient);
         }
         if (payload.isGrpcServer) {
-            const grpcClient: GrpcClient = {
-                sourceNodeName: payload.sourceNodeName,
-                port: payload.grpcServerPort,
-            };
-            debugger
-            for (let i = 0; i < dstNode?.consumerData?.grpcConfig?.clients?.length; i++) {
-                // search for old grpcClient and delete it.
-                if (dstNode?.consumerData?.grpcConfig?.clients[i]?.sourceNodeName === payload.sourceNodeName) {
-                    dstNode?.consumerData?.grpcConfig?.clients.splice(i, 1);
-                    break;
+            if (payload.sourceNodeId && payload.sourceNodeName && payload.grpcServerPort) {
+                const grpcClient: GrpcClient = {
+                    sourceNodeName: payload.sourceNodeName,
+                    sourceNodeId: payload.sourceNodeId,
+                    port: payload.grpcServerPort,
+                };
+                for (let i = 0; i < dstNode?.consumerData?.grpcConfig?.clients?.length; i++) {
+                    // search for old grpcClient and delete it.
+                    if (dstNode?.consumerData?.grpcConfig?.clients[i]?.sourceNodeId === payload.sourceNodeId) {
+                        dstNode?.consumerData?.grpcConfig?.clients.splice(i, 1);
+                        break;
+                    }
+                }
+                if (dstNode?.consumerData?.grpcConfig) {
+                    dstNode?.consumerData?.grpcConfig?.clients.push(grpcClient);
+                } else {
+                    if (dstNode && dstNode.consumerData) {
+                        dstNode.consumerData.grpcConfig = EmptyGrpcConfig;
+                    } else {
+                        dstNode.consumerData = {
+                            name: "",
+                            annotations: new Map<string, string>(),
+                            metadata: new Map<string, string>(),
+                            language: "",
+                            grpcConfig: EmptyGrpcConfig
+                        };
+                    }
+                    // push the client now.
+                    dstNode?.consumerData?.grpcConfig?.clients.push(grpcClient);
                 }
             }
-            if (dstNode?.consumerData?.grpcConfig) {
-                dstNode?.consumerData?.grpcConfig?.clients.push(grpcClient);
-            } else {
-                // The port had to be made optional in server here. The below code will be in picture when you don't have
-                // grpc configured in dst node
-                dstNode.consumerData.grpcConfig = {template: COMPAGE, clients: [], server: {}};
-                // push the client now.
-                dstNode?.consumerData?.grpcConfig?.clients.push(grpcClient);
-            }
-
         }
         if (payload.isWsServer) {
-            const wsClient: WsClient = {
-                sourceNodeName: payload.sourceNodeName,
-                port: payload.wsServerPort,
-            };
-            for (let i = 0; i < dstNode?.consumerData?.wsConfig?.clients.length; i++) {
-                // search for old wsClient and delete it.
-                if (dstNode?.consumerData?.wsConfig?.clients[i].sourceNodeName === payload.sourceNodeName) {
-                    dstNode?.consumerData?.wsConfig?.clients.splice(i, 1);
-                    break;
+            if (payload.sourceNodeId && payload.sourceNodeName && payload.wsServerPort) {
+                const wsClient: WsClient = {
+                    sourceNodeName: payload.sourceNodeName,
+                    sourceNodeId: payload.sourceNodeId,
+                    port: payload.wsServerPort,
+                };
+                for (let i = 0; i < dstNode?.consumerData?.wsConfig?.clients?.length; i++) {
+                    // search for old wsClient and delete it.
+                    if (dstNode?.consumerData?.wsConfig?.clients[i]?.sourceNodeId === payload.sourceNodeId) {
+                        dstNode?.consumerData?.wsConfig?.clients.splice(i, 1);
+                        break;
+                    }
+                }
+                if (dstNode?.consumerData?.wsConfig) {
+                    dstNode?.consumerData?.wsConfig?.clients.push(wsClient);
+                } else {
+                    if (dstNode && dstNode.consumerData) {
+                        dstNode.consumerData.wsConfig = EmptyWsConfig;
+                    } else {
+                        dstNode.consumerData = {
+                            name: "",
+                            annotations: new Map<string, string>(),
+                            metadata: new Map<string, string>(),
+                            language: "",
+                            wsConfig: EmptyWsConfig
+                        };
+                    }
+                    // push the client now.
+                    dstNode?.consumerData?.wsConfig?.clients.push(wsClient);
                 }
             }
-            dstNode?.consumerData?.wsConfig?.clients.push(wsClient);
         }
 
-        // update modifiedState in the localstorage
-        setModifiedState(JSON.stringify(modifiedState));
+        // update parsedModifiedState in the localstorage
+        setModifiedState(JSON.stringify(parsedModifiedState));
         setPayload({
             name: "",
             isRestServer: false,
@@ -177,7 +242,8 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             grpcServerPort: "",
             isWsServer: false,
             wsServerPort: "",
-            sourceNodeName: ""
+            sourceNodeName: "",
+            sourceNodeId: ""
         });
         props.onEdgePropertiesClose();
     };
@@ -221,10 +287,12 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             // retrieve port from src node.
             const srcNodeId = parsedCurrentConfig.edges[props.edgeId].src;
             const srcNode: CompageNode = parsedModifiedState.nodes[srcNodeId];
+            const srcNodeConfig: CompageNode = parsedCurrentConfig.nodes[srcNodeId];
             const restConfig: RestConfig = srcNode?.consumerData?.restConfig;
             if (restConfig && restConfig.server.port) {
                 payload.restServerPort = restConfig.server.port;
                 payload.sourceNodeName = srcNode.consumerData.name;
+                payload.sourceNodeId = srcNodeConfig.id;
             } else {
                 // this is a default port for every project generated by openapi-generator
                 payload.restServerPort = "8080";
@@ -268,9 +336,12 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
             // retrieve port from src node.
             const srcNodeId: string = parsedCurrentConfig.edges[props.edgeId].src;
             const srcNode: CompageNode = parsedModifiedState.nodes[srcNodeId];
+            const srcNodeConfig: CompageNode = parsedCurrentConfig.nodes[srcNodeId];
             const grpcConfig: GrpcConfig = srcNode?.consumerData?.grpcConfig;
-            if (grpcConfig && Object.keys(grpcConfig).length > 0) {
+            if (grpcConfig && grpcConfig.server.port) {
                 payload.grpcServerPort = grpcConfig.server.port;
+                payload.sourceNodeName = srcNode.consumerData.name;
+                payload.sourceNodeId = srcNodeConfig.id;
             }
             return <TextField
                 required
@@ -310,10 +381,14 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     const getWsServerPort = () => {
         if (payload.isWsServer) {
             // retrieve port from src node.
-            const srcNode = parsedCurrentConfig.edges[props.edgeId].src;
-            const wsConfig: WsConfig = parsedModifiedState.nodes[srcNode]?.consumerData?.wsConfig;
-            if (wsConfig && Object.keys(wsConfig).length > 0) {
+            const srcNodeId: string = parsedCurrentConfig.edges[props.edgeId].src;
+            const srcNode: CompageNode = parsedModifiedState.nodes[srcNodeId];
+            const srcNodeConfig: CompageNode = parsedCurrentConfig.nodes[srcNodeId];
+            const wsConfig: WsConfig = srcNode?.consumerData?.wsConfig;
+            if (wsConfig && wsConfig.server.port) {
                 payload.wsServerPort = wsConfig.server.port;
+                payload.sourceNodeName = srcNode.consumerData.name;
+                payload.sourceNodeId = srcNodeConfig.id;
             }
             return <TextField
                 required

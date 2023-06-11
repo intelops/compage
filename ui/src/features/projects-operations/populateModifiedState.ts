@@ -1,5 +1,5 @@
 import {getModifiedState, setModifiedState} from "../../utils/localstorage-client";
-import {CompageJson} from "../../components/diagram-maker/models";
+import {CompageJson, EdgeConsumerData, NodeConsumerData} from "../../components/diagram-maker/models";
 
 export const getNodeConsumerData = (node: any) => {
     delete node.id;
@@ -33,10 +33,16 @@ export const updateModifiedState = (compageJson: CompageJson) => {
             // iterate over nodes and check if they have any consumerData attached to them.
             // tslint:disable-next-line: forin
             for (const key in compageJson.nodes) {
-                const consumerData = compageJson.nodes[key]?.consumerData;
+                const consumerData: NodeConsumerData = compageJson.nodes[key]?.consumerData;
                 if (consumerData && Object.keys(consumerData).length > 1) {
                     // add this node to modifiedState
                     resultState.nodes[key] = getNodeConsumerData(compageJson.nodes[key]);
+                } else {
+                    // TODO - monitor what happens when this block executed.
+                    // add this node to modifiedState even if it has no values added yet.
+                    resultState.nodes[key] = {
+                        consumerData: {}
+                    };
                 }
             }
         }
@@ -45,10 +51,16 @@ export const updateModifiedState = (compageJson: CompageJson) => {
             // iterate over edges and check if they have any consumerData attached to them.
             // tslint:disable-next-line: forin
             for (const key in compageJson.edges) {
-                const consumerData = compageJson.edges[key]?.consumerData;
+                const consumerData: EdgeConsumerData = compageJson.edges[key]?.consumerData;
                 if (consumerData && Object.keys(consumerData).length > 0) {
                     // add this edge to modifiedState
                     resultState.edges[key] = getEdgeConsumerData(compageJson.edges[key]);
+                } else {
+                    // TODO - monitor what happens when this block executed.
+                    // add this edge to modifiedState even if it has no values added yet.
+                    resultState.edges[key] = {
+                        consumerData: {}
+                    };
                 }
             }
         }

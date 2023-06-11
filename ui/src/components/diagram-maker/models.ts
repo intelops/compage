@@ -1,3 +1,5 @@
+import {COMPAGE} from "./node-properties/utils";
+
 export interface Resource {
     name: string;
     // the below map can contain metadata about the field.
@@ -5,11 +7,11 @@ export interface Resource {
 }
 
 export interface RestConfig {
-    template: string;
-    server: {
-        port: string;
+    template?: string;
+    server?: {
+        port?: string;
         framework?: string;
-        sqlDb: string;
+        sqlDb?: string;
         resources?: Resource[];
         openApiFileYamlContent?: string;
     };
@@ -18,44 +20,46 @@ export interface RestConfig {
 
 export interface RestClient {
     sourceNodeName: string;
+    sourceNodeId: string;
     port: string;
 }
 
 export interface GrpcConfig {
-    template: string;
-    server: {
+    template?: string;
+    server?: {
         port?: string;
         sqlDb?: string;
         framework?: string;
         resources?: Resource[];
         protoFileContent?: string;
     };
-    clients: GrpcClient[];
+    clients?: GrpcClient[];
 }
 
 export interface GrpcClient {
     sourceNodeName: string;
+    sourceNodeId: string;
     port: string;
 }
 
 export interface WsConfig {
-    template: string;
-    server: {
-        port: string;
+    template?: string;
+    server?: {
+        port?: string;
         framework?: string;
         resources?: Resource[];
     };
-    clients: WsClient[];
+    clients?: WsClient[];
 }
 
 export interface WsClient {
     sourceNodeName: string;
+    sourceNodeId: string;
     port: string;
 }
 
 export interface NodeConsumerData {
     name: string;
-    template: string;
     restConfig?: RestConfig;
     grpcConfig?: GrpcConfig;
     wsConfig?: WsConfig;
@@ -91,7 +95,7 @@ export interface CompageJson {
 
 // empty interfaces
 export const EmptyRestConfig: RestConfig = {
-    template: "",
+    template: COMPAGE,
     server: {
         resources: [],
         port: "",
@@ -103,7 +107,7 @@ export const EmptyRestConfig: RestConfig = {
 };
 
 export const EmptyGrpcConfig: GrpcConfig = {
-    template: "",
+    template: COMPAGE,
     server: {
         resources: [],
         port: "",
@@ -115,7 +119,7 @@ export const EmptyGrpcConfig: GrpcConfig = {
 };
 
 export const EmptyWsConfig: WsConfig = {
-    template: "",
+    template: COMPAGE,
     server: {
         resources: [],
         port: "",

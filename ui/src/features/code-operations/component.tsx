@@ -38,7 +38,7 @@ export const GenerateCode = () => {
             return true;
         }
         // in case of compage template, resources should not be empty.
-        return isCompageTemplate(restConfig.template) && restConfig.server.resources.length < 1;
+        return isCompageTemplate(restConfig.template) && restConfig?.server?.resources?.length < 1;
     };
 
     const isValidGrpcConfig = (removeUnwantedKeysGetCurrentState: any, key: string) => {
