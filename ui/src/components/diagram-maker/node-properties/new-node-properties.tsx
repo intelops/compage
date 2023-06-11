@@ -488,76 +488,82 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return '';
     };
 
-    const getRestClientsTemplateContent = () => {
-        return <React.Fragment>
-            <TextField value={payload.restConfig.template} id="restClientTemplate" label="Template"
-                       disabled
-                       variant="outlined"/>
-            <br/>
-            <TableContainer component={Paper}>
-                <Table sx={{minWidth: 400}}>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell align="left">Source Node</TableCell>
-                            <TableCell align="center">Port</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {
-                            payload.restConfig.clients.map((client, index) => (
-                                <TableRow
-                                    key={index}
-                                    sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                >
-                                    <TableCell scope="row">
-                                        {client.sourceNodeName}
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        {client.port}
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        }
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </React.Fragment>;
+    const getRestClientsConfig = () => {
+        if (payload.hasRestClients) {
+            return <React.Fragment>
+                <TextField value={payload.restConfig.template} id="restClientTemplate" label="Template"
+                           disabled
+                           variant="outlined"/>
+                <br/>
+                <TableContainer component={Paper}>
+                    <Table sx={{minWidth: 400}}>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell align="left">Source Node</TableCell>
+                                <TableCell align="center">Port</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {
+                                payload.restConfig.clients.map((client, index) => (
+                                    <TableRow
+                                        key={index}
+                                        sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                    >
+                                        <TableCell scope="row">
+                                            {client.sourceNodeName}
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            {client.port}
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            }
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </React.Fragment>;
+        }
+        return '';
     };
 
-    const getGrpcClientsTemplateContent = () => {
-        return <React.Fragment>
-            <TextField value={payload.grpcConfig.template} id="grpcClientTemplate" label="Template"
-                       disabled
-                       variant="outlined"/>
-            <br/>
-            <TableContainer component={Paper}>
-                <Table sx={{minWidth: 400}}>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell align="left">Source Node</TableCell>
-                            <TableCell align="center">Port</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {
-                            payload.grpcConfig.clients.map((client, index) => (
-                                <TableRow
-                                    key={index}
-                                    sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                >
-                                    <TableCell scope="row">
-                                        {client.sourceNodeName}
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        {client.port}
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        }
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </React.Fragment>;
+    const getGrpcClientsConfig = () => {
+        if (payload.hasGrpcClients) {
+            return <React.Fragment>
+                <TextField value={payload.grpcConfig.template} id="grpcClientTemplate" label="Template"
+                           disabled
+                           variant="outlined"/>
+                <br/>
+                <TableContainer component={Paper}>
+                    <Table sx={{minWidth: 400}}>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell align="left">Source Node</TableCell>
+                                <TableCell align="center">Port</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {
+                                payload.grpcConfig.clients.map((client, index) => (
+                                    <TableRow
+                                        key={index}
+                                        sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                    >
+                                        <TableCell scope="row">
+                                            {client.sourceNodeName}
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            {client.port}
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            }
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </React.Fragment>;
+        }
+        return '';
     };
 
     const getRestTemplateContent = () => {
@@ -970,18 +976,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return "";
     };
 
-
-    const getGrpcClientsConfig = () => {
-        if (payload.hasGrpcClients) {
-            return <React.Fragment>
-                {getGrpcClientsTemplateContent()}
-                {/*{getRestClientSourceNodeNameContent()}*/}
-                {/*{getRestClientSourcePortContent()}*/}
-            </React.Fragment>;
-        }
-        return '';
-    };
-
     const handleGrpcConfigServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const grpcConfig: GrpcConfig = payload.grpcConfig;
         grpcConfig.server.port = event.target.value;
@@ -1089,18 +1083,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             </React.Fragment>;
         }
         return "";
-    };
-
-
-    const getRestClientsConfig = () => {
-        if (payload.hasRestClients) {
-            return <React.Fragment>
-                {getRestClientsTemplateContent()}
-                {/*{getRestClientSourceNodeNameContent()}*/}
-                {/*{getRestClientSourcePortContent()}*/}
-            </React.Fragment>;
-        }
-        return '';
     };
 
     const handleRestServerSqlDbChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
