@@ -94,7 +94,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     const parsedCurrentConfig = JSON.parse(getCurrentConfig());
     const parsedModifiedState = getParsedModifiedState();
     // TODO sometimes the parsedModifiedState is empty so, recreate it. this breaks, recreates the modifiedState, need to check.
-    // if (Object.keys(parsedModifiedState.edges).length < 1) {
+    // if (Object.keys(parsedModifiedState.edges).length < 1 || !parsedModifiedState.edges[props.edgeId]) {
     //     updateModifiedState(parsedCurrentConfig);
     //     parsedModifiedState = getParsedModifiedState();
     // }
@@ -130,7 +130,18 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         // referring edge from config here instead of parsedModifiedState as the parsedModifiedState doesn't have a src and dest.
         const edgeConfig: CompageEdge = parsedCurrentConfig.edges[props.edgeId];
         const dstNode: CompageNode = parsedModifiedState.nodes[edgeConfig.dest];
-        modifiedEdgeState.consumerData.name = payload.name;
+        if (!(props.edgeId in parsedModifiedState.edges)) {
+            // adding consumerData to new node in modifiedState
+            parsedModifiedState.edges[props.edgeId] = {
+                consumerData: {
+                    name: payload.name
+                }
+            };
+        } else {
+            parsedModifiedState.edges[props.edgeId].consumerData = {
+                name: payload.name
+            };
+        }
         // get dest node and add details to it.
         if (payload.isRestServer) {
             if (payload.sourceNodeId && payload.sourceNodeName && payload.restServerPort) {
@@ -142,12 +153,17 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                 for (let i = 0; i < dstNode?.consumerData?.restConfig?.clients?.length; i++) {
                     // search for old restClient and delete it.
                     if (dstNode?.consumerData?.restConfig?.clients[i]?.sourceNodeId === payload.sourceNodeId) {
-                        dstNode?.consumerData?.restConfig?.clients.splice(i, 1);
+                        dstNode?.consumerData?.restConfig?.clients?.splice(i, 1);
                         break;
                     }
                 }
                 if (dstNode?.consumerData?.restConfig) {
-                    dstNode?.consumerData?.restConfig?.clients.push(restClient);
+                    if (dstNode.consumerData.restConfig?.clients) {
+                        dstNode?.consumerData?.restConfig?.clients?.push(restClient);
+                    } else {
+                        dstNode.consumerData.restConfig.clients = [];
+                        dstNode.consumerData.restConfig.clients.push(restClient);
+                    }
                 } else {
                     if (dstNode && dstNode.consumerData) {
                         dstNode.consumerData.restConfig = EmptyRestConfig;
@@ -161,7 +177,17 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                         };
                     }
                     // push the client now.
-                    dstNode?.consumerData?.restConfig?.clients.push(restClient);
+                    dstNode?.consumerData?.restConfig?.clients?.push(restClient);
+                }
+            }
+        } else {
+            if (payload.sourceNodeId && payload.sourceNodeName && payload.restServerPort) {
+                for (let i = 0; i < dstNode?.consumerData?.restConfig?.clients?.length; i++) {
+                    // search for old restClient and delete it.
+                    if (dstNode?.consumerData?.restConfig?.clients[i]?.sourceNodeId === payload.sourceNodeId) {
+                        dstNode?.consumerData?.restConfig?.clients?.splice(i, 1);
+                        break;
+                    }
                 }
             }
         }
@@ -180,7 +206,12 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                     }
                 }
                 if (dstNode?.consumerData?.grpcConfig) {
-                    dstNode?.consumerData?.grpcConfig?.clients.push(grpcClient);
+                    if (dstNode.consumerData.grpcConfig?.clients) {
+                        dstNode?.consumerData?.grpcConfig?.clients?.push(grpcClient);
+                    } else {
+                        dstNode.consumerData.grpcConfig.clients = [];
+                        dstNode.consumerData.grpcConfig.clients.push(grpcClient);
+                    }
                 } else {
                     if (dstNode && dstNode.consumerData) {
                         dstNode.consumerData.grpcConfig = EmptyGrpcConfig;
@@ -195,6 +226,16 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                     }
                     // push the client now.
                     dstNode?.consumerData?.grpcConfig?.clients.push(grpcClient);
+                }
+            }
+        } else {
+            if (payload.sourceNodeId && payload.sourceNodeName && payload.grpcServerPort) {
+                for (let i = 0; i < dstNode?.consumerData?.grpcConfig?.clients?.length; i++) {
+                    // search for old grpcClient and delete it.
+                    if (dstNode?.consumerData?.grpcConfig?.clients[i]?.sourceNodeId === payload.sourceNodeId) {
+                        dstNode?.consumerData?.grpcConfig?.clients?.splice(i, 1);
+                        break;
+                    }
                 }
             }
         }
@@ -213,7 +254,12 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                     }
                 }
                 if (dstNode?.consumerData?.wsConfig) {
-                    dstNode?.consumerData?.wsConfig?.clients.push(wsClient);
+                    if (dstNode.consumerData.wsConfig?.clients) {
+                        dstNode?.consumerData?.wsConfig?.clients?.push(wsClient);
+                    } else {
+                        dstNode.consumerData.wsConfig.clients = [];
+                        dstNode.consumerData.wsConfig.clients.push(wsClient);
+                    }
                 } else {
                     if (dstNode && dstNode.consumerData) {
                         dstNode.consumerData.wsConfig = EmptyWsConfig;
@@ -228,6 +274,16 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                     }
                     // push the client now.
                     dstNode?.consumerData?.wsConfig?.clients.push(wsClient);
+                }
+            }
+        } else {
+            if (payload.sourceNodeId && payload.sourceNodeName && payload.grpcServerPort) {
+                for (let i = 0; i < dstNode?.consumerData?.wsConfig?.clients?.length; i++) {
+                    // search for old wsClient and delete it.
+                    if (dstNode?.consumerData?.wsConfig?.clients[i]?.sourceNodeId === payload.sourceNodeId) {
+                        dstNode?.consumerData?.wsConfig?.clients?.splice(i, 1);
+                        break;
+                    }
                 }
             }
         }

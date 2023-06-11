@@ -16,13 +16,18 @@ export const getEdgeConsumerData = (edge: any) => {
     return edge;
 };
 
+// TODO need to monitor this code
+const contentsNotEqual = (modifiedState: string, compageJson: CompageJson) => {
+    return Object.keys(JSON.parse(modifiedState)?.nodes).length !== compageJson.nodes.size || Object.keys(JSON.parse(modifiedState)?.edges).length !== compageJson.edges.size;
+};
 
 export const updateModifiedState = (compageJson: CompageJson) => {
     const modifiedState = getModifiedState();
     if (!modifiedState
         || modifiedState === "{}"
         || Object.keys(JSON.parse(modifiedState)?.nodes).length === 0
-        || Object.keys(JSON.parse(modifiedState)?.edges).length === 0) {
+        || Object.keys(JSON.parse(modifiedState)?.edges).length === 0
+        || contentsNotEqual(modifiedState, compageJson)) {
         const resultState = {
             nodes: {},
             edges: {}
@@ -34,7 +39,7 @@ export const updateModifiedState = (compageJson: CompageJson) => {
             // tslint:disable-next-line: forin
             for (const key in compageJson.nodes) {
                 const consumerData: NodeConsumerData = compageJson.nodes[key]?.consumerData;
-                if (consumerData && Object.keys(consumerData).length > 1) {
+                if (consumerData && Object.keys(consumerData).length > 0) {
                     // add this node to modifiedState
                     resultState.nodes[key] = getNodeConsumerData(compageJson.nodes[key]);
                 } else {

@@ -306,34 +306,27 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             // P.S. - We will have the fields in consumerData which are on dialogBox, so we can assign them directly. We also refer the older values when payload state is initialized, so the older values will be persisted as they are if not changed.
             if (!(props.nodeId in modifiedState.nodes)) {
                 // adding consumerData to new node in modifiedState
-                modifiedState.nodes[props.nodeId].consumerData = {
-                    name: payload.name.value,
-                    language: payload.language,
+                modifiedState.nodes[props.nodeId] = {
+                    consumerData: {
+                        name: payload.name.value,
+                        language: payload.language,
+                    }
                 };
-                if (Object.keys(restConfig).length > 0) {
-                    modifiedState.nodes[props.nodeId].consumerData.restConfig = restConfig;
-                }
-                if (Object.keys(grpcConfig).length > 0) {
-                    modifiedState.nodes[props.nodeId].consumerData.grpcConfig = grpcConfig;
-                }
-                if (Object.keys(wsConfig).length > 0) {
-                    modifiedState.nodes[props.nodeId].consumerData.wsConfig = wsConfig;
-                }
             } else {
                 // adding consumerData to existing node in modifiedState
                 modifiedState.nodes[props.nodeId].consumerData = {
                     name: payload.name.value,
                     language: payload.language,
                 };
-                if (Object.keys(restConfig).length > 0) {
-                    modifiedState.nodes[props.nodeId].consumerData.restConfig = restConfig;
-                }
-                if (Object.keys(grpcConfig).length > 0) {
-                    modifiedState.nodes[props.nodeId].consumerData.grpcConfig = grpcConfig;
-                }
-                if (Object.keys(wsConfig).length > 0) {
-                    modifiedState.nodes[props.nodeId].consumerData.wsConfig = wsConfig;
-                }
+            }
+            if (Object.keys(restConfig).length > 0) {
+                modifiedState.nodes[props.nodeId].consumerData.restConfig = restConfig;
+            }
+            if (Object.keys(grpcConfig).length > 0) {
+                modifiedState.nodes[props.nodeId].consumerData.grpcConfig = grpcConfig;
+            }
+            if (Object.keys(wsConfig).length > 0) {
+                modifiedState.nodes[props.nodeId].consumerData.wsConfig = wsConfig;
             }
             // image to node display
             // const nodeElement = document.getElementById(props.nodeId);
@@ -369,7 +362,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         }
     };
 
-    const handleTemplateChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleRestTemplateChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const restConfig: RestConfig = payload.restConfig;
         restConfig.template = event.target.value;
         setPayload({
@@ -447,7 +440,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const getExistingResources = () => {
+    const getExistingRestServerResources = () => {
         if (payload.restConfig.server.resources?.length > 0) {
             return <>
                 <br/>
@@ -496,13 +489,75 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const getRestClientsTemplateContent = () => {
-        return <TextField value={payload.restConfig.template} id="restClientTemplate" label="Template" disabled
-                          variant="outlined"/>;
+        return <React.Fragment>
+            <TextField value={payload.restConfig.template} id="restClientTemplate" label="Template"
+                       disabled
+                       variant="outlined"/>
+            <br/>
+            <TableContainer component={Paper}>
+                <Table sx={{minWidth: 400}}>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell align="left">Source Node</TableCell>
+                            <TableCell align="center">Port</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {
+                            payload.restConfig.clients.map((client, index) => (
+                                <TableRow
+                                    key={index}
+                                    sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                >
+                                    <TableCell scope="row">
+                                        {client.sourceNodeName}
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        {client.port}
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        }
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </React.Fragment>;
     };
 
     const getGrpcClientsTemplateContent = () => {
-        return <TextField value={payload.restConfig.template} id="grpcClientTemplate" label="Template" disabled
-                          variant="outlined"/>;
+        return <React.Fragment>
+            <TextField value={payload.grpcConfig.template} id="grpcClientTemplate" label="Template"
+                       disabled
+                       variant="outlined"/>
+            <br/>
+            <TableContainer component={Paper}>
+                <Table sx={{minWidth: 400}}>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell align="left">Source Node</TableCell>
+                            <TableCell align="center">Port</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {
+                            payload.grpcConfig.clients.map((client, index) => (
+                                <TableRow
+                                    key={index}
+                                    sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                >
+                                    <TableCell scope="row">
+                                        {client.sourceNodeName}
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        {client.port}
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        }
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </React.Fragment>;
     };
 
     const getRestTemplateContent = () => {
@@ -523,7 +578,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 label="Template"
                 type="text"
                 value={payload.restConfig.template}
-                onChange={handleTemplateChange}
+                onChange={handleRestTemplateChange}
                 variant="outlined">
                 {
                     templates.map((template: string) => (
@@ -558,7 +613,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 defaultValue=''
                 type="text"
                 value={payload.restConfig.server.sqlDb}
-                onChange={handleRestConfigServerSqlDbChange}
+                onChange={handleRestServerSqlDbChange}
                 variant="outlined">
                 {sqlDbs.map((sqlDb: string) => (
                     <MenuItem key={sqlDb} value={sqlDb}>
@@ -591,7 +646,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 defaultValue=''
                 type="text"
                 value={payload.restConfig.server.framework}
-                onChange={handleRestConfigServerFrameworkChange}
+                onChange={handleRestServerFrameworkChange}
                 variant="outlined">
                 {frameworks.map((framework: string) => (
                     <MenuItem key={framework} value={framework}>
@@ -613,7 +668,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 label="Port"
                 type="number"
                 value={payload.restConfig.server.port}
-                onChange={handleRestConfigServerPortChange}
+                onChange={handleRestServerPortChange}
                 variant="outlined"
             />;
         }
@@ -627,7 +682,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     Add Resource
                 </Button>
                 {
-                    getExistingResources()
+                    getExistingRestServerResources()
                 }
             </React.Fragment>;
         } else {
@@ -1048,7 +1103,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return '';
     };
 
-    const handleRestConfigServerSqlDbChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleRestServerSqlDbChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const restConfig: RestConfig = payload.restConfig;
         restConfig.server.sqlDb = event.target.value;
         setPayload({
@@ -1057,7 +1112,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const handleRestConfigServerFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleRestServerFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const restConfig: RestConfig = payload.restConfig;
         restConfig.server.framework = event.target.value;
         setPayload({
@@ -1066,7 +1121,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const handleRestConfigServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleRestServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const restConfig: RestConfig = payload.restConfig;
         restConfig.server.port = event.target.value;
         setPayload({
@@ -1271,6 +1326,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         <Stack style={{
                             padding: "10px",
                             borderRadius: "15px",
+                            // background:"dimgray",
                             border: payload.hasRestClients ? '1px solid #dadada' : ''
                         }} direction="column" spacing={2}>
                             {getRestClientsCheck()}
@@ -1287,6 +1343,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                         <Stack style={{
                             padding: "10px",
                             borderRadius: "15px",
+                            // background:"dimgray",
                             border: payload.hasGrpcClients ? '1px solid #dadada' : ''
                         }} direction="column" spacing={2}>
                             {getGrpcClientsCheck()}
