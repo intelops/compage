@@ -1,4 +1,4 @@
-package core_edge
+package coreedge
 
 // Edge can have connection details such as port (Assumption is that the port mentioned is of SRC in edge)
 type Edge struct {

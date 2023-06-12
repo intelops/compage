@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/intelops/compage/core/internal/core/node"
+	corenode "github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages"
-	common_files "github.com/intelops/compage/core/internal/languages/golang/frameworks/common-files"
+	commonfiles "github.com/intelops/compage/core/internal/languages/golang/frameworks/common-files"
 	goginserver "github.com/intelops/compage/core/internal/languages/golang/frameworks/go-gin-server"
 	gogrpcserver "github.com/intelops/compage/core/internal/languages/golang/frameworks/go-grpc-server"
 	"github.com/intelops/compage/core/internal/languages/golang/integrations/devcontainer"
@@ -133,7 +133,7 @@ func Generate(ctx context.Context) error {
 	return nil
 }
 
-func getCommonFilesCopier(goValues GoValues) *common_files.Copier {
+func getCommonFilesCopier(goValues GoValues) *commonfiles.Copier {
 	userName := goValues.Values.Get(languages.UserName)
 	repositoryName := goValues.Values.Get(languages.RepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
@@ -143,8 +143,8 @@ func getCommonFilesCopier(goValues GoValues) *common_files.Copier {
 	// rest
 	isRestServer := goValues.LGoLangNode.RestConfig != nil && goValues.LGoLangNode.RestConfig.Server != nil
 	var restServerPort string
-	var restResources []*core_node.Resource
-	var restClients []*core_node.RestClient
+	var restResources []*corenode.Resource
+	var restClients []*corenode.RestClient
 	var isRestSQLDB bool
 	var restSQLDB string
 	if isRestServer {
@@ -157,15 +157,15 @@ func getCommonFilesCopier(goValues GoValues) *common_files.Copier {
 		restServerPort = ""
 		isRestSQLDB = false
 		restSQLDB = ""
-		restClients = []*core_node.RestClient{}
-		restResources = []*core_node.Resource{}
+		restClients = []*corenode.RestClient{}
+		restResources = []*corenode.Resource{}
 	}
 
 	// grpc
 	isGrpcServer := goValues.LGoLangNode.GrpcConfig != nil && goValues.LGoLangNode.GrpcConfig.Server != nil
 	var grpcServerPort string
-	var grpcResources []*core_node.Resource
-	var grpcClients []*core_node.GrpcClient
+	var grpcResources []*corenode.Resource
+	var grpcClients []*corenode.GrpcClient
 	var isGrpcSQLDB bool
 	var grpcSQLDB string
 
@@ -179,12 +179,12 @@ func getCommonFilesCopier(goValues GoValues) *common_files.Copier {
 		grpcServerPort = ""
 		isGrpcSQLDB = false
 		grpcSQLDB = ""
-		grpcClients = []*core_node.GrpcClient{}
-		grpcResources = []*core_node.Resource{}
+		grpcClients = []*corenode.GrpcClient{}
+		grpcResources = []*corenode.Resource{}
 	}
 
 	// create golang specific commonFilesCopier
-	copier := common_files.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort, isRestSQLDB, restSQLDB, isGrpcSQLDB, grpcSQLDB, restResources, grpcResources, restClients, grpcClients)
+	copier := commonfiles.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort, isRestSQLDB, restSQLDB, isGrpcSQLDB, grpcSQLDB, restResources, grpcResources, restClients, grpcClients)
 	return copier
 }
 

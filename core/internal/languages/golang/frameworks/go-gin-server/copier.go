@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/gertd/go-pluralize"
 	"github.com/iancoleman/strcase"
-	"github.com/intelops/compage/core/internal/core/node"
+	corenode "github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages/executor"
 	commonUtils "github.com/intelops/compage/core/internal/languages/utils"
 
@@ -50,8 +50,8 @@ type Copier struct {
 	SQLDB             string
 	IsSQLDB           bool
 	RestServerPort    string
-	Resources         []*core_node.Resource
-	RestClients       []*core_node.RestClient
+	Resources         []*corenode.Resource
+	RestClients       []*corenode.RestClient
 	PluralizeClient   *pluralize.Client
 }
 
@@ -64,7 +64,7 @@ type resourceData struct {
 	CapsResourceNamePlural             string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isSQLDB bool, sqlDB string, resources []*core_node.Resource, restClients []*core_node.RestClient) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isSQLDB bool, sqlDB string, resources []*corenode.Resource, restClients []*corenode.RestClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
 
@@ -158,7 +158,7 @@ func (c Copier) createRestServerDirectories() error {
 }
 
 // copyRestServerResourceFiles copies rest server resource files from template and renames them as per resource config.
-func (c Copier) copyRestServerResourceFiles(resource *core_node.Resource) error {
+func (c Copier) copyRestServerResourceFiles(resource *corenode.Resource) error {
 	var filePaths []string
 	resourceName := strcase.ToKebab(resource.Name)
 
@@ -243,7 +243,7 @@ func (c Copier) copyRestServerResourceFiles(resource *core_node.Resource) error 
 }
 
 // copyRestClientResourceFiles copies rest client files from template and renames them as per client config.
-func (c Copier) copyRestClientResourceFiles(restClient *core_node.RestClient) error {
+func (c Copier) copyRestClientResourceFiles(restClient *corenode.RestClient) error {
 	/// add resource specific data to map in c needed for templates.
 	c.Data["RestClientPort"] = restClient.Port
 	c.Data["RestClientServiceName"] = restClient.SourceNodeName
@@ -261,7 +261,7 @@ func (c Copier) copyRestClientResourceFiles(restClient *core_node.RestClient) er
 	return executor.Execute(filePaths, c.Data)
 }
 
-func (c Copier) addResourceSpecificTemplateData(resource *core_node.Resource) error {
+func (c Copier) addResourceSpecificTemplateData(resource *corenode.Resource) error {
 	// make every field public by making its first character capital.
 	fields := map[string]string{}
 	for key, value := range resource.Fields {

@@ -2,7 +2,7 @@ package commonfiles
 
 import (
 	"github.com/gertd/go-pluralize"
-	"github.com/intelops/compage/core/internal/core/node"
+	corenode "github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages/executor"
 	"github.com/intelops/compage/core/internal/utils"
 	"strings"
@@ -26,10 +26,10 @@ type Copier struct {
 	IsRestServer      bool
 	IsRestClient      bool
 	RestServerPort    string
-	RestResources     []*core_node.Resource
-	GrpcResources     []*core_node.Resource
-	RestClients       []*core_node.RestClient
-	GrpcClients       []*core_node.GrpcClient
+	RestResources     []*corenode.Resource
+	GrpcResources     []*corenode.Resource
+	RestClients       []*corenode.RestClient
+	GrpcClients       []*corenode.GrpcClient
 	PluralizeClient   *pluralize.Client
 }
 
@@ -40,7 +40,7 @@ type resourceData struct {
 	CapsResourceNamePlural    string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isGrpcServer bool, grpcServerPort string, isRestSQLDB bool, restSQLDB string, isGrpcSQLDB bool, grpcSQLDB string, restResources []*core_node.Resource, grpcResources []*core_node.Resource, restClients []*core_node.RestClient, grpcClients []*core_node.GrpcClient) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isGrpcServer bool, grpcServerPort string, isRestSQLDB bool, restSQLDB string, isGrpcSQLDB bool, grpcSQLDB string, restResources []*corenode.Resource, grpcResources []*corenode.Resource, restClients []*corenode.RestClient, grpcClients []*corenode.GrpcClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
 

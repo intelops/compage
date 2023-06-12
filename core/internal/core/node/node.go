@@ -1,4 +1,4 @@
-package core_node
+package corenode
 
 // Node depicts a separate repository
 type Node struct {
@@ -36,7 +36,7 @@ type RestServer struct {
 
 type RestClient struct {
 	SourceNodeName string `json:"sourceNodeName"`
-	SourceNodeId   string `json:"sourceNodeId"`
+	SourceNodeID   string `json:"sourceNodeId"`
 	Port           string `json:"port"`
 	// below two keys are populated in language node and are used to create server's clients.
 	Resources              []*Resource `json:"resources"`
@@ -60,7 +60,7 @@ type GrpcServer struct {
 
 type GrpcClient struct {
 	SourceNodeName string `json:"sourceNodeName"`
-	SourceNodeId   string `json:"sourceNodeId"`
+	SourceNodeID   string `json:"sourceNodeId"`
 	Port           string `json:"port"`
 	// below two keys are populated in language node and are used to create server's clients.
 	Resources        []*Resource `json:"resources"`
@@ -81,7 +81,7 @@ type WsServer struct {
 
 type WsClient struct {
 	SourceNodeName string `json:"sourceNodeName"`
-	SourceNodeId   string `json:"sourceNodeId"`
+	SourceNodeID   string `json:"sourceNodeId"`
 	Port           string `json:"port"`
 	// below two keys are populated in language node and are used to create server's clients.
 	Resources []Resource `json:"resources"`

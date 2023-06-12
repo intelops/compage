@@ -3,7 +3,7 @@ package languages
 import (
 	"fmt"
 	"github.com/intelops/compage/core/internal/core"
-	"github.com/intelops/compage/core/internal/core/node"
+	corenode "github.com/intelops/compage/core/internal/core/node"
 )
 
 const Go = "go"
@@ -22,13 +22,13 @@ type LanguageNode struct {
 	Annotations map[string]string      `json:"annotations,omitempty"`
 	Language    string                 `json:"language"`
 
-	RestConfig *core_node.RestConfig `json:"restConfig"`
-	GrpcConfig *core_node.GrpcConfig `json:"grpcConfig"`
-	WsConfig   *core_node.WsConfig   `json:"wsConfig"`
+	RestConfig *corenode.RestConfig `json:"restConfig"`
+	GrpcConfig *corenode.GrpcConfig `json:"grpcConfig"`
+	WsConfig   *corenode.WsConfig   `json:"wsConfig"`
 }
 
 // NewLanguageNode converts node to LanguageNode struct
-func NewLanguageNode(compageJSON *core.CompageJSON, node *core_node.Node) (*LanguageNode, error) {
+func NewLanguageNode(compageJSON *core.CompageJSON, node *corenode.Node) (*LanguageNode, error) {
 	languageNode := &LanguageNode{
 		ID:          node.ID,
 		Name:        node.ConsumerData.Name,
@@ -38,15 +38,15 @@ func NewLanguageNode(compageJSON *core.CompageJSON, node *core_node.Node) (*Lang
 	}
 
 	if node.ConsumerData.RestConfig != nil {
-		languageNode.RestConfig = &core_node.RestConfig{}
+		languageNode.RestConfig = &corenode.RestConfig{}
 		languageNode.RestConfig.Template = node.ConsumerData.RestConfig.Template
 	}
 	if node.ConsumerData.GrpcConfig != nil {
-		languageNode.GrpcConfig = &core_node.GrpcConfig{}
+		languageNode.GrpcConfig = &corenode.GrpcConfig{}
 		languageNode.GrpcConfig.Template = node.ConsumerData.GrpcConfig.Template
 	}
 	if node.ConsumerData.WsConfig != nil {
-		languageNode.WsConfig = &core_node.WsConfig{}
+		languageNode.WsConfig = &corenode.WsConfig{}
 		languageNode.WsConfig.Template = node.ConsumerData.WsConfig.Template
 	}
 
@@ -91,14 +91,14 @@ func NewLanguageNode(compageJSON *core.CompageJSON, node *core_node.Node) (*Lang
 }
 
 // PopulateClientsForNode retrieves all clients for given node
-func PopulateClientsForNode(compageJSON *core.CompageJSON, nodeP *core_node.Node) error {
+func PopulateClientsForNode(compageJSON *core.CompageJSON, nodeP *corenode.Node) error {
 	// REST Clients
 	if nodeP.ConsumerData.RestConfig != nil && nodeP.ConsumerData.RestConfig.Clients != nil {
 		// iterate over the rest clients
 		for _, client := range nodeP.ConsumerData.RestConfig.Clients {
 			// process client, iterate over the nodes and retrieve other details from source node.
 			for _, currentNode := range compageJSON.Nodes {
-				if client.SourceNodeId == currentNode.ID {
+				if client.SourceNodeID == currentNode.ID {
 					client.OpenAPIFileYamlContent = currentNode.ConsumerData.RestConfig.Server.OpenAPIFileYamlContent
 					client.Resources = currentNode.ConsumerData.RestConfig.Server.Resources
 					break
@@ -112,7 +112,7 @@ func PopulateClientsForNode(compageJSON *core.CompageJSON, nodeP *core_node.Node
 		for _, client := range nodeP.ConsumerData.GrpcConfig.Clients {
 			// process client, iterate over the nodes and retrieve other details from source node.
 			for _, currentNode := range compageJSON.Nodes {
-				if client.SourceNodeId == currentNode.ID {
+				if client.SourceNodeID == currentNode.ID {
 					client.ProtoFileContent = currentNode.ConsumerData.GrpcConfig.Server.ProtoFileContent
 					client.Resources = currentNode.ConsumerData.GrpcConfig.Server.Resources
 					break
@@ -125,7 +125,7 @@ func PopulateClientsForNode(compageJSON *core.CompageJSON, nodeP *core_node.Node
 		for _, client := range nodeP.ConsumerData.WsConfig.Clients {
 			// process client, iterate over the nodes and retrieve other details from source node.
 			for _, currentNode := range compageJSON.Nodes {
-				if client.SourceNodeId == currentNode.ID {
+				if client.SourceNodeID == currentNode.ID {
 					client.Resources = currentNode.ConsumerData.WsConfig.Server.Resources
 					break
 				}
@@ -138,7 +138,7 @@ func PopulateClientsForNode(compageJSON *core.CompageJSON, nodeP *core_node.Node
 }
 
 //nolint:golint,unused
-func getProtoFileContentAndFrameworkFromNodeForEdge(src string, nodes []*core_node.Node) (string, string) {
+func getProtoFileContentAndFrameworkFromNodeForEdge(src string, nodes []*corenode.Node) (string, string) {
 	for _, n := range nodes {
 		if src == n.ID {
 			return n.ConsumerData.GrpcConfig.Server.ProtoFileContent, n.ConsumerData.GrpcConfig.Server.Framework
@@ -147,7 +147,7 @@ func getProtoFileContentAndFrameworkFromNodeForEdge(src string, nodes []*core_no
 	return "", ""
 }
 
-func getOpenAPIFileYamlContentAndFrameworkAndTemplateFromNodeForEdge(src string, nodes []*core_node.Node) (string, string, string) {
+func GetOpenAPIFileYamlContentAndFrameworkAndTemplateFromNodeForEdge(src string, nodes []*corenode.Node) (string, string, string) {
 	for _, n := range nodes {
 		if src == n.ID {
 			return n.ConsumerData.RestConfig.Server.OpenAPIFileYamlContent, n.ConsumerData.RestConfig.Server.Framework, n.ConsumerData.RestConfig.Template
