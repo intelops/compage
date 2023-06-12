@@ -29,7 +29,7 @@ RUN apk update && apk add bash && apk add curl && apk add jq && apk add --update
     && export PATH=$PATH:/app/
 
 # Downloading and installing Maven
-ARG MAVEN_VERSION=3.6.3
+ARG MAVEN_VERSION=3.9.2
 ARG USER_HOME_DIR="/root"
 ARG BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries
 RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
