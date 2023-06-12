@@ -119,7 +119,7 @@ export const updateToGithub = (projectEntity: ProjectEntity, response: Response)
                 base64Json,
                 'updated project from ui',
                 sha).then(res => {
-                Logger.debug(`commitCompageJson Response: ${res.data}`);
+                Logger.debug(`commitCompageJson Response: ${JSON.stringify(res.data)}`);
                 const message = `An update to .compage/config.json in Repository for '${projectEntity.displayName}' is committed, '${projectEntity.displayName}' is updated successfully`;
                 Logger.info(message);
                 return response.status(200).json(getUpdateProjectResponse(projectEntity, message));
