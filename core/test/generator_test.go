@@ -31,7 +31,6 @@ func TestRestAndGrpcGeneratorV2(t *testing.T) {
                 "restConfig": {
                     "server": {
                         "sqlDb": "SQLite",
-                        "framework": "go-gin-server",
                         "port": "3400",
                         "resources": [
                             {
@@ -42,12 +41,12 @@ func TestRestAndGrpcGeneratorV2(t *testing.T) {
                             }
                         ]
                     },
+					"framework": "go-gin-server",
                     "template": "compage"
                 },
                 "grpcConfig": {
                     "server": {
                         "sqlDb": "SQLite",
-                        "framework": "go-grpc-server",
                         "port": "32212",
                         "resources": [
                             {
@@ -58,6 +57,7 @@ func TestRestAndGrpcGeneratorV2(t *testing.T) {
                             }
                         ]
                     },
+                    "framework": "go-grpc-server",
                     "template": "compage"
                 }
             }
@@ -72,7 +72,6 @@ func TestRestAndGrpcGeneratorV2(t *testing.T) {
                 "grpcConfig": {
                     "server": {
                         "sqlDb": "SQLite",
-                        "framework": "go-grpc-server",
                         "port": "34533",
                         "resources": [
                             {
@@ -83,6 +82,7 @@ func TestRestAndGrpcGeneratorV2(t *testing.T) {
                             }
                         ]
                     },
+                    "framework": "go-grpc-server",
                     "template": "compage",
                     "clients": [
                         {
@@ -94,10 +94,10 @@ func TestRestAndGrpcGeneratorV2(t *testing.T) {
                 },
                 "restConfig": {
                     "template": "compage",
+                    "framework": "go-gin-server",
                     "server": {
                         "resources": [],
                         "port": "",
-                        "framework": "",
                         "sqlDb": "",
                         "openApiFileYamlContent": ""
                     },
@@ -120,7 +120,7 @@ func TestRestAndGrpcGeneratorV2(t *testing.T) {
 		Json:           restConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-and-grpc-project-v2")
+		//_ = os.RemoveAll("/tmp/first-rest-and-grpc-project-v2")
 	}()
 
 	// retrieve project struct
@@ -148,7 +148,6 @@ func TestRestAndGrpcGenerator(t *testing.T) {
 				"grpcConfig": {
                     "server": {
                         "sqlDb": "SQLite",
-                        "framework": "go-grpc-server",
                         "port": "50052",
                         "resources": [
                             {
@@ -161,12 +160,12 @@ func TestRestAndGrpcGenerator(t *testing.T) {
                             }
                         ]
                     },
+					"framework": "go-grpc-server",
                     "template": "compage"
                 },
                 "restConfig": {
                     "server": {
                         "sqlDb": "SQLite",
-                        "framework": "go-gin-server",
                         "port": "1337",
                         "resources": [
                             {
@@ -177,6 +176,7 @@ func TestRestAndGrpcGenerator(t *testing.T) {
                             }
                         ]
                     },
+                    "framework": "go-gin-server",
                     "template": "compage"
                 }
             }

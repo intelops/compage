@@ -40,17 +40,20 @@ func NewLanguageNode(compageJSON *core.CompageJSON, node *corenode.Node) (*Langu
 	if node.ConsumerData.RestConfig != nil {
 		languageNode.RestConfig = &corenode.RestConfig{}
 		languageNode.RestConfig.Template = node.ConsumerData.RestConfig.Template
+		languageNode.RestConfig.Framework = node.ConsumerData.RestConfig.Framework
 	}
 	if node.ConsumerData.GrpcConfig != nil {
 		languageNode.GrpcConfig = &corenode.GrpcConfig{}
 		languageNode.GrpcConfig.Template = node.ConsumerData.GrpcConfig.Template
+		languageNode.GrpcConfig.Framework = node.ConsumerData.GrpcConfig.Framework
 	}
 	if node.ConsumerData.WsConfig != nil {
 		languageNode.WsConfig = &corenode.WsConfig{}
 		languageNode.WsConfig.Template = node.ConsumerData.WsConfig.Template
+		languageNode.WsConfig.Framework = node.ConsumerData.WsConfig.Framework
 	}
 
-	// REST server should have port and if port is nil.
+	// REST server should have port and if port is nil, that means the node is not server, but it's a client.
 	if node.ConsumerData.RestConfig != nil && node.ConsumerData.RestConfig.Server != nil && node.ConsumerData.RestConfig.Server.Port != "" {
 		// one node, one rest server
 		languageNode.RestConfig.Server = node.ConsumerData.RestConfig.Server
@@ -61,7 +64,7 @@ func NewLanguageNode(compageJSON *core.CompageJSON, node *corenode.Node) (*Langu
 		languageNode.RestConfig.Clients = node.ConsumerData.RestConfig.Clients
 	}
 
-	// gRPC server should have port and if port is nil.
+	// gRPC server should have port and if port is nil, that means the node is not server, but it's a client.
 	if node.ConsumerData.GrpcConfig != nil && node.ConsumerData.GrpcConfig.Server != nil && node.ConsumerData.GrpcConfig.Server.Port != "" {
 		// one node, one grpc server
 		languageNode.GrpcConfig.Server = node.ConsumerData.GrpcConfig.Server
@@ -141,7 +144,7 @@ func PopulateClientsForNode(compageJSON *core.CompageJSON, nodeP *corenode.Node)
 func getProtoFileContentAndFrameworkFromNodeForEdge(src string, nodes []*corenode.Node) (string, string) {
 	for _, n := range nodes {
 		if src == n.ID {
-			return n.ConsumerData.GrpcConfig.Server.ProtoFileContent, n.ConsumerData.GrpcConfig.Server.Framework
+			return n.ConsumerData.GrpcConfig.Server.ProtoFileContent, n.ConsumerData.GrpcConfig.Framework
 		}
 	}
 	return "", ""
@@ -150,7 +153,7 @@ func getProtoFileContentAndFrameworkFromNodeForEdge(src string, nodes []*corenod
 func GetOpenAPIFileYamlContentAndFrameworkAndTemplateFromNodeForEdge(src string, nodes []*corenode.Node) (string, string, string) {
 	for _, n := range nodes {
 		if src == n.ID {
-			return n.ConsumerData.RestConfig.Server.OpenAPIFileYamlContent, n.ConsumerData.RestConfig.Server.Framework, n.ConsumerData.RestConfig.Template
+			return n.ConsumerData.RestConfig.Server.OpenAPIFileYamlContent, n.ConsumerData.RestConfig.Framework, n.ConsumerData.RestConfig.Template
 		}
 	}
 	return "", "", ""

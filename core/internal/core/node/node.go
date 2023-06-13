@@ -27,7 +27,6 @@ type ConsumerData struct {
 
 type RestServer struct {
 	Port      string      `json:"port"`
-	Framework string      `json:"framework"`
 	SQLDB     string      `json:"sqlDb"`
 	Resources []*Resource `json:"resources"`
 	// OpenAPIFileYamlContent holds openAPIFileYamlContent
@@ -44,15 +43,15 @@ type RestClient struct {
 }
 
 type RestConfig struct {
-	Template string        `json:"template"`
-	Server   *RestServer   `json:"server"`
-	Clients  []*RestClient `json:"clients"`
+	Template  string        `json:"template"`
+	Framework string        `json:"framework"`
+	Server    *RestServer   `json:"server"`
+	Clients   []*RestClient `json:"clients"`
 }
 
 type GrpcServer struct {
 	Port      string      `json:"port"`
 	SQLDB     string      `json:"sqlDb"`
-	Framework string      `json:"framework"`
 	Resources []*Resource `json:"resources"`
 	// ProtoFileContent holds protoFileContent
 	ProtoFileContent string `json:"protoFileContent,omitempty"`
@@ -68,14 +67,14 @@ type GrpcClient struct {
 }
 
 type GrpcConfig struct {
-	Template string        `json:"template"`
-	Server   *GrpcServer   `json:"server"`
-	Clients  []*GrpcClient `json:"clients"`
+	Template  string        `json:"template"`
+	Framework string        `json:"framework"`
+	Server    *GrpcServer   `json:"server"`
+	Clients   []*GrpcClient `json:"clients"`
 }
 
 type WsServer struct {
 	Port      string     `json:"port"`
-	Framework string     `json:"framework"`
 	Resources []Resource `json:"resources"`
 }
 
@@ -88,9 +87,10 @@ type WsClient struct {
 }
 
 type WsConfig struct {
-	Template string      `json:"template"`
-	Server   *WsServer   `json:"server"`
-	Clients  []*WsClient `json:"clients"`
+	Template  string      `json:"template"`
+	Framework string      `json:"framework"`
+	Server    *WsServer   `json:"server"`
+	Clients   []*WsClient `json:"clients"`
 }
 
 // Resource depicts the endpoints(e.g. /users, /accounts)

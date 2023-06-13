@@ -18,15 +18,17 @@ func Generate(ctx context.Context) error {
 	n := pythonValues.PythonNode
 	// rest config
 	if n.RestConfig != nil {
-		// check for the templates
-		if n.RestConfig.Server != nil && n.RestConfig.Template == templates.OpenAPI {
-			// add code to generate with openapi
-			// check if OpenAPIFileYamlContent contains value.
-			if len(n.RestConfig.Server.OpenAPIFileYamlContent) < 1 {
-				return errors.New("at least rest-config needs to be provided, OpenAPIFileYamlContent is empty")
-			}
-			if err := languages.ProcessOpenAPITemplate(ctx); err != nil {
-				return err
+		if n.RestConfig.Template == templates.OpenAPI {
+			// check for the templates
+			if n.RestConfig.Server != nil {
+				// add code to generate with openapi
+				// check if OpenAPIFileYamlContent contains value.
+				if len(n.RestConfig.Server.OpenAPIFileYamlContent) < 1 {
+					return errors.New("at least rest-config needs to be provided, OpenAPIFileYamlContent is empty")
+				}
+				if err := languages.ProcessOpenAPITemplate(ctx); err != nil {
+					return err
+				}
 			}
 		}
 	}

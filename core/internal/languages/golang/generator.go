@@ -27,12 +27,21 @@ func Generate(ctx context.Context) error {
 	// rest config
 	if n.RestConfig != nil {
 		// check for the templates
-		if n.RestConfig.Server != nil && n.RestConfig.Template == templates.Compage {
-			if n.RestConfig.Server.Framework == GoGinServerFramework {
+		if n.RestConfig.Template == templates.Compage {
+			if n.RestConfig.Framework == GoGinServerFramework {
 				goGinServerCopier := getGoGinServerCopier(goValues)
-				if err := goGinServerCopier.CreateRestConfigs(); err != nil {
-					log.Debugf("err : %s", err)
-					return err
+				if n.RestConfig.Server != nil {
+					if err := goGinServerCopier.CreateRestServer(); err != nil {
+						log.Debugf("err : %s", err)
+						return err
+					}
+				}
+				if n.RestConfig.Clients != nil {
+					//  restConfig.clients -  present when client config is provided
+					if err := goGinServerCopier.CreateRestClients(); err != nil {
+						log.Debugf("err : %s", err)
+						return err
+					}
 				}
 				// copy all files at root level, fire this at last
 				if err := goGinServerCopier.CreateRootLevelFiles(); err != nil {
@@ -40,7 +49,7 @@ func Generate(ctx context.Context) error {
 					return err
 				}
 			} else {
-				return fmt.Errorf("unsupported framework %s  for template %s for language %s", n.RestConfig.Server.Framework, n.RestConfig.Template, n.Language)
+				return fmt.Errorf("unsupported framework %s  for template %s for language %s", n.RestConfig.Framework, n.RestConfig.Template, n.Language)
 			}
 		} else {
 			if n.RestConfig.Template != templates.OpenAPI {
@@ -60,12 +69,21 @@ func Generate(ctx context.Context) error {
 	// grpc config
 	if n.GrpcConfig != nil {
 		// check for the templates
-		if n.GrpcConfig.Server != nil && n.GrpcConfig.Template == templates.Compage {
-			if n.GrpcConfig.Server.Framework == GoGrpcServerFramework {
+		if n.GrpcConfig.Template == templates.Compage {
+			if n.GrpcConfig.Framework == GoGrpcServerFramework {
 				goGrpcServerCopier := getGoGrpcServerCopier(goValues)
-				if err := goGrpcServerCopier.CreateGrpcConfigs(); err != nil {
-					log.Debugf("err : %s", err)
-					return err
+				if n.GrpcConfig.Server != nil {
+					if err := goGrpcServerCopier.CreateGrpcServer(); err != nil {
+						log.Debugf("err : %s", err)
+						return err
+					}
+				}
+				if n.GrpcConfig.Clients != nil {
+					//  grpcConfig.clients -  present when client config is provided
+					if err := goGrpcServerCopier.CreateGrpcClients(); err != nil {
+						log.Debugf("err : %s", err)
+						return err
+					}
 				}
 				// copy all files at root level, fire this at last
 				if err := goGrpcServerCopier.CreateRootLevelFiles(); err != nil {
@@ -73,7 +91,7 @@ func Generate(ctx context.Context) error {
 					return err
 				}
 			} else {
-				return fmt.Errorf("unsupported framework %s  for template %s for language %s", n.GrpcConfig.Server.Framework, n.GrpcConfig.Template, n.Language)
+				return fmt.Errorf("unsupported framework %s  for template %s for language %s", n.GrpcConfig.Framework, n.GrpcConfig.Template, n.Language)
 			}
 		} else {
 			return fmt.Errorf("unsupported template %s for language %s", n.GrpcConfig.Template, n.Language)
@@ -210,13 +228,20 @@ func getGoGinServerCopier(goValues GoValues) *goginserver.Copier {
 	repositoryName := goValues.Values.Get(languages.RepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := goValues.Values.NodeDirectoryName
-	isRestServer := goValues.LGoLangNode.RestConfig.Server != nil
-	restServerPort := goValues.LGoLangNode.RestConfig.Server.Port
-	resources := goValues.LGoLangNode.RestConfig.Server.Resources
+	var restServerPort string
+	var isRestServer bool
+	var sqlDB string
+	var isSQLDB bool
+	var resources []*corenode.Resource
+	if goValues.LGoLangNode.RestConfig.Server != nil {
+		isRestServer = true
+		restServerPort = goValues.LGoLangNode.RestConfig.Server.Port
+		resources = goValues.LGoLangNode.RestConfig.Server.Resources
+		isSQLDB = goValues.LGoLangNode.RestConfig.Server.SQLDB != ""
+		sqlDB = goValues.LGoLangNode.RestConfig.Server.SQLDB
+	}
 	clients := goValues.LGoLangNode.RestConfig.Clients
 	path := GetGoTemplatesRootPath() + "/frameworks/" + GoGinServerFramework
-	isSQLDB := goValues.LGoLangNode.RestConfig.Server.SQLDB != ""
-	sqlDB := goValues.LGoLangNode.RestConfig.Server.SQLDB
 	// create golang specific copier
 	copier := goginserver.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isSQLDB, sqlDB, resources, clients)
 	return copier
