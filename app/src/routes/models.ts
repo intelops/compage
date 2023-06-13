@@ -6,9 +6,9 @@ export interface Resource {
 
 export interface RestConfig {
     template: string;
+    framework: string;
     server: {
         port: string;
-        framework?: string;
         sqlDb: string;
         resources?: Resource[];
         openApiFileYamlContent?: string;
@@ -23,11 +23,11 @@ export interface RestClient {
 }
 
 export interface GrpcConfig {
-    template?: string;
+    template: string;
+    framework: string;
     server?: {
         port?: string;
         sqlDb?: string;
-        framework?: string;
         resources?: Resource[];
         protoFileContent?: string;
     };
@@ -41,10 +41,10 @@ export interface GrpcClient {
 }
 
 export interface WsConfig {
-    template?: string;
+    template: string;
+    framework: string;
     server?: {
         port?: string;
-        framework?: string;
         resources?: Resource[];
     };
     clients?: WsClient[];

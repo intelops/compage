@@ -1,4 +1,4 @@
-import {COMPAGE} from "./node-properties/utils";
+import {COMPAGE, GO_GIN_SERVER, GO_GRPC_SERVER} from "./node-properties/utils";
 
 export interface Resource {
     name: string;
@@ -8,9 +8,9 @@ export interface Resource {
 
 export interface RestConfig {
     template?: string;
+    framework?: string;
     server?: {
         port?: string;
-        framework?: string;
         sqlDb?: string;
         resources?: Resource[];
         openApiFileYamlContent?: string;
@@ -26,10 +26,10 @@ export interface RestClient {
 
 export interface GrpcConfig {
     template?: string;
+    framework?: string;
     server?: {
         port?: string;
         sqlDb?: string;
-        framework?: string;
         resources?: Resource[];
         protoFileContent?: string;
     };
@@ -44,9 +44,9 @@ export interface GrpcClient {
 
 export interface WsConfig {
     template?: string;
+    framework?: string;
     server?: {
         port?: string;
-        framework?: string;
         resources?: Resource[];
     };
     clients?: WsClient[];
@@ -96,10 +96,10 @@ export interface CompageJson {
 // empty interfaces
 export const EmptyRestConfig: RestConfig = {
     template: COMPAGE,
+    framework: GO_GIN_SERVER,
     server: {
         resources: [],
         port: "",
-        framework: "",
         sqlDb: "",
         openApiFileYamlContent: ""
     },
@@ -108,11 +108,11 @@ export const EmptyRestConfig: RestConfig = {
 
 export const EmptyGrpcConfig: GrpcConfig = {
     template: COMPAGE,
+    framework: GO_GRPC_SERVER,
     server: {
         resources: [],
         port: "",
         sqlDb: "",
-        framework: "",
         protoFileContent: ""
     },
     clients: []
@@ -120,10 +120,11 @@ export const EmptyGrpcConfig: GrpcConfig = {
 
 export const EmptyWsConfig: WsConfig = {
     template: COMPAGE,
+    // TODO add default framework here later when support for ws is added.
+    framework: "",
     server: {
         resources: [],
         port: "",
-        framework: "",
     },
     clients: []
 };

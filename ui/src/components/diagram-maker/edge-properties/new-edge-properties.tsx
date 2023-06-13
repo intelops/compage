@@ -129,7 +129,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
 
         // referring edge from config here instead of parsedModifiedState as the parsedModifiedState doesn't have a src and dest.
         const edgeConfig: CompageEdge = parsedCurrentConfig.edges[props.edgeId];
-        const dstNode: CompageNode = parsedModifiedState.nodes[edgeConfig.dest];
+        let dstNode: CompageNode = parsedModifiedState.nodes[edgeConfig.dest];
         if (!(props.edgeId in parsedModifiedState.edges)) {
             // adding consumerData to new node in modifiedState
             parsedModifiedState.edges[props.edgeId] = {
@@ -165,16 +165,35 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                         dstNode.consumerData.restConfig.clients.push(restClient);
                     }
                 } else {
-                    if (dstNode && dstNode.consumerData) {
-                        dstNode.consumerData.restConfig = EmptyRestConfig;
+                    if (dstNode) {
+                        if (dstNode.consumerData) {
+                            dstNode.consumerData.restConfig = EmptyRestConfig;
+                        } else {
+                            dstNode.consumerData = {
+                                name: "",
+                                annotations: new Map<string, string>(),
+                                metadata: new Map<string, string>(),
+                                language: "",
+                                restConfig: {
+                                    clients: EmptyRestConfig.clients
+                                }
+                            };
+                        }
                     } else {
-                        dstNode.consumerData = {
-                            name: "",
-                            annotations: new Map<string, string>(),
-                            metadata: new Map<string, string>(),
-                            language: "",
-                            restConfig: EmptyRestConfig
+                        // node is not present in modified state
+                        parsedModifiedState.nodes[edgeConfig.dest] = {
+                            consumerData: {
+                                name: "",
+                                annotations: new Map<string, string>(),
+                                metadata: new Map<string, string>(),
+                                language: "",
+                                restConfig: {
+                                    clients: EmptyRestConfig.clients
+                                }
+                            }
                         };
+                        // assign the newly created node to dstNode from modified state.
+                        dstNode = parsedModifiedState.nodes[edgeConfig.dest];
                     }
                     // push the client now.
                     dstNode?.consumerData?.restConfig?.clients?.push(restClient);
@@ -213,16 +232,35 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                         dstNode.consumerData.grpcConfig.clients.push(grpcClient);
                     }
                 } else {
-                    if (dstNode && dstNode.consumerData) {
-                        dstNode.consumerData.grpcConfig = EmptyGrpcConfig;
+                    if (dstNode) {
+                        if (dstNode.consumerData) {
+                            dstNode.consumerData.grpcConfig = EmptyGrpcConfig;
+                        } else {
+                            dstNode.consumerData = {
+                                name: "",
+                                annotations: new Map<string, string>(),
+                                metadata: new Map<string, string>(),
+                                language: "",
+                                grpcConfig: {
+                                    clients: EmptyGrpcConfig.clients
+                                }
+                            };
+                        }
                     } else {
-                        dstNode.consumerData = {
-                            name: "",
-                            annotations: new Map<string, string>(),
-                            metadata: new Map<string, string>(),
-                            language: "",
-                            grpcConfig: EmptyGrpcConfig
+                        // node is not present in modified state
+                        parsedModifiedState.nodes[edgeConfig.dest] = {
+                            consumerData: {
+                                name: "",
+                                annotations: new Map<string, string>(),
+                                metadata: new Map<string, string>(),
+                                language: "",
+                                grpcConfig: {
+                                    clients: EmptyGrpcConfig.clients
+                                }
+                            }
                         };
+                        // assign the newly created node to dstNode from modified state.
+                        dstNode = parsedModifiedState.nodes[edgeConfig.dest];
                     }
                     // push the client now.
                     dstNode?.consumerData?.grpcConfig?.clients.push(grpcClient);
@@ -261,16 +299,35 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                         dstNode.consumerData.wsConfig.clients.push(wsClient);
                     }
                 } else {
-                    if (dstNode && dstNode.consumerData) {
-                        dstNode.consumerData.wsConfig = EmptyWsConfig;
+                    if (dstNode) {
+                        if (dstNode.consumerData) {
+                            dstNode.consumerData.wsConfig = EmptyWsConfig;
+                        } else {
+                            dstNode.consumerData = {
+                                name: "",
+                                annotations: new Map<string, string>(),
+                                metadata: new Map<string, string>(),
+                                language: "",
+                                wsConfig: {
+                                    clients: EmptyWsConfig.clients
+                                }
+                            };
+                        }
                     } else {
-                        dstNode.consumerData = {
-                            name: "",
-                            annotations: new Map<string, string>(),
-                            metadata: new Map<string, string>(),
-                            language: "",
-                            wsConfig: EmptyWsConfig
+                        // node is not present in modified state
+                        parsedModifiedState.nodes[edgeConfig.dest] = {
+                            consumerData: {
+                                name: "",
+                                annotations: new Map<string, string>(),
+                                metadata: new Map<string, string>(),
+                                language: "",
+                                wsConfig: {
+                                    clients: EmptyWsConfig.clients
+                                }
+                            }
                         };
+                        // assign the newly created node to dstNode from modified state.
+                        dstNode = parsedModifiedState.nodes[edgeConfig.dest];
                     }
                     // push the client now.
                     dstNode?.consumerData?.wsConfig?.clients.push(wsClient);

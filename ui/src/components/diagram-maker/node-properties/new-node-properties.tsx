@@ -93,9 +93,10 @@ const getNodeTypesConfig = (parsedModifiedState, nodeId): NodeTypesConfig => {
             nodeTypesConfig.hasRestClients = true;
             nodeTypesConfig.restConfig.clients = restConfig.clients;
         }
-        // add template when the at lease rest server or clients are present.
+        // add template and framework when the at lease rest server or clients are present.
         if (nodeTypesConfig?.restConfig?.server && Object.keys(nodeTypesConfig?.restConfig?.server).length > 0) {
             nodeTypesConfig.restConfig.template = restConfig.template || EmptyRestConfig.template;
+            nodeTypesConfig.restConfig.framework = restConfig.framework || EmptyRestConfig.framework;
         }
     }
     if (grpcConfig && Object.keys(grpcConfig).length > 0) {
@@ -111,9 +112,10 @@ const getNodeTypesConfig = (parsedModifiedState, nodeId): NodeTypesConfig => {
             nodeTypesConfig.hasGrpcClients = true;
             nodeTypesConfig.grpcConfig.clients = grpcConfig.clients;
         }
-        // add template when the at lease grpc server or clients are present.
+        // add template and framework when the at lease grpc server or clients are present.
         if (nodeTypesConfig?.grpcConfig?.server && Object.keys(nodeTypesConfig?.grpcConfig?.server).length > 0) {
             nodeTypesConfig.grpcConfig.template = grpcConfig.template || EmptyGrpcConfig.template;
+            nodeTypesConfig.grpcConfig.framework = grpcConfig.framework || EmptyGrpcConfig.framework;
         }
     }
     if (wsConfig && Object.keys(wsConfig).length > 0) {
@@ -130,9 +132,10 @@ const getNodeTypesConfig = (parsedModifiedState, nodeId): NodeTypesConfig => {
             nodeTypesConfig.hasWsClients = true;
             nodeTypesConfig.wsConfig.clients = wsConfig.clients;
         }
-        // add template when the at lease ws server or clients are present.
+        // add template and framework when the at lease ws server or clients are present.
         if (nodeTypesConfig?.wsConfig?.server && Object.keys(nodeTypesConfig?.wsConfig?.server).length > 0) {
-            nodeTypesConfig.wsConfig.template = wsConfig.template || COMPAGE;
+            nodeTypesConfig.wsConfig.template = wsConfig.template || EmptyWsConfig.template;
+            nodeTypesConfig.wsConfig.framework = wsConfig.framework || EmptyWsConfig.framework;
         }
     }
     return nodeTypesConfig;
@@ -245,7 +248,6 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             if (payload.isRestServer) {
                 restConfig.server = {
                     sqlDb: payload.restConfig.server.sqlDb,
-                    framework: payload.restConfig.server.framework,
                     port: getRestServerPort(payload.restConfig.template, payload.restConfig.server.port),
                 };
                 if (isCompageTemplate(payload.restConfig.template)) {
@@ -262,13 +264,13 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             // add template when at lease one of the rest server or clients are added.
             if (Object.keys(restConfig).length > 0) {
                 restConfig.template = payload.restConfig.template;
+                restConfig.framework = payload.restConfig.framework;
             }
 
             // grpc
             if (payload.isGrpcServer) {
                 grpcConfig.server = {
                     sqlDb: payload.grpcConfig.server.sqlDb,
-                    framework: payload.grpcConfig.server.framework,
                     port: payload.grpcConfig.server.port,
                 };
                 if (isCompageTemplate(payload.grpcConfig.template)) {
@@ -282,12 +284,12 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             // add template when at lease one of the grpc server or clients are added.
             if (Object.keys(grpcConfig).length > 0) {
                 grpcConfig.template = payload.grpcConfig.template;
+                grpcConfig.framework = payload.grpcConfig.framework;
             }
 
             // ws
             if (payload.isWsServer) {
                 wsConfig.server = {
-                    framework: payload.wsConfig.server.framework,
                     port: payload.wsConfig.server.port,
                     resources: []
                 };
@@ -299,6 +301,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             // add template when at lease one of the ws server or clients are added.
             if (Object.keys(wsConfig).length > 0) {
                 wsConfig.template = payload.wsConfig.template;
+                wsConfig.framework = payload.wsConfig.framework;
             }
 
             const modifiedState = getParsedModifiedState();
@@ -495,6 +498,10 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                            disabled
                            variant="outlined"/>
                 <br/>
+                <TextField value={payload.restConfig.framework} id="restClientFramework" label="Template"
+                           disabled
+                           variant="outlined"/>
+                <br/>
                 <TableContainer component={Paper}>
                     <Table sx={{minWidth: 400}}>
                         <TableHead>
@@ -531,6 +538,10 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         if (payload.hasGrpcClients) {
             return <React.Fragment>
                 <TextField value={payload.grpcConfig.template} id="grpcClientTemplate" label="Template"
+                           disabled
+                           variant="outlined"/>
+                <br/>
+                <TextField value={payload.grpcConfig.framework} id="grpcClientFramework" label="Template"
                            disabled
                            variant="outlined"/>
                 <br/>
@@ -651,8 +662,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 label="Framework"
                 defaultValue=''
                 type="text"
-                value={payload.restConfig.server.framework}
-                onChange={handleRestServerFrameworkChange}
+                value={payload.restConfig.framework}
+                onChange={handleRestFrameworkChange}
                 variant="outlined">
                 {frameworks.map((framework: string) => (
                     <MenuItem key={framework} value={framework}>
@@ -825,7 +836,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 defaultValue=''
                 type="text"
                 value={payload.grpcConfig.server.sqlDb}
-                onChange={handleGrpcConfigServerSqlDbChange}
+                onChange={handleGrpcServerSqlDbChange}
                 variant="outlined">
                 {sqlDbs.map((sqlDb: string) => (
                     <MenuItem key={sqlDb} value={sqlDb}>
@@ -837,7 +848,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return '';
     };
 
-    const getGrpcServerFrameworkContent = () => {
+    const getGrpcFrameworkContent = () => {
         // create language:frameworks map based on template chosen
         let map;
         if (isCompageTemplate(payload.grpcConfig.template)) {
@@ -857,8 +868,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 label="Framework"
                 defaultValue=''
                 type="text"
-                value={payload.grpcConfig.server.framework}
-                onChange={handleGrpcConfigServerFrameworkChange}
+                value={payload.grpcConfig.framework}
+                onChange={handleGrpcServerFrameworkChange}
                 variant="outlined">
                 {frameworks.map((framework: string) => (
                     <MenuItem key={framework} value={framework}>
@@ -880,7 +891,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 label="Port"
                 type="number"
                 value={payload.grpcConfig.server.port}
-                onChange={handleGrpcConfigServerPortChange}
+                onChange={handleGrpcServerPortChange}
                 variant="outlined"
             />;
         }
@@ -902,7 +913,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         </React.Fragment>;
     };
 
-    const handleGrpcConfigServerSqlDbChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleGrpcServerSqlDbChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const grpcConfig: GrpcConfig = payload.grpcConfig;
         grpcConfig.server.sqlDb = event.target.value;
         setPayload({
@@ -911,9 +922,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const handleGrpcConfigServerFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleGrpcServerFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const grpcConfig: GrpcConfig = payload.grpcConfig;
-        grpcConfig.server.framework = event.target.value;
+        grpcConfig.framework = event.target.value;
         setPayload({
             ...payload,
             grpcConfig
@@ -939,7 +950,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         if (payload.isGrpcServer) {
             return <React.Fragment>
                 {getGrpcTemplateContent()}
-                {getGrpcServerFrameworkContent()}
+                {getGrpcFrameworkContent()}
                 {getGrpcServerPortContent()}
                 {getGrpcServerSqlDbContent()}
                 {getGrpcServerResourcesContent()}
@@ -976,7 +987,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return "";
     };
 
-    const handleGrpcConfigServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleGrpcServerPortChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const grpcConfig: GrpcConfig = payload.grpcConfig;
         grpcConfig.server.port = event.target.value;
         setPayload({
@@ -1094,9 +1105,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
-    const handleRestServerFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleRestFrameworkChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const restConfig: RestConfig = payload.restConfig;
-        restConfig.server.framework = event.target.value;
+        restConfig.framework = event.target.value;
         setPayload({
             ...payload,
             restConfig

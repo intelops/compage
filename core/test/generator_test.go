@@ -8,6 +8,29 @@ import (
 	"testing"
 )
 
+func TestRestClientAndGrpcClientCrossGenerator(t *testing.T) {
+	restGrpcConfigJSON := `{"edges":{"edge-5d":{"dest":"node-5d","id":"edge-5d","src":"node-cc","consumerData":{"name":"account-user"}},"edge-e6":{"dest":"node-cc","id":"edge-e6","src":"node-5d","consumerData":{"name":"user-account"}}},"nodes":{"node-5d":{"id":"node-5d","typeId":"node-type-circle","consumerData":{"nodeType":"node-type-circle","name":"user-service","language":"go","restConfig":{"server":{"sqlDb":"MySQL","port":"4000","resources":[{"fields":{"Name":"string"},"name":"User"}]},"template":"compage","framework":"go-gin-server"},"grpcConfig":{"clients":[{"sourceNodeName":"account-service","sourceNodeId":"node-cc","port":"50033"}],"template":"compage","framework":"go-grpc-server"}}},"node-cc":{"id":"node-cc","typeId":"node-type-circle","consumerData":{"nodeType":"node-type-circle","name":"account-service","language":"go","restConfig":{"clients":[{"sourceNodeName":"user-service","sourceNodeId":"node-5d","port":"4000"}],"template":"compage","framework":"go-gin-server"},"grpcConfig":{"server":{"sqlDb":"SQLite","port":"50033","resources":[{"fields":{"NameG":"string"},"name":"Account"}]},"template":"compage","framework":"go-grpc-server"}}}}}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-rest-client-and-grpc-client-project",
+		Json:           restGrpcConfigJSON,
+	}
+	defer func() {
+		//_ = os.RemoveAll("/tmp/first-rest-and-grpc-project-v2")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
 func TestRestAndGrpcGeneratorV2(t *testing.T) {
 	restConfigJSON := `{
     "edges": {
@@ -120,7 +143,7 @@ func TestRestAndGrpcGeneratorV2(t *testing.T) {
 		Json:           restConfigJSON,
 	}
 	defer func() {
-		//_ = os.RemoveAll("/tmp/first-rest-and-grpc-project-v2")
+		_ = os.RemoveAll("/tmp/first-rest-and-grpc-project-v2")
 	}()
 
 	// retrieve project struct

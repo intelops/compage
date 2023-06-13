@@ -265,8 +265,8 @@ func (c Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
 	return executor.ExecuteWithFuncs(filePaths, c.Data, funcMap)
 }
 
-// copyGrpcClientResourceFiles copies grpc client files from template and renames them as per client config.
-func (c Copier) copyGrpcClientResourceFiles(grpcClient *corenode.GrpcClient) error {
+// CopyGrpcClientResourceFiles copies grpc client files from template and renames them as per client config.
+func (c Copier) CopyGrpcClientResourceFiles(grpcClient *corenode.GrpcClient) error {
 	/// add resource specific data to map in c needed for templates.
 	// TODO grpcClient needs too many changes (like referring the .proto and generated files) we can better just have a client created for local grpcServer)
 	c.Data["GrpcClientPort"] = grpcClient.Port
@@ -433,18 +433,20 @@ func (c Copier) CreateGrpcClients() error {
 		return err
 	}
 	// if the node is client, add client code
-	if c.IsGrpcClient {
-		// copy files with respect to the names of resources
-		for _, client := range c.GrpcClients {
-			if err := c.copyGrpcClientResourceFiles(client); err != nil {
-				return err
-			}
+	//if c.IsGrpcClient {
+	// copy files with respect to the names of resources
+	// TODO need to add a flow based on client details.
+	//for _, client := range c.GrpcClients {
+	//	if err := c.CopyGrpcClientResourceFiles(client); err != nil {
+	//		return err
+	//	}
+	//}
+	//}
+	if c.IsGrpcServer {
+		// create self client
+		if err := c.copySelfGrpcClientResourceFiles(); err != nil {
+			return err
 		}
-	}
-
-	// create self client
-	if err := c.copySelfGrpcClientResourceFiles(); err != nil {
-		return err
 	}
 
 	return nil

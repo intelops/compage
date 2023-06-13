@@ -48,8 +48,8 @@ export const ContextNode = (props: ContextNodeProps) => {
     };
 
     const getFramework = () => {
-        if (payload.restConfig.server.framework) {
-            return <><strong>Framework</strong>: {payload.restConfig.server.framework}</>;
+        if (payload.restConfig.framework) {
+            return <><strong>Framework</strong>: {payload.restConfig.framework}</>;
         }
         return "";
     };
