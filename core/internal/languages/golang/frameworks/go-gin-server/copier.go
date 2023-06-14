@@ -46,7 +46,7 @@ type Copier struct {
 	TemplatesRootPath string
 	Data              map[string]interface{}
 	IsRestServer      bool
-	IsRestClient      bool
+	HasRestClients    bool
 	SQLDB             string
 	IsSQLDB           bool
 	RestServerPort    string
@@ -55,7 +55,7 @@ type Copier struct {
 	PluralizeClient   *pluralize.Client
 }
 
-type resourceData struct {
+type serverResourceData struct {
 	SmallKebabCaseResourceNameSingular string
 	SmallSnakeCaseResourceNameSingular string
 	SmallResourceNameSingular          string
@@ -78,10 +78,10 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	data["IsSQLDB"] = isSQLDB
 	// set all resources for main.go.tmpl
 	if isRestServer {
-		var resourcesData []resourceData
+		var serverResourcesData []serverResourceData
 		for _, r := range resources {
 			lowerCamelResourceName := strcase.ToLowerCamel(r.Name)
-			resourcesData = append(resourcesData, resourceData{
+			serverResourcesData = append(serverResourcesData, serverResourceData{
 				SmallKebabCaseResourceNameSingular: strcase.ToKebab(r.Name),
 				SmallSnakeCaseResourceNameSingular: strcase.ToSnake(r.Name),
 				SmallResourceNameSingular:          lowerCamelResourceName,
@@ -90,20 +90,19 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 				CapsResourceNamePlural:             pluralizeClient.Plural(r.Name),
 			})
 		}
-		data["RestResources"] = resourcesData
+		data["RestResources"] = serverResourcesData
 		data["RestServerPort"] = restServerPort
 		data["IsRestServer"] = isRestServer
 	}
 	// if restClients slice has elements
-	isRestClient := len(restClients) > 0
-	data["IsRestClient"] = isRestClient
+	hasRestClients := len(restClients) > 0
 
 	return &Copier{
 		TemplatesRootPath: templatesRootPath,
 		NodeDirectoryName: nodeDirectoryName,
 		Data:              data,
 		IsRestServer:      isRestServer,
-		IsRestClient:      isRestClient,
+		HasRestClients:    hasRestClients,
 		SQLDB:             sqlDB,
 		IsSQLDB:           isSQLDB,
 		Resources:         resources,
@@ -146,7 +145,7 @@ func (c Copier) createRestServerDirectories() error {
 		if err := utils.CreateDirectories(sqlDBClientsDirectory); err != nil {
 			return err
 		}
-		resources := c.Data["RestResources"].([]resourceData)
+		resources := c.Data["RestResources"].([]serverResourceData)
 		for _, r := range resources {
 			resourceClientDirectory := c.NodeDirectoryName + SQLDBClientsPath + "/" + r.SmallKebabCaseResourceNameSingular + "-client"
 			if err := utils.CreateDirectories(resourceClientDirectory); err != nil {
@@ -247,6 +246,7 @@ func (c Copier) copyRestClientResourceFiles(restClient *corenode.RestClient) err
 	/// add resource specific data to map in c needed for templates.
 	c.Data["RestClientPort"] = restClient.Port
 	c.Data["RestClientServiceName"] = restClient.SourceNodeName
+	c.Data["RestClientSourceNodeID"] = strings.Replace(cases.Title(language.Und, cases.NoLower).String(restClient.SourceNodeID), "-", "_", -1)
 
 	// copy restClient files to generated project.
 	targetResourceClientFileName := c.NodeDirectoryName + RestClientPath + "/" + restClient.SourceNodeName + "-" + ClientFile
@@ -399,7 +399,7 @@ func (c Copier) CreateRestServer() error {
 // CreateRestClients creates/copies relevant files to generated project
 func (c Copier) CreateRestClients() error {
 	// if the node is client, add client code
-	if c.IsRestClient {
+	if c.HasRestClients {
 		// create directories for client
 		if err := c.createRestClientDirectories(); err != nil {
 			return err

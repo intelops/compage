@@ -51,7 +51,7 @@ type Copier struct {
 	TemplatesRootPath string
 	Data              map[string]interface{}
 	IsGrpcServer      bool
-	IsGrpcClient      bool
+	HasGrpcClients    bool
 	SQLDB             string
 	IsSQLDB           bool
 	GrpcServerPort    string
@@ -100,15 +100,15 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 		data["IsGrpcServer"] = isGrpcServer
 	}
 	// if grpcClients slice has elements
-	isGrpcClient := len(grpcClients) > 0
-	data["IsGrpcClient"] = isGrpcClient
+	hasGrpcClients := len(grpcClients) > 0
+	data["HasGrpcClients"] = hasGrpcClients
 
 	return &Copier{
 		TemplatesRootPath: templatesRootPath,
 		NodeDirectoryName: nodeDirectoryName,
 		Data:              data,
 		IsGrpcServer:      isGrpcServer,
-		IsGrpcClient:      isGrpcClient,
+		HasGrpcClients:    hasGrpcClients,
 		SQLDB:             sqlDB,
 		IsSQLDB:           isSQLDB,
 		Resources:         resources,
@@ -271,7 +271,7 @@ func (c Copier) CopyGrpcClientResourceFiles(grpcClient *corenode.GrpcClient) err
 	// TODO grpcClient needs too many changes (like referring the .proto and generated files) we can better just have a client created for local grpcServer)
 	c.Data["GrpcClientPort"] = grpcClient.Port
 	c.Data["GrpcClientServiceName"] = grpcClient.SourceNodeName
-
+	c.Data["GrpcClientSourceNodeID"] = strings.Replace(cases.Title(language.Und, cases.NoLower).String(grpcClient.SourceNodeID), "-", "_", -1)
 	// copy grpcClient files to generated project.
 	targetResourceClientFileName := c.NodeDirectoryName + GrpcClientPath + "/" + grpcClient.SourceNodeName + "-" + ClientFile
 	_, err := utils.CopyFile(targetResourceClientFileName, c.TemplatesRootPath+GrpcClientPath+"/"+ClientFile)
@@ -433,7 +433,7 @@ func (c Copier) CreateGrpcClients() error {
 		return err
 	}
 	// if the node is client, add client code
-	//if c.IsGrpcClient {
+	//if c.HasGrpcClients {
 	// copy files with respect to the names of resources
 	// TODO need to add a flow based on client details.
 	//for _, client := range c.GrpcClients {

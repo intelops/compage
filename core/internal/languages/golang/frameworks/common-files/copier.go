@@ -5,6 +5,8 @@ import (
 	corenode "github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages/executor"
 	"github.com/intelops/compage/core/internal/utils"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"strings"
 )
 
@@ -21,10 +23,10 @@ type Copier struct {
 	TemplatesRootPath string
 	Data              map[string]interface{}
 	IsGrpcServer      bool
-	IsGrpcClient      bool
+	HasGrpcClients    bool
 	GrpcServerPort    string
 	IsRestServer      bool
-	IsRestClient      bool
+	HasRestClients    bool
 	RestServerPort    string
 	RestResources     []*corenode.Resource
 	GrpcResources     []*corenode.Resource
@@ -38,6 +40,10 @@ type resourceData struct {
 	SmallResourceNamePlural   string
 	CapsResourceNameSingular  string
 	CapsResourceNamePlural    string
+}
+
+type clientData struct {
+	SourceNodeID string
 }
 
 func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isGrpcServer bool, grpcServerPort string, isRestSQLDB bool, restSQLDB string, isGrpcSQLDB bool, grpcSQLDB string, restResources []*corenode.Resource, grpcResources []*corenode.Resource, restClients []*corenode.RestClient, grpcClients []*corenode.GrpcClient) *Copier {
@@ -64,8 +70,8 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	data["GrpcServerPort"] = grpcServerPort
 	data["IsGrpcServer"] = isGrpcServer
 	// if grpcClients slice has elements
-	isGrpcClient := len(grpcClients) > 0
-	data["IsGrpcClient"] = isGrpcClient
+	HasGrpcClients := len(grpcClients) > 0
+	data["HasGrpcClients"] = HasGrpcClients
 
 	// set all grpcResources for main.go.tmpl
 	var restResourcesData []resourceData
@@ -81,8 +87,16 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	data["RestServerPort"] = restServerPort
 	data["IsRestServer"] = isRestServer
 	// if restClients slice has elements
-	isRestClient := len(restClients) > 0
-	data["IsRestClient"] = isRestClient
+	hasRestClients := len(restClients) > 0
+	data["HasRestClients"] = hasRestClients
+	data["HasRestClients"] = hasRestClients
+	if hasRestClients {
+		var d []clientData
+		for _, restClient := range restClients {
+			d = append(d, clientData{SourceNodeID: strings.Replace(cases.Title(language.Und, cases.NoLower).String(restClient.SourceNodeID), "-", "_", -1)})
+		}
+		data["RestClients"] = d
+	}
 
 	data["IsRestSQLDB"] = isRestSQLDB
 	if isRestSQLDB {
@@ -99,11 +113,11 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 		NodeDirectoryName: nodeDirectoryName,
 		Data:              data,
 		IsGrpcServer:      isGrpcServer,
-		IsGrpcClient:      isGrpcClient,
+		HasGrpcClients:    HasGrpcClients,
 		GrpcServerPort:    grpcServerPort,
 		RestServerPort:    restServerPort,
 		IsRestServer:      isRestServer,
-		IsRestClient:      isRestClient,
+		HasRestClients:    hasRestClients,
 		GrpcResources:     grpcResources,
 		GrpcClients:       grpcClients,
 		RestResources:     restResources,
