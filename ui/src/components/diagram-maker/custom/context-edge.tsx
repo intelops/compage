@@ -4,9 +4,9 @@ import {getParsedModifiedState} from "../helper/helper";
 import {
     CompageEdge,
     CompageNode,
-    EmptyGrpcConfig,
-    EmptyRestConfig,
-    EmptyWsConfig,
+    getEmptyGrpcConfig,
+    getEmptyRestConfig,
+    getEmptyWsConfig,
     GrpcClient,
     RestClient,
     WsClient
@@ -34,7 +34,7 @@ export const ContextEdge = (props: ContextEdgeProps) => {
                 }
             }
         }
-        return EmptyRestConfig.server.port;
+        return getEmptyRestConfig().server.port;
     };
     const getGrpcPort = () => {
         const grpcClients: GrpcClient[] = destNode?.consumerData?.grpcConfig?.clients;
@@ -45,7 +45,7 @@ export const ContextEdge = (props: ContextEdgeProps) => {
                 }
             }
         }
-        return EmptyGrpcConfig.server.port;
+        return getEmptyGrpcConfig().server.port;
     };
     const getWsPort = () => {
         const wsClients: WsClient[] = destNode?.consumerData?.wsConfig?.clients;
@@ -56,7 +56,7 @@ export const ContextEdge = (props: ContextEdgeProps) => {
                 }
             }
         }
-        return EmptyWsConfig.server.port;
+        return getEmptyWsConfig().server.port;
     };
     const getSourceNode= () => {
         return srcNode?.consumerData?.name;

@@ -94,39 +94,48 @@ export interface CompageJson {
 }
 
 // empty interfaces
-export const EmptyRestConfig: RestConfig = {
-    template: COMPAGE,
-    framework: GO_GIN_SERVER,
-    server: {
-        resources: [],
-        port: "",
-        sqlDb: "",
-        openApiFileYamlContent: ""
-    },
-    clients: []
+export const getEmptyRestConfig = () => {
+    const emptyRestConfig: RestConfig = {
+        template: COMPAGE,
+        framework: GO_GIN_SERVER,
+        server: {
+            resources: [],
+            port: "",
+            sqlDb: "",
+            openApiFileYamlContent: ""
+        },
+        clients: []
+    };
+    return emptyRestConfig;
 };
 
-export const EmptyGrpcConfig: GrpcConfig = {
-    template: COMPAGE,
-    framework: GO_GRPC_SERVER,
-    server: {
-        resources: [],
-        port: "",
-        sqlDb: "",
-        protoFileContent: ""
-    },
-    clients: []
+export const getEmptyGrpcConfig = () => {
+    const emptyGrpcConfig: GrpcConfig = {
+        template: COMPAGE,
+        framework: GO_GRPC_SERVER,
+        server: {
+            resources: [],
+            port: "",
+            sqlDb: "",
+            protoFileContent: ""
+        },
+        clients: []
+    };
+    return emptyGrpcConfig;
 };
 
-export const EmptyWsConfig: WsConfig = {
-    template: COMPAGE,
-    // TODO add default framework here later when support for ws is added.
-    framework: "",
-    server: {
-        resources: [],
-        port: "",
-    },
-    clients: []
+export const getEmptyWsConfig = () => {
+    const emptyWsConfig: WsConfig = {
+        template: COMPAGE,
+        // TODO add default framework here later when support for ws is added.
+        framework: "",
+        server: {
+            resources: [],
+            port: "",
+        },
+        clients: []
+    };
+    return emptyWsConfig;
 };
 
 export const EmptyCurrentRestResource: Resource = {

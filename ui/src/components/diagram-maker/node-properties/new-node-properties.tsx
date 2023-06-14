@@ -24,9 +24,9 @@ import {
 import {
     EmptyCurrentGrpcResource,
     EmptyCurrentRestResource,
-    EmptyGrpcConfig,
-    EmptyRestConfig,
-    EmptyWsConfig,
+    getEmptyGrpcConfig,
+    getEmptyRestConfig,
+    getEmptyWsConfig,
     GrpcConfig,
     Resource,
     RestConfig,
@@ -87,7 +87,7 @@ const getNodeTypesConfig = (parsedModifiedState, nodeId): NodeTypesConfig => {
                 server: restConfig.server
             };
         } else {
-            nodeTypesConfig.restConfig = EmptyRestConfig;
+            nodeTypesConfig.restConfig = getEmptyRestConfig();
         }
         if (restConfig?.clients?.length > 0) {
             nodeTypesConfig.hasRestClients = true;
@@ -95,8 +95,8 @@ const getNodeTypesConfig = (parsedModifiedState, nodeId): NodeTypesConfig => {
         }
         // add template and framework when the at lease rest server or clients are present.
         if (nodeTypesConfig?.restConfig?.server && Object.keys(nodeTypesConfig?.restConfig?.server).length > 0) {
-            nodeTypesConfig.restConfig.template = restConfig.template || EmptyRestConfig.template;
-            nodeTypesConfig.restConfig.framework = restConfig.framework || EmptyRestConfig.framework;
+            nodeTypesConfig.restConfig.template = restConfig.template || getEmptyRestConfig().template;
+            nodeTypesConfig.restConfig.framework = restConfig.framework || getEmptyRestConfig().framework;
         }
     }
     if (grpcConfig && Object.keys(grpcConfig).length > 0) {
@@ -106,7 +106,7 @@ const getNodeTypesConfig = (parsedModifiedState, nodeId): NodeTypesConfig => {
                 server: grpcConfig.server
             };
         } else {
-            nodeTypesConfig.grpcConfig = EmptyGrpcConfig;
+            nodeTypesConfig.grpcConfig = getEmptyGrpcConfig();
         }
         if (grpcConfig?.clients?.length > 0) {
             nodeTypesConfig.hasGrpcClients = true;
@@ -114,19 +114,19 @@ const getNodeTypesConfig = (parsedModifiedState, nodeId): NodeTypesConfig => {
         }
         // add template and framework when the at lease grpc server or clients are present.
         if (nodeTypesConfig?.grpcConfig?.server && Object.keys(nodeTypesConfig?.grpcConfig?.server).length > 0) {
-            nodeTypesConfig.grpcConfig.template = grpcConfig.template || EmptyGrpcConfig.template;
-            nodeTypesConfig.grpcConfig.framework = grpcConfig.framework || EmptyGrpcConfig.framework;
+            nodeTypesConfig.grpcConfig.template = grpcConfig.template || getEmptyGrpcConfig().template;
+            nodeTypesConfig.grpcConfig.framework = grpcConfig.framework || getEmptyGrpcConfig().framework;
         }
     }
     if (wsConfig && Object.keys(wsConfig).length > 0) {
-        nodeTypesConfig.wsConfig = {template: wsConfig.template || EmptyWsConfig.template};
+        nodeTypesConfig.wsConfig = {template: wsConfig.template || getEmptyWsConfig().template};
         if (wsConfig.server && Object.keys(wsConfig?.server).length > 0) {
             nodeTypesConfig.isWsServer = true;
             nodeTypesConfig.wsConfig = {
                 server: wsConfig.server
             };
         } else {
-            nodeTypesConfig.wsConfig = EmptyWsConfig;
+            nodeTypesConfig.wsConfig = getEmptyWsConfig();
         }
         if (wsConfig?.clients?.length > 0) {
             nodeTypesConfig.hasWsClients = true;
@@ -134,8 +134,8 @@ const getNodeTypesConfig = (parsedModifiedState, nodeId): NodeTypesConfig => {
         }
         // add template and framework when the at lease ws server or clients are present.
         if (nodeTypesConfig?.wsConfig?.server && Object.keys(nodeTypesConfig?.wsConfig?.server).length > 0) {
-            nodeTypesConfig.wsConfig.template = wsConfig.template || EmptyWsConfig.template;
-            nodeTypesConfig.wsConfig.framework = wsConfig.framework || EmptyWsConfig.framework;
+            nodeTypesConfig.wsConfig.template = wsConfig.template || getEmptyWsConfig().template;
+            nodeTypesConfig.wsConfig.framework = wsConfig.framework || getEmptyWsConfig().framework;
         }
     }
     return nodeTypesConfig;
@@ -160,13 +160,13 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         language: parsedModifiedState.nodes[props.nodeId]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.language : '',
         isRestServer: nodeTypesConfig.isRestServer || false,
         hasRestClients: nodeTypesConfig.hasRestClients || false,
-        restConfig: nodeTypesConfig.restConfig || EmptyRestConfig,
+        restConfig: nodeTypesConfig.restConfig || getEmptyRestConfig(),
         isGrpcServer: nodeTypesConfig.isGrpcServer || false,
         hasGrpcClients: nodeTypesConfig.hasGrpcClients || false,
-        grpcConfig: nodeTypesConfig.grpcConfig || EmptyGrpcConfig,
+        grpcConfig: nodeTypesConfig.grpcConfig || getEmptyGrpcConfig(),
         isWsServer: nodeTypesConfig.isWsServer || false,
         hasWsClients: nodeTypesConfig.hasWsClients || false,
-        wsConfig: nodeTypesConfig.wsConfig || EmptyWsConfig,
+        wsConfig: nodeTypesConfig.wsConfig || getEmptyWsConfig(),
         // rest
         isAddRestServerResourceOpen: false,
         isUpdateRestServerResourceOpen: false,
@@ -349,9 +349,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 hasGrpcClients: false,
                 hasRestClients: false,
                 hasWsClients: false,
-                grpcConfig: EmptyGrpcConfig,
-                restConfig: EmptyRestConfig,
-                wsConfig: EmptyWsConfig,
+                grpcConfig: getEmptyGrpcConfig(),
+                restConfig: getEmptyRestConfig(),
+                wsConfig: getEmptyWsConfig(),
                 isAddRestServerResourceOpen: false,
                 isUpdateRestServerResourceOpen: false,
                 isDeleteRestServerResourceOpen: false,

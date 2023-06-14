@@ -13,9 +13,9 @@ import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import {
     CompageEdge,
     CompageNode,
-    EmptyGrpcConfig,
-    EmptyRestConfig,
-    EmptyWsConfig,
+    getEmptyGrpcConfig,
+    getEmptyRestConfig,
+    getEmptyWsConfig,
     GrpcClient,
     GrpcConfig,
     RestClient,
@@ -167,7 +167,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                 } else {
                     if (dstNode) {
                         if (dstNode.consumerData) {
-                            dstNode.consumerData.restConfig = EmptyRestConfig;
+                            dstNode.consumerData.restConfig = getEmptyRestConfig();
                         } else {
                             dstNode.consumerData = {
                                 name: "",
@@ -175,7 +175,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                                 metadata: new Map<string, string>(),
                                 language: "",
                                 restConfig: {
-                                    clients: EmptyRestConfig.clients
+                                    clients: getEmptyRestConfig().clients
                                 }
                             };
                         }
@@ -188,7 +188,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                                 metadata: new Map<string, string>(),
                                 language: "",
                                 restConfig: {
-                                    clients: EmptyRestConfig.clients
+                                    clients: getEmptyRestConfig().clients
                                 }
                             }
                         };
@@ -234,7 +234,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                 } else {
                     if (dstNode) {
                         if (dstNode.consumerData) {
-                            dstNode.consumerData.grpcConfig = EmptyGrpcConfig;
+                            dstNode.consumerData.grpcConfig = getEmptyGrpcConfig();
                         } else {
                             dstNode.consumerData = {
                                 name: "",
@@ -242,7 +242,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                                 metadata: new Map<string, string>(),
                                 language: "",
                                 grpcConfig: {
-                                    clients: EmptyGrpcConfig.clients
+                                    clients: getEmptyGrpcConfig().clients
                                 }
                             };
                         }
@@ -255,7 +255,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                                 metadata: new Map<string, string>(),
                                 language: "",
                                 grpcConfig: {
-                                    clients: EmptyGrpcConfig.clients
+                                    clients: getEmptyGrpcConfig().clients
                                 }
                             }
                         };
@@ -301,7 +301,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                 } else {
                     if (dstNode) {
                         if (dstNode.consumerData) {
-                            dstNode.consumerData.wsConfig = EmptyWsConfig;
+                            dstNode.consumerData.wsConfig = getEmptyWsConfig();
                         } else {
                             dstNode.consumerData = {
                                 name: "",
@@ -309,7 +309,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                                 metadata: new Map<string, string>(),
                                 language: "",
                                 wsConfig: {
-                                    clients: EmptyWsConfig.clients
+                                    clients: getEmptyWsConfig().clients
                                 }
                             };
                         }
@@ -322,7 +322,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
                                 metadata: new Map<string, string>(),
                                 language: "",
                                 wsConfig: {
-                                    clients: EmptyWsConfig.clients
+                                    clients: getEmptyWsConfig().clients
                                 }
                             }
                         };
