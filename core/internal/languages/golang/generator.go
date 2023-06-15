@@ -90,6 +90,11 @@ func Generate(ctx context.Context) error {
 					log.Debugf("err : %s", err)
 					return err
 				}
+				// generate protoc commands on proto file for the code generated
+				if err := RunMakeProto(goValues.Values.NodeDirectoryName); err != nil {
+					log.Debugf("err : %s", err)
+					return err
+				}
 			} else {
 				return fmt.Errorf("unsupported framework %s  for template %s for language %s", n.GrpcConfig.Framework, n.GrpcConfig.Template, n.Language)
 			}
