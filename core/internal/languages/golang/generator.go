@@ -72,8 +72,18 @@ func Generate(ctx context.Context) error {
 		if n.GrpcConfig.Template == templates.Compage {
 			if n.GrpcConfig.Framework == GoGrpcServerFramework {
 				goGrpcServerCopier := getGoGrpcServerCopier(goValues)
+				// copy all files at root level
+				if err := goGrpcServerCopier.CreateRootLevelFiles(); err != nil {
+					log.Debugf("err : %s", err)
+					return err
+				}
 				if n.GrpcConfig.Server != nil {
 					if err := goGrpcServerCopier.CreateGrpcServer(); err != nil {
+						log.Debugf("err : %s", err)
+						return err
+					}
+					// generate protoc commands on proto file for the code generated
+					if err := RunMakeProto(goValues.Values.NodeDirectoryName); err != nil {
 						log.Debugf("err : %s", err)
 						return err
 					}
@@ -84,16 +94,6 @@ func Generate(ctx context.Context) error {
 						log.Debugf("err : %s", err)
 						return err
 					}
-				}
-				// copy all files at root level, fire this at last
-				if err := goGrpcServerCopier.CreateRootLevelFiles(); err != nil {
-					log.Debugf("err : %s", err)
-					return err
-				}
-				// generate protoc commands on proto file for the code generated
-				if err := RunMakeProto(goValues.Values.NodeDirectoryName); err != nil {
-					log.Debugf("err : %s", err)
-					return err
 				}
 			} else {
 				return fmt.Errorf("unsupported framework %s  for template %s for language %s", n.GrpcConfig.Framework, n.GrpcConfig.Template, n.Language)
