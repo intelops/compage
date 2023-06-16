@@ -288,14 +288,17 @@ func (c Copier) CopyGrpcClientResourceFiles(grpcClient *corenode.GrpcClient) err
 func (c Copier) addResourceSpecificTemplateData(resource *corenode.Resource) error {
 	// make every field public by making its first character capital.
 	fields := map[string]string{}
+	protoFields := map[string]string{}
 	// this slice is needed for grpc resource message generation
 	var fieldNames []string
 	for key, value := range resource.Fields {
 		key = cases.Title(language.Und, cases.NoLower).String(key)
-		fields[key] = commonUtils.GetProtoBufDataType(value)
+		fields[key] = value
+		protoFields[key] = commonUtils.GetProtoBufDataType(value)
 		fieldNames = append(fieldNames, key)
 	}
 	c.Data["Fields"] = fields
+	c.Data["ProtoFields"] = protoFields
 	c.Data["FieldNames"] = fieldNames
 	// db fields
 	if c.IsSQLDB {

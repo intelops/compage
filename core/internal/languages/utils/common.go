@@ -130,3 +130,46 @@ func GetMySQLDataType(value string) string {
 		return "VARCHAR(100)"
 	}
 }
+
+func GetDefaultValueForDataType(value string) interface{} {
+	switch value {
+	case "int":
+		fallthrough
+	case "int16":
+		fallthrough
+	case "int32":
+		fallthrough
+	case "int64":
+		fallthrough
+	case "uint8":
+		fallthrough
+	case "uint16":
+		fallthrough
+	case "uint32":
+		fallthrough
+	case "uint64":
+		fallthrough
+	case "uint":
+		fallthrough
+	case "rune":
+		fallthrough
+	case "byte":
+		fallthrough
+	case "uintptr":
+		return 1
+	case "bool":
+		return true
+	case "float32":
+		fallthrough
+	case "float64":
+		return 1.0
+	case "complex64":
+		fallthrough
+	case "complex128":
+		return 1.0
+	case "string":
+		return "sample string"
+	default:
+		return "defaultValue"
+	}
+}

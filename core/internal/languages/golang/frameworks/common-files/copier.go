@@ -1,9 +1,11 @@
 package commonfiles
 
 import (
+	"fmt"
 	"github.com/gertd/go-pluralize"
 	corenode "github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages/executor"
+	commonUtils "github.com/intelops/compage/core/internal/languages/utils"
 	"github.com/intelops/compage/core/internal/utils"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -35,7 +37,16 @@ type Copier struct {
 	PluralizeClient   *pluralize.Client
 }
 
-type resourceData struct {
+type restResourceData struct {
+	SmallResourceNameSingular string
+	SmallResourceNamePlural   string
+	CapsResourceNameSingular  string
+	CapsResourceNamePlural    string
+	ResourcePostBody          string
+	ResourcePutBody           string
+}
+
+type grpcResourceData struct {
 	SmallResourceNameSingular string
 	SmallResourceNamePlural   string
 	CapsResourceNameSingular  string
@@ -57,9 +68,9 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 		"UserName":       userName,
 	}
 	// set all grpcResources for main.go.tmpl
-	var grpcResourcesData []resourceData
+	var grpcResourcesData []grpcResourceData
 	for _, r := range grpcResources {
-		grpcResourcesData = append(grpcResourcesData, resourceData{
+		grpcResourcesData = append(grpcResourcesData, grpcResourceData{
 			SmallResourceNameSingular: strings.ToLower(r.Name),
 			SmallResourceNamePlural:   pluralizeClient.Plural(strings.ToLower(r.Name)),
 			CapsResourceNameSingular:  r.Name,
@@ -74,13 +85,15 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	data["HasGrpcClients"] = HasGrpcClients
 
 	// set all grpcResources for main.go.tmpl
-	var restResourcesData []resourceData
+	var restResourcesData []restResourceData
 	for _, r := range restResources {
-		restResourcesData = append(restResourcesData, resourceData{
+		restResourcesData = append(restResourcesData, restResourceData{
 			SmallResourceNameSingular: strings.ToLower(r.Name),
 			SmallResourceNamePlural:   pluralizeClient.Plural(strings.ToLower(r.Name)),
 			CapsResourceNameSingular:  r.Name,
 			CapsResourceNamePlural:    pluralizeClient.Plural(r.Name),
+			ResourcePostBody:          getResourcePostBody(r),
+			ResourcePutBody:           getResourcePutBody(r),
 		})
 	}
 	data["RestResources"] = restResourcesData
@@ -93,7 +106,7 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	if hasRestClients {
 		var d []clientData
 		for _, restClient := range restClients {
-			d = append(d, clientData{SourceNodeID: strings.Replace(cases.Title(language.Und, cases.NoLower).String(restClient.SourceNodeID), "-", "_", -1)})
+			d = append(d, clientData{SourceNodeID: strings.Replace(cases.Title(language.Und, cases.NoLower).String(restClient.SourceNodeID), "-", "", -1)})
 		}
 		data["RestClients"] = d
 	}
@@ -123,6 +136,28 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 		RestResources:     restResources,
 		PluralizeClient:   pluralizeClient,
 	}
+}
+
+func getResourcePostBody(r *corenode.Resource) string {
+	postBody := "{"
+	for key, value := range r.Fields {
+		sprintf := fmt.Sprintf("\"%s\": \"%v\",", key, commonUtils.GetDefaultValueForDataType(value))
+		postBody += sprintf
+	}
+	postBody = strings.TrimSuffix(postBody, ",")
+	postBody += "}"
+	return postBody
+}
+
+func getResourcePutBody(r *corenode.Resource) string {
+	putBody := fmt.Sprintf("{\"%s\": %v,", "Id", 123)
+	for key, value := range r.Fields {
+		sprintf := fmt.Sprintf("\"%s\": \"%v\",", key, commonUtils.GetDefaultValueForDataType(value))
+		putBody += sprintf
+	}
+	putBody = strings.TrimSuffix(putBody, ",")
+	putBody += "}"
+	return putBody
 }
 
 // CreateCommonFiles creates/copies relevant files to generated project

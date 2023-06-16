@@ -246,7 +246,7 @@ func (c Copier) copyRestClientResourceFiles(restClient *corenode.RestClient) err
 	/// add resource specific data to map in c needed for templates.
 	c.Data["RestClientPort"] = restClient.Port
 	c.Data["RestClientServiceName"] = restClient.SourceNodeName
-	c.Data["RestClientSourceNodeID"] = strings.Replace(cases.Title(language.Und, cases.NoLower).String(restClient.SourceNodeID), "-", "_", -1)
+	c.Data["RestClientSourceNodeID"] = strings.Replace(cases.Title(language.Und, cases.NoLower).String(restClient.SourceNodeID), "-", "", -1)
 
 	// copy restClient files to generated project.
 	targetResourceClientFileName := c.NodeDirectoryName + RestClientPath + "/" + restClient.SourceNodeName + "-" + ClientFile

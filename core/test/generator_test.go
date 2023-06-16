@@ -381,7 +381,9 @@ func TestRestServerGenerator(t *testing.T) {
                         "resources": [
                             {
                                 "fields": {
-                                    "Name": "string"
+                                    "Name": "string",
+                                    "Address": "string",
+                                    "Age": "int32"
                                 },
                                 "name": "User"
                             }
