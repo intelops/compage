@@ -22,6 +22,7 @@ import {
     TableRow
 } from "@mui/material";
 import {
+    CompageNode,
     EmptyCurrentGrpcResource,
     EmptyCurrentRestResource,
     getEmptyGrpcConfig,
@@ -75,10 +76,10 @@ interface NodeTypesConfig {
     wsConfig?: WsConfig;
 }
 
-const getNodeTypesConfig = (parsedModifiedState, nodeId): NodeTypesConfig => {
-    const restConfig: RestConfig = parsedModifiedState.nodes[nodeId]?.consumerData?.restConfig;
-    const grpcConfig: GrpcConfig = parsedModifiedState.nodes[nodeId]?.consumerData?.grpcConfig;
-    const wsConfig: WsConfig = parsedModifiedState.nodes[nodeId]?.consumerData?.wsConfig;
+const getNodeTypesConfig = (currentNodeState: CompageNode): NodeTypesConfig => {
+    const restConfig: RestConfig = currentNodeState?.consumerData?.restConfig;
+    const grpcConfig: GrpcConfig = currentNodeState?.consumerData?.grpcConfig;
+    const wsConfig: WsConfig = currentNodeState?.consumerData?.wsConfig;
     const nodeTypesConfig: NodeTypesConfig = {};
     if (restConfig && Object.keys(restConfig).length > 0) {
         if (restConfig.server && Object.keys(restConfig?.server).length > 0) {
@@ -150,14 +151,15 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         updateModifiedState(JSON.parse(getCurrentConfig()));
         parsedModifiedState = getParsedModifiedState();
     }
-    const nodeTypesConfig: NodeTypesConfig = getNodeTypesConfig(parsedModifiedState, props.nodeId);
+    const currentNodeState: CompageNode = parsedModifiedState.nodes[props.nodeId];
+    const nodeTypesConfig: NodeTypesConfig = getNodeTypesConfig(currentNodeState);
     const [payload, setPayload] = React.useState({
         name: {
-            value: parsedModifiedState.nodes[props.nodeId]?.consumerData.name !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.name : '',
+            value: currentNodeState?.consumerData.name !== undefined ? currentNodeState.consumerData.name : '',
             error: false,
             errorMessage: ''
         },
-        language: parsedModifiedState.nodes[props.nodeId]?.consumerData.language !== undefined ? parsedModifiedState.nodes[props.nodeId].consumerData.language : '',
+        language: currentNodeState?.consumerData.language !== undefined ? currentNodeState.consumerData.language : '',
         isRestServer: nodeTypesConfig.isRestServer || false,
         hasRestClients: nodeTypesConfig.hasRestClients || false,
         restConfig: nodeTypesConfig.restConfig || getEmptyRestConfig(),
@@ -195,10 +197,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             return false;
         } else {
             // check for duplicate node name only when name has any value in it.
-            const modifiedState = getParsedModifiedState();
             // tslint:disable-next-line: forin
-            for (const key in modifiedState.nodes) {
-                const node = modifiedState.nodes[key];
+            for (const key in parsedModifiedState.nodes) {
+                const node: CompageNode = parsedModifiedState.nodes[key];
                 if (props.nodeId !== key
                     && node.consumerData.name === payload.name.value) {
                     newPayload = {
@@ -304,12 +305,11 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 wsConfig.framework = payload.wsConfig.framework;
             }
 
-            const modifiedState = getParsedModifiedState();
             // update modifiedState with current fields on dialog box
             // P.S. - We will have the fields in consumerData which are on dialogBox, so we can assign them directly. We also refer the older values when payload state is initialized, so the older values will be persisted as they are if not changed.
-            if (!(props.nodeId in modifiedState.nodes)) {
+            if (!(props.nodeId in parsedModifiedState.nodes)) {
                 // adding consumerData to new node in modifiedState
-                modifiedState.nodes[props.nodeId] = {
+                parsedModifiedState.nodes[props.nodeId] = {
                     consumerData: {
                         name: payload.name.value,
                         language: payload.language,
@@ -317,25 +317,25 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 };
             } else {
                 // adding consumerData to existing node in modifiedState
-                modifiedState.nodes[props.nodeId].consumerData = {
+                parsedModifiedState.nodes[props.nodeId].consumerData = {
                     name: payload.name.value,
                     language: payload.language,
                 };
             }
             if (Object.keys(restConfig).length > 0) {
-                modifiedState.nodes[props.nodeId].consumerData.restConfig = restConfig;
+                parsedModifiedState.nodes[props.nodeId].consumerData.restConfig = restConfig;
             }
             if (Object.keys(grpcConfig).length > 0) {
-                modifiedState.nodes[props.nodeId].consumerData.grpcConfig = grpcConfig;
+                parsedModifiedState.nodes[props.nodeId].consumerData.grpcConfig = grpcConfig;
             }
             if (Object.keys(wsConfig).length > 0) {
-                modifiedState.nodes[props.nodeId].consumerData.wsConfig = wsConfig;
+                parsedModifiedState.nodes[props.nodeId].consumerData.wsConfig = wsConfig;
             }
             // image to node display
             // const nodeElement = document.getElementById(props.nodeId);
             // nodeElement.style.backgroundImage = `url('${payload.url}')`;
             // update modifiedState in the localstorage
-            setModifiedState(JSON.stringify(modifiedState));
+            setModifiedState(JSON.stringify(parsedModifiedState));
             setPayload({
                 name: {
                     value: '',
