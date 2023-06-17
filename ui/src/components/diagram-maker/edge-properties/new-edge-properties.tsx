@@ -383,12 +383,21 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         });
     };
 
+    const isRestServerDisabled = () => {
+        const edgeConfig: CompageEdge = parsedCurrentConfig.edges[props.edgeId];
+        const srcNode: CompageNode = parsedModifiedState.nodes[edgeConfig?.src];
+        if (srcNode && srcNode.consumerData && srcNode.consumerData.restConfig && srcNode.consumerData.restConfig.server) {
+            return srcNode.consumerData.restConfig.server.port === "";
+        }
+        return true;
+    };
+
     const getRestServerCheck = () => {
         return <React.Fragment>
             <FormControlLabel
                 label="Rest Server"
                 control={<Checkbox
-                    size="medium" checked={payload.isRestServer}
+                    size="medium" disabled={isRestServerDisabled()} checked={payload.isRestServer}
                     onChange={handleIsRestServerChange}
                 />}
             />
@@ -432,11 +441,21 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         });
     };
 
+    const isGrpcServerDisabled = () => {
+        const edgeConfig: CompageEdge = parsedCurrentConfig.edges[props.edgeId];
+        const srcNode: CompageNode = parsedModifiedState.nodes[edgeConfig?.src];
+        if (srcNode && srcNode.consumerData && srcNode.consumerData.grpcConfig && srcNode.consumerData.grpcConfig.server) {
+            return srcNode.consumerData.grpcConfig.server.port === "";
+        }
+        return true;
+    };
+
     const getGrpcServerCheck = () => {
         return <React.Fragment>
             <FormControlLabel
                 label="Grpc Server"
                 control={<Checkbox
+                    disabled={isGrpcServerDisabled()}
                     size="medium" checked={payload.isGrpcServer}
                     onChange={handleIsGrpcServerChange}
                 />}

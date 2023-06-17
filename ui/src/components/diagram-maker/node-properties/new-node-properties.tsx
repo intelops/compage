@@ -233,7 +233,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     };
 
     const getRestServerPort = (template: string, port: string) => {
-        return isCompageTemplate(template) ? port || "8080" : "8080";
+        return isCompageTemplate(template) ? port : "8080";
     };
 
     // TODO this is a hack as there is no NODE_UPDATE action in diagram-maker. We may later update this impl when we fork diagram-maker repo.
