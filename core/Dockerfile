@@ -18,10 +18,11 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflag
 CMD ["go", "run", "main.go"]
 
 ################ Production ################
-FROM openjdk:8-jdk-alpine3.9
+FROM alpine:3.18.2
 # Create project directory (workdir)
 WORKDIR /app
 
+RUN apk update && apk add protoc && apk add openjdk8
 RUN apk update && apk add bash && apk add curl && apk add jq && apk add --update go \
     && curl https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/bin/utils/openapi-generator-cli.sh \
     > /app/openapi-generator-cli \

@@ -37,9 +37,18 @@ jobs:
           cd core
           golangci-lint run
           cd ..
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v2
+        with:
+          version: "23.x"
       - name: Test
         run: |
           cd core
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+          export GOPATH=$HOME/go
+          export GOBIN=$GOPATH/bin
+          export PATH=$PATH:$GOROOT:$GOBIN
           go test -v ./... -race -coverprofile=coverage.out -coverpkg=./... -covermode=atomic
           cd ..
       - name: Upload coverage to Codecov
