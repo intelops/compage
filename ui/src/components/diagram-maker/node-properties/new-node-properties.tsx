@@ -22,6 +22,7 @@ import {
     TableRow
 } from "@mui/material";
 import {
+    CompageJson,
     CompageNode,
     EmptyCurrentGrpcResource,
     EmptyCurrentRestResource,
@@ -101,7 +102,7 @@ const getNodeTypesConfig = (currentNodeState: CompageNode): NodeTypesConfig => {
         }
     }
     if (grpcConfig && Object.keys(grpcConfig).length > 0) {
-        if (grpcConfig.server && Object.keys(grpcConfig?.server).length > 0  && grpcConfig?.server?.port) {
+        if (grpcConfig.server && Object.keys(grpcConfig?.server).length > 0 && grpcConfig?.server?.port) {
             nodeTypesConfig.isGrpcServer = true;
             nodeTypesConfig.grpcConfig = {
                 server: grpcConfig.server
@@ -121,7 +122,7 @@ const getNodeTypesConfig = (currentNodeState: CompageNode): NodeTypesConfig => {
     }
     if (wsConfig && Object.keys(wsConfig).length > 0) {
         nodeTypesConfig.wsConfig = {template: wsConfig.template || getEmptyWsConfig().template};
-        if (wsConfig.server && Object.keys(wsConfig?.server).length > 0  && wsConfig?.server?.port) {
+        if (wsConfig.server && Object.keys(wsConfig?.server).length > 0 && wsConfig?.server?.port) {
             nodeTypesConfig.isWsServer = true;
             nodeTypesConfig.wsConfig = {
                 server: wsConfig.server
@@ -145,7 +146,7 @@ const getNodeTypesConfig = (currentNodeState: CompageNode): NodeTypesConfig => {
 export const NewNodeProperties = (props: NewNodePropertiesProps) => {
     const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
     const uploadYamlData = useAppSelector(selectUploadYamlData);
-    let parsedModifiedState = getParsedModifiedState();
+    let parsedModifiedState: CompageJson = getParsedModifiedState();
     // sometimes the parsedModifiedState is empty so, recreate it.
     if (Object.keys(parsedModifiedState.nodes).length < 1) {
         updateModifiedState(JSON.parse(getCurrentConfig()));
@@ -1130,6 +1131,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         });
     };
 
+    // eslint-disable-next-line
     const getWsServerConfig = () => {
         if (payload.isWsServer) {
             return <React.Fragment>
@@ -1149,6 +1151,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return '';
     };
 
+    // eslint-disable-next-line
     const getWsServerCheck = () => {
         return <React.Fragment>
             <FormControlLabel

@@ -2,7 +2,7 @@ import React from 'react';
 import Divider from "@mui/material/Divider";
 import {getParsedModifiedState} from "../helper/helper";
 import {
-    CompageEdge,
+    CompageEdge, CompageJson,
     CompageNode,
     getEmptyGrpcConfig,
     getEmptyRestConfig,
@@ -18,7 +18,7 @@ interface ContextEdgeProps {
 }
 
 export const ContextEdge = (props: ContextEdgeProps) => {
-    const parsedModifiedState = getParsedModifiedState();
+    const parsedModifiedState : CompageJson = getParsedModifiedState();
     const parsedCurrentConfig = JSON.parse(getCurrentConfig());
     const modifiedEdgeState: CompageEdge = parsedModifiedState.edges[props.id];
     const edgeConfig: CompageEdge = parsedCurrentConfig.edges[props.id];

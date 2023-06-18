@@ -1,14 +1,14 @@
 import React from 'react';
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
-import {CompageNode, getEmptyGrpcConfig, getEmptyRestConfig, getEmptyWsConfig} from "../models";
+import {CompageJson, CompageNode, getEmptyGrpcConfig, getEmptyRestConfig, getEmptyWsConfig} from "../models";
 
 interface ContextNodeProps {
     id: string | undefined;
 }
 
 export const ContextNode = (props: ContextNodeProps) => {
-    const parsedModifiedState = getParsedModifiedState();
+    const parsedModifiedState: CompageJson = getParsedModifiedState();
     const currentNode: CompageNode = parsedModifiedState.nodes[props.id];
     const [payload] = React.useState({
         name: currentNode?.consumerData.name !== undefined ? currentNode.consumerData.name : "",
