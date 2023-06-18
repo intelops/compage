@@ -82,7 +82,7 @@ const getNodeTypesConfig = (currentNodeState: CompageNode): NodeTypesConfig => {
     const wsConfig: WsConfig = currentNodeState?.consumerData?.wsConfig;
     const nodeTypesConfig: NodeTypesConfig = {};
     if (restConfig && Object.keys(restConfig).length > 0) {
-        if (restConfig.server && Object.keys(restConfig?.server).length > 0) {
+        if (restConfig.server && Object.keys(restConfig?.server).length > 0 && restConfig?.server?.port) {
             nodeTypesConfig.isRestServer = true;
             nodeTypesConfig.restConfig = {
                 server: restConfig.server
@@ -101,7 +101,7 @@ const getNodeTypesConfig = (currentNodeState: CompageNode): NodeTypesConfig => {
         }
     }
     if (grpcConfig && Object.keys(grpcConfig).length > 0) {
-        if (grpcConfig.server && Object.keys(grpcConfig?.server).length > 0) {
+        if (grpcConfig.server && Object.keys(grpcConfig?.server).length > 0  && grpcConfig?.server?.port) {
             nodeTypesConfig.isGrpcServer = true;
             nodeTypesConfig.grpcConfig = {
                 server: grpcConfig.server
@@ -121,7 +121,7 @@ const getNodeTypesConfig = (currentNodeState: CompageNode): NodeTypesConfig => {
     }
     if (wsConfig && Object.keys(wsConfig).length > 0) {
         nodeTypesConfig.wsConfig = {template: wsConfig.template || getEmptyWsConfig().template};
-        if (wsConfig.server && Object.keys(wsConfig?.server).length > 0) {
+        if (wsConfig.server && Object.keys(wsConfig?.server).length > 0  && wsConfig?.server?.port) {
             nodeTypesConfig.isWsServer = true;
             nodeTypesConfig.wsConfig = {
                 server: wsConfig.server
