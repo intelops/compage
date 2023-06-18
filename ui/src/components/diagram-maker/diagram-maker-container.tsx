@@ -319,6 +319,15 @@ export const DiagramMakerContainer = ({
                         }
                     }
                 };
+                const removeWsClient = (srcNode: CompageNode, destNode: CompageNode) => {
+                    if (destNode.consumerData.wsConfig && destNode.consumerData.wsConfig.clients) {
+                        for (let i = 0; i < destNode.consumerData.wsConfig.clients.length; i++) {
+                            if (destNode.consumerData.wsConfig.clients[i].sourceNodeId === srcNode.id) {
+                                destNode.consumerData.wsConfig.clients.splice(i--, 1);
+                            }
+                        }
+                    }
+                };
 
                 // onAction(action);
                 if (actionInterceptor) {
@@ -363,6 +372,7 @@ export const DiagramMakerContainer = ({
                                         if (destNodeState) {
                                             removeGrpcClient(srcNodeConfig, destNodeState);
                                             removeRestClient(srcNodeConfig, destNodeState);
+                                            // removeWsClient(srcNodeConfig, destNodeState)
                                         }
                                     }
                                 }
