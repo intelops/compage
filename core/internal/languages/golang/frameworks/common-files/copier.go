@@ -1,11 +1,14 @@
 package commonfiles
 
 import (
+	"fmt"
 	"github.com/gertd/go-pluralize"
-	"github.com/intelops/compage/core/internal/core/node"
-	"github.com/intelops/compage/core/internal/languages"
+	corenode "github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages/executor"
+	commonUtils "github.com/intelops/compage/core/internal/languages/utils"
 	"github.com/intelops/compage/core/internal/utils"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"strings"
 )
 
@@ -22,26 +25,39 @@ type Copier struct {
 	TemplatesRootPath string
 	Data              map[string]interface{}
 	IsGrpcServer      bool
-	IsGrpcClient      bool
+	HasGrpcClients    bool
 	GrpcServerPort    string
 	IsRestServer      bool
-	IsRestClient      bool
+	HasRestClients    bool
 	RestServerPort    string
-	RestResources     []node.Resource
-	GrpcResources     []node.Resource
-	RestClients       []languages.GrpcClient
-	GrpcClients       []languages.GrpcClient
+	RestResources     []*corenode.Resource
+	GrpcResources     []*corenode.Resource
+	RestClients       []*corenode.RestClient
+	GrpcClients       []*corenode.GrpcClient
 	PluralizeClient   *pluralize.Client
 }
 
-type resourceData struct {
+type restResourceData struct {
+	SmallResourceNameSingular string
+	SmallResourceNamePlural   string
+	CapsResourceNameSingular  string
+	CapsResourceNamePlural    string
+	ResourcePostBody          string
+	ResourcePutBody           string
+}
+
+type grpcResourceData struct {
 	SmallResourceNameSingular string
 	SmallResourceNamePlural   string
 	CapsResourceNameSingular  string
 	CapsResourceNamePlural    string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isGrpcServer bool, grpcServerPort string, isRestSQLDB bool, restSQLDB string, isGrpcSQLDB bool, grpcSQLDB string, restResources []node.Resource, grpcResources []node.Resource, restClients []languages.RestClient, grpcClients []languages.GrpcClient) *Copier {
+type clientData struct {
+	SourceNodeID string
+}
+
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isGrpcServer bool, grpcServerPort string, isRestSQLDB bool, restSQLDB string, isGrpcSQLDB bool, grpcSQLDB string, restResources []*corenode.Resource, grpcResources []*corenode.Resource, restClients []*corenode.RestClient, grpcClients []*corenode.GrpcClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
 
@@ -52,9 +68,9 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 		"UserName":       userName,
 	}
 	// set all grpcResources for main.go.tmpl
-	var grpcResourcesData []resourceData
+	var grpcResourcesData []grpcResourceData
 	for _, r := range grpcResources {
-		grpcResourcesData = append(grpcResourcesData, resourceData{
+		grpcResourcesData = append(grpcResourcesData, grpcResourceData{
 			SmallResourceNameSingular: strings.ToLower(r.Name),
 			SmallResourceNamePlural:   pluralizeClient.Plural(strings.ToLower(r.Name)),
 			CapsResourceNameSingular:  r.Name,
@@ -65,25 +81,35 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	data["GrpcServerPort"] = grpcServerPort
 	data["IsGrpcServer"] = isGrpcServer
 	// if grpcClients slice has elements
-	isGrpcClient := len(grpcClients) > 0
-	data["IsGrpcClient"] = isGrpcClient
+	HasGrpcClients := len(grpcClients) > 0
+	data["HasGrpcClients"] = HasGrpcClients
 
 	// set all grpcResources for main.go.tmpl
-	var restResourcesData []resourceData
+	var restResourcesData []restResourceData
 	for _, r := range restResources {
-		restResourcesData = append(restResourcesData, resourceData{
+		restResourcesData = append(restResourcesData, restResourceData{
 			SmallResourceNameSingular: strings.ToLower(r.Name),
 			SmallResourceNamePlural:   pluralizeClient.Plural(strings.ToLower(r.Name)),
 			CapsResourceNameSingular:  r.Name,
 			CapsResourceNamePlural:    pluralizeClient.Plural(r.Name),
+			ResourcePostBody:          getResourcePostBody(r),
+			ResourcePutBody:           getResourcePutBody(r),
 		})
 	}
 	data["RestResources"] = restResourcesData
 	data["RestServerPort"] = restServerPort
 	data["IsRestServer"] = isRestServer
 	// if restClients slice has elements
-	isRestClient := len(restClients) > 0
-	data["IsRestClient"] = isRestClient
+	hasRestClients := len(restClients) > 0
+	data["HasRestClients"] = hasRestClients
+	data["HasRestClients"] = hasRestClients
+	if hasRestClients {
+		var d []clientData
+		for _, restClient := range restClients {
+			d = append(d, clientData{SourceNodeID: strings.Replace(cases.Title(language.Und, cases.NoLower).String(restClient.SourceNodeID), "-", "", -1)})
+		}
+		data["RestClients"] = d
+	}
 
 	data["IsRestSQLDB"] = isRestSQLDB
 	if isRestSQLDB {
@@ -100,16 +126,38 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 		NodeDirectoryName: nodeDirectoryName,
 		Data:              data,
 		IsGrpcServer:      isGrpcServer,
-		IsGrpcClient:      isGrpcClient,
+		HasGrpcClients:    HasGrpcClients,
 		GrpcServerPort:    grpcServerPort,
 		RestServerPort:    restServerPort,
 		IsRestServer:      isRestServer,
-		IsRestClient:      isRestClient,
+		HasRestClients:    hasRestClients,
 		GrpcResources:     grpcResources,
 		GrpcClients:       grpcClients,
 		RestResources:     restResources,
 		PluralizeClient:   pluralizeClient,
 	}
+}
+
+func getResourcePostBody(r *corenode.Resource) string {
+	postBody := "{"
+	for key, value := range r.Fields {
+		sprintf := fmt.Sprintf("\"%s\": \"%v\",", key, commonUtils.GetDefaultValueForDataType(value))
+		postBody += sprintf
+	}
+	postBody = strings.TrimSuffix(postBody, ",")
+	postBody += "}"
+	return postBody
+}
+
+func getResourcePutBody(r *corenode.Resource) string {
+	putBody := fmt.Sprintf("{\"%s\": %v,", "Id", 123)
+	for key, value := range r.Fields {
+		sprintf := fmt.Sprintf("\"%s\": \"%v\",", key, commonUtils.GetDefaultValueForDataType(value))
+		putBody += sprintf
+	}
+	putBody = strings.TrimSuffix(putBody, ",")
+	putBody += "}"
+	return putBody
 }
 
 // CreateCommonFiles creates/copies relevant files to generated project

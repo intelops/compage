@@ -3,7 +3,7 @@ package languages
 import (
 	"fmt"
 	"github.com/intelops/compage/core/internal/core"
-	"github.com/intelops/compage/core/internal/core/node"
+	corenode "github.com/intelops/compage/core/internal/core/node"
 )
 
 const Go = "go"
@@ -22,103 +22,13 @@ type LanguageNode struct {
 	Annotations map[string]string      `json:"annotations,omitempty"`
 	Language    string                 `json:"language"`
 
-	RestConfig *RestConfig `json:"restConfig"`
-	GrpcConfig *GrpcConfig `json:"grpcConfig"`
-	WsConfig   *WsConfig   `json:"wsConfig"`
-	DBConfig   *DBConfig   `json:"dbConfig"`
+	RestConfig *corenode.RestConfig `json:"restConfig"`
+	GrpcConfig *corenode.GrpcConfig `json:"grpcConfig"`
+	WsConfig   *corenode.WsConfig   `json:"wsConfig"`
 }
-
-// RestServer holds information about the node's REST server.
-type RestServer struct {
-	Template  string          `json:"template"`
-	Framework string          `json:"framework"`
-	Port      string          `json:"port"`
-	SQLDB     string          `json:"sqlDb"`
-	Resources []node.Resource `json:"resources"`
-	// OpenAPIFileYamlContent holds openAPIFileYamlContent
-	OpenAPIFileYamlContent string `json:"openAPIFileYamlContent,omitempty"`
-}
-
-// RestClient holds information about edge between nodeA and nodeB.
-type RestClient struct {
-	Port         string `json:"port"`
-	Template     string `json:"template"`
-	Framework    string `json:"framework"`
-	ExternalNode string `json:"externalNode"`
-	// OpenAPIFileYamlContent holds openAPIFileYamlContent
-	OpenAPIFileYamlContent string `json:"openAPIFileYamlContent,omitempty"`
-}
-
-// GrpcServer holds information about the node's grpc server.
-type GrpcServer struct {
-	Port      string          `json:"port"`
-	Template  string          `json:"template"`
-	SQLDB     string          `json:"sqlDb"`
-	Framework string          `json:"framework"`
-	Resources []node.Resource `json:"resources"`
-	// ProtoFileContent holds protoFileContent
-	ProtoFileContent string `json:"protoFileContent,omitempty"`
-}
-
-// GrpcClient holds information about edge between nodeA and nodeB.
-type GrpcClient struct {
-	Port         string `json:"port"`
-	Template     string `json:"template"`
-	Framework    string `json:"framework"`
-	ExternalNode string `json:"externalNode"`
-	// ProtoFileContent holds protoFileContent
-	ProtoFileContent string `json:"protoFileContent,omitempty"`
-}
-
-// WsServer holds information about the node's ws server.
-type WsServer struct {
-	Port      string          `json:"port"`
-	Framework string          `json:"framework"`
-	Resources []node.Resource `json:"resources"`
-}
-
-// WsClient holds information about edge between nodeA and nodeB.
-type WsClient struct {
-	Port         string `json:"port"`
-	Framework    string `json:"framework"`
-	ExternalNode string `json:"externalNode"`
-}
-
-// RestConfig rest configs
-type RestConfig struct {
-	Server  *RestServer  `json:"server"`
-	Clients []RestClient `json:"clients"`
-}
-
-// GrpcConfig grpc configs
-type GrpcConfig struct {
-	Server  *GrpcServer  `json:"server"`
-	Clients []GrpcClient `json:"clients"`
-}
-
-// WsConfig ws configs
-type WsConfig struct {
-	Server  *WsServer  `json:"server"`
-	Clients []WsClient `json:"clients"`
-}
-
-// DBConfig holds information about db for a node
-type DBConfig struct {
-	Framework string          `json:"framework"`
-	Port      string          `json:"port"`
-	Address   string          `json:"address"`
-	Type      string          `json:"type"`
-	Resources []node.Resource `json:"resources"`
-}
-
-// Clients all clients - generic (REST/GRPC/WS)
-type Clients map[string]interface{}
-
-// Servers all servers - generic (REST/GRPC/WS)
-type Servers map[string]interface{}
 
 // NewLanguageNode converts node to LanguageNode struct
-func NewLanguageNode(compageJSON *core.CompageJSON, node *node.Node) (*LanguageNode, error) {
+func NewLanguageNode(compageJSON *core.CompageJSON, node *corenode.Node) (*LanguageNode, error) {
 	languageNode := &LanguageNode{
 		ID:          node.ID,
 		Name:        node.ConsumerData.Name,
@@ -127,173 +37,123 @@ func NewLanguageNode(compageJSON *core.CompageJSON, node *node.Node) (*LanguageN
 		Language:    node.ConsumerData.Language,
 	}
 
-	servers, err := GetServersForNode(node)
-	if err != nil {
-		return nil, err
+	if node.ConsumerData.RestConfig != nil {
+		languageNode.RestConfig = &corenode.RestConfig{}
+		languageNode.RestConfig.Template = node.ConsumerData.RestConfig.Template
+		languageNode.RestConfig.Framework = node.ConsumerData.RestConfig.Framework
+	}
+	if node.ConsumerData.GrpcConfig != nil {
+		languageNode.GrpcConfig = &corenode.GrpcConfig{}
+		languageNode.GrpcConfig.Template = node.ConsumerData.GrpcConfig.Template
+		languageNode.GrpcConfig.Framework = node.ConsumerData.GrpcConfig.Framework
+	}
+	if node.ConsumerData.WsConfig != nil {
+		languageNode.WsConfig = &corenode.WsConfig{}
+		languageNode.WsConfig.Template = node.ConsumerData.WsConfig.Template
+		languageNode.WsConfig.Framework = node.ConsumerData.WsConfig.Framework
+	}
+
+	// REST server should have port and if port is nil, that means the node is not server, but it's a client.
+	if node.ConsumerData.RestConfig != nil && node.ConsumerData.RestConfig.Server != nil && node.ConsumerData.RestConfig.Server.Port != "" {
+		// one node, one rest server
+		languageNode.RestConfig.Server = node.ConsumerData.RestConfig.Server
+	}
+
+	// REST clients should have client's array not nil.
+	if node.ConsumerData.RestConfig != nil && node.ConsumerData.RestConfig.Clients != nil {
+		languageNode.RestConfig.Clients = node.ConsumerData.RestConfig.Clients
+	}
+
+	// gRPC server should have port and if port is nil, that means the node is not server, but it's a client.
+	if node.ConsumerData.GrpcConfig != nil && node.ConsumerData.GrpcConfig.Server != nil && node.ConsumerData.GrpcConfig.Server.Port != "" {
+		// one node, one grpc server
+		languageNode.GrpcConfig.Server = node.ConsumerData.GrpcConfig.Server
+	}
+
+	// gRPC clients should have client's array not nil.
+	if node.ConsumerData.GrpcConfig != nil && node.ConsumerData.GrpcConfig.Clients != nil {
+		languageNode.GrpcConfig.Clients = node.ConsumerData.GrpcConfig.Clients
+	}
+
+	// WS server should have port and if port is nil, that means the node is not server, but it's a client.
+	if node.ConsumerData.WsConfig != nil && node.ConsumerData.WsConfig.Server != nil && node.ConsumerData.WsConfig.Server.Port != "" {
+		// one node, one ws server
+		languageNode.WsConfig.Server = node.ConsumerData.WsConfig.Server
+	}
+
+	// Ws clients should have client's array not nil.
+	if node.ConsumerData.WsConfig != nil && node.ConsumerData.WsConfig.Clients != nil {
+		languageNode.WsConfig.Clients = node.ConsumerData.WsConfig.Clients
 	}
 
 	// Retrieves clients for node to other servers(other nodes). This is required for custom template plus the cli/frameworks plan for next release
-	clients, err := GetClientsForNode(compageJSON, node)
-	if err != nil {
+	if err := PopulateClientsForNode(compageJSON, node); err != nil {
 		return nil, err
 	}
-
-	// check if the servers has rest entry (if node is not server or node is not REST server)
-	if restServer, ok := (*servers)[core.Rest]; ok {
-		// one node, one rest server
-		languageNode.RestConfig = &RestConfig{
-			Server: restServer.(*RestServer),
-		}
-	}
-
-	// check if any rest client needs to be created
-	if restClients, ok := (*clients)[core.Rest]; ok {
-		// if the component is just client and not server, languageNode.RestConfig will be nil in that case.
-		if languageNode.RestConfig == nil {
-			languageNode.RestConfig = &RestConfig{
-				Clients: restClients.([]RestClient),
-			}
-		} else {
-			languageNode.RestConfig.Clients = restClients.([]RestClient)
-		}
-	}
-
-	// check if the servers has grpc entry (if node is not server or node is not GRPC server)
-	if grpcServer, ok := (*servers)[core.Grpc]; ok {
-		// one node, one rest server
-		languageNode.GrpcConfig = &GrpcConfig{
-			Server: grpcServer.(*GrpcServer),
-		}
-	}
-
-	// check if any grpc client needs to be created
-	if grpcClients, ok := (*clients)[core.Grpc]; ok {
-		// if the component is just client and not server, languageNode.RestConfig will be nil in that case.
-		if languageNode.GrpcConfig == nil {
-			languageNode.GrpcConfig = &GrpcConfig{
-				Clients: grpcClients.([]GrpcClient),
-			}
-		} else {
-			languageNode.GrpcConfig.Clients = grpcClients.([]GrpcClient)
-		}
-	}
-
 	return languageNode, nil
 }
 
-// GetServersForNode retrieves all servers for given node
-func GetServersForNode(nodeP *node.Node) (*Servers, error) {
-	servers := &Servers{}
-	// check if the node is REST server
-	if nodeP.ConsumerData.RestServerConfig != nil {
-		// retrieve Rest server config and store in below variable
-		restServer := &RestServer{
-			Template:  nodeP.ConsumerData.RestServerConfig.Template,
-			Framework: nodeP.ConsumerData.RestServerConfig.Framework,
-			Port:      nodeP.ConsumerData.RestServerConfig.Port,
-			SQLDB:     nodeP.ConsumerData.RestServerConfig.SQLDB,
-		}
-		// set resources or openAPIFileYamlContent based on availability.
-		if nodeP.ConsumerData.RestServerConfig.Resources != nil && len(nodeP.ConsumerData.RestServerConfig.Resources) > 0 {
-			restServer.Resources = nodeP.ConsumerData.RestServerConfig.Resources
-		} else if len(nodeP.ConsumerData.RestServerConfig.OpenAPIFileYamlContent) > 0 {
-			restServer.OpenAPIFileYamlContent = nodeP.ConsumerData.RestServerConfig.OpenAPIFileYamlContent
-		}
-		(*servers)[core.Rest] = restServer
-	}
-	if nodeP.ConsumerData.GrpcServerConfig != nil { //nolint:golint,staticcheck
-		// retrieve grpc server config and store in below variable
-		grpcServer := &GrpcServer{
-			Template:  nodeP.ConsumerData.GrpcServerConfig.Template,
-			Framework: nodeP.ConsumerData.GrpcServerConfig.Framework,
-			Port:      nodeP.ConsumerData.GrpcServerConfig.Port,
-			SQLDB:     nodeP.ConsumerData.GrpcServerConfig.SQLDB,
-		}
-		// set resources or openAPIFileYamlContent based on availability.
-		if nodeP.ConsumerData.GrpcServerConfig.Resources != nil && len(nodeP.ConsumerData.GrpcServerConfig.Resources) > 0 {
-			grpcServer.Resources = nodeP.ConsumerData.GrpcServerConfig.Resources
-		} else if len(nodeP.ConsumerData.GrpcServerConfig.ProtoFileContent) > 0 {
-			grpcServer.ProtoFileContent = nodeP.ConsumerData.GrpcServerConfig.ProtoFileContent
-		}
-		(*servers)[core.Grpc] = grpcServer
-	}
-	if nodeP.ConsumerData.WsServerConfig != nil { //nolint:golint,staticcheck
-		// catch Ws server details here
-		// TODO
-	}
-	// empty servers as no server config received in compageJSON.
-	return servers, nil
-}
-
-// GetClientsForNode retrieves all clients for given node
-func GetClientsForNode(compageJSON *core.CompageJSON, nodeP *node.Node) (*Clients, error) {
-	var restClients []RestClient
-	var grpcClients []GrpcClient
-	var wsClients []WsClient
-
-	for _, e := range compageJSON.Edges {
-		// if the current node is in dest field of edge, it means it's a client to node in src field of edge.
-		if e.Dest == nodeP.ID {
-			if e.ConsumerData.RestClientConfig != nil {
-				// extract information from edge's source node.
-				openAPIFileYamlContent, framework, template := getOpenAPIFileYamlContentAndFrameworkAndTemplateFromNodeForEdge(e.Src, compageJSON.Nodes)
-				restClients = append(restClients, RestClient{
-					Port:                   e.ConsumerData.RestClientConfig.Port,
-					ExternalNode:           e.ConsumerData.ExternalNode,
-					Framework:              framework,
-					OpenAPIFileYamlContent: openAPIFileYamlContent,
-					Template:               template,
-				})
-			}
-			if e.ConsumerData.GrpcClientConfig != nil {
-				protoFileContent, framework := getProtoFileContentAndFrameworkFromNodeForEdge(e.Src, compageJSON.Nodes)
-				grpcClients = append(grpcClients, GrpcClient{
-					Port:             e.ConsumerData.GrpcClientConfig.Port,
-					ExternalNode:     e.ConsumerData.ExternalNode,
-					Framework:        framework,
-					ProtoFileContent: protoFileContent,
-				})
-			}
-			if e.ConsumerData.WsClientConfig != nil {
-				//wsClients = append(wsClients, WsClient{
-				//	Port:         e.ConsumerData.RestClientConfig.Port,
-				//	ExternalNode: e.ConsumerData.ExternalNode,
-				//})
-				return nil, fmt.Errorf("unsupported clientProtocol %s for language : %s",
-					"ws", nodeP.ConsumerData.Language)
+// PopulateClientsForNode retrieves all clients for given node
+func PopulateClientsForNode(compageJSON *core.CompageJSON, nodeP *corenode.Node) error {
+	// REST Clients
+	if nodeP.ConsumerData.RestConfig != nil && nodeP.ConsumerData.RestConfig.Clients != nil {
+		// iterate over the rest clients
+		for _, client := range nodeP.ConsumerData.RestConfig.Clients {
+			// process client, iterate over the nodes and retrieve other details from source node.
+			for _, currentNode := range compageJSON.Nodes {
+				if client.SourceNodeID == currentNode.ID {
+					client.OpenAPIFileYamlContent = currentNode.ConsumerData.RestConfig.Server.OpenAPIFileYamlContent
+					client.Resources = currentNode.ConsumerData.RestConfig.Server.Resources
+					break
+				}
 			}
 		}
 	}
-	clients := &Clients{}
-	// if there are any rest clients return them
-	if len(restClients) > 0 {
-		(*clients)[core.Rest] = restClients
+	// gRPC Clients
+	if nodeP.ConsumerData.GrpcConfig != nil && nodeP.ConsumerData.GrpcConfig.Clients != nil {
+		// iterate over the grpc clients
+		for _, client := range nodeP.ConsumerData.GrpcConfig.Clients {
+			// process client, iterate over the nodes and retrieve other details from source node.
+			for _, currentNode := range compageJSON.Nodes {
+				if client.SourceNodeID == currentNode.ID {
+					client.ProtoFileContent = currentNode.ConsumerData.GrpcConfig.Server.ProtoFileContent
+					client.Resources = currentNode.ConsumerData.GrpcConfig.Server.Resources
+					break
+				}
+			}
+		}
+	} // WS Clients
+	if nodeP.ConsumerData.WsConfig != nil && nodeP.ConsumerData.WsConfig.Clients != nil {
+		// iterate over the ws clients
+		for _, client := range nodeP.ConsumerData.WsConfig.Clients {
+			// process client, iterate over the nodes and retrieve other details from source node.
+			for _, currentNode := range compageJSON.Nodes {
+				if client.SourceNodeID == currentNode.ID {
+					client.Resources = currentNode.ConsumerData.WsConfig.Server.Resources
+					break
+				}
+			}
+		}
+		return fmt.Errorf("unsupported clientProtocol %s for language : %s",
+			"ws", nodeP.ConsumerData.Language)
 	}
-	// if there are any grpc clients return them
-	if len(grpcClients) > 0 {
-		(*clients)[core.Grpc] = grpcClients
-	}
-	// if there are any ws clients return them
-	if len(wsClients) > 0 {
-		(*clients)[core.Ws] = wsClients
-	}
-	return clients, nil
+	return nil
 }
 
 //nolint:golint,unused
-func getProtoFileContentAndFrameworkFromNodeForEdge(src string, nodes []*node.Node) (string, string) {
+func getProtoFileContentAndFrameworkFromNodeForEdge(src string, nodes []*corenode.Node) (string, string) {
 	for _, n := range nodes {
 		if src == n.ID {
-			return n.ConsumerData.GrpcServerConfig.ProtoFileContent, n.ConsumerData.GrpcServerConfig.Framework
+			return n.ConsumerData.GrpcConfig.Server.ProtoFileContent, n.ConsumerData.GrpcConfig.Framework
 		}
 	}
 	return "", ""
 }
 
-func getOpenAPIFileYamlContentAndFrameworkAndTemplateFromNodeForEdge(src string, nodes []*node.Node) (string, string, string) {
+func GetOpenAPIFileYamlContentAndFrameworkAndTemplateFromNodeForEdge(src string, nodes []*corenode.Node) (string, string, string) {
 	for _, n := range nodes {
 		if src == n.ID {
-			return n.ConsumerData.RestServerConfig.OpenAPIFileYamlContent, n.ConsumerData.RestServerConfig.Framework, n.ConsumerData.RestServerConfig.Template
+			return n.ConsumerData.RestConfig.Server.OpenAPIFileYamlContent, n.ConsumerData.RestConfig.Framework, n.ConsumerData.RestConfig.Template
 		}
 	}
 	return "", "", ""

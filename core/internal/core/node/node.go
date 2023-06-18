@@ -1,4 +1,4 @@
-package node
+package corenode
 
 // Node depicts a separate repository
 type Node struct {
@@ -13,42 +13,84 @@ type ConsumerData struct {
 	Language string `json:"language"`
 	// Name of component (required, this will be service and deployment name).
 	Name string `json:"name"`
-	// RestServerConfig holds all config related to REST server. If nil, it means that the node is not REST server.
-	RestServerConfig *RestServerConfig `json:"restServerConfig,omitempty"`
-	// GrpcServerConfig holds all config related to gRPC server. If nil, it means that the node is not gRPC server.
-	GrpcServerConfig *GrpcServerConfig `json:"grpcServerConfig,omitempty"`
-	// WsServerConfig holds all config related to ws server. If nil, it means that the node is not ws server.
-	WsServerConfig *WsServerConfig `json:"wsServerConfig,omitempty"`
+	// RestConfig holds all config related to REST. If nil, it means that the node is not REST server or has REST clients.
+	RestConfig *RestConfig `json:"restConfig,omitempty"`
+	// GrpcConfig holds all config related to gRPC. If nil, it means that the node is not gRPC server or has gRPC clients.
+	GrpcConfig *GrpcConfig `json:"grpcConfig,omitempty"`
+	// WsConfig holds all config related to ws. If nil, it means that the node is not ws server or has WS clients.
+	WsConfig *WsConfig `json:"wsConfig,omitempty"`
 	// Metadata holds misc information about the node.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Annotations holds annotations for the node.
 	Annotations map[string]string `json:"annotations,omitempty"`
 }
 
-type RestServerConfig struct {
-	Template  string     `json:"template"`
-	Port      string     `json:"port"`
-	Framework string     `json:"framework"`
-	SQLDB     string     `json:"sqlDb"`
-	Resources []Resource `json:"resources"`
+type RestServer struct {
+	Port      string      `json:"port"`
+	SQLDB     string      `json:"sqlDb"`
+	Resources []*Resource `json:"resources"`
 	// OpenAPIFileYamlContent holds openAPIFileYamlContent
 	OpenAPIFileYamlContent string `json:"openAPIFileYamlContent,omitempty"`
 }
 
-type GrpcServerConfig struct {
-	Port      string     `json:"port"`
-	Template  string     `json:"template"`
-	SQLDB     string     `json:"sqlDb"`
-	Framework string     `json:"framework"`
-	Resources []Resource `json:"resources"`
+type RestClient struct {
+	SourceNodeName string `json:"sourceNodeName"`
+	SourceNodeID   string `json:"sourceNodeId"`
+	Port           string `json:"port"`
+	// below two keys are populated in language node and are used to create server's clients.
+	Resources              []*Resource `json:"resources"`
+	OpenAPIFileYamlContent string      `json:"openAPIFileYamlContent,omitempty"`
+}
+
+type RestConfig struct {
+	Template  string        `json:"template"`
+	Framework string        `json:"framework"`
+	Server    *RestServer   `json:"server"`
+	Clients   []*RestClient `json:"clients"`
+}
+
+type GrpcServer struct {
+	Port      string      `json:"port"`
+	SQLDB     string      `json:"sqlDb"`
+	Resources []*Resource `json:"resources"`
 	// ProtoFileContent holds protoFileContent
 	ProtoFileContent string `json:"protoFileContent,omitempty"`
 }
 
-type WsServerConfig struct {
+type GrpcClient struct {
+	SourceNodeName string `json:"sourceNodeName"`
+	SourceNodeID   string `json:"sourceNodeId"`
+	Port           string `json:"port"`
+	// below two keys are populated in language node and are used to create server's clients.
+	Resources        []*Resource `json:"resources"`
+	ProtoFileContent string      `json:"protoFileContent,omitempty"`
+}
+
+type GrpcConfig struct {
+	Template  string        `json:"template"`
+	Framework string        `json:"framework"`
+	Server    *GrpcServer   `json:"server"`
+	Clients   []*GrpcClient `json:"clients"`
+}
+
+type WsServer struct {
 	Port      string     `json:"port"`
-	Framework string     `json:"framework"`
 	Resources []Resource `json:"resources"`
+}
+
+type WsClient struct {
+	SourceNodeName string `json:"sourceNodeName"`
+	SourceNodeID   string `json:"sourceNodeId"`
+	Port           string `json:"port"`
+	// below two keys are populated in language node and are used to create server's clients.
+	Resources []Resource `json:"resources"`
+}
+
+type WsConfig struct {
+	Template  string      `json:"template"`
+	Framework string      `json:"framework"`
+	Server    *WsServer   `json:"server"`
+	Clients   []*WsClient `json:"clients"`
 }
 
 // Resource depicts the endpoints(e.g. /users, /accounts)

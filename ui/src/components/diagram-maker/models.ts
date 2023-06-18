@@ -1,39 +1,68 @@
+import {COMPAGE, GO_GIN_SERVER, GO_GRPC_SERVER} from "./node-properties/utils";
+
 export interface Resource {
     name: string;
     // the below map can contain metadata about the field.
     fields?: Map<string, Map<string, string>>;
 }
 
-export interface RestServerConfig {
-    template: string;
-    port: string;
+export interface RestConfig {
+    template?: string;
     framework?: string;
-    sqlDb?: string;
-    resources?: Resource[];
-    openApiFileYamlContent?: string;
+    server?: {
+        port?: string;
+        sqlDb?: string;
+        resources?: Resource[];
+        openApiFileYamlContent?: string;
+    };
+    clients?: RestClient[];
 }
 
-export interface GrpcServerConfig {
+export interface RestClient {
+    sourceNodeName: string;
+    sourceNodeId: string;
     port: string;
-    template: string;
-    sqlDb?: string;
-    framework?: string;
-    resources?: Resource[];
-    protoFileContent?: string;
 }
 
-export interface WsServerConfig {
-    port: string;
+export interface GrpcConfig {
+    template?: string;
     framework?: string;
-    resources?: Resource[];
+    server?: {
+        port?: string;
+        sqlDb?: string;
+        resources?: Resource[];
+        protoFileContent?: string;
+    };
+    clients?: GrpcClient[];
+}
+
+export interface GrpcClient {
+    sourceNodeName: string;
+    sourceNodeId: string;
+    port: string;
+}
+
+export interface WsConfig {
+    template?: string;
+    framework?: string;
+    server?: {
+        port?: string;
+        resources?: Resource[];
+    };
+    clients?: WsClient[];
+}
+
+export interface WsClient {
+    sourceNodeName: string;
+    sourceNodeId: string;
+    port: string;
 }
 
 export interface NodeConsumerData {
     name: string;
-    template: string;
-    restServerConfig?: RestServerConfig;
-    grpcServerConfig?: GrpcServerConfig;
-    wsServerConfig?: WsServerConfig;
+    restConfig?: RestConfig;
+    grpcConfig?: GrpcConfig;
+    wsConfig?: WsConfig;
     language: string;
     metadata: Map<string, string>;
     annotations: Map<string, string>;
@@ -45,24 +74,8 @@ export interface CompageNode {
     consumerData: NodeConsumerData;
 }
 
-export interface RestClientConfig {
-    port: string;
-}
-
-export interface GrpcClientConfig {
-    port: string;
-}
-
-export interface WsClientConfig {
-    port: string;
-}
-
 export interface EdgeConsumerData {
     name: string;
-    externalNode: string;
-    restClientConfig: RestClientConfig;
-    grpcClientConfig: GrpcClientConfig;
-    wsClientConfig: WsClientConfig;
     metadata: Map<string, string>;
     annotations: Map<string, string>;
 }
@@ -81,28 +94,48 @@ export interface CompageJson {
 }
 
 // empty interfaces
-export const EmptyRestServerConfig: RestServerConfig = {
-    template: "",
-    resources: [],
-    port: "",
-    framework: "",
-    sqlDb: "",
-    openApiFileYamlContent: ""
+export const getEmptyRestConfig = () => {
+    const emptyRestConfig: RestConfig = {
+        template: COMPAGE,
+        framework: GO_GIN_SERVER,
+        server: {
+            resources: [],
+            port: "",
+            sqlDb: "",
+            openApiFileYamlContent: ""
+        },
+        clients: []
+    };
+    return emptyRestConfig;
 };
 
-export const EmptyGrpcServerConfig: GrpcServerConfig = {
-    resources: [],
-    port: "",
-    template: "",
-    sqlDb: "",
-    framework: "",
-    protoFileContent: ""
+export const getEmptyGrpcConfig = () => {
+    const emptyGrpcConfig: GrpcConfig = {
+        template: COMPAGE,
+        framework: GO_GRPC_SERVER,
+        server: {
+            resources: [],
+            port: "",
+            sqlDb: "",
+            protoFileContent: ""
+        },
+        clients: []
+    };
+    return emptyGrpcConfig;
 };
 
-export const EmptyWsServerConfig: WsServerConfig = {
-    resources: [],
-    port: "",
-    framework: "",
+export const getEmptyWsConfig = () => {
+    const emptyWsConfig: WsConfig = {
+        template: COMPAGE,
+        // TODO add default framework here later when support for ws is added.
+        framework: "",
+        server: {
+            resources: [],
+            port: "",
+        },
+        clients: []
+    };
+    return emptyWsConfig;
 };
 
 export const EmptyCurrentRestResource: Resource = {

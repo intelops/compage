@@ -2,6 +2,11 @@
 export const COMPAGE = "compage";
 export const OPENAPI = "openAPI";
 
+
+// go frameworks
+export const GO_GIN_SERVER = "go-gin-server";
+export const GO_GRPC_SERVER = "go-grpc-server";
+
 // languages
 export const GO = "go";
 export const JAVASCRIPT = "javascript";
@@ -14,12 +19,12 @@ export const LANGUAGES = [GO, JAVA, JAVASCRIPT, RUST, RUBY, PYTHON /*,TYPESCRIPT
 
 // compage template frameworks supported.
 export const COMPAGE_LANGUAGE_FRAMEWORKS = {
-    [GO]: ["go-gin-server"],
+    [GO]: [GO_GIN_SERVER],
 };
 
 // compage template frameworks supported.
 export const COMPAGE_LANGUAGE_GRPC_FRAMEWORKS = {
-    [GO]: ["go-grpc-server"],
+    [GO]: [GO_GRPC_SERVER],
 };
 
 // compage template sql_dbs supported.
@@ -29,7 +34,7 @@ export const COMPAGE_LANGUAGE_SQL_DBS = {
 
 // openapi template frameworks supported.
 export const OPENAPI_LANGUAGE_FRAMEWORKS = {
-    [GO]: ["go-server", "go-gin-server", "go-echo-server"],
+    [GO]: ["go-server", GO_GIN_SERVER, "go-echo-server"],
     [JAVASCRIPT]: ["nodejs-express-server"],
     // [TYPESCRIPT]: ["typescript-node", "typescript-axios"],
     [JAVA]: [/*"java-play-framework", */"java-micronaut-server", "java-undertow-server", "spring"],

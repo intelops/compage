@@ -4,8 +4,7 @@ import (
 	"errors"
 	"github.com/gertd/go-pluralize"
 	"github.com/iancoleman/strcase"
-	"github.com/intelops/compage/core/internal/core/node"
-	"github.com/intelops/compage/core/internal/languages"
+	corenode "github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages/executor"
 	commonUtils "github.com/intelops/compage/core/internal/languages/utils"
 	"github.com/intelops/compage/core/internal/utils"
@@ -52,12 +51,12 @@ type Copier struct {
 	TemplatesRootPath string
 	Data              map[string]interface{}
 	IsGrpcServer      bool
-	IsGrpcClient      bool
+	HasGrpcClients    bool
 	SQLDB             string
 	IsSQLDB           bool
 	GrpcServerPort    string
-	Resources         []node.Resource
-	GrpcClients       []languages.GrpcClient
+	Resources         []*corenode.Resource
+	GrpcClients       []*corenode.GrpcClient
 	PluralizeClient   *pluralize.Client
 }
 
@@ -70,7 +69,7 @@ type resourceData struct {
 	CapsResourceNamePlural             string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isGrpcServer bool, grpcServerPort string, isSQLDB bool, sqlDB string, resources []node.Resource, grpcClients []languages.GrpcClient) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isGrpcServer bool, grpcServerPort string, isSQLDB bool, sqlDB string, resources []*corenode.Resource, grpcClients []*corenode.GrpcClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
 
@@ -101,15 +100,15 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 		data["IsGrpcServer"] = isGrpcServer
 	}
 	// if grpcClients slice has elements
-	isGrpcClient := len(grpcClients) > 0
-	data["IsGrpcClient"] = isGrpcClient
+	hasGrpcClients := len(grpcClients) > 0
+	data["HasGrpcClients"] = hasGrpcClients
 
 	return &Copier{
 		TemplatesRootPath: templatesRootPath,
 		NodeDirectoryName: nodeDirectoryName,
 		Data:              data,
 		IsGrpcServer:      isGrpcServer,
-		IsGrpcClient:      isGrpcClient,
+		HasGrpcClients:    hasGrpcClients,
 		SQLDB:             sqlDB,
 		IsSQLDB:           isSQLDB,
 		Resources:         resources,
@@ -168,7 +167,7 @@ func (c Copier) createGrpcServerDirectories() error {
 }
 
 // copyGrpcServerResourceFiles copies grpc server resource files from template and renames them as per resource config.
-func (c Copier) copyGrpcServerResourceFiles(resource node.Resource) error {
+func (c Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
 	var filePaths []string
 	resourceName := strcase.ToKebab(resource.Name)
 
@@ -266,15 +265,15 @@ func (c Copier) copyGrpcServerResourceFiles(resource node.Resource) error {
 	return executor.ExecuteWithFuncs(filePaths, c.Data, funcMap)
 }
 
-// copyGrpcClientResourceFiles copies grpc client files from template and renames them as per client config.
-func (c Copier) copyGrpcClientResourceFiles(grpcClient languages.GrpcClient) error {
+// CopyGrpcClientResourceFiles copies grpc client files from template and renames them as per client config.
+func (c Copier) CopyGrpcClientResourceFiles(grpcClient *corenode.GrpcClient) error {
 	/// add resource specific data to map in c needed for templates.
 	// TODO grpcClient needs too many changes (like referring the .proto and generated files) we can better just have a client created for local grpcServer)
 	c.Data["GrpcClientPort"] = grpcClient.Port
-	c.Data["GrpcClientServiceName"] = grpcClient.ExternalNode
-
+	c.Data["GrpcClientServiceName"] = grpcClient.SourceNodeName
+	c.Data["GrpcClientSourceNodeID"] = strings.Replace(cases.Title(language.Und, cases.NoLower).String(grpcClient.SourceNodeID), "-", "_", -1)
 	// copy grpcClient files to generated project.
-	targetResourceClientFileName := c.NodeDirectoryName + GrpcClientPath + "/" + grpcClient.ExternalNode + "-" + ClientFile
+	targetResourceClientFileName := c.NodeDirectoryName + GrpcClientPath + "/" + grpcClient.SourceNodeName + "-" + ClientFile
 	_, err := utils.CopyFile(targetResourceClientFileName, c.TemplatesRootPath+GrpcClientPath+"/"+ClientFile)
 	if err != nil {
 		return err
@@ -286,17 +285,20 @@ func (c Copier) copyGrpcClientResourceFiles(grpcClient languages.GrpcClient) err
 	return executor.Execute(filePaths, c.Data)
 }
 
-func (c Copier) addResourceSpecificTemplateData(resource node.Resource) error {
+func (c Copier) addResourceSpecificTemplateData(resource *corenode.Resource) error {
 	// make every field public by making its first character capital.
 	fields := map[string]string{}
+	protoFields := map[string]string{}
 	// this slice is needed for grpc resource message generation
 	var fieldNames []string
 	for key, value := range resource.Fields {
 		key = cases.Title(language.Und, cases.NoLower).String(key)
-		fields[key] = commonUtils.GetProtoBufDataType(value)
+		fields[key] = value
+		protoFields[key] = commonUtils.GetProtoBufDataType(value)
 		fieldNames = append(fieldNames, key)
 	}
 	c.Data["Fields"] = fields
+	c.Data["ProtoFields"] = protoFields
 	c.Data["FieldNames"] = fieldNames
 	// db fields
 	if c.IsSQLDB {
@@ -434,18 +436,20 @@ func (c Copier) CreateGrpcClients() error {
 		return err
 	}
 	// if the node is client, add client code
-	if c.IsGrpcClient {
-		// copy files with respect to the names of resources
-		for _, client := range c.GrpcClients {
-			if err := c.copyGrpcClientResourceFiles(client); err != nil {
-				return err
-			}
+	//if c.HasGrpcClients {
+	// copy files with respect to the names of resources
+	// TODO need to add a flow based on client details.
+	//for _, client := range c.GrpcClients {
+	//	if err := c.CopyGrpcClientResourceFiles(client); err != nil {
+	//		return err
+	//	}
+	//}
+	//}
+	if c.IsGrpcServer {
+		// create self client
+		if err := c.copySelfGrpcClientResourceFiles(); err != nil {
+			return err
 		}
-	}
-
-	// create self client
-	if err := c.copySelfGrpcClientResourceFiles(); err != nil {
-		return err
 	}
 
 	return nil

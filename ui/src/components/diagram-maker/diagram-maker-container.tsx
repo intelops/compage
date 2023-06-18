@@ -55,8 +55,8 @@ import {ContextWorkspace} from "./custom/context-workspace";
 import {EdgeBadge} from "./custom/edge-badge";
 import {PotentialNode} from "./custom/potential-node";
 import {getNodeTypeConfig} from "./helper/node-type-ui";
-import {NewEdgeProperties} from "./new-properties/new-edge-properties";
-import {NewNodeProperties} from "./new-properties/new-node-properties";
+import {NewEdgeProperties} from "./edge-properties/new-edge-properties";
+import {NewNodeProperties} from "./node-properties/new-node-properties";
 import JSONPretty from "react-json-pretty";
 import Button from "@mui/material/Button";
 import {ButtonsPanel} from "./buttons-panel";
@@ -346,12 +346,42 @@ export const DiagramMakerContainer = ({
                         && "payload" in diagramMakerAction) {
                         if (diagramMakerAction.payload["typeId"] === "node-type-rectangle") {
                             diagramMakerAction.payload["consumerData"] = {
-                                "nodeType": "rectangle",
+                                "nodeType": "node-type-rectangle",
                             };
                         }
                         if (diagramMakerAction.payload["typeId"] === "node-type-circle") {
                             diagramMakerAction.payload["consumerData"] = {
-                                "nodeType": "circle",
+                                "nodeType": "node-type-circle",
+                            };
+                        }
+                        if (diagramMakerAction.payload["typeId"] === "node-type-rectangle-top-bottom") {
+                            diagramMakerAction.payload["consumerData"] = {
+                                "nodeType": "node-type-rectangle-top-bottom",
+                            };
+                        }
+                        if (diagramMakerAction.payload["typeId"] === "node-type-start") {
+                            diagramMakerAction.payload["consumerData"] = {
+                                "nodeType": "node-type-start",
+                            };
+                        }
+                        if (diagramMakerAction.payload["typeId"] === "node-type-end") {
+                            diagramMakerAction.payload["consumerData"] = {
+                                "nodeType": "node-type-end",
+                            };
+                        }
+                        if (diagramMakerAction.payload["typeId"] === "node-type-start-top-bottom") {
+                            diagramMakerAction.payload["consumerData"] = {
+                                "nodeType": "node-type-start-top-bottom",
+                            };
+                        }
+                        if (diagramMakerAction.payload["typeId"] === "node-type-end-top-bottom") {
+                            diagramMakerAction.payload["consumerData"] = {
+                                "nodeType": "node-type-end-top-bottom",
+                            };
+                        }
+                        if (diagramMakerAction.payload["typeId"] === "node-type-dead") {
+                            diagramMakerAction.payload["consumerData"] = {
+                                "nodeType": "node-type-dead",
                             };
                         }
                         diagramMakerAction.payload["id"] = diagramMakerAction.payload["id"].substring(3, 10);

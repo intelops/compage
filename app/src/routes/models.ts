@@ -4,36 +4,66 @@ export interface Resource {
     fields: Map<string, Map<string, string>>;
 }
 
-interface RestServerConfig {
+export interface RestConfig {
     template: string;
-    port: string;
-    framework?: string;
-    sqlDb: string;
-    resources?: Resource[];
-    openApiFileYamlContent?: string;
+    framework: string;
+    server: {
+        port: string;
+        sqlDb: string;
+        resources?: Resource[];
+        openApiFileYamlContent?: string;
+    };
+    clients: RestClient[];
 }
 
-export interface GrpcServerConfig {
+export interface RestClient {
+    sourceNodeName: string;
+    sourceNodeId: string;
     port: string;
-    framework?: string;
-    resources?: Resource[];
-    protoFileContent?: string;
 }
 
-export interface WsServerConfig {
+export interface GrpcConfig {
+    template: string;
+    framework: string;
+    server?: {
+        port?: string;
+        sqlDb?: string;
+        resources?: Resource[];
+        protoFileContent?: string;
+    };
+    clients?: GrpcClient[];
+}
+
+export interface GrpcClient {
+    sourceNodeName: string;
+    sourceNodeId: string;
     port: string;
-    framework?: string;
-    resources?: Resource[];
+}
+
+export interface WsConfig {
+    template: string;
+    framework: string;
+    server?: {
+        port?: string;
+        resources?: Resource[];
+    };
+    clients?: WsClient[];
+}
+
+export interface WsClient {
+    sourceNodeName: string;
+    sourceNodeId: string;
+    port: string;
 }
 
 export interface NodeConsumerData {
     name: string;
-    restServerConfig: RestServerConfig;
-    grpcServerConfig: GrpcServerConfig;
-    wsServerConfig: WsServerConfig;
+    restConfig?: RestConfig;
+    grpcConfig?: GrpcConfig;
+    wsConfig?: WsConfig;
     language: string;
-    metadata?: Map<string, string>;
-    annotations?: Map<string, string>;
+    metadata: Map<string, string>;
+    annotations: Map<string, string>;
 }
 
 export interface CompageNode {
@@ -42,24 +72,8 @@ export interface CompageNode {
     consumerData: NodeConsumerData;
 }
 
-export interface RestClientConfig {
-    port: string;
-}
-
-export interface GrpcClientConfig {
-    port: string;
-}
-
-export interface WsClientConfig {
-    port: string;
-}
-
 export interface EdgeConsumerData {
     name: string;
-    externalNode: string;
-    restClientConfig: RestClientConfig;
-    grpcClientConfig: GrpcClientConfig;
-    wsClientConfig: WsClientConfig;
     metadata?: Map<string, string>;
     annotations?: Map<string, string>;
 }

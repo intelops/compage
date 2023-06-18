@@ -1,7 +1,17 @@
 import React from 'react';
 import Divider from "@mui/material/Divider";
 import {getParsedModifiedState} from "../helper/helper";
-import {CompageEdge, EmptyGrpcServerConfig, EmptyRestServerConfig, EmptyWsServerConfig} from "../models";
+import {
+    CompageEdge,
+    CompageNode,
+    getEmptyGrpcConfig,
+    getEmptyRestConfig,
+    getEmptyWsConfig,
+    GrpcClient,
+    RestClient,
+    WsClient
+} from "../models";
+import {getCurrentConfig} from "../../../utils/localstorage-client";
 
 interface ContextEdgeProps {
     id: string | undefined;
@@ -9,17 +19,60 @@ interface ContextEdgeProps {
 
 export const ContextEdge = (props: ContextEdgeProps) => {
     const parsedModifiedState = getParsedModifiedState();
-    const edge: CompageEdge = parsedModifiedState.edges[props.id];
+    const parsedCurrentConfig = JSON.parse(getCurrentConfig());
+    const modifiedEdgeState: CompageEdge = parsedModifiedState.edges[props.id];
+    const edgeConfig: CompageEdge = parsedCurrentConfig.edges[props.id];
+    const destNode: CompageNode = parsedModifiedState.nodes[edgeConfig?.dest];
+    const srcNode: CompageNode = parsedModifiedState.nodes[edgeConfig?.src];
+
+    const getRestPort = () => {
+        const restClients: RestClient[] = destNode?.consumerData?.restConfig?.clients;
+        if (restClients && restClients.length > 0) {
+            for (const restClient of restClients) {
+                if (srcNode?.consumerData?.name === restClient.sourceNodeName) {
+                    return srcNode?.consumerData?.restConfig?.server?.port;
+                }
+            }
+        }
+        return getEmptyRestConfig().server.port;
+    };
+    const getGrpcPort = () => {
+        const grpcClients: GrpcClient[] = destNode?.consumerData?.grpcConfig?.clients;
+        if (grpcClients && grpcClients.length > 0) {
+            for (const grpcClient of grpcClients) {
+                if (srcNode?.consumerData?.name === grpcClient.sourceNodeName) {
+                    return srcNode?.consumerData?.grpcConfig?.server?.port;
+                }
+            }
+        }
+        return getEmptyGrpcConfig().server.port;
+    };
+    const getWsPort = () => {
+        const wsClients: WsClient[] = destNode?.consumerData?.wsConfig?.clients;
+        if (wsClients && wsClients.length > 0) {
+            for (const wsClient of wsClients) {
+                if (srcNode?.consumerData?.name === wsClient.sourceNodeName) {
+                    return srcNode?.consumerData?.wsConfig?.server?.port;
+                }
+            }
+        }
+        return getEmptyWsConfig().server.port;
+    };
+    const getSourceNode= () => {
+        return srcNode?.consumerData?.name;
+    };
+
     const [payload] = React.useState({
-        name: edge?.consumerData.name !== undefined ? edge.consumerData.name : "",
-        port: edge?.consumerData.name !== undefined ? edge.consumerData.name : "",
-        // restClientConfig
-        restClientConfig: edge?.consumerData.restClientConfig !== undefined ? edge.consumerData.restClientConfig : EmptyRestServerConfig,
-        // grpcClientConfig
-        grpcClientConfig: edge?.consumerData.grpcClientConfig !== undefined ? edge.consumerData.grpcClientConfig : EmptyGrpcServerConfig,
-        // wsServerType
-        wsClientConfig: edge?.consumerData.wsClientConfig !== undefined ? edge.consumerData.wsClientConfig : EmptyWsServerConfig,
-        externalNode: edge?.consumerData.externalNode !== undefined ? edge.consumerData.externalNode : "",
+        name: modifiedEdgeState?.consumerData?.name !== undefined ? modifiedEdgeState?.consumerData?.name : "",
+        port: modifiedEdgeState?.consumerData?.name !== undefined ? modifiedEdgeState?.consumerData?.name : "",
+        // restPort
+        restPort: getRestPort(),
+        // grpcPort
+        grpcPort: getGrpcPort(),
+        // wsPort
+        wsPort: getWsPort(),
+        // sourceNodeName
+        sourceNodeName: getSourceNode(),
     });
 
     if (!props.id) {
@@ -33,30 +86,30 @@ export const ContextEdge = (props: ContextEdgeProps) => {
         return "";
     };
 
-    const getRestClientPort = () => {
-        if (payload.restClientConfig.port) {
-            return <><strong>Port(REST)</strong> : {payload.restClientConfig.port}</>;
+    const getRestServerPort = () => {
+        if (payload.restPort) {
+            return <><strong>Port(REST)</strong> : {payload.restPort}</>;
         }
         return "";
     };
 
-    const getGrpcClientPort = () => {
-        if (payload.grpcClientConfig.port) {
-            return <><strong>Port(gRPC)</strong> : {payload.grpcClientConfig.port}</>;
+    const getGrpcServerPort = () => {
+        if (payload.grpcPort) {
+            return <><strong>Port(gRPC)</strong> : {payload.grpcPort}</>;
         }
         return "";
     };
 
-    const getWsClientPort = () => {
-        if (payload.wsClientConfig.port) {
-            return <><strong>Port(WS)</strong> : {payload.wsClientConfig.port}</>;
+    const getWsServerPort = () => {
+        if (payload.wsPort) {
+            return <><strong>Port(WS)</strong> : {payload.wsPort}</>;
         }
         return "";
     };
 
-    const getExternalNode = () => {
-        if (payload.externalNode) {
-            return <><strong>External Node</strong> : {payload.externalNode}</>;
+    const getSourceNodeName = () => {
+        if (payload.sourceNodeName) {
+            return <><strong>Source Node</strong> : {payload.sourceNodeName}</>;
         }
         return "";
     };
@@ -67,13 +120,13 @@ export const ContextEdge = (props: ContextEdgeProps) => {
             <Divider/>
             {getName()}
             <br/>
-            {getExternalNode()}
+            {getSourceNodeName()}
             <br/>
-            {getRestClientPort()}
+            {getRestServerPort()}
             <br/>
-            {getGrpcClientPort()}
+            {getGrpcServerPort()}
             <br/>
-            {getWsClientPort()}
+            {getWsServerPort()}
         </div>
     </React.Fragment>;
 };

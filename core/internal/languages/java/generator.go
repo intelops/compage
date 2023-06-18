@@ -19,15 +19,17 @@ func Generate(ctx context.Context) error {
 	n := javaValues.JavaNode
 	// rest config
 	if n.RestConfig != nil {
-		// check for the templates
-		if n.RestConfig.Server.Template == templates.OpenAPI {
-			// add code to generate with openapi
-			// check if OpenAPIFileYamlContent contains value.
-			if len(n.RestConfig.Server.OpenAPIFileYamlContent) < 1 {
-				return errors.New("at least rest-config needs to be provided, OpenAPIFileYamlContent is empty")
-			}
-			if err := languages.ProcessOpenAPITemplate(ctx); err != nil {
-				return err
+		if n.RestConfig.Template == templates.OpenAPI {
+			// check for the templates
+			if n.RestConfig.Server != nil {
+				// add code to generate with openapi
+				// check if OpenAPIFileYamlContent contains value.
+				if len(n.RestConfig.Server.OpenAPIFileYamlContent) < 1 {
+					return errors.New("at least rest-config needs to be provided, OpenAPIFileYamlContent is empty")
+				}
+				if err := languages.ProcessOpenAPITemplate(ctx); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -76,11 +78,11 @@ func getIntegrationsCopier(javaValues Values) map[string]interface{} {
 	path := GetJavaTemplatesRootPath()
 	// extract generatedJar name
 	generatedJarName := ""
-	if javaValues.JavaNode.RestConfig.Server.Framework == Spring {
+	if javaValues.JavaNode.RestConfig.Framework == Spring {
 		generatedJarName = "openapi-spring-1.0.0.jar"
-	} else if javaValues.JavaNode.RestConfig.Server.Framework == LJavaUndertowServer {
+	} else if javaValues.JavaNode.RestConfig.Framework == LJavaUndertowServer {
 		generatedJarName = "openapi-undertow-server-1.0.0.jar"
-	} else if javaValues.JavaNode.RestConfig.Server.Framework == LJavaMicronautServer {
+	} else if javaValues.JavaNode.RestConfig.Framework == LJavaMicronautServer {
 		generatedJarName = "openapi-micronaut-1.0.0.jar"
 	}
 

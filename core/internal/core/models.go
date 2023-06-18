@@ -1,8 +1,8 @@
 package core
 
 import (
-	"github.com/intelops/compage/core/internal/core/edge"
-	"github.com/intelops/compage/core/internal/core/node"
+	coreedge "github.com/intelops/compage/core/internal/core/edge"
+	corenode "github.com/intelops/compage/core/internal/core/node"
 	"time"
 )
 
@@ -28,9 +28,9 @@ type Project struct {
 // CompageJSON has all edges and nodes
 type CompageJSON struct {
 	// Linkages (connection details) between Nodes
-	Edges []*edge.Edge `json:"edges"`
+	Edges []*coreedge.Edge `json:"edges"`
 	// Nodes represent components and has details of the component.
-	Nodes []*node.Node `json:"nodes"`
+	Nodes []*corenode.Node `json:"nodes"`
 }
 
 // Rest Protocol

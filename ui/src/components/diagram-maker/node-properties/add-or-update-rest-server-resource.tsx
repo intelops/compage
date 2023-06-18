@@ -29,10 +29,10 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import EditIcon from "@mui/icons-material/Edit";
 
-interface AddOrUpdateGrpcResourceProperties {
+interface AddOrUpdateRestServerResourceProperties {
     isOpen: boolean;
-    onAddOrUpdateGrpcResourceClose: () => void;
-    handleAddOrUpdateGrpcResource: (resource: Resource) => void;
+    onAddOrUpdateRestServerResourceClose: () => void;
+    handleAddOrUpdateRestServerResource: (resource: Resource) => void;
     resource: Resource;
     resourceNames: string[];
     nodeId: string;
@@ -83,7 +83,7 @@ const getFieldsCollection = (resource: Resource) => {
     return fieldsCollection;
 };
 
-export const AddOrUpdateGrpcResource = (props: AddOrUpdateGrpcResourceProperties) => {
+export const AddOrUpdateRestServerResource = (props: AddOrUpdateRestServerResourceProperties) => {
     const [payload, setPayload] = React.useState({
         name: {
             value: props.resource.name,
@@ -300,7 +300,7 @@ export const AddOrUpdateGrpcResource = (props: AddOrUpdateGrpcResourceProperties
             }
 
             // check for invalid names for fields.
-            // removed _ from regex as we dont want users to have names starting with _.
+            // removed _ from regex as we don't want users to have names starting with _.
             const regex = new RegExp("^[a-zA-Z$][a-zA-Z$0-9]*$");
             if (!regex.test(payload.name.value)) {
                 newPayload = {
@@ -318,14 +318,14 @@ export const AddOrUpdateGrpcResource = (props: AddOrUpdateGrpcResourceProperties
         return true;
     };
 
-    const addOrUpdateGrpcResource = () => {
+    const addOrUpdateRestResource = () => {
         const fields = {};
         for (const fld of payload.fieldsCollection) {
             fields[fld.attribute] = fld.datatype;
         }
         const resource: Resource = {fields: JSON.parse(JSON.stringify(fields)), name: payload.name.value};
         if (isNameValid()) {
-            props.handleAddOrUpdateGrpcResource(resource);
+            props.handleAddOrUpdateRestServerResource(resource);
             setPayload({
                 ...payload,
                 fields: '',
@@ -348,17 +348,17 @@ export const AddOrUpdateGrpcResource = (props: AddOrUpdateGrpcResourceProperties
         }
     };
 
-    const onAddOrUpdateGrpcResourceClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
+    const onAddOrUpdateRestResourceClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
         // this prevents dialog box from closing.
         if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
         }
-        props.onAddOrUpdateGrpcResourceClose();
+        props.onAddOrUpdateRestServerResourceClose();
     };
 
     return <React.Fragment>
-        <Dialog open={props.isOpen} onClose={onAddOrUpdateGrpcResourceClose}>
-            <DialogTitle>Add or update [GRPC Server] resource : {props.nodeId}</DialogTitle>
+        <Dialog open={props.isOpen} onClose={onAddOrUpdateRestResourceClose}>
+            <DialogTitle>Add or update [REST Server] resource : {props.nodeId}</DialogTitle>
             <Divider/>
             <DialogContent style={{
                 height: "500px",
@@ -493,10 +493,10 @@ export const AddOrUpdateGrpcResource = (props: AddOrUpdateGrpcResourceProperties
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary"
-                        onClick={props.onAddOrUpdateGrpcResourceClose}>Cancel</Button>
+                        onClick={props.onAddOrUpdateRestServerResourceClose}>Cancel</Button>
                 <Button variant="contained"
                         disabled={isEmpty(payload.name.value) || isEmptyField()}
-                        onClick={addOrUpdateGrpcResource}>
+                        onClick={addOrUpdateRestResource}>
                     {
                         props.resource.name ? <>Update Resource</> : <>Add Resource</>
                     }
