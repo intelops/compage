@@ -92,6 +92,7 @@ const addToGithub = (projectEntity: ProjectEntity, response: Response) => {
         base64Json,
         'first commit',
         sha).then(resp => {
+        Logger.debug(`commitCompageJson Response: ${JSON.stringify(resp.data)}`);
         const message = `The .compage/config.json in Repository for '${projectEntity.displayName}' is committed, ${projectEntity.displayName}[${projectEntity.id}] project is created successfully.`;
         Logger.info(message);
         return response.status(200).json(getCreateProjectResponse(projectEntity, message));
@@ -168,6 +169,7 @@ const createOnGithub = (projectEntity: ProjectEntity, response: Response) => {
     // TODO change description
     return createRepository(projectEntity.user.name, projectEntity.repository.name, projectEntity.repository.name, projectEntity.repository.isPublic)
         .then(resp => {
+            Logger.debug(`createRepository Response: ${JSON.stringify(resp.data)}`);
             // create .compage/config.json file in GitHub repo
             return addToGithub(projectEntity, response);
         }).catch(error => {

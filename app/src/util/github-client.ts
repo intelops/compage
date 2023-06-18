@@ -6,7 +6,6 @@ const USER_REPO_URL = `https://api.github.com/user/repos`;
 const REPO_URL = `https://api.github.com/repos`;
 
 export const createRepository = async (userName: string, repositoryName: string, description: string, isPublic: boolean) => {
-    console.log("isPublic : ", isPublic);
     return axios({
         headers: {
             Accept: ACCEPT,
