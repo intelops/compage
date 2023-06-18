@@ -357,7 +357,7 @@ export const DiagramMakerContainer = ({
                             message = "Are you sure you want to delete the edge(s) : [" + diagramMakerAction.payload.edgeIds + "]";
                             result = "Deleting edge(s) : [" + diagramMakerAction.payload.edgeIds + "]";
                         }
-                        if (diagramMakerAction.payload.nodeIds.length > 0 || diagramMakerAction.payload.edgeIds.length > 0) {
+                        if (diagramMakerAction.payload.edgeIds.length > 0 || diagramMakerAction.payload.nodeIds.length > 0) {
                             if (window.confirm(message)) {
                                 // delete the sourceNodes info from destination nodes for the edges getting deleted.
                                 const parsedCurrentConfig: CompageJsonConfig = getParsedCurrentConfig();
@@ -366,7 +366,6 @@ export const DiagramMakerContainer = ({
                                     // iterate over edges and extract nodes and modify the clients
                                     const selectedEdge: CompageEdge = parsedCurrentConfig.edges[item];
                                     if (selectedEdge) {
-                                        console.log(selectedEdge.dest);
                                         const srcNodeConfig: CompageNode = parsedCurrentConfig.nodes[selectedEdge.src];
                                         const destNodeState: CompageNode = parsedModifiedState.nodes[selectedEdge.dest];
                                         if (destNodeState) {
@@ -376,6 +375,22 @@ export const DiagramMakerContainer = ({
                                         }
                                     }
                                 }
+                                // delete the sourceNodes info from destination nodes for the node getting deleted.
+                                for (const nodeIdsToBeDeleted of diagramMakerAction.payload.nodeIds) {
+                                    // iterate over nodes and check if the node has sourceNode reference in clients.
+                                    const nodeToBeDeletedConfig: CompageNode = parsedCurrentConfig.nodes[nodeIdsToBeDeleted];
+                                    // tslint:disable-next-line: forin
+                                    for (const key in parsedModifiedState.nodes) {
+                                        const destNodeState: CompageNode = parsedModifiedState.nodes[key];
+                                        const destNodeConfig: CompageNode = parsedCurrentConfig.nodes[key];
+                                        if (nodeToBeDeletedConfig.id !== destNodeConfig.id) {
+                                            removeGrpcClient(nodeToBeDeletedConfig, destNodeState);
+                                            removeRestClient(nodeToBeDeletedConfig, destNodeState);
+                                            // removeWsClient(nodeToBeDeleted, destNodeState)
+                                        }
+                                    }
+                                }
+
                                 setModifiedState(JSON.stringify(parsedModifiedState));
                             } else {
                                 return;
