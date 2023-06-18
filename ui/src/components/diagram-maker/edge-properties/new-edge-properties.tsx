@@ -101,8 +101,21 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
 
     const clientTypesConfig: ClientTypesConfig = getClientTypesConfig(srcNodeConfig, srcNodeState, destNodeState);
 
+    const getDefaultName = () => {
+        return srcNodeState?.consumerData?.name + "-to-" + destNodeState?.consumerData?.name;
+    };
+
+    const getName = () => {
+        const name = currentEdgeState?.consumerData?.name;
+        // name captured as undefined when destNode wasn't added properties with may include `undefined` in name.
+        if (name && !name.includes("undefined")) {
+            return name;
+        }
+        return getDefaultName();
+    };
+
     const [payload, setPayload] = React.useState({
-        name: currentEdgeState?.consumerData?.name !== undefined ? currentEdgeState?.consumerData?.name : "",
+        name: getName(),
         isRestServer: clientTypesConfig.isRestServer || false,
         restServerPort: clientTypesConfig.restServerPort,
         isGrpcServer: clientTypesConfig.isGrpcServer || false,
