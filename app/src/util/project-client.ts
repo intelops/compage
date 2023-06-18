@@ -16,6 +16,7 @@ const convertProjectEntityToProjectResourceSpec = (projectId: string, userName: 
     const repository: Repository = {
         branch: '',
         name: '',
+        isPublic: projectEntity.repository.isPublic
     };
 
     // if repository name is not set, add displayName as repository name.

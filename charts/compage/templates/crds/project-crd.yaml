@@ -53,6 +53,8 @@ spec:
                       type: string
                     branch:
                       type: string
+                    isPublic:
+                      type: boolean
                 metadata:
                   type: string
                 version:

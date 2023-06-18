@@ -94,6 +94,7 @@ export interface CompageJson {
 export interface Repository {
     name: string;
     branch: string;
+    isPublic: boolean;
 }
 
 // all keys are of string format
@@ -196,7 +197,7 @@ export interface DeleteProjectError {
 }
 
 export const initializeEmptyProjectEntity = () => {
-    const repository: Repository = {branch: '', name: ''};
+    const repository: Repository = {branch: '', name: '', isPublic: false};
     const user: User = {email: '', name: ''};
     const json: CompageJson = {
         edges: new Map<string, CompageEdge>(),

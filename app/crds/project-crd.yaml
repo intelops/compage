@@ -51,6 +51,8 @@ spec:
                       type: string
                     branch:
                       type: string
+                    isPublic:
+                      type: boolean
                 oldVersions:
                   type: array
                   items:

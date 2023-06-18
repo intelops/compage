@@ -7,7 +7,7 @@ import {CreateProjectRequest, Repository, User} from "./model";
 import {selectAuthData} from "../auth-operations/slice";
 import {Navigate} from "react-router-dom";
 import TextField from "@mui/material/TextField";
-import {Stack} from "@mui/material";
+import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import {createProjectAsync} from "./async-apis/createProject";
 import {getData} from "../../components/diagram-maker/data/BoundaryCircular/data";
 import {sanitizeString} from "../../utils/backend-api";
@@ -26,6 +26,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
     const [data, setData] = useState({
         projectName: "",
         repositoryName: "",
+        isPublicRepository: true,
         repositoryBranch: "",
         // TODO ui for this yet to be added.
         metadata: new Map<string, string>()
@@ -64,6 +65,13 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
         });
     };
 
+    const handleIsPublicRepositoryChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setData({
+            ...data,
+            isPublicRepository: event.target.checked
+        });
+    };
+
     const isValid = () => {
         for (const project of listProjectsData) {
             if (data.projectName === project.id) {
@@ -71,6 +79,17 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             }
         }
         return true;
+    };
+
+    const getIsRepositoryPublic = (): React.ReactNode => {
+        return <FormControlLabel
+            label="Is Public Repository?"
+            control={<Checkbox
+                id="isPublicRepository"
+                size="medium" checked={data.isPublicRepository}
+                onChange={handleIsPublicRepositoryChange}
+            />}
+        />;
     };
 
     const getRepositoryName = (): React.ReactNode => {
@@ -121,6 +140,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
         const repository: Repository = {
             branch: data.repositoryBranch || 'compage',
             name: data.repositoryName,
+            isPublic: data.isPublicRepository,
         };
         const json = getData(0, 0, "");
         const displayName = data.projectName;
@@ -150,6 +170,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             {getProjectName()}
             {getRepositoryName()}
             {getRepositoryBranch()}
+            {getIsRepositoryPublic()}
             {getActionButtons()}
         </Stack>
     </React.Fragment>;

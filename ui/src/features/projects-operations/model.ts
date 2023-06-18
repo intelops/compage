@@ -29,6 +29,7 @@ export interface CreateProjectRequest extends ProjectEntity {
 export interface Repository {
     name: string;
     branch: string;
+    isPublic: boolean;
 }
 
 export interface User {

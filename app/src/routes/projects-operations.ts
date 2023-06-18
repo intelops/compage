@@ -166,7 +166,7 @@ const updateFromGithub = (projectEntity: ProjectEntity, response: Response) => {
 // creates repository on GitHub and commits first version of yaml
 const createOnGithub = (projectEntity: ProjectEntity, response: Response) => {
     // TODO change description
-    return createRepository(projectEntity.user.name, projectEntity.repository.name, projectEntity.repository.name)
+    return createRepository(projectEntity.user.name, projectEntity.repository.name, projectEntity.repository.name, projectEntity.repository.isPublic)
         .then(resp => {
             // create .compage/config.json file in GitHub repo
             return addToGithub(projectEntity, response);
