@@ -48,7 +48,7 @@ jobs:
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
           export GOPATH=$HOME/go
           export GOBIN=$GOPATH/bin
-          export PATH=$PATH:$GOROOT:$GOBIN
+          export PATH=$PATH:$GOPATH:$GOBIN
           go test -v ./... -race -coverprofile=coverage.out -coverpkg=./... -covermode=atomic
           cd ..
       - name: Upload coverage to Codecov

@@ -22,8 +22,7 @@ FROM alpine:3.18.2
 # Create project directory (workdir)
 WORKDIR /app
 
-RUN apk update && apk add protoc && apk add openjdk8
-RUN apk update && apk add bash && apk add curl && apk add jq && apk add --update go \
+RUN apk update && apk add protoc && apk add openjdk8 && apk add make && apk add bash && apk add curl && apk add jq && apk add --update go \
     && curl https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/bin/utils/openapi-generator-cli.sh \
     > /app/openapi-generator-cli \
     && chmod u+x /app/openapi-generator-cli \
@@ -41,6 +40,7 @@ RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
   && echo "Cleaning and setting links" \
   && rm -f /tmp/apache-maven.tar.gz \
   && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+
 ENV MAVEN_HOME /usr/share/maven
 ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
 
@@ -52,6 +52,8 @@ RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 # test if the below command avoids loading the files later.
 RUN /app/openapi-generator-cli version
 RUN go version
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 COPY --from=builder /app/core /
 COPY templates /app/templates
 # Application port (optional)
