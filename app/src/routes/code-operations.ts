@@ -39,6 +39,7 @@ codeOperationsRouter.post('/generate', requireUserNameMiddleware, async (request
     const cleanup = (downloadedPrjPath: string) => {
         // remove directory created, delete directory recursively
         rimraf(downloadedPrjPath).then((result: any) => {
+            Logger.debug(`Result: ${result}`);
             Logger.debug(`${downloadedPrjPath} is cleaned up`);
         });
     };
@@ -53,8 +54,8 @@ codeOperationsRouter.post('/generate', requireUserNameMiddleware, async (request
     if (!projectResource.spec.json
         || projectResource.spec.json === '{}'
         || projectResource.spec.json.length === 0
-        || !JSON.parse(projectResource.spec.json).nodes
-        || JSON.parse(projectResource.spec.json).nodes?.length === 0) {
+        || !JSON.parse(projectResource.spec.json)?.nodes
+        || JSON.parse(projectResource.spec.json)?.nodes?.length === 0) {
         const message = `unable to generate code, have at least a node added to your project: ${projectResource.spec.displayName}[${projectId}].`;
         return resource.status(500).json(getGenerateCodeError(message));
     }

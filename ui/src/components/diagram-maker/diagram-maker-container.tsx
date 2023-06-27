@@ -71,7 +71,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import {getCurrentUserName} from "../../utils/sessionstorage-client";
 import {useNavigate} from "react-router-dom";
-import {CompageEdge, CompageJson, CompageJsonConfig, CompageNode} from "./models";
+import {CompageEdge, CompageJson, CompageNode} from "./models";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -360,7 +360,7 @@ export const DiagramMakerContainer = ({
                         if (diagramMakerAction.payload.edgeIds.length > 0 || diagramMakerAction.payload.nodeIds.length > 0) {
                             if (window.confirm(message)) {
                                 // delete the sourceNodes info from destination nodes for the edges getting deleted.
-                                const parsedCurrentConfig: CompageJsonConfig = getParsedCurrentConfig();
+                                const parsedCurrentConfig: CompageJson = getParsedCurrentConfig();
                                 const parsedModifiedState: CompageJson = getParsedModifiedState();
                                 for (const item of diagramMakerAction.payload.edgeIds) {
                                     // iterate over edges and extract nodes and modify the clients

@@ -1,5 +1,5 @@
 import {getCurrentConfig, getModifiedState, setModifiedState} from "../../../utils/localstorage-client";
-import {CompageEdge, CompageJson, CompageJsonConfig, CompageNode} from "../models";
+import {CompageEdge, CompageJson, CompageNode} from "../models";
 
 export const cleanse = (state: string) => {
     if (state === undefined || state === null || (!state || state === "{}")) {
@@ -97,7 +97,7 @@ export const getParsedModifiedState = (): CompageJson => {
 };
 
 
-export const getParsedCurrentConfig = (): CompageJsonConfig => {
+export const getParsedCurrentConfig = (): CompageJson => {
     const currentConfig = getCurrentConfig();
 
     if (currentConfig && currentConfig !== "{}") {
