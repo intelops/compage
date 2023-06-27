@@ -10,7 +10,6 @@ import Card from "@mui/material/Card";
 import {Button} from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import Box from "@mui/material/Box";
-import Logo from "../../compage-logo.svg";
 import {LoginRequest} from "./model";
 import {loginAsync} from "./async-apis/login";
 import {selectAuthData, selectAuthStatus} from "./slice";
@@ -52,7 +51,7 @@ export const Login = () => {
             component="img"
             height="350"
             style={{objectFit: "scale-down"}}
-            image={Logo}
+            image={require('../../compage-512x512.png')}
             alt={"Login to Compage"}
         />
         <CardContent>
