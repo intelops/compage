@@ -1240,6 +1240,44 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return [];
     };
 
+        // update Node Validation
+        const updateNodeValidation = ()=>{
+            // Bare minimum validation
+            if(payload.name.value === '' || payload.language === '' || uploadYamlData === 'loading'){
+                return true
+            }
+
+            // validation for rest server
+            if((payload.name.value !== '' && payload.language !== '') && payload.isRestServer){
+                // validation for rest server with openAPI template
+                if(payload.restConfig.template === 'openAPI'){
+                    let openValidation = (payload.restConfig.template === 'openAPI' && payload.restConfig.framework !== '' && payload.restConfig.framework !== 'go-gin-server' && JSON.stringify(uploadYamlData) !== '{}' );
+                    return !openValidation
+                }
+
+                // validation for rest server with compage template 
+                if(payload.language === 'go' && payload.restConfig.template === 'compage'){
+                    console.log(payload?.restConfig)
+                    let compageValidation = payload?.restConfig?.server?.port !== '' && payload?.restConfig?.server?.sqlDb !== ''
+                    console.log(compageValidation);
+                    return !compageValidation
+                }
+
+                // disables the update node button if the above conditions doesn't meet
+                return true    
+            }
+    
+            // validation for gRPC Server
+            if((payload.name.value !== '' && payload.language !== '') && payload.isGrpcServer){
+                if(payload.language === 'go' && payload.restConfig.template === 'compage'){
+                    console.log(payload?.grpcConfig)
+                    let compageValidation = payload?.grpcConfig?.server?.port !== '' && payload?.grpcConfig?.server?.sqlDb !== ''
+                    return !compageValidation
+                }
+                return true    
+            }
+        }
+
     return <React.Fragment>
         {payload.isDeleteRestServerResourceOpen && (
             <DeleteRestServerResource isOpen={payload.isDeleteRestServerResourceOpen}
@@ -1359,7 +1397,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     <Button variant="outlined" color="secondary" onClick={props.onNodePropertiesClose}>Cancel</Button>
                     <Button variant="contained"
                             onClick={handleNodeUpdate}
-                            disabled={payload.name.value === '' || payload.language === '' || uploadYamlStatus === 'loading'}>Update
+                            // added validation based on QA bug
+                            disabled={updateNodeValidation()}>Update
                         Node</Button>
                 </DialogActions>
             </Dialog>
