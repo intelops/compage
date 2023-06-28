@@ -90,7 +90,14 @@ export interface CompageEdge {
 export interface CompageJson {
     edges: Map<string, CompageEdge>;
     nodes: Map<string, CompageNode>;
-    version: string;
+    version?: string;
+    workspace?: any;
+    undoHistory?: any;
+    potentialNode?: any;
+    potentialEdge?: any;
+    plugins?: any;
+    panels?: any;
+    editor?: any;
 }
 
 // empty interfaces

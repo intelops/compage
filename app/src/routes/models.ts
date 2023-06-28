@@ -88,12 +88,20 @@ export interface CompageEdge {
 export interface CompageJson {
     edges: Map<string, CompageEdge>;
     nodes: Map<string, CompageNode>;
-    version: string;
+    version?: string;
+    workspace?: any;
+    undoHistory?: any;
+    potentialNode?: any;
+    potentialEdge?: any;
+    plugins?: any;
+    panels?: any;
+    editor?: any;
 }
 
 export interface Repository {
     name: string;
     branch: string;
+    isPublic: boolean;
 }
 
 // all keys are of string format
@@ -196,12 +204,19 @@ export interface DeleteProjectError {
 }
 
 export const initializeEmptyProjectEntity = () => {
-    const repository: Repository = {branch: '', name: ''};
+    const repository: Repository = {branch: '', name: '', isPublic: false};
     const user: User = {email: '', name: ''};
     const json: CompageJson = {
         edges: new Map<string, CompageEdge>(),
         nodes: new Map<string, CompageNode>(),
-        version: ''
+        version: '',
+        editor: {},
+        panels: {},
+        plugins: {},
+        undoHistory: {},
+        workspace: {},
+        potentialEdge: {},
+        potentialNode: {}
     };
     const projectEntity: ProjectEntity = {
         displayName: '',

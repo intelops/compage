@@ -1,4 +1,5 @@
-import {getModifiedState, setModifiedState} from "../../../utils/localstorage-client";
+import {getCurrentConfig, getModifiedState, setModifiedState} from "../../../utils/localstorage-client";
+import {CompageEdge, CompageJson, CompageNode} from "../models";
 
 export const cleanse = (state: string) => {
     if (state === undefined || state === null || (!state || state === "{}")) {
@@ -80,7 +81,7 @@ export const removeUnwantedKeys = (state: string) => {
     return stateJson;
 };
 
-export const getParsedModifiedState = () => {
+export const getParsedModifiedState = (): CompageJson => {
     // retrieve current modifiedState
     // logic is to store the dialog-state in localstorage and then refer it in updating state.
     const modifiedState = getModifiedState();
@@ -89,8 +90,29 @@ export const getParsedModifiedState = () => {
         return JSON.parse(modifiedState);
     } else {
         return {
-            nodes: {},
-            edges: {}
+            nodes: new Map<string, CompageNode>(),
+            edges: new Map<string, CompageEdge>()
+        };
+    }
+};
+
+
+export const getParsedCurrentConfig = (): CompageJson => {
+    const currentConfig = getCurrentConfig();
+
+    if (currentConfig && currentConfig !== "{}") {
+        return JSON.parse(currentConfig);
+    } else {
+        return {
+            nodes: new Map<string, CompageNode>(),
+            edges: new Map<string, CompageEdge>(),
+            editor: {},
+            panels: {},
+            potentialEdge: {},
+            undoHistory: {},
+            plugins: {},
+            potentialNode: {},
+            workspace: {}
         };
     }
 };

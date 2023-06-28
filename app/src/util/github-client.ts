@@ -5,7 +5,7 @@ const ACCEPT = `application/vnd.github+json`;
 const USER_REPO_URL = `https://api.github.com/user/repos`;
 const REPO_URL = `https://api.github.com/repos`;
 
-export const createRepository = async (userName: string, repositoryName: string, description: string) => {
+export const createRepository = async (userName: string, repositoryName: string, description: string, isPublic: boolean) => {
     return axios({
         headers: {
             Accept: ACCEPT,
@@ -14,7 +14,7 @@ export const createRepository = async (userName: string, repositoryName: string,
         url: USER_REPO_URL, method: 'POST', data: {
             name: repositoryName,
             description,
-            private: true,
+            private: !isPublic,
         }
     });
 };

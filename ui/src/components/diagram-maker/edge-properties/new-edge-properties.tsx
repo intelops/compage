@@ -12,6 +12,7 @@ import Divider from "@mui/material/Divider";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import {
     CompageEdge,
+    CompageJson,
     CompageNode,
     getEmptyGrpcConfig,
     getEmptyRestConfig,
@@ -86,11 +87,11 @@ const getClientTypesConfig = (srcNodeConfig: CompageNode, srcNodeState: CompageN
 
 export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
     const parsedCurrentConfig = JSON.parse(getCurrentConfig());
-    const parsedModifiedState = getParsedModifiedState();
+    const parsedModifiedState: CompageJson = getParsedModifiedState();
     // TODO sometimes the parsedModifiedState is empty so, recreate it. this breaks, recreates the modifiedState, need to check.
     // if (Object.keys(parsedModifiedState.edges).length < 1 || !parsedModifiedState.edges[props.edgeId]) {
     //     updateModifiedState(parsedCurrentConfig);
-    //     parsedModifiedState = getParsedModifiedState();
+    //     parsedModifiedState : CompageJson = getParsedModifiedState();
     // }
     const currentEdgeState: CompageEdge = parsedModifiedState.edges[props.edgeId];
     // read node's clients array and get these values
@@ -498,6 +499,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         });
     };
 
+    // eslint-disable-next-line
     const getWsServerCheck = () => {
         return <React.Fragment>
             <FormControlLabel
@@ -511,6 +513,7 @@ export const NewEdgeProperties = (props: NewEdgePropertiesProps) => {
         </React.Fragment>;
     };
 
+    // eslint-disable-next-line
     const getWsServerPort = () => {
         if (payload.isWsServer) {
             // retrieve port from src node.

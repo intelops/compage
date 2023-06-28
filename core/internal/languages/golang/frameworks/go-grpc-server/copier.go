@@ -293,7 +293,7 @@ func (c Copier) addResourceSpecificTemplateData(resource *corenode.Resource) err
 	var fieldNames []string
 	for key, value := range resource.Fields {
 		key = cases.Title(language.Und, cases.NoLower).String(key)
-		fields[key] = value
+		fields[key] = commonUtils.GetFieldsDataTypeForProtobuf(value)
 		protoFields[key] = commonUtils.GetProtoBufDataType(value)
 		fieldNames = append(fieldNames, key)
 	}

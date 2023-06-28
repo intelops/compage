@@ -383,7 +383,8 @@ func TestRestServerGenerator(t *testing.T) {
                                 "fields": {
                                     "Name": "string",
                                     "Address": "string",
-                                    "Age": "int32"
+                                    "Age": "int",
+									"Sign": "rune"
                                 },
                                 "name": "User"
                             }
@@ -399,11 +400,11 @@ func TestRestServerGenerator(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		UserName:       "mahendraintelops",
 		RepositoryName: "first-project-github",
-		ProjectName:    "first-rest-project",
+		ProjectName:    "first-rest-server-project",
 		Json:           restServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-project")
+		_ = os.RemoveAll("/tmp/first-rest-server-project")
 	}()
 
 	// retrieve project struct
@@ -437,7 +438,11 @@ func TestGrpcServerGenerator(t *testing.T) {
                                 "fields": {
                                     "Name": "string",
                                     "RollNumber": "int32",
-                                    "College": "string"
+                                    "College": "string",
+									"Sign": "rune",
+									"Marks": "int",
+									"GateScore": "uint",
+									"IsPassed": "bool"
                                 },
                                 "name": "StudentModel"
                             }
@@ -468,5 +473,109 @@ func TestGrpcServerGenerator(t *testing.T) {
 	// trigger project generation
 	if err0 := handlers.Handle(getProject); err0 != nil {
 		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
+func TestRestServerWithOpenApiGenerator(t *testing.T) {
+	restServerWithOpenAPIConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-02": {
+            "id": "node-02",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "node-type-circle",
+                "name": "sample-service",
+                "language": "go",
+                "restConfig": {
+                    "server": {
+                        "sqlDb": "",
+                        "port": "8080",
+                        "resources": [],
+                        "openApiFileYamlContent": "swagger: \"2.0\"\ninfo:\n  version: 1.0.0\n  title: Swagger Petstore\n  license:\n    name: MIT\nhost: petstore.swagger.io\nbasePath: /v1\nschemes:\n  - http\nconsumes:\n  - application/json\nproduces:\n  - application/json\npaths:\n  /pets:\n    get:\n      summary: List all pets\n      operationId: listPets\n      tags:\n        - pets\n      parameters:\n        - name: limit\n          in: query\n          description: How many items to return at one time (max 100)\n          required: false\n          type: integer\n          format: int32\n      responses:\n        \"200\":\n          description: A paged array of pets\n          headers:\n            x-next:\n              type: string\n              description: A link to the next page of responses\n          schema:\n            $ref: '#/definitions/Pets'\n        default:\n          description: unexpected error\n          schema:\n            $ref: '#/definitions/Error'\n    post:\n      summary: Create a pet\n      operationId: createPets\n      tags:\n        - pets\n      responses:\n        \"201\":\n          description: Null response\n        default:\n          description: unexpected error\n          schema:\n            $ref: '#/definitions/Error'\n  /pets/{petId}:\n    get:\n      summary: Info for a specific pet\n      operationId: showPetById\n      tags:\n        - pets\n      parameters:\n        - name: petId\n          in: path\n          required: true\n          description: The id of the pet to retrieve\n          type: string\n      responses:\n        \"200\":\n          description: Expected response to a valid request\n          schema:\n            $ref: '#/definitions/Pets'\n        default:\n          description: unexpected error\n          schema:\n            $ref: '#/definitions/Error'\ndefinitions:\n  Pet:\n    type: \"object\"\n    required:\n      - id\n      - name\n    properties:\n      id:\n        type: integer\n        format: int64\n      name:\n        type: string\n      tag:\n        type: string\n  Pets:\n    type: array\n    items:\n      $ref: '#/definitions/Pet'\n  Error:\n    type: \"object\"\n    required:\n      - code\n      - message\n    properties:\n      code:\n        type: integer\n        format: int32\n      message:\n        type: string\n"
+                    },
+                    "template": "openAPI",
+                    "framework": "go-gin-server"
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-rest-server-with-openapi-project",
+		Json:           restServerWithOpenAPIConfigJSON,
+	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-rest-server-with-openapi-project")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
+func TestWsServerGenerator(t *testing.T) {
+	wsServerConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-b0": {
+            "id": "node-b0",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "circle",
+                "name": "student-service",
+                "language": "go",
+                "wsConfig": {
+                    "server": {
+                        "sqlDb": "SQLite",
+                        "port": "50052",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": "string",
+                                    "RollNumber": "int32",
+                                    "College": "string"
+                                },
+                                "name": "StudentModel"
+                            }
+                        ]
+                    },
+                    "framework": "go-ws-server",
+                    "template": "compage"
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-ws-server-project",
+		Json:           wsServerConfigJSON,
+	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-ws-server-project")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		if err0.Error() == "unsupported protocol ws for language go" {
+			// TODO implementation is yet to be done
+		} else {
+			t.Errorf("handlers.Handle failed %s", err0.Error())
+		}
 	}
 }

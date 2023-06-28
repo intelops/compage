@@ -43,6 +43,7 @@ import {
     getCurrentState,
     setCurrentConfig,
     setCurrentState,
+    setModifiedState,
     setReset,
     shouldReset
 } from "../../utils/localstorage-client";
@@ -63,13 +64,14 @@ import {ButtonsPanel} from "./buttons-panel";
 import {UpdateProjectRequest} from "../../features/projects-operations/model";
 import {updateProjectAsync} from "../../features/projects-operations/async-apis/updateProject";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
-import {selectGetProjectData, selectUpdateProjectStatus} from "../../features/projects-operations/slice";
-import {cleanse, removeUnwantedKeys} from "./helper/helper";
+import {selectUpdateProjectStatus} from "../../features/projects-operations/slice";
+import {cleanse, getParsedCurrentConfig, getParsedModifiedState, removeUnwantedKeys} from "./helper/helper";
 import * as _ from "lodash";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import {getCurrentUserName} from "../../utils/sessionstorage-client";
 import {useNavigate} from "react-router-dom";
+import {CompageEdge, CompageJson, CompageNode} from "./models";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -97,9 +99,7 @@ export const DiagramMakerContainer = ({
     const containerRef = useRef() as any;
     const diagramMakerRef = useRef() as any;
     const dispatch = useAppDispatch();
-    const getProjectData = useAppSelector(selectGetProjectData);
     const updateProjectStatus = useAppSelector(selectUpdateProjectStatus);
-
     const navigate = useNavigate();
 
     // handle ctrl+s in window
@@ -301,6 +301,34 @@ export const DiagramMakerContainer = ({
                 } as ContextMenuRenderCallbacks,
             },
             actionInterceptor: (action: Action, next: Dispatch<Action>, getState: () => DiagramMakerData<{}, {}>) => {
+                const removeGrpcClient = (srcNode: CompageNode, destNode: CompageNode) => {
+                    if (destNode.consumerData.grpcConfig && destNode.consumerData.grpcConfig.clients) {
+                        for (let i = 0; i < destNode.consumerData.grpcConfig.clients.length; i++) {
+                            if (destNode.consumerData.grpcConfig.clients[i].sourceNodeId === srcNode.id) {
+                                destNode.consumerData.grpcConfig.clients.splice(i--, 1);
+                            }
+                        }
+                    }
+                };
+                const removeRestClient = (srcNode: CompageNode, destNode: CompageNode) => {
+                    if (destNode.consumerData.restConfig && destNode.consumerData.restConfig.clients) {
+                        for (let i = 0; i < destNode.consumerData.restConfig.clients.length; i++) {
+                            if (destNode.consumerData.restConfig.clients[i].sourceNodeId === srcNode.id) {
+                                destNode.consumerData.restConfig.clients.splice(i--, 1);
+                            }
+                        }
+                    }
+                };
+                const removeWsClient = (srcNode: CompageNode, destNode: CompageNode) => {
+                    if (destNode.consumerData.wsConfig && destNode.consumerData.wsConfig.clients) {
+                        for (let i = 0; i < destNode.consumerData.wsConfig.clients.length; i++) {
+                            if (destNode.consumerData.wsConfig.clients[i].sourceNodeId === srcNode.id) {
+                                destNode.consumerData.wsConfig.clients.splice(i--, 1);
+                            }
+                        }
+                    }
+                };
+
                 // onAction(action);
                 if (actionInterceptor) {
                     const diagramMakerAction = action as DiagramMakerAction<{ odd: boolean }, {}>;
@@ -329,8 +357,42 @@ export const DiagramMakerContainer = ({
                             message = "Are you sure you want to delete the edge(s) : [" + diagramMakerAction.payload.edgeIds + "]";
                             result = "Deleting edge(s) : [" + diagramMakerAction.payload.edgeIds + "]";
                         }
-                        if (diagramMakerAction.payload.nodeIds.length > 0 || diagramMakerAction.payload.edgeIds.length > 0) {
-                            if (!window.confirm(message)) {
+                        if (diagramMakerAction.payload.edgeIds.length > 0 || diagramMakerAction.payload.nodeIds.length > 0) {
+                            if (window.confirm(message)) {
+                                // delete the sourceNodes info from destination nodes for the edges getting deleted.
+                                const parsedCurrentConfig: CompageJson = getParsedCurrentConfig();
+                                const parsedModifiedState: CompageJson = getParsedModifiedState();
+                                for (const item of diagramMakerAction.payload.edgeIds) {
+                                    // iterate over edges and extract nodes and modify the clients
+                                    const selectedEdge: CompageEdge = parsedCurrentConfig.edges[item];
+                                    if (selectedEdge) {
+                                        const srcNodeConfig: CompageNode = parsedCurrentConfig.nodes[selectedEdge.src];
+                                        const destNodeState: CompageNode = parsedModifiedState.nodes[selectedEdge.dest];
+                                        if (destNodeState) {
+                                            removeGrpcClient(srcNodeConfig, destNodeState);
+                                            removeRestClient(srcNodeConfig, destNodeState);
+                                            // removeWsClient(srcNodeConfig, destNodeState)
+                                        }
+                                    }
+                                }
+                                // delete the sourceNodes info from destination nodes for the node getting deleted.
+                                for (const nodeIdsToBeDeleted of diagramMakerAction.payload.nodeIds) {
+                                    // iterate over nodes and check if the node has sourceNode reference in clients.
+                                    const nodeToBeDeletedConfig: CompageNode = parsedCurrentConfig.nodes[nodeIdsToBeDeleted];
+                                    // tslint:disable-next-line: forin
+                                    for (const key in parsedModifiedState.nodes) {
+                                        const destNodeState: CompageNode = parsedModifiedState.nodes[key];
+                                        const destNodeConfig: CompageNode = parsedCurrentConfig.nodes[key];
+                                        if (nodeToBeDeletedConfig.id !== destNodeConfig.id) {
+                                            removeGrpcClient(nodeToBeDeletedConfig, destNodeState);
+                                            removeRestClient(nodeToBeDeletedConfig, destNodeState);
+                                            // removeWsClient(nodeToBeDeleted, destNodeState)
+                                        }
+                                    }
+                                }
+
+                                setModifiedState(JSON.stringify(parsedModifiedState));
+                            } else {
                                 return;
                             }
                         }

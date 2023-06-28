@@ -1,5 +1,42 @@
 package utils
 
+// GetFieldsDataTypeForProtobuf returns the protobuf data type for the given data type, Used in go struct
+func GetFieldsDataTypeForProtobuf(value string) string {
+	switch value {
+	case "rune":
+		fallthrough
+	case "byte":
+		fallthrough
+	case "uintptr":
+		fallthrough
+	case "int":
+		fallthrough
+	case "int16":
+		fallthrough
+	case "int32":
+		return "int32"
+	case "int64":
+		fallthrough
+	case "uint64":
+		return "int64"
+	case "uint":
+		fallthrough
+	case "uint8":
+		fallthrough
+	case "uint16":
+		fallthrough
+	case "uint32":
+		return "uint32"
+	case "bool":
+		return "bool"
+	case "string":
+		return "string"
+	default:
+		return value
+	}
+}
+
+// GetProtoBufDataType returns the protobuf data type for the given data type, Used in proto file
 func GetProtoBufDataType(value string) string {
 	switch value {
 	case "rune":
@@ -15,6 +52,8 @@ func GetProtoBufDataType(value string) string {
 	case "int32":
 		return "int32"
 	case "int64":
+		fallthrough
+	case "uint64":
 		return "int64"
 	case "uint":
 		fallthrough
@@ -24,8 +63,6 @@ func GetProtoBufDataType(value string) string {
 		fallthrough
 	case "uint32":
 		return "uint32"
-	case "uint64":
-		return "int64"
 	case "bool":
 		return "bool"
 	case "float32":
@@ -34,14 +71,14 @@ func GetProtoBufDataType(value string) string {
 		fallthrough
 	case "complex128":
 		fallthrough
-	case "float64 ":
+	case "float64":
 		return "double"
 	case "[]byte":
 		return "bytes"
 	case "string":
 		return "string"
 	default:
-		return "string"
+		return value
 	}
 }
 
