@@ -9,6 +9,7 @@ import {getCurrentConfig, setModifiedState} from "../../../utils/localstorage-cl
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
+import * as _ from 'lodash';
 import {
     Checkbox,
     FormControlLabel,
@@ -1243,39 +1244,38 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         // update Node Validation
         const updateNodeValidation = ()=>{
             // Bare minimum validation
-            if(payload.name.value === '' || payload.language === '' || uploadYamlStatus === 'loading'){
+            if(_.isEmpty(payload.name.value) || _.isEmpty(payload.language) || uploadYamlStatus === 'loading'){
                 return true
             }
 
             // validation for rest server
-            if((payload.name.value !== '' && payload.language !== '') && payload.isRestServer){
+            if((!(_.isEmpty(payload.name.value)) && !(_.isEmpty(payload.language))) && payload.isRestServer){
                 // validation for rest server with openAPI template
                 if(payload.restConfig.template === 'openAPI'){
-                    let openValidation = (payload.restConfig.template === 'openAPI' && payload.restConfig.framework !== '' && JSON.stringify(uploadYamlData) !== '{}' );
-                    return !openValidation
+                    const openValidation = (payload.restConfig.template === 'openAPI' && !(_.isEmpty(payload.restConfig.framework)) && JSON.stringify(uploadYamlData) !== '{}' );
+                    return !openValidation;
                 }
 
                 // validation for rest server with compage template 
                 if(payload.language === 'go' && payload.restConfig.template === 'compage'){
                     // if template is compage and grpc server
                     if(payload.isGrpcServer){
-                        let compageRestValidation = payload?.restConfig?.server?.port !== '' && payload?.restConfig?.server?.sqlDb !== ''
-                        let compageValidation = payload?.grpcConfig?.server?.port !== '' && payload?.grpcConfig?.server?.sqlDb !== ''                     
-                        return !(compageValidation && compageRestValidation)
+                        const compageRestValidation = !(_.isEmpty(payload?.restConfig?.server?.port))&& (_.isEmpty(payload?.restConfig?.server?.sqlDb));
+                        const compageValidation = !(_.isEmpty(payload?.grpcConfig?.server?.port )) && !(_.isEmpty(payload?.grpcConfig?.server?.sqlDb ));                   
+                        return !(compageValidation && compageRestValidation);
                     }
-                    let compageValidation = payload?.restConfig?.server?.port !== '' && payload?.restConfig?.server?.sqlDb !== ''
+                    const compageValidation = !(_.isEmpty(payload?.restConfig?.server?.port)) && !(_.isEmpty(payload?.restConfig?.server?.sqlDb));
                     return !compageValidation
                 }
             }
 
 
             // // validation for gRPC Server
-            if((payload.name.value !== '' && payload.language !== '') && payload.isGrpcServer && !payload.isRestServer){
+            if((!(_.isEmpty(payload.name.value)) && !(_.isEmpty(payload.language))) && payload.isGrpcServer && !payload.isRestServer){
                 if(payload.language === 'go' && payload.restConfig.template === 'compage'){
-                    let compageValidation = payload?.grpcConfig?.server?.port !== '' && payload?.grpcConfig?.server?.sqlDb !== ''
+                    const compageValidation = !(_.isEmpty(payload?.grpcConfig?.server?.port )) && !(_.isEmpty(payload?.grpcConfig?.server?.sqlDb ));                   
                     return !compageValidation
                 }
-                return true    
             }
         }
     
