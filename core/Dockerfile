@@ -22,7 +22,7 @@ FROM alpine:3.18.2
 # Create project directory (workdir)
 WORKDIR /app
 
-RUN apk update && apk add protoc && apk add openjdk8 && apk add make && apk add bash && apk add curl && apk add jq && apk add --update go \
+RUN apk update && apk add protoc && apk add dos2unix && apk add openjdk8 && apk add make && apk add bash && apk add curl && apk add jq && apk add --update go \
     && curl https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/bin/utils/openapi-generator-cli.sh \
     > /app/openapi-generator-cli \
     && chmod a+x /app/openapi-generator-cli

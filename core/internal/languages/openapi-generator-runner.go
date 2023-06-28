@@ -11,7 +11,13 @@ import (
 
 // runs openapi-generator-cli with args passed.
 func runOpenAPIGenerator(args ...string) error {
-	output, err := exec.Command("openapi-generator-cli", args...).Output()
+	path, err := exec.LookPath("openapi-generator-cli")
+	if err != nil {
+		log.Debugf("err : %s", err)
+		return errors.New("'openapi-generator-cli' command doesn't exist")
+	}
+	log.Debugf("openapi-generator-cli is available at %s", path)
+	output, err := exec.Command(path, args...).Output()
 	if err != nil {
 		log.Debugf("Output : %s", string(output))
 		log.Debugf("err : %s", err)
@@ -46,6 +52,12 @@ func ProcessOpenAPITemplate(ctx context.Context) error {
 		return err
 	}
 
+	// dos2unix on the file
+	if err = runDos2Unix(fileName); err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+
 	// generate code by openapi.yaml
 	if err0 := runOpenAPIGenerator("generate", "-i", fileName, "-g", strings.ToLower(values.LanguageNode.RestConfig.Framework), "-o", values.NodeDirectoryName, "--git-user-id", values.TemplateVars[UserName], "--git-repo-id", values.TemplateVars[RepositoryName]+"/"+values.LanguageNode.Name); err0 != nil {
 		log.Debugf("err : %s", err0)
@@ -56,6 +68,23 @@ func ProcessOpenAPITemplate(ctx context.Context) error {
 	if err1 := runOpenAPIGenerator("generate", "-i", fileName, "-g", "dynamic-html", "-o", values.NodeDirectoryName+"/gen/docs", "--git-user-id", values.TemplateVars[UserName], "--git-repo-id", values.TemplateVars[RepositoryName]+"/"+values.LanguageNode.Name); err1 != nil {
 		log.Debugf("err : %s", err1)
 		return errors.New("something happened while running openAPI generator for documentation")
+	}
+	return nil
+}
+
+func runDos2Unix(fileName string) error {
+	path, err := exec.LookPath("dos2unix")
+	if err != nil {
+		log.Debugf("err : %s", err)
+		return errors.New("'dos2unix' command doesn't exist")
+	}
+	log.Debugf("dos2unix is available at %s", path)
+	args := []string{fileName}
+	output, err := exec.Command(path, args...).Output()
+	log.Debugf("Output : %s", string(output))
+	if err != nil {
+		log.Debugf("err : %s", err)
+		return err
 	}
 	return nil
 }

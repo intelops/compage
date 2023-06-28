@@ -44,6 +44,7 @@ jobs:
       - name: Test
         run: |
           cd core
+          sudo apt install dos2unix -y
           # install openapi-generator-cli
           mkdir -p $HOME/ogc
           curl https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/bin/utils/openapi-generator-cli.sh > $HOME/ogc/openapi-generator-cli && chmod a+x $HOME/ogc/openapi-generator-cli
