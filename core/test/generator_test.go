@@ -383,7 +383,8 @@ func TestRestServerGenerator(t *testing.T) {
                                 "fields": {
                                     "Name": "string",
                                     "Address": "string",
-                                    "Age": "int32"
+                                    "Age": "int",
+									"Sign": "rune"
                                 },
                                 "name": "User"
                             }
@@ -437,7 +438,11 @@ func TestGrpcServerGenerator(t *testing.T) {
                                 "fields": {
                                     "Name": "string",
                                     "RollNumber": "int32",
-                                    "College": "string"
+                                    "College": "string",
+									"Sign": "rune",
+									"Marks": "int",
+									"GateScore": "uint",
+									"IsPassed": "bool"
                                 },
                                 "name": "StudentModel"
                             }
