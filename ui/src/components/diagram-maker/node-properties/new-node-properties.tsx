@@ -1243,7 +1243,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         // update Node Validation
         const updateNodeValidation = ()=>{
             // Bare minimum validation
-            if(payload.name.value === '' || payload.language === '' || uploadYamlData === 'loading'){
+            if(payload.name.value === '' || payload.language === '' || uploadYamlStatus === 'loading'){
                 return true
             }
 
@@ -1251,33 +1251,34 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             if((payload.name.value !== '' && payload.language !== '') && payload.isRestServer){
                 // validation for rest server with openAPI template
                 if(payload.restConfig.template === 'openAPI'){
-                    let openValidation = (payload.restConfig.template === 'openAPI' && payload.restConfig.framework !== '' && payload.restConfig.framework !== 'go-gin-server' && JSON.stringify(uploadYamlData) !== '{}' );
+                    let openValidation = (payload.restConfig.template === 'openAPI' && payload.restConfig.framework !== '' && JSON.stringify(uploadYamlData) !== '{}' );
                     return !openValidation
                 }
 
                 // validation for rest server with compage template 
                 if(payload.language === 'go' && payload.restConfig.template === 'compage'){
-                    console.log(payload?.restConfig)
+                    // if template is compage and grpc server
+                    if(payload.isGrpcServer){
+                        let compageRestValidation = payload?.restConfig?.server?.port !== '' && payload?.restConfig?.server?.sqlDb !== ''
+                        let compageValidation = payload?.grpcConfig?.server?.port !== '' && payload?.grpcConfig?.server?.sqlDb !== ''                     
+                        return !(compageValidation && compageRestValidation)
+                    }
                     let compageValidation = payload?.restConfig?.server?.port !== '' && payload?.restConfig?.server?.sqlDb !== ''
-                    console.log(compageValidation);
                     return !compageValidation
                 }
-
-                // disables the update node button if the above conditions doesn't meet
-                return true    
             }
-    
-            // validation for gRPC Server
-            if((payload.name.value !== '' && payload.language !== '') && payload.isGrpcServer){
+
+
+            // // validation for gRPC Server
+            if((payload.name.value !== '' && payload.language !== '') && payload.isGrpcServer && !payload.isRestServer){
                 if(payload.language === 'go' && payload.restConfig.template === 'compage'){
-                    console.log(payload?.grpcConfig)
                     let compageValidation = payload?.grpcConfig?.server?.port !== '' && payload?.grpcConfig?.server?.sqlDb !== ''
                     return !compageValidation
                 }
                 return true    
             }
         }
-
+    
     return <React.Fragment>
         {payload.isDeleteRestServerResourceOpen && (
             <DeleteRestServerResource isOpen={payload.isDeleteRestServerResourceOpen}
