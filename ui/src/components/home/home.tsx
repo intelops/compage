@@ -44,15 +44,17 @@ export const Home = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        const currentProjectDetails: string = getCurrentProjectDetails();
-        if (currentProjectDetails) {
-            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
-            const getProjectRequest: GetProjectRequest = {
-                id: userNameAndProjectAndVersion[1]
-            };
-            dispatch(existsProjectAsync(getProjectRequest));
-            const getCurrentProjectContext: GetCurrentContextRequest = {};
-            dispatch(getCurrentContextAsync(getCurrentProjectContext));
+        if (authData.login) {
+            const currentProjectDetails: string = getCurrentProjectDetails();
+            if (currentProjectDetails) {
+                const userNameAndProjectAndVersion = currentProjectDetails.split("###");
+                const getProjectRequest: GetProjectRequest = {
+                    id: userNameAndProjectAndVersion[1]
+                };
+                dispatch(existsProjectAsync(getProjectRequest));
+                const getCurrentProjectContext: GetCurrentContextRequest = {};
+                dispatch(getCurrentContextAsync(getCurrentProjectContext));
+            }
         }
     }, [dispatch]);
 
