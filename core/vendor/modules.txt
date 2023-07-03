@@ -1,24 +1,6 @@
-# github.com/bytedance/sonic v1.9.1
-## explicit; go 1.15
-# github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311
-## explicit; go 1.15
-# github.com/gabriel-vasile/mimetype v1.4.2
-## explicit; go 1.20
 # github.com/gertd/go-pluralize v0.2.1
 ## explicit; go 1.17
 github.com/gertd/go-pluralize
-# github.com/gin-contrib/sse v0.1.0
-## explicit; go 1.12
-# github.com/gin-gonic/gin v1.9.1
-## explicit; go 1.20
-# github.com/go-playground/locales v0.14.1
-## explicit; go 1.17
-# github.com/go-playground/universal-translator v0.18.1
-## explicit; go 1.18
-# github.com/go-playground/validator/v10 v10.14.0
-## explicit; go 1.18
-# github.com/goccy/go-json v0.10.2
-## explicit; go 1.12
 # github.com/golang/protobuf v1.5.3
 ## explicit; go 1.9
 github.com/golang/protobuf/jsonpb
@@ -30,33 +12,11 @@ github.com/golang/protobuf/ptypes/timestamp
 # github.com/iancoleman/strcase v0.2.0
 ## explicit; go 1.16
 github.com/iancoleman/strcase
-# github.com/json-iterator/go v1.1.12
-## explicit; go 1.12
-# github.com/klauspost/cpuid/v2 v2.2.4
-## explicit; go 1.15
-# github.com/leodido/go-urn v1.2.4
-## explicit; go 1.16
-# github.com/mattn/go-isatty v0.0.19
-## explicit; go 1.15
-# github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
-## explicit
-# github.com/modern-go/reflect2 v1.0.2
-## explicit; go 1.12
-# github.com/pelletier/go-toml/v2 v2.0.8
-## explicit; go 1.16
 # github.com/sirupsen/logrus v1.9.0
 ## explicit; go 1.13
 github.com/sirupsen/logrus
 # github.com/stretchr/testify v1.8.3
 ## explicit; go 1.20
-# github.com/twitchyliquid64/golang-asm v0.15.1
-## explicit; go 1.13
-# github.com/ugorji/go/codec v1.2.11
-## explicit; go 1.11
-# golang.org/x/arch v0.3.0
-## explicit; go 1.17
-# golang.org/x/crypto v0.9.0
-## explicit; go 1.17
 # golang.org/x/exp v0.0.0-20230321023759-10a507213a29
 ## explicit; go 1.18
 golang.org/x/exp/constraints
@@ -142,7 +102,7 @@ google.golang.org/grpc/serviceconfig
 google.golang.org/grpc/stats
 google.golang.org/grpc/status
 google.golang.org/grpc/tap
-# google.golang.org/protobuf v1.30.0
+# google.golang.org/protobuf v1.31.0
 ## explicit; go 1.11
 google.golang.org/protobuf/encoding/protojson
 google.golang.org/protobuf/encoding/prototext
@@ -176,5 +136,3 @@ google.golang.org/protobuf/types/descriptorpb
 google.golang.org/protobuf/types/known/anypb
 google.golang.org/protobuf/types/known/durationpb
 google.golang.org/protobuf/types/known/timestamppb
-# gopkg.in/yaml.v3 v3.0.1
-## explicit
