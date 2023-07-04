@@ -9,6 +9,7 @@ import {getCurrentConfig, setModifiedState} from "../../../utils/localstorage-cl
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
+import * as _ from 'lodash';
 import {
     Checkbox,
     FormControlLabel,
@@ -1240,6 +1241,51 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return [];
     };
 
+        // update Node Validation
+    const updateNodeValidation = ()=>{
+        const notEmpty = (value : string)=> value !== '';
+        // Bare minimum validation
+        if(_.isEmpty(payload.name.value) || _.isEmpty(payload.language) || uploadYamlStatus === 'loading'){
+            return true
+        }
+
+        // validation for rest server
+        if((notEmpty(payload.name.value) && notEmpty(payload.language)) && payload.isRestServer){
+            // validation for rest server with openAPI template
+            if(payload.restConfig.template === 'openAPI'){
+                if(payload.isGrpcServer){
+                    const openValidation = ( notEmpty(payload.restConfig.framework) && JSON.stringify(uploadYamlData) !== '{}' && notEmpty(uploadYamlData.content) );
+                    const compageValidation = notEmpty(payload?.grpcConfig?.server?.port) && notEmpty(payload?.grpcConfig?.server?.sqlDb);                     
+                    return !(compageValidation && openValidation)
+                }                
+                const openValidation = (notEmpty(payload.restConfig.framework) && JSON.stringify(uploadYamlData) !== '{}' && notEmpty(uploadYamlData.content));
+                return !openValidation
+            }
+
+            // validation for rest server with compage template 
+            if(payload.language === 'go' && payload.restConfig.template === 'compage'){
+                // if template is compage and grpc server
+                if(payload.isGrpcServer){
+                    const compageRestValidation = notEmpty(payload?.restConfig?.server?.port) && notEmpty(payload?.restConfig?.server?.sqlDb)
+                    const compageValidation = notEmpty(payload?.grpcConfig?.server?.port) && notEmpty(payload?.grpcConfig?.server?.sqlDb)                     
+                    return !(compageValidation && compageRestValidation)
+                }
+                const compageValidation = notEmpty(payload?.restConfig?.server?.port) && notEmpty(payload?.restConfig?.server?.sqlDb)
+                return !compageValidation
+            }
+        }
+
+
+        // // validation for gRPC Server
+        if((notEmpty(payload.name.value) && notEmpty(payload.language)) && payload.isGrpcServer && !payload.isRestServer){
+            if(payload.language === 'go' && payload.restConfig.template === 'compage'){
+                let compageValidation = notEmpty(payload?.grpcConfig?.server?.port) && notEmpty(payload?.grpcConfig?.server?.sqlDb)
+                return !compageValidation
+            }
+            return true    
+        }
+    }
+    
     return <React.Fragment>
         {payload.isDeleteRestServerResourceOpen && (
             <DeleteRestServerResource isOpen={payload.isDeleteRestServerResourceOpen}
@@ -1359,7 +1405,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     <Button variant="outlined" color="secondary" onClick={props.onNodePropertiesClose}>Cancel</Button>
                     <Button variant="contained"
                             onClick={handleNodeUpdate}
-                            disabled={payload.name.value === '' || payload.language === '' || uploadYamlStatus === 'loading'}>Update
+                            // added validation based on QA bug
+                            disabled={updateNodeValidation()}>Update
                         Node</Button>
                 </DialogActions>
             </Dialog>
