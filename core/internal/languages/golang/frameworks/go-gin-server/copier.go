@@ -30,7 +30,6 @@ const DaoFile = "dao.go.tmpl"
 const MySQLDaoFile = "mysql-dao.go.tmpl"
 const SqliteDaoFile = "sqlite-dao.go.tmpl"
 const MySQLDBClientFile = "mysql-client.go.tmpl"
-const SqliteDBClientFile = "sqlite-client.go.tmpl"
 const MySQLDBConfigFile = "mysql.go.tmpl"
 const SqliteDBConfigFile = "sqlite.go.tmpl"
 const ModelFile = "model.go.tmpl"
@@ -191,16 +190,9 @@ func (c Copier) copyRestServerResourceFiles(resource *corenode.Resource) error {
 	targetResourceSQLDBClientFileName := ""
 	if c.IsSQLDB {
 		if c.SQLDB == Sqlite {
-			// client files
-			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "-client" + "/" + SqliteDBClientFile
-			_, err2 := utils.CopyFile(targetResourceSQLDBClientFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SqliteDBClientFile)
-			if err2 != nil {
-				return err2
-			}
-			filePaths = append(filePaths, targetResourceSQLDBClientFileName)
 			// dao files
 			targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + SqliteDaoFile
-			_, err2 = utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+SqliteDaoFile)
+			_, err2 := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+SqliteDaoFile)
 			if err2 != nil {
 				return err2
 			}
