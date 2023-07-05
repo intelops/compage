@@ -374,23 +374,46 @@ func TestRestServerGenerator(t *testing.T) {
                 "nodeType": "circle",
                 "name": "user-service",
                 "language": "go",
- 				"restConfig": {
+                "restConfig": {
                     "server": {
                         "sqlDb": "SQLite",
                         "port": "1337",
                         "resources": [
                             {
                                 "fields": {
-                                    "Name": "string",
-                                    "Address": "string",
-                                    "Age": "int",
-									"Sign": "rune"
+                                    "Name": {
+                                        "type": "string"
+                                    },
+                                    "Address": {
+                                        "type": "Address",
+                                        "isComposite": true
+                                    },
+                                    "Age": {
+                                        "type": "int"
+                                    },
+                                    "Sign": {
+                                        "type": "rune"
+                                    }
                                 },
                                 "name": "User"
+                            },
+                            {
+                                "fields": {
+                                    "Street": {
+                                        "type": "string"
+                                    },
+                                    "PinCode": {
+                                        "type": "string"
+                                    },
+                                    "City": {
+                                        "type": "string"
+                                    }
+                                },
+                                "name": "Address"
                             }
                         ]
                     },
-					"framework": "go-gin-server",
+                    "framework": "go-gin-server",
                     "template": "compage"
                 }
             }
