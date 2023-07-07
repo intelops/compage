@@ -72,6 +72,7 @@ import Typography from "@mui/material/Typography";
 import {getCurrentUserName} from "../../utils/sessionstorage-client";
 import {useNavigate} from "react-router-dom";
 import {CompageEdge, CompageJson, CompageNode} from "./models";
+import {DEVELOPMENT} from "../../utils/constants";
 
 interface ArgTypes {
     initialData?: DiagramMakerData<{}, {}>;
@@ -619,7 +620,7 @@ export const DiagramMakerContainer = ({
 };
 
 export function addDevTools() {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === DEVELOPMENT) {
         const windowAsAny = window as any;
         // eslint-disable-next-line no-underscore-dangle
         return windowAsAny.__REDUX_DEVTOOLS_EXTENSION__ && windowAsAny.__REDUX_DEVTOOLS_EXTENSION__();

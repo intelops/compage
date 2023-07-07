@@ -45,6 +45,8 @@ spec:
           env:
             - name: SYSTEM_NAMESPACE
               value: {{ .Values.systemNamespace }}
+            - name: LOG_LEVEL
+              value: {{ .Values.app.logLevel }}
             - name: COMPAGE_CORE_URL
               valueFrom:
                 configMapKeyRef:

@@ -1,4 +1,5 @@
 import winston from 'winston';
+import {DEVELOPMENT} from './constants';
 
 const levels = {
     error: 0,
@@ -9,8 +10,8 @@ const levels = {
 };
 
 const level = () => {
-    const env = process.env.NODE_ENV || 'development';
-    const isDevelopment = env === 'development';
+    const env = process.env.NODE_ENV || DEVELOPMENT;
+    const isDevelopment = env === DEVELOPMENT;
     return isDevelopment ? 'debug' : 'info';
 };
 
@@ -35,7 +36,7 @@ const format = winston.format.combine(
 const transports = [
     new winston.transports.Console({
         // set the level here and logs at given level will be recorded.
-        level: level(),
+        level: process.env.LOG_LEVEL || level(),
     }),
     new winston.transports.File({
         filename: 'logs/error.log',

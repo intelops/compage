@@ -12,11 +12,11 @@ import {
     USER_VERSION
 } from './models';
 import Logger from '../util/logger';
-import config from '../util/constants';
+import config, {DEVELOPMENT} from '../util/constants';
 
 export const initializeKubeClient = () => {
     const kubeConfig = new k8s.KubeConfig();
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === DEVELOPMENT) {
         kubeConfig.loadFromDefault();
     } else {
         kubeConfig.loadFromCluster();

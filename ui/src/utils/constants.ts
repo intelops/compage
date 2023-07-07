@@ -1,6 +1,7 @@
 import assert from 'assert';
 
 // const configValue : string = process.env.REACT_APP_SOME_CONFIGURATION
+export const DEVELOPMENT = 'development';
 
 console.log("process.env.NODE_ENV: ", process.env.NODE_ENV);
 console.log("process.env.REACT_APP_GITHUB_APP_CLIENT_ID: ", process.env.REACT_APP_GITHUB_APP_CLIENT_ID);
