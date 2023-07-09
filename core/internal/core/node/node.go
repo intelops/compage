@@ -94,7 +94,7 @@ type WsConfig struct {
 }
 
 type FieldMetadata struct {
-	Type        string `json:"type,omitempty"`
+	Type        string `json:"datatype,omitempty"`
 	IsComposite bool   `json:"isComposite,omitempty"`
 }
 

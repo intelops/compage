@@ -231,8 +231,22 @@ func (c Copier) copyRestServerResourceFiles(resource *corenode.Resource) error {
 	}
 
 	funcMap := template.FuncMap{
-		"toLowerCase": func(key string) string {
-			return strings.ToLower(key)
+		"ToLowerCamelCase": func(key string) string {
+			return strcase.ToLowerCamel(key)
+		},
+		"AddPointerIfCompositeField": func(key string) string {
+			fieldMetaData, ok := resource.Fields[key]
+			if ok && fieldMetaData.IsComposite {
+				return "*" + fieldMetaData.Type
+			}
+			return fieldMetaData.Type
+		},
+		"GetCompositeFields": func(key string) string {
+			fieldMetaData, ok := resource.Fields[key]
+			if ok && fieldMetaData.IsComposite {
+				return key + ": &models." + fieldMetaData.Type + "{},"
+			}
+			return ""
 		},
 	}
 	// apply template
@@ -269,7 +283,7 @@ func (c Copier) addResourceSpecificTemplateData(resource *corenode.Resource) err
 	c.Data["Fields"] = fields
 	// db fields
 	if c.IsSQLDB {
-		createQueryColumns := map[string]string{}
+		var createQueryColumns string
 		var insertQueryColumns string
 		var insertQueryParams string
 		var insertQueryExecColumns string
@@ -283,7 +297,19 @@ func (c Copier) addResourceSpecificTemplateData(resource *corenode.Resource) err
 			if err != nil {
 				return err
 			}
-			createQueryColumns[key] = dbDataType
+			if len(createQueryColumns) > 0 {
+				if value.IsComposite {
+					createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NULL,"
+				} else {
+					createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
+				}
+			} else {
+				if value.IsComposite {
+					createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NULL,"
+				} else {
+					createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
+				}
+			}
 			if len(insertQueryColumns) > 0 {
 				if value.IsComposite {
 					insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
