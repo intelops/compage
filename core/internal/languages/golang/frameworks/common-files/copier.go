@@ -141,7 +141,16 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 func getResourcePostBody(r *corenode.Resource) string {
 	postBody := "{"
 	for key, value := range r.Fields {
-		sprintf := fmt.Sprintf("\"%s\": \"%v\",", key, commonUtils.GetDefaultValueForDataType(value.Type))
+		var sprintf string
+		if value.IsComposite {
+			sprintf = fmt.Sprintf("\"%s\": {},", key)
+		} else {
+			if value.Type == "string" {
+				sprintf = fmt.Sprintf("\"%s\": \"%v\",", key, commonUtils.GetDefaultValueForDataType(value.Type))
+			} else {
+				sprintf = fmt.Sprintf("\"%s\": %v,", key, commonUtils.GetDefaultValueForDataType(value.Type))
+			}
+		}
 		postBody += sprintf
 	}
 	postBody = strings.TrimSuffix(postBody, ",")
@@ -152,7 +161,16 @@ func getResourcePostBody(r *corenode.Resource) string {
 func getResourcePutBody(r *corenode.Resource) string {
 	putBody := fmt.Sprintf("{\"%s\": %v,", "Id", 123)
 	for key, value := range r.Fields {
-		sprintf := fmt.Sprintf("\"%s\": \"%v\",", key, commonUtils.GetDefaultValueForDataType(value.Type))
+		var sprintf string
+		if value.IsComposite {
+			sprintf = fmt.Sprintf("\"%s\": {},", key)
+		} else {
+			if value.Type == "string" {
+				sprintf = fmt.Sprintf("\"%s\": \"%v\",", key, commonUtils.GetDefaultValueForDataType(value.Type))
+			} else {
+				sprintf = fmt.Sprintf("\"%s\": %v,", key, commonUtils.GetDefaultValueForDataType(value.Type))
+			}
+		}
 		putBody += sprintf
 	}
 	putBody = strings.TrimSuffix(putBody, ",")
