@@ -30,7 +30,6 @@ const ServiceFile = "service.go.tmpl"
 const DaoFile = "dao.go.tmpl"
 const MySQLDaoFile = "mysql-dao.go.tmpl"
 const SqliteDaoFile = "sqlite-dao.go.tmpl"
-const MySQLDBClientFile = "mysql-client.go.tmpl"
 const MySQLDBConfigFile = "mysql.go.tmpl"
 const SqliteDBConfigFile = "sqlite.go.tmpl"
 const ModelFile = "model.go.tmpl"
@@ -188,7 +187,6 @@ func (c Copier) copyRestServerResourceFiles(resource *corenode.Resource) error {
 	// copy dao files to generated project
 	// add database config here
 	var targetResourceDaoFileName string
-	targetResourceSQLDBClientFileName := ""
 	if c.IsSQLDB {
 		if c.SQLDB == Sqlite {
 			// dao files
@@ -199,17 +197,9 @@ func (c Copier) copyRestServerResourceFiles(resource *corenode.Resource) error {
 			}
 			filePaths = append(filePaths, targetResourceDaoFileName)
 		} else if c.SQLDB == MySQL {
-			// client files
-			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "-client" + "/" + MySQLDBClientFile
-			_, err2 := utils.CopyFile(targetResourceSQLDBClientFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBClientFile)
-			if err2 != nil {
-				return err2
-			}
-			filePaths = append(filePaths, targetResourceSQLDBClientFileName)
-
 			// dao files
 			targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + MySQLDaoFile
-			_, err2 = utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+MySQLDaoFile)
+			_, err2 := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+MySQLDaoFile)
 			if err2 != nil {
 				return err2
 			}

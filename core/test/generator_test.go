@@ -382,17 +382,17 @@ func TestRestServerGenerator(t *testing.T) {
                             {
                                 "fields": {
                                     "Name": {
-                                        "type": "string"
+                                        "datatype": "string"
                                     },
                                     "Address": {
-                                        "type": "Address",
+                                        "datatype": "Address",
                                         "isComposite": true
                                     },
                                     "Age": {
-                                        "type": "int"
+                                        "datatype": "int"
                                     },
                                     "Sign": {
-                                        "type": "rune"
+                                        "datatype": "rune"
                                     }
                                 },
                                 "name": "User"
@@ -400,13 +400,13 @@ func TestRestServerGenerator(t *testing.T) {
                             {
                                 "fields": {
                                     "Street": {
-                                        "type": "string"
+                                        "datatype": "string"
                                     },
                                     "PinCode": {
-                                        "type": "string"
+                                        "datatype": "string"
                                     },
                                     "City": {
-                                        "type": "string"
+                                        "datatype": "string"
                                     }
                                 },
                                 "name": "Address"
