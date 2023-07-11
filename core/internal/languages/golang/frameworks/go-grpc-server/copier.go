@@ -34,8 +34,6 @@ const ServiceFile = "service.go.tmpl"
 const DaoFile = "dao.go.tmpl"
 const MySQLDaoFile = "mysql-dao.go.tmpl"
 const SqliteDaoFile = "sqlite-dao.go.tmpl"
-const MySQLDBClientFile = "mysql-client.go.tmpl"
-const SqliteDBClientFile = "sqlite-client.go.tmpl"
 const MySQLDBConfigFile = "mysql.go.tmpl"
 const SqliteDBConfigFile = "sqlite.go.tmpl"
 const ModelFile = "model.go.tmpl"
@@ -155,13 +153,6 @@ func (c Copier) createGrpcServerDirectories() error {
 		if err := utils.CreateDirectories(sqlDBClientsDirectory); err != nil {
 			return err
 		}
-		resources := c.Data["GrpcResources"].([]resourceData)
-		for _, r := range resources {
-			resourceClientDirectory := c.NodeDirectoryName + SQLDBClientsPath + "/" + r.SmallKebabCaseResourceNameSingular + "-client"
-			if err := utils.CreateDirectories(resourceClientDirectory); err != nil {
-				return err
-			}
-		}
 	}
 	return nil
 }
@@ -198,35 +189,19 @@ func (c Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
 	// copy dao files to generated project
 	// add database config here
 	var targetResourceDaoFileName string
-	targetResourceSQLDBClientFileName := ""
 	if c.IsSQLDB {
 		if c.SQLDB == Sqlite {
-			// client files
-			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "-client" + "/" + SqliteDBClientFile
-			_, err2 := utils.CopyFile(targetResourceSQLDBClientFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SqliteDBClientFile)
-			if err2 != nil {
-				return err2
-			}
-			filePaths = append(filePaths, targetResourceSQLDBClientFileName)
 			// dao files
 			targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + SqliteDaoFile
-			_, err2 = utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+SqliteDaoFile)
+			_, err2 := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+SqliteDaoFile)
 			if err2 != nil {
 				return err2
 			}
 			filePaths = append(filePaths, targetResourceDaoFileName)
 		} else if c.SQLDB == MySQL {
-			// client files
-			targetResourceSQLDBClientFileName = c.NodeDirectoryName + SQLDBClientsPath + "/" + resourceName + "-client" + "/" + MySQLDBClientFile
-			_, err2 := utils.CopyFile(targetResourceSQLDBClientFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBClientFile)
-			if err2 != nil {
-				return err2
-			}
-			filePaths = append(filePaths, targetResourceSQLDBClientFileName)
-
 			// dao files
 			targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + MySQLDaoFile
-			_, err2 = utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+MySQLDaoFile)
+			_, err2 := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+MySQLDaoFile)
 			if err2 != nil {
 				return err2
 			}
@@ -251,6 +226,23 @@ func (c Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
 	funcMap := template.FuncMap{
 		"incCount": func(count int) int {
 			return count + 2
+		},
+		"ToLowerCamelCase": func(key string) string {
+			return strcase.ToLowerCamel(key)
+		},
+		"AddPointerIfCompositeField": func(key string) string {
+			fieldMetaData, ok := resource.Fields[key]
+			if ok && fieldMetaData.IsComposite {
+				return "*" + fieldMetaData.Type
+			}
+			return fieldMetaData.Type
+		},
+		"GetCompositeFields": func(key string) string {
+			fieldMetaData, ok := resource.Fields[key]
+			if ok && fieldMetaData.IsComposite {
+				return key + ": &models." + fieldMetaData.Type + "{},"
+			}
+			return ""
 		},
 	}
 	filePaths = append(filePaths, targetResourceAPIFileName)
@@ -302,7 +294,7 @@ func (c Copier) addResourceSpecificTemplateData(resource *corenode.Resource) err
 	c.Data["FieldNames"] = fieldNames
 	// db fields
 	if c.IsSQLDB {
-		createQueryColumns := map[string]string{}
+		var createQueryColumns string
 		var insertQueryColumns string
 		var insertQueryParams string
 		var insertQueryExecColumns string
@@ -316,34 +308,81 @@ func (c Copier) addResourceSpecificTemplateData(resource *corenode.Resource) err
 			if err != nil {
 				return err
 			}
-			createQueryColumns[key] = dbDataType
-			if len(insertQueryColumns) > 0 {
-				insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
-				insertQueryParams += ", ?"
-				// m here is a model's variable
-				insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+			if len(createQueryColumns) > 0 {
+				if value.IsComposite {
+					createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NULL,"
+				} else {
+					createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
+				}
 			} else {
-				insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
-				insertQueryParams = "?"
-				// m here is a model's variable
-				insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+				if value.IsComposite {
+					createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NULL,"
+				} else {
+					createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
+				}
+			}
+			if len(insertQueryColumns) > 0 {
+				if value.IsComposite {
+					insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
+					insertQueryParams += ", ?"
+					// m here is a model's variable
+					insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+				} else {
+					insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
+					insertQueryParams += ", ?"
+					// m here is a model's variable
+					insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+				}
+			} else {
+				if value.IsComposite {
+					insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
+					insertQueryParams = "?"
+					// m here is a model's variable
+					insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+				} else {
+					insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
+					insertQueryParams = "?"
+					// m here is a model's variable
+					insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+				}
 			}
 			if len(updateQueryColumnsAndParams) > 0 {
-				updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
-				// m here is a model's variable
-				updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+				if value.IsComposite {
+					updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
+					// m here is a model's variable
+					updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+				} else {
+					updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
+					// m here is a model's variable
+					updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+				}
 			} else {
-				updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
-				// m here is a model's variable
-				updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+				if value.IsComposite {
+					updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
+					// m here is a model's variable
+					updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+				} else {
+					updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
+					// m here is a model's variable
+					updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+				}
 			}
-
 			if len(getQueryScanColumns) > 0 {
-				// m here is a model's variable
-				getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key)
+				if value.IsComposite {
+					// m here is a model's variable
+					getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+				} else {
+					// m here is a model's variable
+					getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key)
+				}
 			} else {
-				// m here is a model's variable
-				getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key)
+				if value.IsComposite {
+					// m here is a model's variable
+					getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+				} else {
+					// m here is a model's variable
+					getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key)
+				}
 			}
 		}
 		// create query columns

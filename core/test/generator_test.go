@@ -51,9 +51,15 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
                         "resources": [
                             {
                                 "fields": {
-                                    "invoiceDate": "string",
-                                    "items": "string",
-                                    "Amount": "float64"
+                                    "invoiceDate": {
+                                        "datatype": "string"
+                                    },
+                                    "items": {
+                                        "datatype": "string"
+                                    },
+                                    "Amount": {
+                                        "datatype": "float64"
+                                    }
                                 },
                                 "name": "Invoice"
                             }
@@ -85,8 +91,12 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
                         "resources": [
                             {
                                 "fields": {
-                                    "Name": "string",
-                                    "Department": "string"
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "Department": {
+                                        "datatype": "string"
+                                    }
                                 },
                                 "name": "User"
                             }
@@ -111,9 +121,15 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
                         "resources": [
                             {
                                 "fields": {
-                                    "invoiceId": "int64",
-                                    "invoiceAmount": "float32",
-                                    "paymentTerms": "string"
+                                    "invoiceId": {
+                                        "datatype": "int64"
+                                    },
+                                    "invoiceAmount": {
+                                        "datatype": "float32"
+                                    },
+                                    "paymentTerms": {
+                                        "datatype": "string"
+                                    }
                                 },
                                 "name": "Payment"
                             }
@@ -141,9 +157,15 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
                         "resources": [
                             {
                                 "fields": {
-                                    "invoiceId": "int64",
-                                    "invoiceAmount": "float32",
-                                    "paymentTerms": "string"
+                                    "invoiceId": {
+                                        "datatype": "int64"
+                                    },
+                                    "invoiceAmount": {
+                                        "datatype": "float32"
+                                    },
+                                    "paymentTerms": {
+                                        "datatype": "string"
+                                    }
                                 },
                                 "name": "Payment"
                             }
@@ -212,7 +234,9 @@ func TestRestClientAndGrpcClientCrossConfigGenerator(t *testing.T) {
                         "resources": [
                             {
                                 "fields": {
-                                    "Name": "string"
+                                    "Name": {
+                                        "datatype": "string"
+                                    }
                                 },
                                 "name": "User"
                             }
@@ -259,7 +283,9 @@ func TestRestClientAndGrpcClientCrossConfigGenerator(t *testing.T) {
                         "resources": [
                             {
                                 "fields": {
-                                    "NameG": "string"
+                                    "NameG": {
+                                        "datatype": "string"
+                                    }
                                 },
                                 "name": "Account"
                             }
@@ -304,22 +330,28 @@ func TestRestAndGrpcServerGenerator(t *testing.T) {
                 "nodeType": "circle",
                 "name": "user-service",
                 "language": "go",
-				"grpcConfig": {
+                "grpcConfig": {
                     "server": {
                         "sqlDb": "SQLite",
                         "port": "50052",
                         "resources": [
                             {
                                 "fields": {
-                                    "Name": "string",
-                                    "RollNumber": "int32",
-                                    "College": "string"
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "RollNumber": {
+                                        "datatype": "int32"
+                                    },
+                                    "College": {
+                                        "datatype": "string"
+                                    }
                                 },
                                 "name": "StudentModel"
                             }
                         ]
                     },
-					"framework": "go-grpc-server",
+                    "framework": "go-grpc-server",
                     "template": "compage"
                 },
                 "restConfig": {
@@ -329,7 +361,9 @@ func TestRestAndGrpcServerGenerator(t *testing.T) {
                         "resources": [
                             {
                                 "fields": {
-                                    "Name": "string"
+                                    "Name": {
+                                        "datatype": "string"
+                                    }
                                 },
                                 "name": "User"
                             }
@@ -459,13 +493,27 @@ func TestGrpcServerGenerator(t *testing.T) {
                         "resources": [
                             {
                                 "fields": {
-                                    "Name": "string",
-                                    "RollNumber": "int32",
-                                    "College": "string",
-									"Sign": "rune",
-									"Marks": "int",
-									"GateScore": "uint",
-									"IsPassed": "bool"
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "RollNumber": {
+                                        "datatype": "int32"
+                                    },
+                                    "College": {
+                                        "datatype": "string"
+                                    },
+                                    "Sign": {
+                                        "datatype": "rune"
+                                    },
+                                    "Marks": {
+                                        "datatype": "int"
+                                    },
+                                    "GateScore": {
+                                        "datatype": "uint"
+                                    },
+                                    "IsPassed": {
+                                        "datatype": "bool"
+                                    }
                                 },
                                 "name": "StudentModel"
                             }
@@ -563,9 +611,15 @@ func TestWsServerGenerator(t *testing.T) {
                         "resources": [
                             {
                                 "fields": {
-                                    "Name": "string",
-                                    "RollNumber": "int32",
-                                    "College": "string"
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "RollNumber": {
+                                        "datatype": "int32"
+                                    },
+                                    "College": {
+                                        "datatype": "string"
+                                    }
                                 },
                                 "name": "StudentModel"
                             }
