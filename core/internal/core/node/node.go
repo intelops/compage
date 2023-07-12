@@ -93,9 +93,14 @@ type WsConfig struct {
 	Clients   []*WsClient `json:"clients"`
 }
 
+type FieldMetadata struct {
+	Type        string `json:"datatype,omitempty"`
+	IsComposite bool   `json:"isComposite,omitempty"`
+}
+
 // Resource depicts the endpoints(e.g. /users, /accounts)
 type Resource struct {
 	Name string `json:"name"`
 	// resources fields (e.g. name, age in user)
-	Fields map[string]string `json:"fields"`
+	Fields map[string]FieldMetadata `json:"fields"`
 }

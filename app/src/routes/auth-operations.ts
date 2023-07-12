@@ -92,6 +92,7 @@ authOperationsRouter.get('/check_token', requireUserNameMiddleware, async (req, 
         }
         return res.status(200).json(response.data);
     }).catch((error) => {
+        Logger.debug(`error occurred while retrieving access token from github : ${JSON.stringify(error)}`);
         return res.status(500).json(error);
     });
 });
@@ -99,5 +100,6 @@ authOperationsRouter.get('/check_token', requireUserNameMiddleware, async (req, 
 export default authOperationsRouter;
 
 const getLoginError = (error: string): LoginError => {
+    Logger.debug(`error occurred while retrieving access token from github : ${JSON.stringify(error)}`);
     return {message: error};
 };

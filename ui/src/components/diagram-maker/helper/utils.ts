@@ -1,6 +1,7 @@
 import {DiagramMakerNode, Event, WorkspaceActions} from 'diagram-maker';
 import {Action, AnyAction} from 'redux';
 import {getModifiedState} from "../../../utils/localstorage-client";
+import {DEVELOPMENT} from "../../../utils/constants";
 
 export function createDivWithText(text: string) {
     const newDiv = document.createElement('div');
@@ -212,7 +213,7 @@ export function updateActionInLogger(action: Action) {
 }
 
 export function addDevTools() {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === DEVELOPMENT) {
         const windowAsAny = window as any;
         // eslint-disable-next-line no-underscore-dangle
         return windowAsAny.__REDUX_DEVTOOLS_EXTENSION__ && windowAsAny.__REDUX_DEVTOOLS_EXTENSION__();

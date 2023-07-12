@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import os from 'os';
 
 export const X_USER_NAME_HEADER = 'X-User-Name';
+export const DEVELOPMENT = 'development';
+export const TEST = 'test';
 
 const readSecretFile = (secretPath: string) => {
     const keyValuePairs: Map<string, string> = new Map();
@@ -19,12 +21,12 @@ const readSecretFile = (secretPath: string) => {
 };
 
 if (!process.env.NODE_ENV) {
-    process.env.NODE_ENV = 'development';
+    process.env.NODE_ENV = DEVELOPMENT;
 }
 
-Logger.info(`process.env.NODE_ENV:  ${process.env.NODE_ENV || 'development'}`);
-const isDevelopment = (process.env.NODE_ENV === 'development');
-const isTest = (process.env.NODE_ENV === 'test');
+Logger.info(`process.env.NODE_ENV:  ${process.env.NODE_ENV || DEVELOPMENT}`);
+const isDevelopment = (process.env.NODE_ENV === DEVELOPMENT);
+const isTest = (process.env.NODE_ENV === TEST);
 let config: Config;
 if (isDevelopment) {
     // use verbose logging

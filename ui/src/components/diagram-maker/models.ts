@@ -3,7 +3,12 @@ import {COMPAGE, GO_GIN_SERVER, GO_GRPC_SERVER} from "./node-properties/utils";
 export interface Resource {
     name: string;
     // the below map can contain metadata about the field.
-    fields?: Map<string, Map<string, string>>;
+    fields?: Map<string, FieldMetadata>;
+}
+
+export interface FieldMetadata {
+    datatype: string;
+    isComposite: boolean;
 }
 
 export interface RestConfig {
@@ -147,10 +152,10 @@ export const getEmptyWsConfig = () => {
 
 export const EmptyCurrentRestResource: Resource = {
     name: "",
-    fields: new Map<string, Map<string, string>>()
+    fields: new Map<string, FieldMetadata>()
 };
 
 export const EmptyCurrentGrpcResource: Resource = {
     name: "",
-    fields: new Map<string, Map<string, string>>()
+    fields: new Map<string, FieldMetadata>()
 };
