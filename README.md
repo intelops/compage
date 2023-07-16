@@ -15,7 +15,7 @@
 ![core-ci](https://github.com/intelops/compage/workflows/core-ci/badge.svg)
 ![ui-ci](https://github.com/intelops/compage/workflows/ui-ci/badge.svg)
 [![codecov](https://codecov.io/gh/intelops/compage/branch/main/graph/badge.svg?token=HZZ0196V4D)](https://codecov.io/gh/intelops/compage)
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/intelops/compage/core)](https://goreportcard.com/report/github.com/intelops/compage/core)
 [![Price](https://img.shields.io/badge/price-FREE-0098f7.svg)](https://github.com/intelops/compage/blob/main/LICENSE) [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/DeapQc22qe)
 [![Discussions](https://badgen.net/badge/icon/discussions?label=open)](https://github.com/intelops/compage/discussions)
 [![Code of Conduct](https://badgen.net/badge/icon/code-of-conduct?label=open)](./code-of-conduct.md)
