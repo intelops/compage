@@ -16,7 +16,12 @@ func runOpenAPIGenerator(args ...string) error {
 		log.Debugf("err : %s", err)
 		return errors.New("'openapi-generator-cli' command doesn't exist")
 	}
-	log.Debugf("openapi-generator-cli is available at %s", path)
+	log.Debugf("'openapi-generator-cli' is available at %s", path)
+	err = os.Setenv("OPENAPI_GENERATOR_VERSION", "6.6.0")
+	if err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
 	output, err := exec.Command(path, args...).Output()
 	if err != nil {
 		log.Debugf("Output : %s", string(output))

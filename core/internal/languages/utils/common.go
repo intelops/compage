@@ -54,8 +54,6 @@ func GetProtoBufDataType(value string) string {
 		return "double"
 	} else if value == "[]byte" {
 		return "bytes"
-	} else if value == "string" {
-		return "string"
 	}
 	return value
 }
