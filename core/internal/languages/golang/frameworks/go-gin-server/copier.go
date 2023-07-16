@@ -151,14 +151,6 @@ func (c *Copier) createRestServerDirectories() error {
 			log.Debugf("error creating sql db clients directory: %v", err)
 			return err
 		}
-		resources := c.Data["RestResources"].([]serverResourceData)
-		for _, r := range resources {
-			resourceClientDirectory := c.NodeDirectoryName + SQLDBClientsPath + "/" + r.SmallKebabCaseResourceNameSingular + "-client"
-			if err := utils.CreateDirectories(resourceClientDirectory); err != nil {
-				log.Debugf("error creating resource client directory: %v", err)
-				return err
-			}
-		}
 	}
 	return nil
 }
@@ -273,16 +265,15 @@ func (c *Copier) addSQLDetails(resource *corenode.Resource) error {
 	var getQueryScanColumns *string
 
 	for key, value := range resource.Fields {
-		key = cases.Title(language.Und, cases.NoLower).String(key)
 		dbDataType, err := c.getDBDataType(value.Type)
 		if err != nil {
 			log.Debugf("error while getting db data type for %s", value.Type)
 			return err
 		}
-		createQueryColumns = c.getCreateQueryColumns(key, value, dbDataType)
-		insertQueryColumns, insertQueryParams, insertQueryExecColumns = c.getQueryParamsNColumnsNExecColumns(key, value)
-		updateQueryColumnsAndParams, updateQueryExecColumns = c.getUpdateQueryColumnsAndParamsNExecColumns(key, value)
-		getQueryScanColumns = c.getGetQueryScanColumns(key, value)
+		createQueryColumns = c.getCreateQueryColumns(createQueryColumns, key, value, dbDataType)
+		insertQueryColumns, insertQueryParams, insertQueryExecColumns = c.getQueryParamsNColumnsNExecColumns(insertQueryColumns, insertQueryParams, insertQueryExecColumns, key, value)
+		updateQueryColumnsAndParams, updateQueryExecColumns = c.getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAndParams, updateQueryExecColumns, key, value)
+		getQueryScanColumns = c.getGetQueryScanColumns(getQueryScanColumns, key, value)
 	}
 	// create query columns
 	c.Data["CreateQueryColumns"] = createQueryColumns
@@ -301,9 +292,8 @@ func (c *Copier) addSQLDetails(resource *corenode.Resource) error {
 	return nil
 }
 
-func (c *Copier) getUpdateQueryColumnsAndParamsNExecColumns(key string, value corenode.FieldMetadata) (*string, *string) {
-	var updateQueryColumnsAndParams, updateQueryExecColumns *string
-	if len(*updateQueryColumnsAndParams) > 0 {
+func (c *Copier) getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAndParams, updateQueryExecColumns *string, key string, value corenode.FieldMetadata) (*string, *string) {
+	if updateQueryColumnsAndParams != nil {
 		if value.IsComposite {
 			*updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
 			// m here is a model's variable
@@ -314,6 +304,8 @@ func (c *Copier) getUpdateQueryColumnsAndParamsNExecColumns(key string, value co
 			*updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
 		}
 	} else {
+		updateQueryColumnsAndParams = new(string)
+		updateQueryExecColumns = new(string)
 		if value.IsComposite {
 			*updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
 			// m here is a model's variable
@@ -327,9 +319,8 @@ func (c *Copier) getUpdateQueryColumnsAndParamsNExecColumns(key string, value co
 	return updateQueryColumnsAndParams, updateQueryExecColumns
 }
 
-func (c *Copier) getQueryParamsNColumnsNExecColumns(key string, value corenode.FieldMetadata) (*string, *string, *string) {
-	var insertQueryParams, insertQueryColumns, insertQueryExecColumns *string
-	if len(*insertQueryColumns) > 0 {
+func (c *Copier) getQueryParamsNColumnsNExecColumns(insertQueryColumns, insertQueryParams, insertQueryExecColumns *string, key string, value corenode.FieldMetadata) (*string, *string, *string) {
+	if insertQueryColumns != nil {
 		if value.IsComposite {
 			*insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
 			*insertQueryParams += ", ?"
@@ -342,6 +333,9 @@ func (c *Copier) getQueryParamsNColumnsNExecColumns(key string, value corenode.F
 			*insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
 		}
 	} else {
+		insertQueryParams = new(string)
+		insertQueryColumns = new(string)
+		insertQueryExecColumns = new(string)
 		if value.IsComposite {
 			*insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
 			*insertQueryParams = "?"
@@ -357,15 +351,15 @@ func (c *Copier) getQueryParamsNColumnsNExecColumns(key string, value corenode.F
 	return insertQueryColumns, insertQueryParams, insertQueryExecColumns
 }
 
-func (c *Copier) getCreateQueryColumns(key string, value corenode.FieldMetadata, dbDataType string) *string {
-	var createQueryColumns *string
-	if len(*createQueryColumns) > 0 {
+func (c *Copier) getCreateQueryColumns(createQueryColumns *string, key string, value corenode.FieldMetadata, dbDataType string) *string {
+	if createQueryColumns != nil {
 		if value.IsComposite {
 			*createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NULL,"
 		} else {
 			*createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
 		}
 	} else {
+		createQueryColumns = new(string)
 		if value.IsComposite {
 			*createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NULL,"
 		} else {
@@ -375,9 +369,8 @@ func (c *Copier) getCreateQueryColumns(key string, value corenode.FieldMetadata,
 	return createQueryColumns
 }
 
-func (c *Copier) getGetQueryScanColumns(key string, value corenode.FieldMetadata) *string {
-	var getQueryScanColumns *string
-	if len(*getQueryScanColumns) > 0 {
+func (c *Copier) getGetQueryScanColumns(getQueryScanColumns *string, key string, value corenode.FieldMetadata) *string {
+	if getQueryScanColumns != nil {
 		if value.IsComposite {
 			// m here is a model's variable
 			*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
@@ -386,6 +379,7 @@ func (c *Copier) getGetQueryScanColumns(key string, value corenode.FieldMetadata
 			*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key)
 		}
 	} else {
+		getQueryScanColumns = new(string)
 		if value.IsComposite {
 			// m here is a model's variable
 			*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
@@ -401,7 +395,6 @@ func (c *Copier) addResourceSpecificTemplateData(resource *corenode.Resource) er
 	// make every field public by making its first character capital.
 	fields := map[string]string{}
 	for key, value := range resource.Fields {
-		key = cases.Title(language.Und, cases.NoLower).String(key)
 		fields[key] = value.Type
 	}
 	c.Data["Fields"] = fields
