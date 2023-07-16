@@ -44,7 +44,7 @@ const ClientFile = "client.go.tmpl"
 const Sqlite = "SQLite"
 const MySQL = "MySQL"
 
-// Copier Language specific copier
+// Copier Language specific *Copier
 type Copier struct {
 	NodeDirectoryName string
 	TemplatesRootPath string
@@ -117,7 +117,7 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 }
 
 // createGrpcClientDirectories creates grpc client directories.
-func (c Copier) createGrpcClientDirectories() error {
+func (c *Copier) createGrpcClientDirectories() error {
 	clientDirectory := c.NodeDirectoryName + GrpcClientPath
 	if err := utils.CreateDirectories(clientDirectory); err != nil {
 		return err
@@ -127,7 +127,7 @@ func (c Copier) createGrpcClientDirectories() error {
 }
 
 // createGrpcServerDirectories creates grpc server directories.
-func (c Copier) createGrpcServerDirectories() error {
+func (c *Copier) createGrpcServerDirectories() error {
 	apiDirectory := c.NodeDirectoryName + APIPath
 	controllersDirectory := c.NodeDirectoryName + ControllersPath
 	modelsDirectory := c.NodeDirectoryName + ModelsPath
@@ -160,7 +160,7 @@ func (c Copier) createGrpcServerDirectories() error {
 }
 
 // copyGrpcServerResourceFiles copies grpc server resource files from template and renames them as per resource config.
-func (c Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
+func (c *Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
 	var filePaths []string
 	resourceName := strcase.ToKebab(resource.Name)
 
@@ -193,7 +193,7 @@ func (c Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
 
 	// copy dao files to generated project
 	// add database config here
-	filePaths, err2 := c.copySQLDBResources(resourceName, filePaths)
+	filePaths, err2 := c.copySQLDBResourceFiles(resourceName, filePaths)
 	if err2 != nil {
 		log.Debugf("error copying sql db resources: %v", err2)
 		return err2
@@ -207,7 +207,6 @@ func (c Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
 		return err2
 	}
 
-	funcMap := c.getFuncMap(resource)
 	filePaths = append(filePaths, targetResourceAPIFileName)
 
 	// add resource specific data to map in c needed for templates.
@@ -217,11 +216,14 @@ func (c Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
 		return err
 	}
 
+	// get func map for template
+	funcMap := c.getFuncMap(resource)
+
 	// apply template
 	return executor.ExecuteWithFuncs(filePaths, c.Data, funcMap)
 }
 
-func (c Copier) copySQLDBResources(resourceName string, filePaths []string) ([]string, error) {
+func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []string) ([]string, error) {
 	var targetResourceDaoFileName string
 	if c.IsSQLDB {
 		if c.SQLDB == Sqlite {
@@ -255,7 +257,7 @@ func (c Copier) copySQLDBResources(resourceName string, filePaths []string) ([]s
 	return filePaths, nil
 }
 
-func (c Copier) getFuncMap(resource *corenode.Resource) template.FuncMap {
+func (c *Copier) getFuncMap(resource *corenode.Resource) template.FuncMap {
 	funcMap := template.FuncMap{
 		// this function increments message fields number (grpc message)
 		"incCount": func(count int) int {
@@ -286,7 +288,7 @@ func (c Copier) getFuncMap(resource *corenode.Resource) template.FuncMap {
 }
 
 // CopyGrpcClientResourceFiles copies grpc client files from template and renames them as per client config.
-func (c Copier) CopyGrpcClientResourceFiles(grpcClient *corenode.GrpcClient) error {
+func (c *Copier) CopyGrpcClientResourceFiles(grpcClient *corenode.GrpcClient) error {
 	/// add resource specific data to map in c needed for templates.
 	// TODO grpcClient needs too many changes (like referring the .proto and generated files) we can better just have a client created for local grpcServer)
 	c.Data["GrpcClientPort"] = grpcClient.Port
@@ -306,7 +308,7 @@ func (c Copier) CopyGrpcClientResourceFiles(grpcClient *corenode.GrpcClient) err
 	return executor.Execute(filePaths, c.Data)
 }
 
-func (c Copier) addResourceSpecificTemplateData(resource *corenode.Resource) error {
+func (c *Copier) addResourceSpecificTemplateData(resource *corenode.Resource) error {
 	// make every field public by making its first character capital.
 	fields := map[string]string{}
 	protoFields := map[string]string{}
@@ -342,7 +344,7 @@ func (c Copier) addResourceSpecificTemplateData(resource *corenode.Resource) err
 	return nil
 }
 
-func (c Copier) addSQLDetails(resource *corenode.Resource) error {
+func (c *Copier) addSQLDetails(resource *corenode.Resource) error {
 	var createQueryColumns *string
 	var insertQueryColumns *string
 	var insertQueryParams *string
@@ -359,7 +361,7 @@ func (c Copier) addSQLDetails(resource *corenode.Resource) error {
 			return err
 		}
 		createQueryColumns = c.getCreateQueryColumns(key, value, dbDataType)
-		insertQueryColumns, insertQueryParams, insertQueryExecColumns = c.getQueryParamnsNColumnsNExecColumns(key, value)
+		insertQueryColumns, insertQueryParams, insertQueryExecColumns = c.getQueryParamsNColumnsNExecColumns(key, value)
 		updateQueryColumnsAndParams, updateQueryExecColumns = c.getUpdateQueryColumnsAndParamsNExecColumns(key, value)
 		getQueryScanColumns = c.getGetQueryScanColumns(key, value)
 	}
@@ -380,7 +382,7 @@ func (c Copier) addSQLDetails(resource *corenode.Resource) error {
 	return nil
 }
 
-func (c Copier) getUpdateQueryColumnsAndParamsNExecColumns(key string, value corenode.FieldMetadata) (*string, *string) {
+func (c *Copier) getUpdateQueryColumnsAndParamsNExecColumns(key string, value corenode.FieldMetadata) (*string, *string) {
 	var updateQueryColumnsAndParams, updateQueryExecColumns *string
 	if len(*updateQueryColumnsAndParams) > 0 {
 		if value.IsComposite {
@@ -406,7 +408,7 @@ func (c Copier) getUpdateQueryColumnsAndParamsNExecColumns(key string, value cor
 	return updateQueryColumnsAndParams, updateQueryExecColumns
 }
 
-func (c Copier) getQueryParamnsNColumnsNExecColumns(key string, value corenode.FieldMetadata) (*string, *string, *string) {
+func (c *Copier) getQueryParamsNColumnsNExecColumns(key string, value corenode.FieldMetadata) (*string, *string, *string) {
 	var insertQueryParams, insertQueryColumns, insertQueryExecColumns *string
 	if len(*insertQueryColumns) > 0 {
 		if value.IsComposite {
@@ -436,7 +438,7 @@ func (c Copier) getQueryParamnsNColumnsNExecColumns(key string, value corenode.F
 	return insertQueryColumns, insertQueryParams, insertQueryExecColumns
 }
 
-func (c Copier) getCreateQueryColumns(key string, value corenode.FieldMetadata, dbDataType string) *string {
+func (c *Copier) getCreateQueryColumns(key string, value corenode.FieldMetadata, dbDataType string) *string {
 	var createQueryColumns *string
 	if len(*createQueryColumns) > 0 {
 		if value.IsComposite {
@@ -455,7 +457,7 @@ func (c Copier) getCreateQueryColumns(key string, value corenode.FieldMetadata, 
 }
 
 // CreateGrpcConfigs creates/copies relevant files to generated project
-func (c Copier) CreateGrpcConfigs() error {
+func (c *Copier) CreateGrpcConfigs() error {
 	if err := c.CreateGrpcServer(); err != nil {
 		return err
 	}
@@ -466,7 +468,7 @@ func (c Copier) CreateGrpcConfigs() error {
 }
 
 // CreateGrpcServer creates/copies relevant files to generated project
-func (c Copier) CreateGrpcServer() error {
+func (c *Copier) CreateGrpcServer() error {
 	// if the node is server, add server code
 	if c.IsGrpcServer {
 		// create directories for controller, service, dao[for every resource's db clients], models
@@ -511,7 +513,7 @@ func (c Copier) CreateGrpcServer() error {
 }
 
 // CreateGrpcClients creates/copies relevant files to generated project
-func (c Copier) CreateGrpcClients() error {
+func (c *Copier) CreateGrpcClients() error {
 	// create directories for client
 	if err := c.createGrpcClientDirectories(); err != nil {
 		return err
@@ -537,7 +539,7 @@ func (c Copier) CreateGrpcClients() error {
 }
 
 // CreateRootLevelFiles copies all root level files at language template.
-func (c Copier) CreateRootLevelFiles() error {
+func (c *Copier) CreateRootLevelFiles() error {
 	err := utils.CopyFiles(c.NodeDirectoryName, c.TemplatesRootPath)
 	if err != nil {
 		return err
@@ -549,7 +551,7 @@ func (c Copier) CreateRootLevelFiles() error {
 	return executor.Execute(files, c.Data)
 }
 
-func (c Copier) getDBDataType(value string) (string, error) {
+func (c *Copier) getDBDataType(value string) (string, error) {
 	if c.SQLDB == Sqlite {
 		return commonUtils.GetSqliteDataType(value), nil
 	} else if c.SQLDB == MySQL {
@@ -558,7 +560,7 @@ func (c Copier) getDBDataType(value string) (string, error) {
 	return "", errors.New("database not supported")
 }
 
-func (c Copier) copySelfGrpcClientResourceFiles() error {
+func (c *Copier) copySelfGrpcClientResourceFiles() error {
 	targetResourceClientFileName := c.NodeDirectoryName + GrpcClientPath + "/ping-" + ClientFile
 	_, err := utils.CopyFile(targetResourceClientFileName, c.TemplatesRootPath+GrpcClientPath+"/"+ClientFile)
 	if err != nil {
@@ -571,7 +573,7 @@ func (c Copier) copySelfGrpcClientResourceFiles() error {
 	return executor.Execute(filePaths, c.Data)
 }
 
-func (c Copier) getGetQueryScanColumns(key string, value corenode.FieldMetadata) *string {
+func (c *Copier) getGetQueryScanColumns(key string, value corenode.FieldMetadata) *string {
 	var getQueryScanColumns *string
 	if len(*getQueryScanColumns) > 0 {
 		if value.IsComposite {
