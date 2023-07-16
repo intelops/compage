@@ -2,211 +2,142 @@ package utils
 
 // GetFieldsDataTypeForProtobuf returns the protobuf data type for the given data type, Used in go struct
 func GetFieldsDataTypeForProtobuf(value string) string {
-	switch value {
-	case "rune":
-		fallthrough
-	case "byte":
-		fallthrough
-	case "uintptr":
-		fallthrough
-	case "int":
-		fallthrough
-	case "int16":
-		fallthrough
-	case "int32":
+	if value == "rune" ||
+		value == "byte" ||
+		value == "uintptr" ||
+		value == "int" ||
+		value == "int16" ||
+		value == "int32" {
 		return "int32"
-	case "int64":
-		fallthrough
-	case "uint64":
+	} else if value == "int64" ||
+		value == "uint64" {
 		return "int64"
-	case "uint":
-		fallthrough
-	case "uint8":
-		fallthrough
-	case "uint16":
-		fallthrough
-	case "uint32":
+	} else if value == "uint" ||
+		value == "uint8" ||
+		value == "uint16" ||
+		value == "uint32" {
 		return "uint32"
-	case "bool":
+	} else if value == "bool" {
 		return "bool"
-	case "string":
+	} else if value == "string" {
 		return "string"
-	default:
-		return value
 	}
+	return value
 }
 
 // GetProtoBufDataType returns the protobuf data type for the given data type, Used in proto file
 func GetProtoBufDataType(value string) string {
-	switch value {
-	case "rune":
-		fallthrough
-	case "byte":
-		fallthrough
-	case "uintptr":
-		fallthrough
-	case "int":
-		fallthrough
-	case "int16":
-		fallthrough
-	case "int32":
+	if value == "rune" ||
+		value == "byte" ||
+		value == "uintptr" ||
+		value == "int" ||
+		value == "int16" ||
+		value == "int32" {
 		return "int32"
-	case "int64":
-		fallthrough
-	case "uint64":
+	} else if value == "int64" ||
+		value == "uint64" {
 		return "int64"
-	case "uint":
-		fallthrough
-	case "uint8":
-		fallthrough
-	case "uint16":
-		fallthrough
-	case "uint32":
+	} else if value == "uint" ||
+		value == "uint8" ||
+		value == "uint16" ||
+		value == "uint32" {
 		return "uint32"
-	case "bool":
+	} else if value == "bool" {
 		return "bool"
-	case "float32":
-		return "float"
-	case "complex64":
-		fallthrough
-	case "complex128":
-		fallthrough
-	case "float64":
-		return "double"
-	case "[]byte":
-		return "bytes"
-	case "string":
+	} else if value == "string" {
 		return "string"
-	default:
-		return value
+	} else if value == "float32" {
+		return "float"
+	} else if value == "float64" ||
+		value == "complex64" ||
+		value == "complex128" {
+		return "double"
+	} else if value == "[]byte" {
+		return "bytes"
 	}
+	return value
 }
 
 func GetSqliteDataType(value string) string {
-	switch value {
-	case "int":
-		fallthrough
-	case "int16":
-		fallthrough
-	case "int32":
-		fallthrough
-	case "int64":
-		fallthrough
-	case "uint8":
-		fallthrough
-	case "uint16":
-		fallthrough
-	case "uint32":
-		fallthrough
-	case "uint64":
-		fallthrough
-	case "uint":
-		fallthrough
-	case "rune":
-		fallthrough
-	case "byte":
-		fallthrough
-	case "uintptr":
-		fallthrough
-	case "bool":
+	if value == "int" ||
+		value == "int16" ||
+		value == "int32" ||
+		value == "int64" ||
+		value == "uint8" ||
+		value == "uint16" ||
+		value == "uint32" ||
+		value == "uint64" ||
+		value == "uint" ||
+		value == "rune" ||
+		value == "byte" ||
+		value == "uintptr" ||
+		value == "bool" {
 		return "INTEGER"
-	case "float32":
-		fallthrough
-	case "float64 ":
-		fallthrough
-	case "complex64":
-		fallthrough
-	case "complex128":
+	} else if value == "bool" {
+		return "INTEGER"
+	} else if value == "float32" ||
+		value == "float64 " ||
+		value == "complex64" ||
+		value == "complex128" {
 		return "REAL"
-	case "string":
-		return "TEXT"
-	default:
+	} else if value == "string" {
 		return "TEXT"
 	}
+	return "TEXT"
 }
 
 func GetMySQLDataType(value string) string {
-	switch value {
-	case "int":
-		fallthrough
-	case "int16":
-		fallthrough
-	case "int32":
-		fallthrough
-	case "int64":
-		fallthrough
-	case "uint8":
-		fallthrough
-	case "uint16":
-		fallthrough
-	case "uint32":
-		fallthrough
-	case "uint64":
-		fallthrough
-	case "uint":
-		fallthrough
-	case "rune":
-		fallthrough
-	case "byte":
-		fallthrough
-	case "uintptr":
+	if value == "int" ||
+		value == "int16" ||
+		value == "int32" ||
+		value == "int64" ||
+		value == "uint8" ||
+		value == "uint16" ||
+		value == "uint32" ||
+		value == "uint64" ||
+		value == "uint" ||
+		value == "rune" ||
+		value == "byte" ||
+		value == "uintptr" {
 		return "INT"
-	case "bool":
+	} else if value == "bool" {
 		return "BOOL"
-	case "float32":
-		fallthrough
-	case "float64 ":
+	} else if value == "float32" ||
+		value == "float64 " {
 		return "FLOAT"
-	case "complex64":
-		fallthrough
-	case "complex128":
+	} else if value == "complex64" ||
+		value == "complex128" {
 		return "DOUBLE"
-	case "string":
-		return "VARCHAR(100)"
-	default:
+	} else if value == "string" {
 		return "VARCHAR(100)"
 	}
+	return "VARCHAR(100)"
 }
 
 func GetDefaultValueForDataType(value string) interface{} {
-	switch value {
-	case "int":
-		fallthrough
-	case "int16":
-		fallthrough
-	case "int32":
-		fallthrough
-	case "int64":
-		fallthrough
-	case "uint8":
-		fallthrough
-	case "uint16":
-		fallthrough
-	case "uint32":
-		fallthrough
-	case "uint64":
-		fallthrough
-	case "uint":
-		fallthrough
-	case "rune":
-		fallthrough
-	case "byte":
-		fallthrough
-	case "uintptr":
+	if value == "int" ||
+		value == "int16" ||
+		value == "int32" ||
+		value == "int64" ||
+		value == "uint8" ||
+		value == "uint16" ||
+		value == "uint32" ||
+		value == "uint64" ||
+		value == "uint" ||
+		value == "rune" ||
+		value == "byte" ||
+		value == "uintptr" {
 		return 1
-	case "bool":
+	} else if value == "bool" {
 		return true
-	case "float32":
-		fallthrough
-	case "float64":
+	} else if value == "float32" ||
+		value == "float64 " ||
+		value == "complex64" ||
+		value == "complex128" {
 		return 1.0
-	case "complex64":
-		fallthrough
-	case "complex128":
-		return 1.0
-	case "string":
+	} else if value == "string" {
 		return "sample string"
-	default:
-		return "defaultValue"
 	}
+
+	return "defaultValue"
 }

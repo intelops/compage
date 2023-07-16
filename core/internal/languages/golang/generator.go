@@ -25,6 +25,123 @@ func Generate(ctx context.Context) error {
 	goValues := ctx.Value(contextKeyGoContextVars).(GoValues)
 	n := goValues.LGoLangNode
 	// rest config
+	err := generateRESTConfig(ctx, &goValues)
+	if err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+	// grpc config
+	err = generateGRPCConfig(&goValues)
+	if err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+	// ws config
+	if n.WsConfig != nil {
+		return fmt.Errorf("unsupported protocol %s for language %s", "ws", n.Language)
+	}
+	// common files needs to be generated for the project(custom template for rest and grpc) so, it should be here.
+	if (n.RestConfig != nil && n.RestConfig.Server != nil && n.RestConfig.Template == templates.Compage) || (n.GrpcConfig != nil && n.GrpcConfig.Server != nil && n.GrpcConfig.Template == templates.Compage) {
+		commonFilesCopier := getCommonFilesCopier(goValues)
+		if err := commonFilesCopier.CreateCommonFiles(); err != nil {
+			log.Debugf("err : %s", err)
+			return err
+		}
+	}
+	// integrations config
+	err = generateIntegrationConfig(&goValues)
+	if err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+
+	return nil
+}
+
+func generateIntegrationConfig(goValues *GoValues) error {
+	m := getIntegrationsCopier(goValues)
+	// dockerfile needs to be generated for the whole project so, it should be here.
+	dockerCopier := m["docker"].(*docker.Copier)
+	if err := dockerCopier.CreateDockerFile(); err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+
+	// k8s files need to be generated for the whole project so, it should be here.
+	k8sCopier := m["k8s"].(*kubernetes.Copier)
+	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+
+	// githubActions files need to be generated for the whole project so, it should be here.
+	githubActionsCopier := m["githubActions"].(*githubactions.Copier)
+	if err := githubActionsCopier.CreateYamls(); err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+
+	// devspace.yaml and devspace_start.sh need to be generated for the whole project so, it should be here.
+	devspaceCopier := m["devspace"].(*devspace.Copier)
+	if err := devspaceCopier.CreateDevspaceConfigs(); err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+
+	// devcontainer.json and Dockerfile need to be generated for the whole project so, it should be here.
+	devContainerCopier := m["devcontainer"].(*devcontainer.Copier)
+	if err := devContainerCopier.CreateDevContainerConfigs(); err != nil {
+		log.Debugf("err : %s", err)
+		return err
+	}
+
+	return nil
+}
+
+func generateGRPCConfig(goValues *GoValues) error {
+	n := goValues.LGoLangNode
+	if n.GrpcConfig != nil {
+		// check for the templates
+		if n.GrpcConfig.Template == templates.Compage {
+			if n.GrpcConfig.Framework == GoGrpcServerFramework {
+				goGrpcServerCopier := getGoGrpcServerCopier(goValues)
+				// copy all files at root level
+				if err := goGrpcServerCopier.CreateRootLevelFiles(); err != nil {
+					log.Debugf("err : %s", err)
+					return err
+				}
+				if n.GrpcConfig.Server != nil {
+					if err := goGrpcServerCopier.CreateGrpcServer(); err != nil {
+						log.Debugf("err : %s", err)
+						return err
+					}
+					// generate protoc commands on proto file for the code generated
+					if err := RunMakeProto(goValues.Values.NodeDirectoryName); err != nil {
+						log.Debugf("err : %s", err)
+						return err
+					}
+				}
+				if n.GrpcConfig.Clients != nil {
+					//  grpcConfig.clients -  present when client config is provided
+					if err := goGrpcServerCopier.CreateGrpcClients(); err != nil {
+						log.Debugf("err : %s", err)
+						return err
+					}
+				}
+			} else {
+				return fmt.Errorf("unsupported framework %s  for template %s for language %s", n.GrpcConfig.Framework, n.GrpcConfig.Template, n.Language)
+			}
+		} else {
+			return fmt.Errorf("unsupported template %s for language %s", n.GrpcConfig.Template, n.Language)
+		}
+	}
+
+	return nil
+}
+
+func generateRESTConfig(ctx context.Context, goValues *GoValues) error {
+	n := goValues.LGoLangNode
+
 	if n.RestConfig != nil {
 		// check for the templates
 		if n.RestConfig.Template == templates.Compage {
@@ -65,92 +182,6 @@ func Generate(ctx context.Context) error {
 				return err
 			}
 		}
-	}
-	// grpc config
-	if n.GrpcConfig != nil {
-		// check for the templates
-		if n.GrpcConfig.Template == templates.Compage {
-			if n.GrpcConfig.Framework == GoGrpcServerFramework {
-				goGrpcServerCopier := getGoGrpcServerCopier(goValues)
-				// copy all files at root level
-				if err := goGrpcServerCopier.CreateRootLevelFiles(); err != nil {
-					log.Debugf("err : %s", err)
-					return err
-				}
-				if n.GrpcConfig.Server != nil {
-					if err := goGrpcServerCopier.CreateGrpcServer(); err != nil {
-						log.Debugf("err : %s", err)
-						return err
-					}
-					// generate protoc commands on proto file for the code generated
-					if err := RunMakeProto(goValues.Values.NodeDirectoryName); err != nil {
-						log.Debugf("err : %s", err)
-						return err
-					}
-				}
-				if n.GrpcConfig.Clients != nil {
-					//  grpcConfig.clients -  present when client config is provided
-					if err := goGrpcServerCopier.CreateGrpcClients(); err != nil {
-						log.Debugf("err : %s", err)
-						return err
-					}
-				}
-			} else {
-				return fmt.Errorf("unsupported framework %s  for template %s for language %s", n.GrpcConfig.Framework, n.GrpcConfig.Template, n.Language)
-			}
-		} else {
-			return fmt.Errorf("unsupported template %s for language %s", n.GrpcConfig.Template, n.Language)
-		}
-	}
-
-	// ws config
-	if n.WsConfig != nil {
-		return fmt.Errorf("unsupported protocol %s for language %s", "ws", n.Language)
-	}
-
-	// common files needs to be generated for the project(custom template for rest and grpc) so, it should be here.
-	if (n.RestConfig != nil && n.RestConfig.Server != nil && n.RestConfig.Template == templates.Compage) || (n.GrpcConfig != nil && n.GrpcConfig.Server != nil && n.GrpcConfig.Template == templates.Compage) {
-		commonFilesCopier := getCommonFilesCopier(goValues)
-		if err := commonFilesCopier.CreateCommonFiles(); err != nil {
-			log.Debugf("err : %s", err)
-			return err
-		}
-	}
-
-	m := getIntegrationsCopier(goValues)
-	// dockerfile needs to be generated for the whole project so, it should be here.
-	dockerCopier := m["docker"].(*docker.Copier)
-	if err := dockerCopier.CreateDockerFile(); err != nil {
-		log.Debugf("err : %s", err)
-		return err
-	}
-
-	// k8s files need to be generated for the whole project so, it should be here.
-	k8sCopier := m["k8s"].(*kubernetes.Copier)
-	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
-		log.Debugf("err : %s", err)
-		return err
-	}
-
-	// githubActions files need to be generated for the whole project so, it should be here.
-	githubActionsCopier := m["githubActions"].(*githubactions.Copier)
-	if err := githubActionsCopier.CreateYamls(); err != nil {
-		log.Debugf("err : %s", err)
-		return err
-	}
-
-	// devspace.yaml and devspace_start.sh need to be generated for the whole project so, it should be here.
-	devspaceCopier := m["devspace"].(*devspace.Copier)
-	if err := devspaceCopier.CreateDevspaceConfigs(); err != nil {
-		log.Debugf("err : %s", err)
-		return err
-	}
-
-	// devcontainer.json and Dockerfile need to be generated for the whole project so, it should be here.
-	devContainerCopier := m["devcontainer"].(*devcontainer.Copier)
-	if err := devContainerCopier.CreateDevContainerConfigs(); err != nil {
-		log.Debugf("err : %s", err)
-		return err
 	}
 
 	return nil
@@ -208,7 +239,7 @@ func getCommonFilesCopier(goValues GoValues) *commonfiles.Copier {
 	return copier
 }
 
-func getGoGrpcServerCopier(goValues GoValues) *gogrpcserver.Copier {
+func getGoGrpcServerCopier(goValues *GoValues) *gogrpcserver.Copier {
 	userName := goValues.Values.Get(languages.UserName)
 	repositoryName := goValues.Values.Get(languages.RepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
@@ -238,7 +269,7 @@ func getGoGrpcServerCopier(goValues GoValues) *gogrpcserver.Copier {
 	return copier
 }
 
-func getGoGinServerCopier(goValues GoValues) *goginserver.Copier {
+func getGoGinServerCopier(goValues *GoValues) *goginserver.Copier {
 	userName := goValues.Values.Get(languages.UserName)
 	repositoryName := goValues.Values.Get(languages.RepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
@@ -268,7 +299,7 @@ func getGoGinServerCopier(goValues GoValues) *goginserver.Copier {
 	return copier
 }
 
-func getIntegrationsCopier(goValues GoValues) map[string]interface{} {
+func getIntegrationsCopier(goValues *GoValues) map[string]interface{} {
 	userName := goValues.Values.Get(languages.UserName)
 	repositoryName := goValues.Values.Get(languages.RepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)

@@ -5,6 +5,7 @@ import (
 	"github.com/intelops/compage/core/internal/converter/grpc"
 	"github.com/intelops/compage/core/internal/handlers"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -557,7 +558,7 @@ func TestRestServerWithOpenApiGenerator(t *testing.T) {
             "consumerData": {
                 "nodeType": "node-type-circle",
                 "name": "sample-service",
-                "language": "go",
+                "language": "$$LANGUAGE$$",
                 "restConfig": {
                     "server": {
                         "sqlDb": "",
@@ -566,30 +567,56 @@ func TestRestServerWithOpenApiGenerator(t *testing.T) {
                         "openApiFileYamlContent": "swagger: \"2.0\"\ninfo:\n  version: 1.0.0\n  title: Swagger Petstore\n  license:\n    name: MIT\nhost: petstore.swagger.io\nbasePath: /v1\nschemes:\n  - http\nconsumes:\n  - application/json\nproduces:\n  - application/json\npaths:\n  /pets:\n    get:\n      summary: List all pets\n      operationId: listPets\n      tags:\n        - pets\n      parameters:\n        - name: limit\n          in: query\n          description: How many items to return at one time (max 100)\n          required: false\n          type: integer\n          format: int32\n      responses:\n        \"200\":\n          description: A paged array of pets\n          headers:\n            x-next:\n              type: string\n              description: A link to the next page of responses\n          schema:\n            $ref: '#/definitions/Pets'\n        default:\n          description: unexpected error\n          schema:\n            $ref: '#/definitions/Error'\n    post:\n      summary: Create a pet\n      operationId: createPets\n      tags:\n        - pets\n      responses:\n        \"201\":\n          description: Null response\n        default:\n          description: unexpected error\n          schema:\n            $ref: '#/definitions/Error'\n  /pets/{petId}:\n    get:\n      summary: Info for a specific pet\n      operationId: showPetById\n      tags:\n        - pets\n      parameters:\n        - name: petId\n          in: path\n          required: true\n          description: The id of the pet to retrieve\n          type: string\n      responses:\n        \"200\":\n          description: Expected response to a valid request\n          schema:\n            $ref: '#/definitions/Pets'\n        default:\n          description: unexpected error\n          schema:\n            $ref: '#/definitions/Error'\ndefinitions:\n  Pet:\n    type: \"object\"\n    required:\n      - id\n      - name\n    properties:\n      id:\n        type: integer\n        format: int64\n      name:\n        type: string\n      tag:\n        type: string\n  Pets:\n    type: array\n    items:\n      $ref: '#/definitions/Pet'\n  Error:\n    type: \"object\"\n    required:\n      - code\n      - message\n    properties:\n      code:\n        type: integer\n        format: int32\n      message:\n        type: string\n"
                     },
                     "template": "openAPI",
-                    "framework": "go-gin-server"
+                    "framework": "$$FRAMEWORK$$"
                 }
             }
         }
     }
 }`
-	input := project.GenerateCodeRequest{
-		UserName:       "mahendraintelops",
-		RepositoryName: "first-project-github",
-		ProjectName:    "first-rest-server-with-openapi-project",
-		Json:           restServerWithOpenAPIConfigJSON,
+	var tests = []struct {
+		language  string
+		framework string
+		want      error
+	}{
+		{"java", "java-micronaut-server", nil},
+		{"java", "java-undertow-server", nil},
+		{"java", "spring", nil},
+		{"python", "python-flask", nil},
+		{"ruby", "ruby-on-rails", nil},
+		{"ruby", "ruby-sinatra", nil},
+		{"go", "go-gin-server", nil},
+		{"go", "go-server", nil},
+		{"go", "go-echo-server", nil},
+		{"javascript", "nodejs-express-server", nil},
+		{"rust", "rust-server", nil},
 	}
-	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-server-with-openapi-project")
-	}()
 
-	// retrieve project struct
-	getProject, err := grpc.GetProject(&input)
-	if err != nil {
-		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
-	}
-	// trigger project generation
-	if err0 := handlers.Handle(getProject); err0 != nil {
-		t.Errorf("handlers.Handle failed %s", err0.Error())
+	for _, tt := range tests {
+		t.Run(tt.language, func(t *testing.T) {
+			replacedConfig := strings.Replace(restServerWithOpenAPIConfigJSON, "$$LANGUAGE$$", tt.language, 1)
+			replacedConfig = strings.Replace(replacedConfig, "$$FRAMEWORK$$", tt.framework, 1)
+			input := project.GenerateCodeRequest{
+				UserName:       "mahendraintelops",
+				RepositoryName: "first-project-github",
+				ProjectName:    "first-openapi-based-project-" + tt.language,
+				Json:           replacedConfig,
+			}
+			defer func() {
+				_ = os.RemoveAll("/tmp/first-openapi-based-project-" + tt.language)
+			}()
+
+			// retrieve project struct
+			getProject, err := grpc.GetProject(&input)
+			if err != nil {
+				t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+			}
+
+			// trigger project generation
+			ans := handlers.Handle(getProject)
+			if ans != tt.want {
+				t.Errorf("got %v, want %v", ans, tt.want)
+			}
+		})
 	}
 }
 

@@ -8,6 +8,7 @@ import (
 	"github.com/intelops/compage/core/internal/languages/executor"
 	commonUtils "github.com/intelops/compage/core/internal/languages/utils"
 	"github.com/intelops/compage/core/internal/utils"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"strings"
@@ -43,7 +44,7 @@ const ClientFile = "client.go.tmpl"
 const Sqlite = "SQLite"
 const MySQL = "MySQL"
 
-// Copier Language specific copier
+// Copier Language specific *Copier
 type Copier struct {
 	NodeDirectoryName string
 	TemplatesRootPath string
@@ -116,7 +117,7 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 }
 
 // createGrpcClientDirectories creates grpc client directories.
-func (c Copier) createGrpcClientDirectories() error {
+func (c *Copier) createGrpcClientDirectories() error {
 	clientDirectory := c.NodeDirectoryName + GrpcClientPath
 	if err := utils.CreateDirectories(clientDirectory); err != nil {
 		return err
@@ -126,7 +127,7 @@ func (c Copier) createGrpcClientDirectories() error {
 }
 
 // createGrpcServerDirectories creates grpc server directories.
-func (c Copier) createGrpcServerDirectories() error {
+func (c *Copier) createGrpcServerDirectories() error {
 	apiDirectory := c.NodeDirectoryName + APIPath
 	controllersDirectory := c.NodeDirectoryName + ControllersPath
 	modelsDirectory := c.NodeDirectoryName + ModelsPath
@@ -151,6 +152,7 @@ func (c Copier) createGrpcServerDirectories() error {
 	if c.IsSQLDB {
 		sqlDBClientsDirectory := c.NodeDirectoryName + SQLDBClientsPath
 		if err := utils.CreateDirectories(sqlDBClientsDirectory); err != nil {
+			log.Debugf("error creating sql db clients directory: %v", err)
 			return err
 		}
 	}
@@ -158,7 +160,7 @@ func (c Copier) createGrpcServerDirectories() error {
 }
 
 // copyGrpcServerResourceFiles copies grpc server resource files from template and renames them as per resource config.
-func (c Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
+func (c *Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
 	var filePaths []string
 	resourceName := strcase.ToKebab(resource.Name)
 
@@ -166,6 +168,7 @@ func (c Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
 	targetResourceControllerFileName := c.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + ControllerFile
 	_, err := utils.CopyFile(targetResourceControllerFileName, c.TemplatesRootPath+ControllersPath+"/"+ControllerFile)
 	if err != nil {
+		log.Debugf("error copying controller file: %v", err)
 		return err
 	}
 	filePaths = append(filePaths, targetResourceControllerFileName)
@@ -174,6 +177,7 @@ func (c Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
 	targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + ModelFile
 	_, err0 := utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+ModelFile)
 	if err0 != nil {
+		log.Debugf("error copying model file: %v", err0)
 		return err0
 	}
 	filePaths = append(filePaths, targetResourceModelFileName)
@@ -182,54 +186,88 @@ func (c Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
 	targetResourceServiceFileName := c.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + ServiceFile
 	_, err1 := utils.CopyFile(targetResourceServiceFileName, c.TemplatesRootPath+ServicesPath+"/"+ServiceFile)
 	if err1 != nil {
+		log.Debugf("error copying service file: %v", err1)
 		return err1
 	}
 	filePaths = append(filePaths, targetResourceServiceFileName)
 
 	// copy dao files to generated project
 	// add database config here
+	filePaths, err2 := c.copySQLDBResourceFiles(resourceName, filePaths)
+	if err2 != nil {
+		log.Debugf("error copying sql db resources: %v", err2)
+		return err2
+	}
+
+	// add api.proto file for the resource.
+	targetResourceAPIFileName := c.NodeDirectoryName + APIPath + "/" + resourceName + "-" + APIProtoFile
+	_, err2 = utils.CopyFile(targetResourceAPIFileName, c.TemplatesRootPath+APIPath+"/"+APIProtoFile)
+	if err2 != nil {
+		log.Debugf("error copying api.proto file: %v", err2)
+		return err2
+	}
+
+	filePaths = append(filePaths, targetResourceAPIFileName)
+
+	// add resource specific data to map in c needed for templates.
+	err = c.addResourceSpecificTemplateData(resource)
+	if err != nil {
+		log.Debugf("error adding resource specific template data: %v", err)
+		return err
+	}
+
+	// get func map for template
+	funcMap := c.getFuncMap(resource)
+
+	// apply template
+	return executor.ExecuteWithFuncs(filePaths, c.Data, funcMap)
+}
+
+func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []string) ([]string, error) {
 	var targetResourceDaoFileName string
 	if c.IsSQLDB {
 		if c.SQLDB == Sqlite {
 			// dao files
 			targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + SqliteDaoFile
-			_, err2 := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+SqliteDaoFile)
-			if err2 != nil {
-				return err2
+			_, err := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+SqliteDaoFile)
+			if err != nil {
+				log.Debugf("error copying sqlite dao file: %v", err)
+				return nil, err
 			}
 			filePaths = append(filePaths, targetResourceDaoFileName)
 		} else if c.SQLDB == MySQL {
 			// dao files
 			targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + MySQLDaoFile
-			_, err2 := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+MySQLDaoFile)
-			if err2 != nil {
-				return err2
+			_, err := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+MySQLDaoFile)
+			if err != nil {
+				log.Debugf("error copying mysql dao file: %v", err)
+				return nil, err
 			}
 			filePaths = append(filePaths, targetResourceDaoFileName)
 		}
 	} else {
 		targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + DaoFile
-		_, err2 := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+DaoFile)
-		if err2 != nil {
-			return err2
+		_, err := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+DaoFile)
+		if err != nil {
+			log.Debugf("error copying dao file: %v", err)
+			return nil, err
 		}
 		filePaths = append(filePaths, targetResourceDaoFileName)
 	}
+	return filePaths, nil
+}
 
-	// add api.proto file for the resource.
-	targetResourceAPIFileName := c.NodeDirectoryName + APIPath + "/" + resourceName + "-" + APIProtoFile
-	_, err2 := utils.CopyFile(targetResourceAPIFileName, c.TemplatesRootPath+APIPath+"/"+APIProtoFile)
-	if err2 != nil {
-		return err2
-	}
-	// this function increments message fields number (grpc message)
+func (c *Copier) getFuncMap(resource *corenode.Resource) template.FuncMap {
 	funcMap := template.FuncMap{
+		// this function increments message fields number (grpc message)
 		"incCount": func(count int) int {
 			return count + 2
 		},
+		// this function lowercase's the first letter of the string in camel case style
 		"ToLowerCamelCase": func(key string) string {
 			return strcase.ToLowerCamel(key)
 		},
+		// this function adds pointer to the type if the field is composite
 		"AddPointerIfCompositeField": func(key string) string {
 			fieldMetaData, ok := resource.Fields[key]
 			if ok && fieldMetaData.IsComposite {
@@ -237,6 +275,7 @@ func (c Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
 			}
 			return fieldMetaData.Type
 		},
+		// this function returns the composite fields of the resource
 		"GetCompositeFields": func(key string) string {
 			fieldMetaData, ok := resource.Fields[key]
 			if ok && fieldMetaData.IsComposite {
@@ -245,20 +284,11 @@ func (c Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
 			return ""
 		},
 	}
-	filePaths = append(filePaths, targetResourceAPIFileName)
-
-	// add resource specific data to map in c needed for templates.
-	err = c.addResourceSpecificTemplateData(resource)
-	if err != nil {
-		return err
-	}
-
-	// apply template
-	return executor.ExecuteWithFuncs(filePaths, c.Data, funcMap)
+	return funcMap
 }
 
 // CopyGrpcClientResourceFiles copies grpc client files from template and renames them as per client config.
-func (c Copier) CopyGrpcClientResourceFiles(grpcClient *corenode.GrpcClient) error {
+func (c *Copier) CopyGrpcClientResourceFiles(grpcClient *corenode.GrpcClient) error {
 	/// add resource specific data to map in c needed for templates.
 	// TODO grpcClient needs too many changes (like referring the .proto and generated files) we can better just have a client created for local grpcServer)
 	c.Data["GrpcClientPort"] = grpcClient.Port
@@ -268,6 +298,7 @@ func (c Copier) CopyGrpcClientResourceFiles(grpcClient *corenode.GrpcClient) err
 	targetResourceClientFileName := c.NodeDirectoryName + GrpcClientPath + "/" + grpcClient.SourceNodeName + "-" + ClientFile
 	_, err := utils.CopyFile(targetResourceClientFileName, c.TemplatesRootPath+GrpcClientPath+"/"+ClientFile)
 	if err != nil {
+		log.Debugf("error copying grpc client file: %v", err)
 		return err
 	}
 	var filePaths []string
@@ -277,14 +308,13 @@ func (c Copier) CopyGrpcClientResourceFiles(grpcClient *corenode.GrpcClient) err
 	return executor.Execute(filePaths, c.Data)
 }
 
-func (c Copier) addResourceSpecificTemplateData(resource *corenode.Resource) error {
+func (c *Copier) addResourceSpecificTemplateData(resource *corenode.Resource) error {
 	// make every field public by making its first character capital.
 	fields := map[string]string{}
 	protoFields := map[string]string{}
 	// this slice is needed for grpc resource message generation
 	var fieldNames []string
 	for key, value := range resource.Fields {
-		key = cases.Title(language.Und, cases.NoLower).String(key)
 		fields[key] = commonUtils.GetFieldsDataTypeForProtobuf(value.Type)
 		protoFields[key] = commonUtils.GetProtoBufDataType(value.Type)
 		fieldNames = append(fieldNames, key)
@@ -292,117 +322,18 @@ func (c Copier) addResourceSpecificTemplateData(resource *corenode.Resource) err
 	c.Data["Fields"] = fields
 	c.Data["ProtoFields"] = protoFields
 	c.Data["FieldNames"] = fieldNames
+
 	// db fields
 	if c.IsSQLDB {
-		var createQueryColumns string
-		var insertQueryColumns string
-		var insertQueryParams string
-		var insertQueryExecColumns string
-		var updateQueryColumnsAndParams string
-		var updateQueryExecColumns string
-		var getQueryScanColumns string
-
-		for key, value := range resource.Fields {
-			key = cases.Title(language.Und, cases.NoLower).String(key)
-			dbDataType, err := c.getDBDataType(value.Type)
-			if err != nil {
-				return err
-			}
-			if len(createQueryColumns) > 0 {
-				if value.IsComposite {
-					createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NULL,"
-				} else {
-					createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
-				}
-			} else {
-				if value.IsComposite {
-					createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NULL,"
-				} else {
-					createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
-				}
-			}
-			if len(insertQueryColumns) > 0 {
-				if value.IsComposite {
-					insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
-					insertQueryParams += ", ?"
-					// m here is a model's variable
-					insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
-				} else {
-					insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
-					insertQueryParams += ", ?"
-					// m here is a model's variable
-					insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
-				}
-			} else {
-				if value.IsComposite {
-					insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
-					insertQueryParams = "?"
-					// m here is a model's variable
-					insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
-				} else {
-					insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
-					insertQueryParams = "?"
-					// m here is a model's variable
-					insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
-				}
-			}
-			if len(updateQueryColumnsAndParams) > 0 {
-				if value.IsComposite {
-					updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
-					// m here is a model's variable
-					updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
-				} else {
-					updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
-					// m here is a model's variable
-					updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
-				}
-			} else {
-				if value.IsComposite {
-					updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
-					// m here is a model's variable
-					updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
-				} else {
-					updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
-					// m here is a model's variable
-					updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
-				}
-			}
-			if len(getQueryScanColumns) > 0 {
-				if value.IsComposite {
-					// m here is a model's variable
-					getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
-				} else {
-					// m here is a model's variable
-					getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key)
-				}
-			} else {
-				if value.IsComposite {
-					// m here is a model's variable
-					getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
-				} else {
-					// m here is a model's variable
-					getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key)
-				}
-			}
+		err := c.addSQLDetails(resource)
+		if err != nil {
+			log.Debug("error while adding sql details to resource specific template data", err)
+			return err
 		}
-		// create query columns
-		c.Data["CreateQueryColumns"] = createQueryColumns
-
-		// insert query columns and params
-		c.Data["InsertQueryColumns"] = insertQueryColumns
-		c.Data["InsertQueryParams"] = insertQueryParams
-		c.Data["InsertQueryExecColumns"] = insertQueryExecColumns
-
-		// update query columns and params, execColumns
-		c.Data["UpdateQueryColumnsAndParams"] = updateQueryColumnsAndParams
-		c.Data["UpdateQueryExecColumns"] = updateQueryExecColumns
-
-		// get query columns and params
-		c.Data["GetQueryExecColumns"] = getQueryScanColumns
 	}
 
-	lowerCamelResourceName := strcase.ToLowerCamel(resource.Name)
 	// Add another map with below keys at root level (this is for specific resource for this iteration)
+	lowerCamelResourceName := strcase.ToLowerCamel(resource.Name)
 	c.Data["SmallKebabCaseResourceNameSingular"] = strcase.ToKebab(resource.Name)
 	c.Data["SmallSnakeCaseResourceNameSingular"] = strcase.ToSnake(resource.Name)
 	c.Data["SmallResourceNameSingular"] = lowerCamelResourceName
@@ -412,8 +343,144 @@ func (c Copier) addResourceSpecificTemplateData(resource *corenode.Resource) err
 	return nil
 }
 
+func (c *Copier) addSQLDetails(resource *corenode.Resource) error {
+	var createQueryColumns *string
+	var insertQueryColumns *string
+	var insertQueryParams *string
+	var insertQueryExecColumns *string
+	var updateQueryColumnsAndParams *string
+	var updateQueryExecColumns *string
+	var getQueryScanColumns *string
+
+	for key, value := range resource.Fields {
+		dbDataType, err := c.getDBDataType(value.Type)
+		if err != nil {
+			log.Debugf("error while getting db data type for %s", value.Type)
+			return err
+		}
+		createQueryColumns = c.getCreateQueryColumns(createQueryColumns, key, value, dbDataType)
+		insertQueryColumns, insertQueryParams, insertQueryExecColumns = c.getQueryParamsNColumnsNExecColumns(insertQueryColumns, insertQueryParams, insertQueryExecColumns, key, value)
+		updateQueryColumnsAndParams, updateQueryExecColumns = c.getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAndParams, updateQueryExecColumns, key, value)
+		getQueryScanColumns = c.getGetQueryScanColumns(getQueryScanColumns, key, value)
+	}
+	// create query columns
+	c.Data["CreateQueryColumns"] = createQueryColumns
+
+	// insert query columns and params
+	c.Data["InsertQueryColumns"] = insertQueryColumns
+	c.Data["InsertQueryParams"] = insertQueryParams
+	c.Data["InsertQueryExecColumns"] = insertQueryExecColumns
+
+	// update query columns and params, execColumns
+	c.Data["UpdateQueryColumnsAndParams"] = updateQueryColumnsAndParams
+	c.Data["UpdateQueryExecColumns"] = updateQueryExecColumns
+
+	// get query columns and params
+	c.Data["GetQueryExecColumns"] = getQueryScanColumns
+	return nil
+}
+
+func (c *Copier) getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAndParams, updateQueryExecColumns *string, key string, value corenode.FieldMetadata) (*string, *string) {
+	if updateQueryColumnsAndParams != nil {
+		if value.IsComposite {
+			*updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
+			// m here is a model's variable
+			*updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+		} else {
+			*updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
+			// m here is a model's variable
+			*updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+		}
+	} else {
+		updateQueryColumnsAndParams = new(string)
+		updateQueryExecColumns = new(string)
+		if value.IsComposite {
+			*updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
+			// m here is a model's variable
+			*updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+		} else {
+			*updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
+			// m here is a model's variable
+			*updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+		}
+	}
+	return updateQueryColumnsAndParams, updateQueryExecColumns
+}
+
+func (c *Copier) getQueryParamsNColumnsNExecColumns(insertQueryColumns, insertQueryParams, insertQueryExecColumns *string, key string, value corenode.FieldMetadata) (*string, *string, *string) {
+	if insertQueryColumns != nil {
+		if value.IsComposite {
+			*insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
+			*insertQueryParams += ", ?"
+			// m here is a model's variable
+			*insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+		} else {
+			*insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
+			*insertQueryParams += ", ?"
+			// m here is a model's variable
+			*insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+		}
+	} else {
+		insertQueryColumns = new(string)
+		insertQueryParams = new(string)
+		insertQueryExecColumns = new(string)
+		if value.IsComposite {
+			*insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
+			*insertQueryParams = "?"
+			// m here is a model's variable
+			*insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+		} else {
+			*insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
+			*insertQueryParams = "?"
+			// m here is a model's variable
+			*insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+		}
+	}
+	return insertQueryColumns, insertQueryParams, insertQueryExecColumns
+}
+
+func (c *Copier) getGetQueryScanColumns(getQueryScanColumns *string, key string, value corenode.FieldMetadata) *string {
+	if getQueryScanColumns != nil {
+		if value.IsComposite {
+			// m here is a model's variable
+			*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+		} else {
+			// m here is a model's variable
+			*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key)
+		}
+	} else {
+		getQueryScanColumns = new(string)
+		if value.IsComposite {
+			// m here is a model's variable
+			*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+		} else {
+			// m here is a model's variable
+			*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key)
+		}
+	}
+	return getQueryScanColumns
+}
+
+func (c *Copier) getCreateQueryColumns(createQueryColumns *string, key string, value corenode.FieldMetadata, dbDataType string) *string {
+	if createQueryColumns != nil {
+		if value.IsComposite {
+			*createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NULL,"
+		} else {
+			*createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
+		}
+	} else {
+		createQueryColumns = new(string)
+		if value.IsComposite {
+			*createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NULL,"
+		} else {
+			*createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
+		}
+	}
+	return createQueryColumns
+}
+
 // CreateGrpcConfigs creates/copies relevant files to generated project
-func (c Copier) CreateGrpcConfigs() error {
+func (c *Copier) CreateGrpcConfigs() error {
 	if err := c.CreateGrpcServer(); err != nil {
 		return err
 	}
@@ -424,7 +491,7 @@ func (c Copier) CreateGrpcConfigs() error {
 }
 
 // CreateGrpcServer creates/copies relevant files to generated project
-func (c Copier) CreateGrpcServer() error {
+func (c *Copier) CreateGrpcServer() error {
 	// if the node is server, add server code
 	if c.IsGrpcServer {
 		// create directories for controller, service, dao[for every resource's db clients], models
@@ -469,7 +536,7 @@ func (c Copier) CreateGrpcServer() error {
 }
 
 // CreateGrpcClients creates/copies relevant files to generated project
-func (c Copier) CreateGrpcClients() error {
+func (c *Copier) CreateGrpcClients() error {
 	// create directories for client
 	if err := c.createGrpcClientDirectories(); err != nil {
 		return err
@@ -495,7 +562,7 @@ func (c Copier) CreateGrpcClients() error {
 }
 
 // CreateRootLevelFiles copies all root level files at language template.
-func (c Copier) CreateRootLevelFiles() error {
+func (c *Copier) CreateRootLevelFiles() error {
 	err := utils.CopyFiles(c.NodeDirectoryName, c.TemplatesRootPath)
 	if err != nil {
 		return err
@@ -507,7 +574,7 @@ func (c Copier) CreateRootLevelFiles() error {
 	return executor.Execute(files, c.Data)
 }
 
-func (c Copier) getDBDataType(value string) (string, error) {
+func (c *Copier) getDBDataType(value string) (string, error) {
 	if c.SQLDB == Sqlite {
 		return commonUtils.GetSqliteDataType(value), nil
 	} else if c.SQLDB == MySQL {
@@ -516,7 +583,7 @@ func (c Copier) getDBDataType(value string) (string, error) {
 	return "", errors.New("database not supported")
 }
 
-func (c Copier) copySelfGrpcClientResourceFiles() error {
+func (c *Copier) copySelfGrpcClientResourceFiles() error {
 	targetResourceClientFileName := c.NodeDirectoryName + GrpcClientPath + "/ping-" + ClientFile
 	_, err := utils.CopyFile(targetResourceClientFileName, c.TemplatesRootPath+GrpcClientPath+"/"+ClientFile)
 	if err != nil {
