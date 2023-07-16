@@ -41,49 +41,47 @@ func NewLanguageNode(compageJSON *core.CompageJSON, node *corenode.Node) (*Langu
 		languageNode.RestConfig = &corenode.RestConfig{}
 		languageNode.RestConfig.Template = node.ConsumerData.RestConfig.Template
 		languageNode.RestConfig.Framework = node.ConsumerData.RestConfig.Framework
+		// REST clients should have client's array not nil.
+		if node.ConsumerData.RestConfig.Clients != nil {
+			languageNode.RestConfig.Clients = node.ConsumerData.RestConfig.Clients
+		}
+		// REST server should have port and if port is nil, that means the node is not server, but it's a client.
+		if node.ConsumerData.RestConfig.Server != nil && node.ConsumerData.RestConfig.Server.Port != "" {
+			// one node, one rest server
+			languageNode.RestConfig.Server = node.ConsumerData.RestConfig.Server
+		}
 	}
 	if node.ConsumerData.GrpcConfig != nil {
 		languageNode.GrpcConfig = &corenode.GrpcConfig{}
 		languageNode.GrpcConfig.Template = node.ConsumerData.GrpcConfig.Template
 		languageNode.GrpcConfig.Framework = node.ConsumerData.GrpcConfig.Framework
+
+		// gRPC clients should have client's array not nil.
+		if node.ConsumerData.GrpcConfig.Clients != nil {
+			languageNode.GrpcConfig.Clients = node.ConsumerData.GrpcConfig.Clients
+		}
+
+		// gRPC server should have port and if port is nil, that means the node is not server, but it's a client.
+		if node.ConsumerData.GrpcConfig.Server != nil && node.ConsumerData.GrpcConfig.Server.Port != "" {
+			// one node, one grpc server
+			languageNode.GrpcConfig.Server = node.ConsumerData.GrpcConfig.Server
+		}
 	}
 	if node.ConsumerData.WsConfig != nil {
 		languageNode.WsConfig = &corenode.WsConfig{}
 		languageNode.WsConfig.Template = node.ConsumerData.WsConfig.Template
 		languageNode.WsConfig.Framework = node.ConsumerData.WsConfig.Framework
-	}
 
-	// REST server should have port and if port is nil, that means the node is not server, but it's a client.
-	if node.ConsumerData.RestConfig != nil && node.ConsumerData.RestConfig.Server != nil && node.ConsumerData.RestConfig.Server.Port != "" {
-		// one node, one rest server
-		languageNode.RestConfig.Server = node.ConsumerData.RestConfig.Server
-	}
+		// Ws clients should have client's array not nil.
+		if node.ConsumerData.WsConfig.Clients != nil {
+			languageNode.WsConfig.Clients = node.ConsumerData.WsConfig.Clients
+		}
 
-	// REST clients should have client's array not nil.
-	if node.ConsumerData.RestConfig != nil && node.ConsumerData.RestConfig.Clients != nil {
-		languageNode.RestConfig.Clients = node.ConsumerData.RestConfig.Clients
-	}
-
-	// gRPC server should have port and if port is nil, that means the node is not server, but it's a client.
-	if node.ConsumerData.GrpcConfig != nil && node.ConsumerData.GrpcConfig.Server != nil && node.ConsumerData.GrpcConfig.Server.Port != "" {
-		// one node, one grpc server
-		languageNode.GrpcConfig.Server = node.ConsumerData.GrpcConfig.Server
-	}
-
-	// gRPC clients should have client's array not nil.
-	if node.ConsumerData.GrpcConfig != nil && node.ConsumerData.GrpcConfig.Clients != nil {
-		languageNode.GrpcConfig.Clients = node.ConsumerData.GrpcConfig.Clients
-	}
-
-	// WS server should have port and if port is nil, that means the node is not server, but it's a client.
-	if node.ConsumerData.WsConfig != nil && node.ConsumerData.WsConfig.Server != nil && node.ConsumerData.WsConfig.Server.Port != "" {
-		// one node, one ws server
-		languageNode.WsConfig.Server = node.ConsumerData.WsConfig.Server
-	}
-
-	// Ws clients should have client's array not nil.
-	if node.ConsumerData.WsConfig != nil && node.ConsumerData.WsConfig.Clients != nil {
-		languageNode.WsConfig.Clients = node.ConsumerData.WsConfig.Clients
+		// WS server should have port and if port is nil, that means the node is not server, but it's a client.
+		if node.ConsumerData.WsConfig.Server != nil && node.ConsumerData.WsConfig.Server.Port != "" {
+			// one node, one ws server
+			languageNode.WsConfig.Server = node.ConsumerData.WsConfig.Server
+		}
 	}
 
 	// Retrieves clients for node to other servers(other nodes). This is required for custom template plus the cli/frameworks plan for next release
