@@ -2,6 +2,8 @@ package goginserver
 
 import (
 	"errors"
+	"fmt"
+
 	"github.com/gertd/go-pluralize"
 	"github.com/iancoleman/strcase"
 	corenode "github.com/intelops/compage/core/internal/core/node"
@@ -30,15 +32,21 @@ const ControllerFile = "controller.go.tmpl"
 const ServiceFile = "service.go.tmpl"
 const DaoFile = "dao.go.tmpl"
 const MySQLDaoFile = "mysql-dao.go.tmpl"
+const GormMySQLDaoFile = "gorm-mysql-dao.go.tmpl"
 const SqliteDaoFile = "sqlite-dao.go.tmpl"
+const GormSqliteDaoFile = "gorm-sqlite-dao.go.tmpl"
 const MySQLDBConfigFile = "mysql.go.tmpl"
 const SqliteDBConfigFile = "sqlite.go.tmpl"
+const GormMySQLDBConfigFile = "gorm-mysql.go.tmpl"
+const GormSqliteDBConfigFile = "gorm-sqlite.go.tmpl"
 const ModelFile = "model.go.tmpl"
 
 const ClientFile = "client.go.tmpl"
 
 const Sqlite = "SQLite"
 const MySQL = "MySQL"
+const SqliteGorm = "SQLite-Gorm"
+const MySQLGorm = "MySQL-Gorm"
 
 // Copier Language specific *Copier
 type Copier struct {
@@ -49,6 +57,7 @@ type Copier struct {
 	HasRestClients    bool
 	SQLDB             string
 	IsSQLDB           bool
+	IsGormSQLDB		  bool
 	RestServerPort    string
 	Resources         []*corenode.Resource
 	RestClients       []*corenode.RestClient
@@ -67,6 +76,8 @@ type serverResourceData struct {
 func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isSQLDB bool, sqlDB string, resources []*corenode.Resource, restClients []*corenode.RestClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
+	// check if SQLDB needs Gorm integration
+	isGormSQLDB := strings.Contains(sqlDB, "Gorm")
 
 	// populate map to replace templates
 	data := map[string]interface{}{
@@ -75,6 +86,7 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 		"UserName":       userName,
 	}
 	data["SQLDB"] = sqlDB
+	data["IsGormSQLDB"] = isGormSQLDB
 	data["IsSQLDB"] = isSQLDB
 	// set all resources for main.go.tmpl
 	if isRestServer {
@@ -105,6 +117,7 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 		HasRestClients:    hasRestClients,
 		SQLDB:             sqlDB,
 		IsSQLDB:           isSQLDB,
+		IsGormSQLDB:       isGormSQLDB,
 		Resources:         resources,
 		RestClients:       restClients,
 		PluralizeClient:   pluralizeClient,
@@ -222,6 +235,13 @@ func (c *Copier) getFuncMap(resource *corenode.Resource) template.FuncMap {
 				return "*" + fieldMetaData.Type
 			}
 			return fieldMetaData.Type
+		},
+		// This function helps the template to add a foreignKey based on composite field
+		"AddForeignKeyIfCompositeField": func(key string) string {
+			if fieldMetaData, ok := resource.Fields[key]; ok && fieldMetaData.IsComposite {
+				return fmt.Sprintf("%sId int64 `gorm:\"foreignKey:id\" json:\"%s_id,omitempty\"`", key, strcase.ToLowerCamel(key))
+			}
+			return ""
 		},
 		"GetCompositeFields": func(key string) string {
 			fieldMetaData, ok := resource.Fields[key]
@@ -399,7 +419,7 @@ func (c *Copier) addResourceSpecificTemplateData(resource *corenode.Resource) er
 	}
 	c.Data["Fields"] = fields
 	// db fields
-	if c.IsSQLDB {
+	if c.IsSQLDB && !c.IsGormSQLDB {
 		err := c.addSQLDetails(resource)
 		if err != nil {
 			log.Debug("error while adding sql details to resource specific template data", err)
@@ -436,6 +456,24 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []string)
 			_, err := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+MySQLDaoFile)
 			if err != nil {
 				log.Debugf("error copying mysql dao file: %v", err)
+				return nil, err
+			}
+			filePaths = append(filePaths, targetResourceDaoFileName)
+		} else if c.SQLDB == SqliteGorm {
+			// dao files
+			targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + GormSqliteDaoFile
+			_, err := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+GormSqliteDaoFile)
+			if err != nil {
+				log.Debugf("error copying gorm sqlite dao file: %v", err)
+				return nil, err
+			}
+			filePaths = append(filePaths, targetResourceDaoFileName)
+		} else if c.SQLDB == MySQLGorm {
+			// dao files
+			targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + GormMySQLDaoFile
+			_, err := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+ GormMySQLDaoFile)
+			if err != nil {
+				log.Debugf("error copying gorm sqlite dao file: %v", err)
 				return nil, err
 			}
 			filePaths = append(filePaths, targetResourceDaoFileName)
@@ -495,11 +533,33 @@ func (c *Copier) CreateRestServer() error {
 				}
 				filePaths = append(filePaths, targetSQLiteConfigFileName)
 				return executor.Execute(filePaths, c.Data)
+			} else if c.SQLDB == SqliteGorm {
+				var filePaths []string
+				// client files
+				targetSQLiteConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + GormSqliteDBConfigFile
+				_, err2 := utils.CopyFile(targetSQLiteConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+ GormSqliteDBConfigFile)
+				if err2 != nil {
+					log.Debugf("error copying sqlite config file: %v", err2)
+					return err2
+				}
+				filePaths = append(filePaths, targetSQLiteConfigFileName)
+				return executor.Execute(filePaths, c.Data)
 			} else if c.SQLDB == MySQL {
 				var filePaths []string
 				// client files
 				targetMySQLConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + MySQLDBConfigFile
 				_, err2 := utils.CopyFile(targetMySQLConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBConfigFile)
+				if err2 != nil {
+					log.Debugf("error copying mysql config file: %v", err2)
+					return err2
+				}
+				filePaths = append(filePaths, targetMySQLConfigFileName)
+				return executor.Execute(filePaths, c.Data)
+			} else if c.SQLDB == MySQLGorm {
+				var filePaths []string
+				// client files
+				targetMySQLConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + GormMySQLDBConfigFile
+				_, err2 := utils.CopyFile(targetMySQLConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+GormMySQLDBConfigFile)
 				if err2 != nil {
 					log.Debugf("error copying mysql config file: %v", err2)
 					return err2
