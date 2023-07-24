@@ -1,12 +1,13 @@
 package test
 
 import (
-	"github.com/intelops/compage/core/gen/api/v1"
-	"github.com/intelops/compage/core/internal/converter/grpc"
-	"github.com/intelops/compage/core/internal/handlers"
 	"os"
 	"strings"
 	"testing"
+
+	project "github.com/intelops/compage/core/gen/api/v1"
+	"github.com/intelops/compage/core/internal/converter/grpc"
+	"github.com/intelops/compage/core/internal/handlers"
 )
 
 func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T) {
@@ -411,7 +412,7 @@ func TestRestServerGenerator(t *testing.T) {
                 "language": "go",
                 "restConfig": {
                     "server": {
-                        "sqlDb": "SQLite",
+                        "sqlDb": "SQLite-Gorm",
                         "port": "1337",
                         "resources": [
                             {
