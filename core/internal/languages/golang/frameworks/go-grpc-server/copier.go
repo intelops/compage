@@ -161,7 +161,7 @@ func (c *Copier) createGrpcServerDirectories() error {
 
 // copyGrpcServerResourceFiles copies grpc server resource files from template and renames them as per resource config.
 func (c *Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error {
-	var filePaths []string
+	var filePaths []*string
 	resourceName := strcase.ToKebab(resource.Name)
 
 	// copy controller files to generated project
@@ -171,7 +171,7 @@ func (c *Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error 
 		log.Debugf("error copying controller file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, targetResourceControllerFileName)
+	filePaths = append(filePaths, &targetResourceControllerFileName)
 
 	// copy model files to generated project
 	targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + ModelFile
@@ -180,7 +180,7 @@ func (c *Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error 
 		log.Debugf("error copying model file: %v", err0)
 		return err0
 	}
-	filePaths = append(filePaths, targetResourceModelFileName)
+	filePaths = append(filePaths, &targetResourceModelFileName)
 
 	// copy service files to generated project
 	targetResourceServiceFileName := c.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + ServiceFile
@@ -189,7 +189,7 @@ func (c *Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error 
 		log.Debugf("error copying service file: %v", err1)
 		return err1
 	}
-	filePaths = append(filePaths, targetResourceServiceFileName)
+	filePaths = append(filePaths, &targetResourceServiceFileName)
 
 	// copy dao files to generated project
 	// add database config here
@@ -207,7 +207,7 @@ func (c *Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error 
 		return err2
 	}
 
-	filePaths = append(filePaths, targetResourceAPIFileName)
+	filePaths = append(filePaths, &targetResourceAPIFileName)
 
 	// add resource specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
@@ -223,7 +223,7 @@ func (c *Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error 
 	return executor.ExecuteWithFuncs(filePaths, c.Data, funcMap)
 }
 
-func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []string) ([]string, error) {
+func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string) ([]*string, error) {
 	var targetResourceDaoFileName string
 	if c.IsSQLDB {
 		if c.SQLDB == Sqlite {
@@ -234,7 +234,7 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []string)
 				log.Debugf("error copying sqlite dao file: %v", err)
 				return nil, err
 			}
-			filePaths = append(filePaths, targetResourceDaoFileName)
+			filePaths = append(filePaths, &targetResourceDaoFileName)
 		} else if c.SQLDB == MySQL {
 			// dao files
 			targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + MySQLDaoFile
@@ -243,7 +243,7 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []string)
 				log.Debugf("error copying mysql dao file: %v", err)
 				return nil, err
 			}
-			filePaths = append(filePaths, targetResourceDaoFileName)
+			filePaths = append(filePaths, &targetResourceDaoFileName)
 		}
 	} else {
 		targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + DaoFile
@@ -252,7 +252,7 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []string)
 			log.Debugf("error copying dao file: %v", err)
 			return nil, err
 		}
-		filePaths = append(filePaths, targetResourceDaoFileName)
+		filePaths = append(filePaths, &targetResourceDaoFileName)
 	}
 	return filePaths, nil
 }

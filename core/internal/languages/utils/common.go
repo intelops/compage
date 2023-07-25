@@ -86,6 +86,34 @@ func GetSqliteDataType(value string) string {
 	return "TEXT"
 }
 
+func GetMongoDBDataType(value string) string {
+	if value == "int" ||
+		value == "int16" ||
+		value == "int32" ||
+		value == "int64" ||
+		value == "uint8" ||
+		value == "uint16" ||
+		value == "uint32" ||
+		value == "uint64" ||
+		value == "uint" ||
+		value == "rune" ||
+		value == "byte" ||
+		value == "uintptr" ||
+		value == "bool" {
+		return "TEXT"
+	} else if value == "bool" {
+		return "TEXT"
+	} else if value == "float32" ||
+		value == "float64 " ||
+		value == "complex64" ||
+		value == "complex128" {
+		return "REAL"
+	} else if value == "string" {
+		return "TEXT"
+	}
+	return "TEXT"
+}
+
 func GetMySQLDataType(value string) string {
 	if value == "int" ||
 		value == "int16" ||

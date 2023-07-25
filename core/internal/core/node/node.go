@@ -27,7 +27,8 @@ type ConsumerData struct {
 
 type RestServer struct {
 	Port      string      `json:"port"`
-	SQLDB     string      `json:"sqlDb"`
+	SQLDB     string      `json:"sqlDB"`
+	NoSQLDB   string      `json:"noSQLDB"`
 	Resources []*Resource `json:"resources"`
 	// OpenAPIFileYamlContent holds openAPIFileYamlContent
 	OpenAPIFileYamlContent string `json:"openAPIFileYamlContent,omitempty"`
@@ -51,7 +52,8 @@ type RestConfig struct {
 
 type GrpcServer struct {
 	Port      string      `json:"port"`
-	SQLDB     string      `json:"sqlDb"`
+	SQLDB     string      `json:"sqlDB"`
+	NoSQLDB   string      `json:"noSQLDB"`
 	Resources []*Resource `json:"resources"`
 	// ProtoFileContent holds protoFileContent
 	ProtoFileContent string `json:"protoFileContent,omitempty"`

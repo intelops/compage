@@ -1,7 +1,7 @@
 [submodule "core/templates/compage-template-go"]
 	path = core/templates/compage-template-go
 	url =  https://github.com/intelops/compage-template-go.git
-    branch = template-v8
+    branch = add-mongodb-integration
 [submodule "core/templates/compage-template-java"]
 	path = core/templates/compage-template-java
 	url =  https://github.com/intelops/compage-template-java.git

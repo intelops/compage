@@ -47,7 +47,7 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
                 "language": "go",
                 "restConfig": {
                     "server": {
-                        "sqlDb": "SQLite",
+                        "sqlDB": "SQLite",
                         "port": "3400",
                         "resources": [
                             {
@@ -87,7 +87,7 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
                 "language": "go",
                 "restConfig": {
                     "server": {
-                        "sqlDb": "SQLite",
+                        "sqlDB": "SQLite",
                         "port": "4500",
                         "resources": [
                             {
@@ -117,7 +117,7 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
                 "language": "go",
                 "restConfig": {
                     "server": {
-                        "sqlDb": "MySQL",
+                        "sqlDB": "MySQL",
                         "port": "3000",
                         "resources": [
                             {
@@ -153,7 +153,7 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
                 },
                 "grpcConfig": {
                     "server": {
-                        "sqlDb": "SQLite",
+                        "sqlDB": "SQLite",
                         "port": "34555",
                         "resources": [
                             {
@@ -230,7 +230,7 @@ func TestRestClientAndGrpcClientCrossConfigGenerator(t *testing.T) {
                 "language": "go",
                 "restConfig": {
                     "server": {
-                        "sqlDb": "MySQL",
+                        "sqlDB": "MySQL",
                         "port": "4000",
                         "resources": [
                             {
@@ -279,7 +279,7 @@ func TestRestClientAndGrpcClientCrossConfigGenerator(t *testing.T) {
                 },
                 "grpcConfig": {
                     "server": {
-                        "sqlDb": "SQLite",
+                        "sqlDB": "SQLite",
                         "port": "50033",
                         "resources": [
                             {
@@ -333,7 +333,7 @@ func TestRestAndGrpcServerGenerator(t *testing.T) {
                 "language": "go",
                 "grpcConfig": {
                     "server": {
-                        "sqlDb": "SQLite",
+                        "sqlDB": "SQLite",
                         "port": "50052",
                         "resources": [
                             {
@@ -357,7 +357,7 @@ func TestRestAndGrpcServerGenerator(t *testing.T) {
                 },
                 "restConfig": {
                     "server": {
-                        "sqlDb": "SQLite",
+                        "sqlDB": "SQLite",
                         "port": "1337",
                         "resources": [
                             {
@@ -398,7 +398,7 @@ func TestRestAndGrpcServerGenerator(t *testing.T) {
 	}
 }
 
-func TestRestServerGenerator(t *testing.T) {
+func TestRestServerGeneratorSql(t *testing.T) {
 	restServerConfigJSON := `{
     "edges": {},
     "nodes": {
@@ -411,7 +411,7 @@ func TestRestServerGenerator(t *testing.T) {
                 "language": "go",
                 "restConfig": {
                     "server": {
-                        "sqlDb": "SQLite",
+                        "sqlDB": "SQLite",
                         "port": "1337",
                         "resources": [
                             {
@@ -476,6 +476,84 @@ func TestRestServerGenerator(t *testing.T) {
 	}
 }
 
+func TestRestServerGeneratorNoSql(t *testing.T) {
+	restServerConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-ef": {
+            "id": "node-ef",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "circle",
+                "name": "user-service",
+                "language": "go",
+                "restConfig": {
+                    "server": {
+                        "noSQLDB": "MongoDB",
+                        "port": "1337",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "Address": {
+                                        "datatype": "Address",
+                                        "isComposite": true
+                                    },
+                                    "Age": {
+                                        "datatype": "int"
+                                    },
+                                    "Sign": {
+                                        "datatype": "rune"
+                                    }
+                                },
+                                "name": "User"
+                            },
+                            {
+                                "fields": {
+                                    "Street": {
+                                        "datatype": "string"
+                                    },
+                                    "PinCode": {
+                                        "datatype": "string"
+                                    },
+                                    "City": {
+                                        "datatype": "string"
+                                    }
+                                },
+                                "name": "Address"
+                            }
+                        ]
+                    },
+                    "framework": "go-gin-server",
+                    "template": "compage"
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-rest-server-project-nosql",
+		Json:           restServerConfigJSON,
+	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-rest-server-project-nosql")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
 func TestGrpcServerGenerator(t *testing.T) {
 	grpcServerConfigJSON := `{
     "edges": {},
@@ -489,7 +567,7 @@ func TestGrpcServerGenerator(t *testing.T) {
                 "language": "go",
                 "grpcConfig": {
                     "server": {
-                        "sqlDb": "SQLite",
+                        "sqlDB": "SQLite",
                         "port": "50052",
                         "resources": [
                             {
@@ -561,7 +639,7 @@ func TestRestServerWithOpenApiGenerator(t *testing.T) {
                 "language": "$$LANGUAGE$$",
                 "restConfig": {
                     "server": {
-                        "sqlDb": "",
+                        "sqlDB": "",
                         "port": "8080",
                         "resources": [],
                         "openApiFileYamlContent": "swagger: \"2.0\"\ninfo:\n  version: 1.0.0\n  title: Swagger Petstore\n  license:\n    name: MIT\nhost: petstore.swagger.io\nbasePath: /v1\nschemes:\n  - http\nconsumes:\n  - application/json\nproduces:\n  - application/json\npaths:\n  /pets:\n    get:\n      summary: List all pets\n      operationId: listPets\n      tags:\n        - pets\n      parameters:\n        - name: limit\n          in: query\n          description: How many items to return at one time (max 100)\n          required: false\n          type: integer\n          format: int32\n      responses:\n        \"200\":\n          description: A paged array of pets\n          headers:\n            x-next:\n              type: string\n              description: A link to the next page of responses\n          schema:\n            $ref: '#/definitions/Pets'\n        default:\n          description: unexpected error\n          schema:\n            $ref: '#/definitions/Error'\n    post:\n      summary: Create a pet\n      operationId: createPets\n      tags:\n        - pets\n      responses:\n        \"201\":\n          description: Null response\n        default:\n          description: unexpected error\n          schema:\n            $ref: '#/definitions/Error'\n  /pets/{petId}:\n    get:\n      summary: Info for a specific pet\n      operationId: showPetById\n      tags:\n        - pets\n      parameters:\n        - name: petId\n          in: path\n          required: true\n          description: The id of the pet to retrieve\n          type: string\n      responses:\n        \"200\":\n          description: Expected response to a valid request\n          schema:\n            $ref: '#/definitions/Pets'\n        default:\n          description: unexpected error\n          schema:\n            $ref: '#/definitions/Error'\ndefinitions:\n  Pet:\n    type: \"object\"\n    required:\n      - id\n      - name\n    properties:\n      id:\n        type: integer\n        format: int64\n      name:\n        type: string\n      tag:\n        type: string\n  Pets:\n    type: array\n    items:\n      $ref: '#/definitions/Pet'\n  Error:\n    type: \"object\"\n    required:\n      - code\n      - message\n    properties:\n      code:\n        type: integer\n        format: int32\n      message:\n        type: string\n"
@@ -633,7 +711,7 @@ func TestWsServerGenerator(t *testing.T) {
                 "language": "go",
                 "wsConfig": {
                     "server": {
-                        "sqlDb": "SQLite",
+                        "sqlDB": "SQLite",
                         "port": "50052",
                         "resources": [
                             {

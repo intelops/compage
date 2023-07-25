@@ -10,13 +10,13 @@ import (
 var tmpl = template.New("").Option("missingkey=error")
 var ghActionsTmpl = template.New("").Option("missingkey=error").Delims("[[", "]]")
 
-func ExecuteWithFuncs(filePaths []string, data map[string]interface{}, funcMap template.FuncMap) error {
+func ExecuteWithFuncs(filePaths []*string, data map[string]interface{}, funcMap template.FuncMap) error {
 	for _, filePathName := range filePaths {
 		// template code
-		parsedTemplates := template.Must(tmpl.ParseFiles(filePathName)).Funcs(funcMap)
+		parsedTemplates := template.Must(tmpl.ParseFiles(*filePathName)).Funcs(funcMap)
 		// generate go code now
-		fileName := filePathName[strings.LastIndex(filePathName, utils.SubstrString)+1:]
-		createdFile, err := os.Create(strings.TrimSuffix(filePathName, utils.TemplateExtension))
+		fileName := (*filePathName)[strings.LastIndex(*filePathName, utils.SubstrString)+1:]
+		createdFile, err := os.Create(strings.TrimSuffix(*filePathName, utils.TemplateExtension))
 		if err != nil {
 			return err
 		}
@@ -27,8 +27,8 @@ func ExecuteWithFuncs(filePaths []string, data map[string]interface{}, funcMap t
 
 	// delete the template files
 	for _, filePathName := range filePaths {
-		if strings.HasSuffix(filePathName, ".tmpl") {
-			if err := os.Remove(filePathName); err != nil {
+		if strings.HasSuffix(*filePathName, ".tmpl") {
+			if err := os.Remove(*filePathName); err != nil {
 				return err
 			}
 		}

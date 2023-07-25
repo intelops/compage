@@ -279,23 +279,29 @@ func getGoGinServerCopier(goValues *GoValues) *goginserver.Copier {
 	var restServerPort string
 	var restSQLDB string
 	var isRestSQLDB bool
+	var restNoSQLDB string
+	var isRestNoSQLDB bool
 	var restResources []*corenode.Resource
 	if isRestServer {
 		restServerPort = goValues.LGoLangNode.RestConfig.Server.Port
 		restResources = goValues.LGoLangNode.RestConfig.Server.Resources
 		isRestSQLDB = goValues.LGoLangNode.RestConfig.Server.SQLDB != ""
 		restSQLDB = goValues.LGoLangNode.RestConfig.Server.SQLDB
+		isRestNoSQLDB = goValues.LGoLangNode.RestConfig.Server.NoSQLDB != ""
+		restNoSQLDB = goValues.LGoLangNode.RestConfig.Server.NoSQLDB
 	} else {
 		restServerPort = ""
 		isRestSQLDB = false
 		restSQLDB = ""
+		isRestNoSQLDB = false
+		restNoSQLDB = ""
 		restResources = []*corenode.Resource{}
 	}
 
 	restClients := goValues.LGoLangNode.RestConfig.Clients
 	path := GetGoTemplatesRootPath() + "/frameworks/" + GoGinServerFramework
 	// create golang specific copier
-	copier := goginserver.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isRestSQLDB, restSQLDB, restResources, restClients)
+	copier := goginserver.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isRestSQLDB, restSQLDB, isRestNoSQLDB, restNoSQLDB, restResources, restClients)
 	return copier
 }
 
