@@ -2,18 +2,20 @@ package goginserver
 
 import (
 	"errors"
+	"text/template"
+
 	"github.com/gertd/go-pluralize"
 	"github.com/iancoleman/strcase"
 	corenode "github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages/executor"
 	commonUtils "github.com/intelops/compage/core/internal/languages/utils"
 	log "github.com/sirupsen/logrus"
-	"text/template"
+
+	"strings"
 
 	"github.com/intelops/compage/core/internal/utils"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"strings"
 )
 
 const RestServerPath = "/pkg/rest/server"
@@ -21,7 +23,7 @@ const RestClientPath = "/pkg/rest/client"
 
 const DaosPath = RestServerPath + "/daos"
 const SQLDBClientsPath = DaosPath + "/clients/sqls"
-const NOSQLDBClientsPath = DaosPath + "/clients/nosqls"
+const NoSQLDBClientsPath = DaosPath + "/clients/nosqls"
 
 const ServicesPath = RestServerPath + "/services"
 const ControllersPath = RestServerPath + "/controllers"
@@ -161,17 +163,16 @@ func (c *Copier) createRestServerDirectories() error {
 		log.Debugf("error creating daos directory: %v", err)
 		return err
 	}
-	// create directories for every resource's db client.
 	if c.IsSQLDB {
+		// create directories for every resource's db client.
 		sqlDBClientsDirectory := c.NodeDirectoryName + SQLDBClientsPath
 		if err := utils.CreateDirectories(sqlDBClientsDirectory); err != nil {
 			log.Debugf("error creating sql db clients directory: %v", err)
 			return err
 		}
-	}
-	// create directories for every resource's db client.
-	if c.IsNoSQLDB {
-		noSQLDBClientsDirectory := c.NodeDirectoryName + NOSQLDBClientsPath
+	} else if c.IsNoSQLDB {
+		// create directories for every resource's db client.
+		noSQLDBClientsDirectory := c.NodeDirectoryName + NoSQLDBClientsPath
 		if err := utils.CreateDirectories(noSQLDBClientsDirectory); err != nil {
 			log.Debugf("error creating nosql db clients directory: %v", err)
 			return err
@@ -556,17 +557,17 @@ func (c *Copier) CreateRestServer() error {
 				return err
 			}
 		}
-		// create sql db config file (common to all resources for specific database)
-		// No vars in config file as of now but in future they may be there.
 		if c.IsSQLDB {
+			// create sql db config file (common to all resources for specific database)
+			// No vars in config file as of now but in future they may be there.
 			if c.SQLDB == SQLite {
 				var filePaths []string
 				// client files
 				targetSQLiteConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + SQLiteDBConfigFile
-				_, err2 := utils.CopyFile(targetSQLiteConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SQLiteDBConfigFile)
-				if err2 != nil {
-					log.Debugf("error copying sqlite config file: %v", err2)
-					return err2
+				_, err := utils.CopyFile(targetSQLiteConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SQLiteDBConfigFile)
+				if err != nil {
+					log.Debugf("error copying sqlite config file: %v", err)
+					return err
 				}
 				filePaths = append(filePaths, targetSQLiteConfigFileName)
 				return executor.Execute(filePaths, c.Data)
@@ -574,26 +575,25 @@ func (c *Copier) CreateRestServer() error {
 				var filePaths []string
 				// client files
 				targetMySQLConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + MySQLDBConfigFile
-				_, err2 := utils.CopyFile(targetMySQLConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBConfigFile)
-				if err2 != nil {
-					log.Debugf("error copying mysql config file: %v", err2)
-					return err2
+				_, err := utils.CopyFile(targetMySQLConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBConfigFile)
+				if err != nil {
+					log.Debugf("error copying mysql config file: %v", err)
+					return err
 				}
 				filePaths = append(filePaths, targetMySQLConfigFileName)
 				return executor.Execute(filePaths, c.Data)
 			}
-		}
-		// create nosql db config file (common to all resources for specific database)
-		// No vars in config file as of now but in future they may be there.
-		if c.IsNoSQLDB {
+		} else if c.IsNoSQLDB {
+			// create nosql db config file (common to all resources for specific database)
+			// No vars in config file as of now but in future they may be there.
 			if c.NoSQLDB == MongoDB {
 				var filePaths []string
 				// client files
-				targetMongoDBConfigFileName := c.NodeDirectoryName + NOSQLDBClientsPath + "/" + MongoDBConfigFile
-				_, err2 := utils.CopyFile(targetMongoDBConfigFileName, c.TemplatesRootPath+NOSQLDBClientsPath+"/"+MongoDBConfigFile)
-				if err2 != nil {
-					log.Debugf("error copying mongodb config file: %v", err2)
-					return err2
+				targetMongoDBConfigFileName := c.NodeDirectoryName + NoSQLDBClientsPath + "/" + MongoDBConfigFile
+				_, err := utils.CopyFile(targetMongoDBConfigFileName, c.TemplatesRootPath+NoSQLDBClientsPath+"/"+MongoDBConfigFile)
+				if err != nil {
+					log.Debugf("error copying mongodb config file: %v", err)
+					return err
 				}
 				filePaths = append(filePaths, targetMongoDBConfigFileName)
 				return executor.Execute(filePaths, c.Data)

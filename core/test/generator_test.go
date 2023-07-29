@@ -554,6 +554,78 @@ func TestRestServerGeneratorNoSql(t *testing.T) {
 	}
 }
 
+func TestGrpcServerGeneratorNoSql(t *testing.T) {
+	grpcServerConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-b0": {
+            "id": "node-b0",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "circle",
+                "name": "student-service",
+                "language": "go",
+                "grpcConfig": {
+                    "server": {
+						"noSQLDB": "MongoDB",
+                        "port": "50052",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "RollNumber": {
+                                        "datatype": "int32"
+                                    },
+                                    "College": {
+                                        "datatype": "string"
+                                    },
+                                    "Sign": {
+                                        "datatype": "rune"
+                                    },
+                                    "Marks": {
+                                        "datatype": "int"
+                                    },
+                                    "GateScore": {
+                                        "datatype": "uint"
+                                    },
+                                    "IsPassed": {
+                                        "datatype": "bool"
+                                    }
+                                },
+                                "name": "StudentModel"
+                            }
+                        ]
+                    },
+                    "framework": "go-grpc-server",
+                    "template": "compage"
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-grpc-server-project-nosql",
+		Json:           grpcServerConfigJSON,
+	}
+	defer func() {
+		//_ = os.RemoveAll("/tmp/first-grpc-server-project-nosql")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
 func TestGrpcServerGenerator(t *testing.T) {
 	grpcServerConfigJSON := `{
     "edges": {},
