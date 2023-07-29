@@ -44,6 +44,7 @@ import {
     COMPAGE,
     COMPAGE_LANGUAGE_FRAMEWORKS,
     COMPAGE_LANGUAGE_GRPC_FRAMEWORKS,
+    COMPAGE_LANGUAGE_NOSQL_DBS,
     COMPAGE_LANGUAGE_SQL_DBS,
     GO,
     isCompageTemplate,
@@ -67,9 +68,13 @@ interface NewNodePropertiesProps {
 
 interface NodeTypesConfig {
     isRestServer?: boolean;
+    isRestServerNoSQLDB?: boolean;
+    isRestServerSQLDB?: boolean;
     hasRestClients?: boolean;
     restConfig?: RestConfig;
     isGrpcServer?: boolean;
+    isGrpcServerNoSQLDB?: boolean;
+    isGrpcServerSQLDB?: boolean;
     hasGrpcClients?: boolean;
     grpcConfig?: GrpcConfig;
     isWsServer?: boolean;
@@ -95,10 +100,16 @@ const getNodeTypesConfig = (currentNodeState: CompageNode): NodeTypesConfig => {
             nodeTypesConfig.hasRestClients = true;
             nodeTypesConfig.restConfig.clients = restConfig.clients;
         }
-        // add template and framework when the at lease rest server or clients are present.
+        // add template and framework when rest server or clients are present at least.
         if (nodeTypesConfig?.restConfig?.server && Object.keys(nodeTypesConfig?.restConfig?.server).length > 0) {
             nodeTypesConfig.restConfig.template = restConfig.template || getEmptyRestConfig().template;
             nodeTypesConfig.restConfig.framework = restConfig.framework || getEmptyRestConfig().framework;
+        }
+        if (restConfig?.server?.noSQLDB) {
+            nodeTypesConfig.isRestServerNoSQLDB = true;
+        }
+        if (restConfig?.server?.sqlDB) {
+            nodeTypesConfig.isRestServerSQLDB = true;
         }
     }
     if (grpcConfig && Object.keys(grpcConfig).length > 0) {
@@ -162,9 +173,13 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         },
         language: currentNodeState?.consumerData.language !== undefined ? currentNodeState.consumerData.language : '',
         isRestServer: nodeTypesConfig.isRestServer || false,
+        isRestServerSQLDB: nodeTypesConfig.isRestServerSQLDB || false,
+        isRestServerNoSQLDB: nodeTypesConfig.isRestServerNoSQLDB || false,
         hasRestClients: nodeTypesConfig.hasRestClients || false,
         restConfig: nodeTypesConfig.restConfig || getEmptyRestConfig(),
         isGrpcServer: nodeTypesConfig.isGrpcServer || false,
+        isGrpcServerSQLDB: nodeTypesConfig.isGrpcServerSQLDB || false,
+        isGrpcServerNoSQLDB: nodeTypesConfig.isGrpcServerNoSQLDB || false,
         hasGrpcClients: nodeTypesConfig.hasGrpcClients || false,
         grpcConfig: nodeTypesConfig.grpcConfig || getEmptyGrpcConfig(),
         isWsServer: nodeTypesConfig.isWsServer || false,
@@ -249,7 +264,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             // rest
             if (payload.isRestServer) {
                 restConfig.server = {
-                    sqlDb: payload.restConfig.server.sqlDb,
+                    sqlDB: payload.restConfig.server.sqlDB,
+                    noSQLDB: payload.restConfig.server.noSQLDB,
                     port: getRestServerPort(payload.restConfig.template, payload.restConfig.server.port),
                 };
                 if (isCompageTemplate(payload.restConfig.template)) {
@@ -272,7 +288,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             // grpc
             if (payload.isGrpcServer) {
                 grpcConfig.server = {
-                    sqlDb: payload.grpcConfig.server.sqlDb,
+                    sqlDB: payload.grpcConfig.server.sqlDB,
+                    noSQLDB: payload.grpcConfig.server.noSQLDB,
                     port: payload.grpcConfig.server.port,
                 };
                 if (isCompageTemplate(payload.grpcConfig.template)) {
@@ -345,7 +362,11 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 },
                 language: '',
                 isGrpcServer: false,
+                isGrpcServerNoSQLDB: false,
+                isGrpcServerSQLDB: false,
                 isRestServer: false,
+                isRestServerNoSQLDB: false,
+                isRestServerSQLDB: false,
                 isWsServer: false,
                 hasGrpcClients: false,
                 hasRestClients: false,
@@ -408,6 +429,46 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         setPayload({
             ...payload,
             isRestServer: event.target.checked
+        });
+    };
+
+    const handleIsGrpcServerSQLDBChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const grpcConfig: GrpcConfig = payload.grpcConfig;
+        grpcConfig.server.noSQLDB = '';
+        setPayload({
+            ...payload,
+            isGrpcServerSQLDB: event.target.checked,
+            grpcConfig,
+        });
+    };
+
+    const handleIsGrpcServerNoSQLDBChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const grpcConfig: GrpcConfig = payload.grpcConfig;
+        grpcConfig.server.sqlDB = '';
+        setPayload({
+            ...payload,
+            isGrpcServerNoSQLDB: event.target.checked,
+            grpcConfig
+        });
+    };
+
+    const handleIsRestServerSQLDBChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const restConfig: RestConfig = payload.restConfig;
+        restConfig.server.noSQLDB = '';
+        setPayload({
+            ...payload,
+            isRestServerSQLDB: event.target.checked,
+            restConfig,
+        });
+    };
+
+    const handleIsRestServerNoSQLDBChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const restConfig: RestConfig = payload.restConfig;
+        restConfig.server.sqlDB = '';
+        setPayload({
+            ...payload,
+            isRestServerNoSQLDB: event.target.checked,
+            restConfig
         });
     };
 
@@ -610,35 +671,72 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return '';
     };
 
-    const getRestServerSqlDbContent = () => {
-        // create language:sqlDbs map based on template chosen
-        let map;
-        if (isCompageTemplate(payload.restConfig.template)) {
-            map = new Map(Object.entries(COMPAGE_LANGUAGE_SQL_DBS));
-        } else {
-            map = new Map();
-        }
-        const sqlDbs = map.get(payload.language) || [];
+    const getRestServerNoSQLDBContent = () => {
+        if (payload.isRestServerNoSQLDB) {
+            // create language:NoSQLDBs map based on template chosen
+            let map;
+            if (isCompageTemplate(payload.restConfig.template)) {
+                map = new Map(Object.entries(COMPAGE_LANGUAGE_NOSQL_DBS));
+            } else {
+                map = new Map();
+            }
+            const noSQLDBs = map.get(payload.language) || [];
 
-        if (sqlDbs.length > 0) {
-            return <TextField
-                required
-                size="medium"
-                select
-                margin="dense"
-                id="restServerSqlDb"
-                label="Sql Database"
-                defaultValue=''
-                type="text"
-                value={payload.restConfig.server.sqlDb}
-                onChange={handleRestServerSqlDbChange}
-                variant="outlined">
-                {sqlDbs.map((sqlDb: string) => (
-                    <MenuItem key={sqlDb} value={sqlDb}>
-                        {sqlDb}
-                    </MenuItem>
-                ))}
-            </TextField>;
+            if (noSQLDBs.length > 0) {
+                return <TextField
+                    required
+                    size="medium"
+                    select
+                    margin="dense"
+                    id="restServerNoSQLDB"
+                    label="NoSQL Database"
+                    defaultValue=''
+                    type="text"
+                    value={payload.restConfig.server.noSQLDB}
+                    onChange={handleRestServerNoSQLDBChange}
+                    variant="outlined">
+                    {noSQLDBs.map((noSQLDB: string) => (
+                        <MenuItem key={noSQLDB} value={noSQLDB}>
+                            {noSQLDB}
+                        </MenuItem>
+                    ))}
+                </TextField>;
+            }
+        }
+        return '';
+    };
+
+    const getRestServerSQLDBContent = () => {
+        if (payload.isRestServerSQLDB) {
+            // create language:SQLDBs map based on template chosen
+            let map;
+            if (isCompageTemplate(payload.restConfig.template)) {
+                map = new Map(Object.entries(COMPAGE_LANGUAGE_SQL_DBS));
+            } else {
+                map = new Map();
+            }
+            const sqlDBs = map.get(payload.language) || [];
+
+            if (sqlDBs.length > 0) {
+                return <TextField
+                    required
+                    size="medium"
+                    select
+                    margin="dense"
+                    id="restServerSQLDB"
+                    label="SQL Database"
+                    defaultValue=''
+                    type="text"
+                    value={payload.restConfig.server.sqlDB}
+                    onChange={handleRestServerSQLDBChange}
+                    variant="outlined">
+                    {sqlDBs.map((sqlDB: string) => (
+                        <MenuItem key={sqlDB} value={sqlDB}>
+                            {sqlDB}
+                        </MenuItem>
+                    ))}
+                </TextField>;
+            }
         }
         return '';
     };
@@ -816,32 +914,65 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return '';
     };
 
-    const getGrpcServerSqlDbContent = () => {
-        // create language:sqlDbs map based on template chosen
+    const getGrpcServerSQLDBContent = () => {
+        // create language:sqlDBs map based on template chosen
         let map;
         if (isCompageTemplate(payload.grpcConfig.template)) {
             map = new Map(Object.entries(COMPAGE_LANGUAGE_SQL_DBS));
         } else {
             map = new Map();
         }
-        const sqlDbs = map.get(payload.language) || [];
+        const sqlDBs = map.get(payload.language) || [];
 
-        if (sqlDbs.length > 0) {
+        if (sqlDBs.length > 0) {
             return <TextField
                 required
                 size="medium"
                 select
                 margin="dense"
-                id="grpcServerSqlDb"
-                label="Sql Database"
+                id="grpcServerSQLDB"
+                label="SQL Database"
                 defaultValue=''
                 type="text"
-                value={payload.grpcConfig.server.sqlDb}
-                onChange={handleGrpcServerSqlDbChange}
+                value={payload.grpcConfig.server.sqlDB}
+                onChange={handleGrpcServerSQLDBChange}
                 variant="outlined">
-                {sqlDbs.map((sqlDb: string) => (
-                    <MenuItem key={sqlDb} value={sqlDb}>
-                        {sqlDb}
+                {sqlDBs.map((sqlDB: string) => (
+                    <MenuItem key={sqlDB} value={sqlDB}>
+                        {sqlDB}
+                    </MenuItem>
+                ))}
+            </TextField>;
+        }
+        return '';
+    };
+
+    const getGrpcServerNoSQLDBContent = () => {
+        // create language:noSQLDBs map based on template chosen
+        let map;
+        if (isCompageTemplate(payload.grpcConfig.template)) {
+            map = new Map(Object.entries(COMPAGE_LANGUAGE_NOSQL_DBS));
+        } else {
+            map = new Map();
+        }
+        const noSQLDBs = map.get(payload.language) || [];
+
+        if (noSQLDBs.length > 0) {
+            return <TextField
+                required
+                size="medium"
+                select
+                margin="dense"
+                id="grpcServerNoSQLDB"
+                label="NoSQL Database"
+                defaultValue=''
+                type="text"
+                value={payload.grpcConfig.server.noSQLDB}
+                onChange={handleGrpcServerNoSQLDBChange}
+                variant="outlined">
+                {noSQLDBs.map((noSQLDB: string) => (
+                    <MenuItem key={noSQLDB} value={noSQLDB}>
+                        {noSQLDB}
                     </MenuItem>
                 ))}
             </TextField>;
@@ -914,9 +1045,18 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         </React.Fragment>;
     };
 
-    const handleGrpcServerSqlDbChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleGrpcServerSQLDBChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const grpcConfig: GrpcConfig = payload.grpcConfig;
-        grpcConfig.server.sqlDb = event.target.value;
+        grpcConfig.server.sqlDB = event.target.value;
+        setPayload({
+            ...payload,
+            grpcConfig
+        });
+    };
+
+    const handleGrpcServerNoSQLDBChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const grpcConfig: GrpcConfig = payload.grpcConfig;
+        grpcConfig.server.noSQLDB = event.target.value;
         setPayload({
             ...payload,
             grpcConfig
@@ -953,7 +1093,10 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 {getGrpcTemplateContent()}
                 {getGrpcFrameworkContent()}
                 {getGrpcServerPortContent()}
-                {getGrpcServerSqlDbContent()}
+                {getGrpcServerSQLDBCheck()}
+                {getGrpcServerSQLDBContent()}
+                {getGrpcServerNoSQLDBCheck()}
+                {getGrpcServerNoSQLDBContent()}
                 {getGrpcServerResourcesContent()}
             </React.Fragment>;
         }
@@ -1055,13 +1198,72 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return [];
     };
 
+    const getGrpcServerSQLDBCheck = () => {
+        return <React.Fragment>
+            <FormControlLabel
+                label="SQL DB"
+                control={<Checkbox
+                    id="isGrpcServerSQLDB"
+                    disabled={payload.isGrpcServerNoSQLDB}
+                    size="medium" checked={payload.isGrpcServerSQLDB}
+                    onChange={handleIsGrpcServerSQLDBChange}
+                />}
+            />
+        </React.Fragment>;
+    };
+
+    const getGrpcServerNoSQLDBCheck = () => {
+        return <React.Fragment>
+            <FormControlLabel
+                label="NoSQL DB"
+                control={<Checkbox
+                    id="isGrpcServerNoSQLDB"
+                    disabled={payload.isGrpcServerSQLDB}
+                    size="medium" checked={payload.isGrpcServerNoSQLDB}
+                    onChange={handleIsGrpcServerNoSQLDBChange}
+                />}
+            />
+        </React.Fragment>;
+    };
+
+    const getRestServerSQLDBCheck = () => {
+        return <React.Fragment>
+            <FormControlLabel
+                label="SQL DB"
+                control={<Checkbox
+                    id="isRestServerSQLDB"
+                    disabled={payload.isRestServerNoSQLDB}
+                    size="medium" checked={payload.isRestServerSQLDB}
+                    onChange={handleIsRestServerSQLDBChange}
+                />}
+            />
+        </React.Fragment>;
+    };
+
+    const getRestServerNoSQLDBCheck = () => {
+        return <React.Fragment>
+            <FormControlLabel
+                label="NoSQL DB"
+                control={<Checkbox
+                    id="isRestServerNoSQLDB"
+                    disabled={payload.isRestServerSQLDB}
+                    size="medium" checked={payload.isRestServerNoSQLDB}
+                    onChange={handleIsRestServerNoSQLDBChange}
+                />}
+            />
+        </React.Fragment>;
+    };
+
     const getRestServerConfig = () => {
         if (payload.isRestServer) {
             return <React.Fragment>
                 {getRestTemplateContent()}
                 {getRestServerFrameworkContent()}
                 {getRestServerPortContent()}
-                {getRestServerSqlDbContent()}
+                {getRestServerSQLDBCheck()}
+                {getRestServerSQLDBContent()}
+                {getRestServerNoSQLDBCheck()}
+                {getRestServerNoSQLDBContent()}
                 {getRestServerResourcesContent()}
             </React.Fragment>;
         }
@@ -1097,9 +1299,18 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         return "";
     };
 
-    const handleRestServerSqlDbChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleRestServerSQLDBChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const restConfig: RestConfig = payload.restConfig;
-        restConfig.server.sqlDb = event.target.value;
+        restConfig.server.sqlDB = event.target.value;
+        setPayload({
+            ...payload,
+            restConfig
+        });
+    };
+
+    const handleRestServerNoSQLDBChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const restConfig: RestConfig = payload.restConfig;
+        restConfig.server.noSQLDB = event.target.value;
         setPayload({
             ...payload,
             restConfig

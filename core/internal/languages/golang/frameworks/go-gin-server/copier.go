@@ -2,18 +2,20 @@ package goginserver
 
 import (
 	"errors"
+	"text/template"
+
 	"github.com/gertd/go-pluralize"
 	"github.com/iancoleman/strcase"
 	corenode "github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages/executor"
 	commonUtils "github.com/intelops/compage/core/internal/languages/utils"
 	log "github.com/sirupsen/logrus"
-	"text/template"
+
+	"strings"
 
 	"github.com/intelops/compage/core/internal/utils"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"strings"
 )
 
 const RestServerPath = "/pkg/rest/server"
@@ -21,24 +23,35 @@ const RestClientPath = "/pkg/rest/client"
 
 const DaosPath = RestServerPath + "/daos"
 const SQLDBClientsPath = DaosPath + "/clients/sqls"
+const NoSQLDBClientsPath = DaosPath + "/clients/nosqls"
 
 const ServicesPath = RestServerPath + "/services"
 const ControllersPath = RestServerPath + "/controllers"
 const ModelsPath = RestServerPath + "/models"
 
-const ControllerFile = "controller.go.tmpl"
-const ServiceFile = "service.go.tmpl"
+const SQLControllerFile = "sqls-controller.go.tmpl"
+const SQLServiceFile = "sqls-service.go.tmpl"
+const NoSQLControllerFile = "nosqls-controller.go.tmpl"
+const NoSQLServiceFile = "nosqls-service.go.tmpl"
 const DaoFile = "dao.go.tmpl"
+const MongoDBDaoFile = "mongodb-dao.go.tmpl"
 const MySQLDaoFile = "mysql-dao.go.tmpl"
-const SqliteDaoFile = "sqlite-dao.go.tmpl"
+const SQLiteDaoFile = "sqlite-dao.go.tmpl"
+const MongoDBConfigFile = "mongodb.go.tmpl"
 const MySQLDBConfigFile = "mysql.go.tmpl"
-const SqliteDBConfigFile = "sqlite.go.tmpl"
-const ModelFile = "model.go.tmpl"
+const SQLiteDBConfigFile = "sqlite.go.tmpl"
+const SQLModelFile = "sqls-model.go.tmpl"
+const NoSQLModelFile = "nosqls-model.go.tmpl"
 
 const ClientFile = "client.go.tmpl"
 
-const Sqlite = "SQLite"
+// MongoDB nosql databases
+const MongoDB = "MongoDB"
+
+// SQLite sql databases
+const SQLite = "SQLite"
 const MySQL = "MySQL"
+const InMemory = "InMemory"
 
 // Copier Language specific *Copier
 type Copier struct {
@@ -49,6 +62,8 @@ type Copier struct {
 	HasRestClients    bool
 	SQLDB             string
 	IsSQLDB           bool
+	NoSQLDB           string
+	IsNoSQLDB         bool
 	RestServerPort    string
 	Resources         []*corenode.Resource
 	RestClients       []*corenode.RestClient
@@ -64,7 +79,7 @@ type serverResourceData struct {
 	CapsResourceNamePlural             string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isSQLDB bool, sqlDB string, resources []*corenode.Resource, restClients []*corenode.RestClient) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isSQLDB bool, sqlDB string, isNoSQLDB bool, noSQLDB string, resources []*corenode.Resource, restClients []*corenode.RestClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
 
@@ -76,6 +91,8 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	}
 	data["SQLDB"] = sqlDB
 	data["IsSQLDB"] = isSQLDB
+	data["NoSQLDB"] = noSQLDB
+	data["IsNoSQLDB"] = isNoSQLDB
 	// set all resources for main.go.tmpl
 	if isRestServer {
 		var serverResourcesData []serverResourceData
@@ -105,6 +122,8 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 		HasRestClients:    hasRestClients,
 		SQLDB:             sqlDB,
 		IsSQLDB:           isSQLDB,
+		NoSQLDB:           noSQLDB,
+		IsNoSQLDB:         isNoSQLDB,
 		Resources:         resources,
 		RestClients:       restClients,
 		PluralizeClient:   pluralizeClient,
@@ -144,11 +163,18 @@ func (c *Copier) createRestServerDirectories() error {
 		log.Debugf("error creating daos directory: %v", err)
 		return err
 	}
-	// create directories for every resource's db client.
 	if c.IsSQLDB {
+		// create directories for every resource's db client.
 		sqlDBClientsDirectory := c.NodeDirectoryName + SQLDBClientsPath
 		if err := utils.CreateDirectories(sqlDBClientsDirectory); err != nil {
 			log.Debugf("error creating sql db clients directory: %v", err)
+			return err
+		}
+	} else if c.IsNoSQLDB {
+		// create directories for every resource's db client.
+		noSQLDBClientsDirectory := c.NodeDirectoryName + NoSQLDBClientsPath
+		if err := utils.CreateDirectories(noSQLDBClientsDirectory); err != nil {
+			log.Debugf("error creating nosql db clients directory: %v", err)
 			return err
 		}
 	}
@@ -157,44 +183,26 @@ func (c *Copier) createRestServerDirectories() error {
 
 // copyRestServerResourceFiles copies rest server resource files from template and renames them as per resource config.
 func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error {
-	var filePaths []string
+	var filePaths []*string
+	var err error
 	resourceName := strcase.ToKebab(resource.Name)
 
-	// copy controller files to generated project
-	targetResourceControllerFileName := c.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + ControllerFile
-	_, err := utils.CopyFile(targetResourceControllerFileName, c.TemplatesRootPath+ControllersPath+"/"+ControllerFile)
-	if err != nil {
-		log.Debugf("error copying controller file: %v", err)
-		return err
+	// copy sql controller/service/dao/models files to generated project
+	if c.IsSQLDB {
+		filePaths, err = c.copySQLDBResourceFiles(resourceName, filePaths)
+		if err != nil {
+			log.Debugf("error copying sql db resources: %v", err)
+			return err
+		}
 	}
-	filePaths = append(filePaths, targetResourceControllerFileName)
 
-	// copy model files to generated project
-	targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + ModelFile
-	_, err0 := utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+ModelFile)
-	if err0 != nil {
-		log.Debugf("error copying model file: %v", err0)
-		return err0
-	}
-	filePaths = append(filePaths, targetResourceModelFileName)
-
-	// copy service files to generated project
-	targetResourceServiceFileName := c.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + ServiceFile
-	_, err1 := utils.CopyFile(targetResourceServiceFileName, c.TemplatesRootPath+ServicesPath+"/"+ServiceFile)
-	if err1 != nil {
-		log.Debugf("error copying service file: %v", err1)
-		return err1
-	}
-	filePaths = append(filePaths, targetResourceServiceFileName)
-
-	// copy dao files to generated project
-	// add database config here
-	// copy dao files to generated project
-	// add database config here
-	filePaths, err2 := c.copySQLDBResourceFiles(resourceName, filePaths)
-	if err2 != nil {
-		log.Debugf("error copying sql db resources: %v", err2)
-		return err2
+	// copy nosql controller/service/dao/models to generated project
+	if c.IsNoSQLDB {
+		filePaths, err = c.copyNoSQLDBResourceFiles(resourceName, filePaths)
+		if err != nil {
+			log.Debugf("error copying sql db resources: %v", err)
+			return err
+		}
 	}
 
 	// add resource specific data to map in c needed for templates.
@@ -265,7 +273,7 @@ func (c *Copier) addSQLDetails(resource *corenode.Resource) error {
 	var getQueryScanColumns *string
 
 	for key, value := range resource.Fields {
-		dbDataType, err := c.getDBDataType(value.Type)
+		dbDataType, err := c.getSQLDBDataType(value.Type)
 		if err != nil {
 			log.Debugf("error while getting db data type for %s", value.Type)
 			return err
@@ -418,36 +426,104 @@ func (c *Copier) addResourceSpecificTemplateData(resource *corenode.Resource) er
 	return nil
 }
 
-func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []string) ([]string, error) {
+func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*string) ([]*string, error) {
+	// copy controller files to generated project
+	targetResourceControllerFileName := c.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + strings.Replace(NoSQLControllerFile, "nosqls-", "", 1)
+	_, err := utils.CopyFile(targetResourceControllerFileName, c.TemplatesRootPath+ControllersPath+"/"+NoSQLControllerFile)
+	if err != nil {
+		log.Debugf("error copying controller file: %v", err)
+		return nil, err
+	}
+	filePaths = append(filePaths, &targetResourceControllerFileName)
+
+	// copy model files to generated project
+	targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + strings.Replace(NoSQLModelFile, "nosqls-", "", 1)
+	_, err = utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+NoSQLModelFile)
+	if err != nil {
+		log.Debugf("error copying model file: %v", err)
+		return nil, err
+	}
+	filePaths = append(filePaths, &targetResourceModelFileName)
+
+	// copy service files to generated project
+	targetResourceServiceFileName := c.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + strings.Replace(NoSQLServiceFile, "nosqls-", "", 1)
+	_, err = utils.CopyFile(targetResourceServiceFileName, c.TemplatesRootPath+ServicesPath+"/"+NoSQLServiceFile)
+	if err != nil {
+		log.Debugf("error copying service file: %v", err)
+		return nil, err
+	}
+	filePaths = append(filePaths, &targetResourceServiceFileName)
+
 	var targetResourceDaoFileName string
-	if c.IsSQLDB {
-		if c.SQLDB == Sqlite {
-			// dao files
-			targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + SqliteDaoFile
-			_, err := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+SqliteDaoFile)
-			if err != nil {
-				log.Debugf("error copying sqlite dao file: %v", err)
-				return nil, err
-			}
-			filePaths = append(filePaths, targetResourceDaoFileName)
-		} else if c.SQLDB == MySQL {
-			// dao files
-			targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + MySQLDaoFile
-			_, err := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+MySQLDaoFile)
-			if err != nil {
-				log.Debugf("error copying mysql dao file: %v", err)
-				return nil, err
-			}
-			filePaths = append(filePaths, targetResourceDaoFileName)
+	if c.NoSQLDB == MongoDB {
+		// dao files
+		targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + MongoDBDaoFile
+		_, err = utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+MongoDBDaoFile)
+		if err != nil {
+			log.Debugf("error copying mongodb dao file: %v", err)
+			return nil, err
 		}
-	} else {
+		filePaths = append(filePaths, &targetResourceDaoFileName)
+	}
+
+	return filePaths, nil
+}
+
+func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string) ([]*string, error) {
+	// copy controller files to generated project
+	targetResourceControllerFileName := c.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + strings.Replace(SQLControllerFile, "sqls-", "", 1)
+	_, err := utils.CopyFile(targetResourceControllerFileName, c.TemplatesRootPath+ControllersPath+"/"+SQLControllerFile)
+	if err != nil {
+		log.Debugf("error copying controller file: %v", err)
+		return nil, err
+	}
+	filePaths = append(filePaths, &targetResourceControllerFileName)
+
+	// copy model files to generated project
+	targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + strings.Replace(SQLModelFile, "sqls-", "", 1)
+	_, err = utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+SQLModelFile)
+	if err != nil {
+		log.Debugf("error copying model file: %v", err)
+		return nil, err
+	}
+	filePaths = append(filePaths, &targetResourceModelFileName)
+
+	// copy service files to generated project
+	targetResourceServiceFileName := c.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + strings.Replace(SQLServiceFile, "sqls-", "", 1)
+	_, err = utils.CopyFile(targetResourceServiceFileName, c.TemplatesRootPath+ServicesPath+"/"+SQLServiceFile)
+	if err != nil {
+		log.Debugf("error copying service file: %v", err)
+		return nil, err
+	}
+	filePaths = append(filePaths, &targetResourceServiceFileName)
+
+	var targetResourceDaoFileName string
+	if c.SQLDB == SQLite {
+		// dao files
+		targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + SQLiteDaoFile
+		_, err := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+SQLiteDaoFile)
+		if err != nil {
+			log.Debugf("error copying sqlite dao file: %v", err)
+			return nil, err
+		}
+		filePaths = append(filePaths, &targetResourceDaoFileName)
+	} else if c.SQLDB == MySQL {
+		// dao files
+		targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + MySQLDaoFile
+		_, err := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+MySQLDaoFile)
+		if err != nil {
+			log.Debugf("error copying mysql dao file: %v", err)
+			return nil, err
+		}
+		filePaths = append(filePaths, &targetResourceDaoFileName)
+	} else if c.SQLDB == InMemory {
 		targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + DaoFile
 		_, err := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+DaoFile)
 		if err != nil {
 			log.Debugf("error copying dao file: %v", err)
 			return nil, err
 		}
-		filePaths = append(filePaths, targetResourceDaoFileName)
+		filePaths = append(filePaths, &targetResourceDaoFileName)
 	}
 	return filePaths, nil
 }
@@ -481,17 +557,17 @@ func (c *Copier) CreateRestServer() error {
 				return err
 			}
 		}
-		// create sql db config file (common to all resources for specific database)
-		// No vars in config file as of now but in future they may be there.
 		if c.IsSQLDB {
-			if c.SQLDB == Sqlite {
+			// create sql db config file (common to all resources for specific database)
+			// No vars in config file as of now but in future they may be there.
+			if c.SQLDB == SQLite {
 				var filePaths []string
 				// client files
-				targetSQLiteConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + SqliteDBConfigFile
-				_, err2 := utils.CopyFile(targetSQLiteConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SqliteDBConfigFile)
-				if err2 != nil {
-					log.Debugf("error copying sqlite config file: %v", err2)
-					return err2
+				targetSQLiteConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + SQLiteDBConfigFile
+				_, err := utils.CopyFile(targetSQLiteConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SQLiteDBConfigFile)
+				if err != nil {
+					log.Debugf("error copying sqlite config file: %v", err)
+					return err
 				}
 				filePaths = append(filePaths, targetSQLiteConfigFileName)
 				return executor.Execute(filePaths, c.Data)
@@ -499,12 +575,27 @@ func (c *Copier) CreateRestServer() error {
 				var filePaths []string
 				// client files
 				targetMySQLConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + MySQLDBConfigFile
-				_, err2 := utils.CopyFile(targetMySQLConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBConfigFile)
-				if err2 != nil {
-					log.Debugf("error copying mysql config file: %v", err2)
-					return err2
+				_, err := utils.CopyFile(targetMySQLConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBConfigFile)
+				if err != nil {
+					log.Debugf("error copying mysql config file: %v", err)
+					return err
 				}
 				filePaths = append(filePaths, targetMySQLConfigFileName)
+				return executor.Execute(filePaths, c.Data)
+			}
+		} else if c.IsNoSQLDB {
+			// create nosql db config file (common to all resources for specific database)
+			// No vars in config file as of now but in future they may be there.
+			if c.NoSQLDB == MongoDB {
+				var filePaths []string
+				// client files
+				targetMongoDBConfigFileName := c.NodeDirectoryName + NoSQLDBClientsPath + "/" + MongoDBConfigFile
+				_, err := utils.CopyFile(targetMongoDBConfigFileName, c.TemplatesRootPath+NoSQLDBClientsPath+"/"+MongoDBConfigFile)
+				if err != nil {
+					log.Debugf("error copying mongodb config file: %v", err)
+					return err
+				}
+				filePaths = append(filePaths, targetMongoDBConfigFileName)
 				return executor.Execute(filePaths, c.Data)
 			}
 		}
@@ -544,8 +635,8 @@ func (c *Copier) CreateRootLevelFiles() error {
 	return executor.Execute(files, c.Data)
 }
 
-func (c *Copier) getDBDataType(value string) (string, error) {
-	if c.SQLDB == Sqlite {
+func (c *Copier) getSQLDBDataType(value string) (string, error) {
+	if c.SQLDB == SQLite {
 		return commonUtils.GetSqliteDataType(value), nil
 	} else if c.SQLDB == MySQL {
 		return commonUtils.GetMySQLDataType(value), nil

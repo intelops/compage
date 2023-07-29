@@ -11,3 +11,4 @@
 /app/coverage
 openapitools.json
 /core/openapitools.json
+/ui/.env.kind.cluster

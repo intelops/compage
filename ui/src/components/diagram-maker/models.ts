@@ -16,7 +16,8 @@ export interface RestConfig {
     framework?: string;
     server?: {
         port?: string;
-        sqlDb?: string;
+        sqlDB?: string;
+        noSQLDB?: string;
         resources?: Resource[];
         openApiFileYamlContent?: string;
     };
@@ -34,7 +35,8 @@ export interface GrpcConfig {
     framework?: string;
     server?: {
         port?: string;
-        sqlDb?: string;
+        sqlDB?: string;
+        noSQLDB?: string;
         resources?: Resource[];
         protoFileContent?: string;
     };
@@ -113,7 +115,8 @@ export const getEmptyRestConfig = () => {
         server: {
             resources: [],
             port: "",
-            sqlDb: "",
+            sqlDB: "",
+            noSQLDB: "",
             openApiFileYamlContent: ""
         },
         clients: []
@@ -128,7 +131,8 @@ export const getEmptyGrpcConfig = () => {
         server: {
             resources: [],
             port: "",
-            sqlDb: "",
+            sqlDB: "",
+            noSQLDB:"",
             protoFileContent: ""
         },
         clients: []

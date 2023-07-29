@@ -57,7 +57,7 @@ type clientData struct {
 	SourceNodeID string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isGrpcServer bool, grpcServerPort string, isRestSQLDB bool, restSQLDB string, isGrpcSQLDB bool, grpcSQLDB string, restResources []*corenode.Resource, grpcResources []*corenode.Resource, restClients []*corenode.RestClient, grpcClients []*corenode.GrpcClient) *Copier {
+func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isGrpcServer bool, grpcServerPort string, isRestSQLDB bool, restSQLDB string, isGrpcSQLDB bool, grpcSQLDB string, isRestNoSQLDB bool, restNoSQLDB string, isGrpcNoSQLDB bool, grpcNoSQLDB string, restResources []*corenode.Resource, grpcResources []*corenode.Resource, restClients []*corenode.RestClient, grpcClients []*corenode.GrpcClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
 
@@ -119,6 +119,16 @@ func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesR
 	data["IsGrpcSQLDB"] = isGrpcSQLDB
 	if isGrpcSQLDB {
 		data["GrpcSQLDB"] = grpcSQLDB
+	}
+
+	data["IsRestNoSQLDB"] = isRestNoSQLDB
+	if isRestNoSQLDB {
+		data["RestNoSQLDB"] = restNoSQLDB
+	}
+
+	data["IsGrpcNoSQLDB"] = isGrpcNoSQLDB
+	if isGrpcNoSQLDB {
+		data["GrpcNoSQLDB"] = grpcNoSQLDB
 	}
 
 	return &Copier{
