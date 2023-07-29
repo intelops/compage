@@ -73,6 +73,8 @@ interface NodeTypesConfig {
     hasRestClients?: boolean;
     restConfig?: RestConfig;
     isGrpcServer?: boolean;
+    isGrpcServerNoSQLDB?: boolean;
+    isGrpcServerSQLDB?: boolean;
     hasGrpcClients?: boolean;
     grpcConfig?: GrpcConfig;
     isWsServer?: boolean;
@@ -176,6 +178,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         hasRestClients: nodeTypesConfig.hasRestClients || false,
         restConfig: nodeTypesConfig.restConfig || getEmptyRestConfig(),
         isGrpcServer: nodeTypesConfig.isGrpcServer || false,
+        isGrpcServerSQLDB: nodeTypesConfig.isGrpcServerSQLDB || false,
+        isGrpcServerNoSQLDB: nodeTypesConfig.isGrpcServerNoSQLDB || false,
         hasGrpcClients: nodeTypesConfig.hasGrpcClients || false,
         grpcConfig: nodeTypesConfig.grpcConfig || getEmptyGrpcConfig(),
         isWsServer: nodeTypesConfig.isWsServer || false,
@@ -358,6 +362,8 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 },
                 language: '',
                 isGrpcServer: false,
+                isGrpcServerNoSQLDB: false,
+                isGrpcServerSQLDB: false,
                 isRestServer: false,
                 isRestServerNoSQLDB: false,
                 isRestServerSQLDB: false,
@@ -423,6 +429,26 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         setPayload({
             ...payload,
             isRestServer: event.target.checked
+        });
+    };
+
+    const handleIsGrpcServerSQLDBChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const grpcConfig: GrpcConfig = payload.grpcConfig;
+        grpcConfig.server.noSQLDB = '';
+        setPayload({
+            ...payload,
+            isGrpcServerSQLDB: event.target.checked,
+            grpcConfig,
+        });
+    };
+
+    const handleIsGrpcServerNoSQLDBChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const grpcConfig: GrpcConfig = payload.grpcConfig;
+        grpcConfig.server.sqlDB = '';
+        setPayload({
+            ...payload,
+            isGrpcServerNoSQLDB: event.target.checked,
+            grpcConfig
         });
     };
 
@@ -677,7 +703,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 </TextField>;
             }
         }
-        return ''
+        return '';
     };
 
     const getRestServerSQLDBContent = () => {
@@ -1067,7 +1093,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 {getGrpcTemplateContent()}
                 {getGrpcFrameworkContent()}
                 {getGrpcServerPortContent()}
+                {getGrpcServerSQLDBCheck()}
                 {getGrpcServerSQLDBContent()}
+                {getGrpcServerNoSQLDBCheck()}
                 {getGrpcServerNoSQLDBContent()}
                 {getGrpcServerResourcesContent()}
             </React.Fragment>;
@@ -1168,6 +1196,34 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             return resourceNames;
         }
         return [];
+    };
+
+    const getGrpcServerSQLDBCheck = () => {
+        return <React.Fragment>
+            <FormControlLabel
+                label="SQL DB"
+                control={<Checkbox
+                    id="isGrpcServerSQLDB"
+                    disabled={payload.isGrpcServerNoSQLDB}
+                    size="medium" checked={payload.isGrpcServerSQLDB}
+                    onChange={handleIsGrpcServerSQLDBChange}
+                />}
+            />
+        </React.Fragment>;
+    };
+
+    const getGrpcServerNoSQLDBCheck = () => {
+        return <React.Fragment>
+            <FormControlLabel
+                label="NoSQL DB"
+                control={<Checkbox
+                    id="isGrpcServerNoSQLDB"
+                    disabled={payload.isGrpcServerSQLDB}
+                    size="medium" checked={payload.isGrpcServerNoSQLDB}
+                    onChange={handleIsGrpcServerNoSQLDBChange}
+                />}
+            />
+        </React.Fragment>;
     };
 
     const getRestServerSQLDBCheck = () => {

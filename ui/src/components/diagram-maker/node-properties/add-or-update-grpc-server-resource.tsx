@@ -102,6 +102,7 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
             errorMessage: ''
         },
         datatype: '',
+        isComposite: false,
         mode: {
             index: 0,
             edit: false
@@ -169,14 +170,21 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
             if (field.mode.edit) {
                 payload.fieldsCollection.splice(field.mode.index, 1);
             }
-            payload.fieldsCollection.push({attribute: field.attribute.value, datatype: field.datatype});
+            payload.fieldsCollection.push({
+                attribute: field.attribute.value,
+                datatype: field.datatype,
+                isComposite: field.isComposite
+            });
             setPayload({...payload});
             setField({
                 attribute: {
                     value: '',
                     error: false,
                     errorMessage: ''
-                }, datatype: '', mode: {edit: false, index: 0}
+                },
+                datatype: '',
+                isComposite: false,
+                mode: {edit: false, index: 0}
             });
         }
     };
@@ -189,6 +197,7 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
                 errorMessage: '',
                 error: false
             },
+            isComposite: payload.fieldsCollection[index].isComposite,
             datatype: payload.fieldsCollection[index].datatype,
             // set the index and mode as true
             mode: {edit: true, index}
@@ -321,7 +330,11 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
     const addOrUpdateGrpcResource = () => {
         const fields = {};
         for (const fld of payload.fieldsCollection) {
-            fields[fld.attribute] = fld.datatype;
+            if (fld.isComposite) {
+                fields[fld.attribute] = {datatype: fld.datatype, isComposite: fld.isComposite};
+            } else {
+                fields[fld.attribute] = {datatype: fld.datatype};
+            }
         }
         const resource: Resource = {fields: JSON.parse(JSON.stringify(fields)), name: payload.name.value};
         if (isNameValid()) {
@@ -337,6 +350,7 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
                 fieldsCollection: []
             });
             setField({
+                isComposite: false,
                 datatype: '',
                 attribute: {
                     value: '',
@@ -453,6 +467,7 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
                                 <TableRow>
                                     <TableCell align="left">Attribute</TableCell>
                                     <TableCell align="center">Datatype</TableCell>
+                                    <TableCell align="center">Is Composite</TableCell>
                                     <TableCell align="center">Actions</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -467,6 +482,7 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
                                                 {fld.attribute}
                                             </TableCell>
                                             <TableCell align="center">{fld.datatype}</TableCell>
+                                            <TableCell align="center">{fld.isComposite ? "Yes" : "No"}</TableCell>
                                             <TableCell align="left">
                                                 <Stack direction="row-reverse" spacing={1}>
                                                     <Button variant="text"

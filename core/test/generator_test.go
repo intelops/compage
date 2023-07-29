@@ -612,7 +612,7 @@ func TestGrpcServerGeneratorNoSql(t *testing.T) {
 		Json:           grpcServerConfigJSON,
 	}
 	defer func() {
-		//_ = os.RemoveAll("/tmp/first-grpc-server-project-nosql")
+		_ = os.RemoveAll("/tmp/first-grpc-server-project-nosql")
 	}()
 
 	// retrieve project struct
