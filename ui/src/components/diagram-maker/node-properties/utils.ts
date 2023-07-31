@@ -29,12 +29,12 @@ export const COMPAGE_LANGUAGE_GRPC_FRAMEWORKS = {
 
 // compage template sql_dbs supported.
 export const COMPAGE_LANGUAGE_SQL_DBS = {
-    [GO]: ["MySQL", "SQLite"],
+    [GO]: ["MySQL", "SQLite", "Map", "SQLite-GORM", "MySQL-GORM"],
 };
 
 // compage template sql_dbs supported.
 export const COMPAGE_LANGUAGE_NOSQL_DBS = {
-    [GO]: ["MongoDB"]
+    [GO]: ["MongoDB", "Map"],
 };
 
 // openapi template frameworks supported.

@@ -348,7 +348,7 @@ func TestRestAndGrpcServerGenerator(t *testing.T) {
                                         "datatype": "string"
                                     }
                                 },
-                                "name": "StudentModel"
+                                "name": "Student"
                             }
                         ]
                     },
@@ -385,84 +385,6 @@ func TestRestAndGrpcServerGenerator(t *testing.T) {
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-rest-and-grpc-server-project")
-	}()
-
-	// retrieve project struct
-	getProject, err := grpc.GetProject(&input)
-	if err != nil {
-		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
-	}
-	// trigger project generation
-	if err0 := handlers.Handle(getProject); err0 != nil {
-		t.Errorf("handlers.Handle failed %s", err0.Error())
-	}
-}
-
-func TestRestServerGeneratorSql(t *testing.T) {
-	restServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-ef": {
-            "id": "node-ef",
-            "typeId": "node-type-circle",
-            "consumerData": {
-                "nodeType": "circle",
-                "name": "user-service",
-                "language": "go",
-                "restConfig": {
-                    "server": {
-                        "sqlDB": "SQLite",
-                        "port": "1337",
-                        "resources": [
-                            {
-                                "fields": {
-                                    "Name": {
-                                        "datatype": "string"
-                                    },
-                                    "Address": {
-                                        "datatype": "Address",
-                                        "isComposite": true
-                                    },
-                                    "Age": {
-                                        "datatype": "int"
-                                    },
-                                    "Sign": {
-                                        "datatype": "rune"
-                                    }
-                                },
-                                "name": "User"
-                            },
-                            {
-                                "fields": {
-                                    "Street": {
-                                        "datatype": "string"
-                                    },
-                                    "PinCode": {
-                                        "datatype": "string"
-                                    },
-                                    "City": {
-                                        "datatype": "string"
-                                    }
-                                },
-                                "name": "Address"
-                            }
-                        ]
-                    },
-                    "framework": "go-gin-server",
-                    "template": "compage"
-                }
-            }
-        }
-    }
-}`
-	input := project.GenerateCodeRequest{
-		UserName:       "mahendraintelops",
-		RepositoryName: "first-project-github",
-		ProjectName:    "first-rest-server-project",
-		Json:           restServerConfigJSON,
-	}
-	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-server-project")
 	}()
 
 	// retrieve project struct
@@ -554,6 +476,396 @@ func TestRestServerGeneratorNoSql(t *testing.T) {
 	}
 }
 
+func TestRestServerGeneratorSqlMap(t *testing.T) {
+	restServerConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-ef": {
+            "id": "node-ef",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "circle",
+                "name": "user-service",
+                "language": "go",
+                "restConfig": {
+                    "server": {
+                        "sqlDB": "Map",
+                        "port": "1337",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "Address": {
+                                        "datatype": "Address",
+                                        "isComposite": true
+                                    },
+                                    "Age": {
+                                        "datatype": "int"
+                                    },
+                                    "Sign": {
+                                        "datatype": "rune"
+                                    }
+                                },
+                                "name": "User"
+                            },
+                            {
+                                "fields": {
+                                    "Street": {
+                                        "datatype": "string"
+                                    },
+                                    "PinCode": {
+                                        "datatype": "string"
+                                    },
+                                    "City": {
+                                        "datatype": "string"
+                                    }
+                                },
+                                "name": "Address"
+                            }
+                        ]
+                    },
+                    "framework": "go-gin-server",
+                    "template": "compage"
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-rest-server-project-map",
+		Json:           restServerConfigJSON,
+	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-rest-server-project-map")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
+func TestRestServerGeneratorSqlSQLite(t *testing.T) {
+	restServerConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-ef": {
+            "id": "node-ef",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "circle",
+                "name": "user-service",
+                "language": "go",
+                "restConfig": {
+                    "server": {
+                        "sqlDB": "SQLite",
+                        "port": "1337",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "Address": {
+                                        "datatype": "Address",
+                                        "isComposite": true
+                                    },
+                                    "Age": {
+                                        "datatype": "int"
+                                    },
+                                    "Sign": {
+                                        "datatype": "rune"
+                                    }
+                                },
+                                "name": "User"
+                            },
+                            {
+                                "fields": {
+                                    "Street": {
+                                        "datatype": "string"
+                                    },
+                                    "PinCode": {
+                                        "datatype": "string"
+                                    },
+                                    "City": {
+                                        "datatype": "string"
+                                    }
+                                },
+                                "name": "Address"
+                            }
+                        ]
+                    },
+                    "framework": "go-gin-server",
+                    "template": "compage"
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-rest-server-project-sqlite",
+		Json:           restServerConfigJSON,
+	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-rest-server-project-sqlite")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
+func TestRestServerGeneratorSqlMySQL(t *testing.T) {
+	restServerConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-ef": {
+            "id": "node-ef",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "circle",
+                "name": "user-service",
+                "language": "go",
+                "restConfig": {
+                    "server": {
+                        "sqlDB": "MySQL",
+                        "port": "1337",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "Address": {
+                                        "datatype": "Address",
+                                        "isComposite": true
+                                    },
+                                    "Age": {
+                                        "datatype": "int"
+                                    },
+                                    "Sign": {
+                                        "datatype": "rune"
+                                    }
+                                },
+                                "name": "User"
+                            },
+                            {
+                                "fields": {
+                                    "Street": {
+                                        "datatype": "string"
+                                    },
+                                    "PinCode": {
+                                        "datatype": "string"
+                                    },
+                                    "City": {
+                                        "datatype": "string"
+                                    }
+                                },
+                                "name": "Address"
+                            }
+                        ]
+                    },
+                    "framework": "go-gin-server",
+                    "template": "compage"
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-rest-server-project-mysql",
+		Json:           restServerConfigJSON,
+	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-rest-server-project-mysql")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
+func TestRestServerGeneratorSqlSQLiteGORM(t *testing.T) {
+	restServerConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-ef": {
+            "id": "node-ef",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "circle",
+                "name": "user-service",
+                "language": "go",
+                "restConfig": {
+                    "server": {
+                        "sqlDB": "SQLite-GORM",
+                        "port": "1337",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "Address": {
+                                        "datatype": "Address",
+                                        "isComposite": true
+                                    },
+                                    "Age": {
+                                        "datatype": "int"
+                                    },
+                                    "Sign": {
+                                        "datatype": "rune"
+                                    }
+                                },
+                                "name": "User"
+                            },
+                            {
+                                "fields": {
+                                    "Street": {
+                                        "datatype": "string"
+                                    },
+                                    "PinCode": {
+                                        "datatype": "string"
+                                    },
+                                    "City": {
+                                        "datatype": "string"
+                                    }
+                                },
+                                "name": "Address"
+                            }
+                        ]
+                    },
+                    "framework": "go-gin-server",
+                    "template": "compage"
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-rest-server-project-sqlite-gorm",
+		Json:           restServerConfigJSON,
+	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-rest-server-project-sqlite-gorm")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
+func TestRestServerGeneratorSqlMySQLGORM(t *testing.T) {
+	restServerConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-ef": {
+            "id": "node-ef",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "circle",
+                "name": "user-service",
+                "language": "go",
+                "restConfig": {
+                    "server": {
+                        "sqlDB": "MySQL-GORM",
+                        "port": "1337",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "Address": {
+                                        "datatype": "Address",
+                                        "isComposite": true
+                                    },
+                                    "Age": {
+                                        "datatype": "int"
+                                    },
+                                    "Sign": {
+                                        "datatype": "rune"
+                                    }
+                                },
+                                "name": "User"
+                            },
+                            {
+                                "fields": {
+                                    "Street": {
+                                        "datatype": "string"
+                                    },
+                                    "PinCode": {
+                                        "datatype": "string"
+                                    },
+                                    "City": {
+                                        "datatype": "string"
+                                    }
+                                },
+                                "name": "Address"
+                            }
+                        ]
+                    },
+                    "framework": "go-gin-server",
+                    "template": "compage"
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-rest-server-project-mysql-gorm",
+		Json:           restServerConfigJSON,
+	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-rest-server-project-mysql-gorm")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
 func TestGrpcServerGeneratorNoSql(t *testing.T) {
 	grpcServerConfigJSON := `{
     "edges": {},
@@ -594,7 +906,7 @@ func TestGrpcServerGeneratorNoSql(t *testing.T) {
                                         "datatype": "bool"
                                     }
                                 },
-                                "name": "StudentModel"
+                                "name": "Student"
                             }
                         ]
                     },
@@ -626,7 +938,79 @@ func TestGrpcServerGeneratorNoSql(t *testing.T) {
 	}
 }
 
-func TestGrpcServerGenerator(t *testing.T) {
+func TestGrpcServerGeneratorSqlMap(t *testing.T) {
+	grpcServerConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-b0": {
+            "id": "node-b0",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "circle",
+                "name": "student-service",
+                "language": "go",
+                "grpcConfig": {
+                    "server": {
+                        "sqlDB": "Map",
+                        "port": "50052",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "RollNumber": {
+                                        "datatype": "int32"
+                                    },
+                                    "College": {
+                                        "datatype": "string"
+                                    },
+                                    "Sign": {
+                                        "datatype": "rune"
+                                    },
+                                    "Marks": {
+                                        "datatype": "int"
+                                    },
+                                    "GateScore": {
+                                        "datatype": "uint"
+                                    },
+                                    "IsPassed": {
+                                        "datatype": "bool"
+                                    }
+                                },
+                                "name": "Student"
+                            }
+                        ]
+                    },
+                    "framework": "go-grpc-server",
+                    "template": "compage"
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-grpc-server-project-map",
+		Json:           grpcServerConfigJSON,
+	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-grpc-server-project-map")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
+func TestGrpcServerGeneratorSqlSQLite(t *testing.T) {
 	grpcServerConfigJSON := `{
     "edges": {},
     "nodes": {
@@ -666,7 +1050,7 @@ func TestGrpcServerGenerator(t *testing.T) {
                                         "datatype": "bool"
                                     }
                                 },
-                                "name": "StudentModel"
+                                "name": "Student"
                             }
                         ]
                     },
@@ -680,11 +1064,227 @@ func TestGrpcServerGenerator(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		UserName:       "mahendraintelops",
 		RepositoryName: "first-project-github",
-		ProjectName:    "first-grpc-server-project",
+		ProjectName:    "first-grpc-server-project-sqlite",
 		Json:           grpcServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-grpc-server-project")
+		_ = os.RemoveAll("/tmp/first-grpc-server-project-sqlite")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
+func TestGrpcServerGeneratorSqlMySQL(t *testing.T) {
+	grpcServerConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-b0": {
+            "id": "node-b0",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "circle",
+                "name": "student-service",
+                "language": "go",
+                "grpcConfig": {
+                    "server": {
+                        "sqlDB": "MySQL",
+                        "port": "50052",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "RollNumber": {
+                                        "datatype": "int32"
+                                    },
+                                    "College": {
+                                        "datatype": "string"
+                                    },
+                                    "Sign": {
+                                        "datatype": "rune"
+                                    },
+                                    "Marks": {
+                                        "datatype": "int"
+                                    },
+                                    "GateScore": {
+                                        "datatype": "uint"
+                                    },
+                                    "IsPassed": {
+                                        "datatype": "bool"
+                                    }
+                                },
+                                "name": "Student"
+                            }
+                        ]
+                    },
+                    "framework": "go-grpc-server",
+                    "template": "compage"
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-grpc-server-project-mysql",
+		Json:           grpcServerConfigJSON,
+	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-grpc-server-project-mysql")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
+func TestGrpcServerGeneratorSqlSQLiteGORM(t *testing.T) {
+	grpcServerConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-b0": {
+            "id": "node-b0",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "circle",
+                "name": "student-service",
+                "language": "go",
+                "grpcConfig": {
+                    "server": {
+                        "sqlDB": "SQLite-GORM",
+                        "port": "50052",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "RollNumber": {
+                                        "datatype": "int32"
+                                    },
+                                    "College": {
+                                        "datatype": "string"
+                                    },
+                                    "Sign": {
+                                        "datatype": "rune"
+                                    },
+                                    "Marks": {
+                                        "datatype": "int"
+                                    },
+                                    "GateScore": {
+                                        "datatype": "uint"
+                                    },
+                                    "IsPassed": {
+                                        "datatype": "bool"
+                                    }
+                                },
+                                "name": "Student"
+                            }
+                        ]
+                    },
+                    "framework": "go-grpc-server",
+                    "template": "compage"
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-grpc-server-project-sqlite-gorm",
+		Json:           grpcServerConfigJSON,
+	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-grpc-server-project-sqlite-gorm")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}
+
+func TestGrpcServerGeneratorSqlMySQLGORM(t *testing.T) {
+	grpcServerConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-b0": {
+            "id": "node-b0",
+            "typeId": "node-type-circle",
+            "consumerData": {
+                "nodeType": "circle",
+                "name": "student-service",
+                "language": "go",
+                "grpcConfig": {
+                    "server": {
+                        "sqlDB": "MySQL-GORM",
+                        "port": "50052",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "RollNumber": {
+                                        "datatype": "int32"
+                                    },
+                                    "College": {
+                                        "datatype": "string"
+                                    },
+                                    "Sign": {
+                                        "datatype": "rune"
+                                    },
+                                    "Marks": {
+                                        "datatype": "int"
+                                    },
+                                    "GateScore": {
+                                        "datatype": "uint"
+                                    },
+                                    "IsPassed": {
+                                        "datatype": "bool"
+                                    }
+                                },
+                                "name": "Student"
+                            }
+                        ]
+                    },
+                    "framework": "go-grpc-server",
+                    "template": "compage"
+                }
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		UserName:       "mahendraintelops",
+		RepositoryName: "first-project-github",
+		ProjectName:    "first-grpc-server-project-mysql-gorm",
+		Json:           grpcServerConfigJSON,
+	}
+	defer func() {
+		_ = os.RemoveAll("/tmp/first-grpc-server-project-mysql-gorm")
 	}()
 
 	// retrieve project struct
@@ -798,7 +1398,7 @@ func TestWsServerGenerator(t *testing.T) {
                                         "datatype": "string"
                                     }
                                 },
-                                "name": "StudentModel"
+                                "name": "Student"
                             }
                         ]
                     },
