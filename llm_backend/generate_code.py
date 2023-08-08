@@ -47,7 +47,7 @@ app.add_middleware(
 def ping():
     return {"message": "Hello World"}
 
-@app.post("/generate_code/")
+@app.post("/llm_generate_code/")
 async def generate_code(item:Item,apikey: str = Header(None) ):
     global api_key
     
