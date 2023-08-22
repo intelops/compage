@@ -18,6 +18,7 @@ import (
 
 const APIPath = "/api/v1"
 
+const ConfigPath = "/config"
 const GrpcServerPath = "/pkg/grpc/server"
 const GrpcClientPath = "/pkg/grpc/client"
 
@@ -53,6 +54,7 @@ const MySQLGORMDBConfigFile = "mysql-gorm.go.tmpl"
 const SQLiteGORMDBConfigFile = "sqlite-gorm.go.tmpl"
 
 const ClientFile = "client.go.tmpl"
+const ConfigFile = "opentel-config.go.tmpl"
 
 // MongoDB nosql databases
 const MongoDB = "MongoDB"
@@ -156,11 +158,15 @@ func (c *Copier) createGrpcClientDirectories() error {
 
 // createGrpcServerDirectories creates grpc server directories.
 func (c *Copier) createGrpcServerDirectories() error {
+	configDirectory := c.NodeDirectoryName + ConfigPath
 	apiDirectory := c.NodeDirectoryName + APIPath
 	controllersDirectory := c.NodeDirectoryName + ControllersPath
 	modelsDirectory := c.NodeDirectoryName + ModelsPath
 	servicesDirectory := c.NodeDirectoryName + ServicesPath
 	daosDirectory := c.NodeDirectoryName + DaosPath
+	if err := utils.CreateDirectories(configDirectory); err != nil {
+		return err
+	}
 	if err := utils.CreateDirectories(apiDirectory); err != nil {
 		return err
 	}
@@ -655,6 +661,23 @@ func (c *Copier) CreateGrpcServer() error {
 				return err
 			}
 		}
+
+		// copy opentel config file
+		var filePaths []string
+		// client files
+		targetOpenTelConfigFileName := c.NodeDirectoryName + ConfigPath + "/" + ConfigFile
+		_, err := utils.CopyFile(targetOpenTelConfigFileName, c.TemplatesRootPath+ConfigPath+"/"+ConfigFile)
+		if err != nil {
+			log.Debugf("error copying opentel config file: %v", err)
+			return err
+		}
+		filePaths = append(filePaths, targetOpenTelConfigFileName)
+		err = executor.Execute(filePaths, c.Data)
+		if err != nil {
+			log.Debugf("error executing opentel config file: %v", err)
+			return err
+		}
+
 		if c.IsSQLDB {
 			// create sql db config file (common to all resources for specific database)
 			// No vars in config file as of now but in future they may be there.
