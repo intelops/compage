@@ -42,6 +42,16 @@ spec:
               port: grpc
             initialDelaySeconds: 15
             periodSeconds: 30
+          env:
+            - name: SERVICE_NAME
+              value: Core
+            - name: INSECURE_MODE
+              value: "true"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: core-open-telemetry-data
+                  key: OTEL_EXPORTER_OTLP_ENDPOINT
           resources:
             {{- toYaml .Values.core.resources | nindent 12 }}
       {{- with .Values.core.nodeSelector }}

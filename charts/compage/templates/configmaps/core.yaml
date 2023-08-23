@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: core-open-telemetry-data
+  labels:
+    {{- include "compage.core.labels" . | nindent 4 }}
+data:
+  OTEL_EXPORTER_OTLP_ENDPOINT: {{.Values.core.open-telemetry.otelExporterOtlpEndpoint}}

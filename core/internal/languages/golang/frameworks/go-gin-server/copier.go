@@ -21,6 +21,7 @@ import (
 
 const RestServerPath = "/pkg/rest/server"
 const RestClientPath = "/pkg/rest/client"
+const ConfigPath = "/config"
 
 const ControllersPath = RestServerPath + "/controllers"
 const ServicesPath = RestServerPath + "/services"
@@ -53,6 +54,7 @@ const MySQLGORMDBConfigFile = "mysql-gorm.go.tmpl"
 const SQLiteGORMDBConfigFile = "sqlite-gorm.go.tmpl"
 
 const ClientFile = "client.go.tmpl"
+const ConfigFile = "rest-opentel-config.go.tmpl"
 
 // MongoDB nosql databases
 const MongoDB = "MongoDB"
@@ -155,10 +157,15 @@ func (c *Copier) createRestClientDirectories() error {
 
 // createRestServerDirectories creates rest server directories.
 func (c *Copier) createRestServerDirectories() error {
+	configDirectory := c.NodeDirectoryName + ConfigPath
 	controllersDirectory := c.NodeDirectoryName + ControllersPath
 	modelsDirectory := c.NodeDirectoryName + ModelsPath
 	servicesDirectory := c.NodeDirectoryName + ServicesPath
 	daosDirectory := c.NodeDirectoryName + DaosPath
+	if err := utils.CreateDirectories(configDirectory); err != nil {
+		log.Debugf("error creating config directory: %v", err)
+		return err
+	}
 	if err := utils.CreateDirectories(controllersDirectory); err != nil {
 		log.Debugf("error creating controllers directory: %v", err)
 		return err
@@ -624,6 +631,22 @@ func (c *Copier) CreateRestServer() error {
 				return err
 			}
 		}
+		// copy opentel config file
+		var filePaths []string
+		// client files
+		targetOpenTelConfigFileName := c.NodeDirectoryName + ConfigPath + "/" + ConfigFile
+		_, err := utils.CopyFile(targetOpenTelConfigFileName, c.TemplatesRootPath+ConfigPath+"/"+ConfigFile)
+		if err != nil {
+			log.Debugf("error copying opentel config file: %v", err)
+			return err
+		}
+		filePaths = append(filePaths, targetOpenTelConfigFileName)
+		err = executor.Execute(filePaths, c.Data)
+		if err != nil {
+			log.Debugf("error executing opentel config file: %v", err)
+			return err
+		}
+
 		if c.IsSQLDB {
 			// create sql db config file (common to all resources for specific database)
 			// No vars in config file as of now but in future they may be there.

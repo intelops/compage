@@ -131,7 +131,7 @@ func GetDefaultValueForDataType(value string) interface{} {
 	} else if value == "bool" {
 		return true
 	} else if value == "float32" ||
-		value == "float64 " ||
+		value == "float64" ||
 		value == "complex64" ||
 		value == "complex128" {
 		return 1.0

@@ -1158,7 +1158,7 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
 		Json:           restGrpcServerClientsCrossConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-server-clients-and-grpc-server-clients-cross-config-project")
+		//_ = os.RemoveAll("/tmp/first-rest-server-clients-and-grpc-server-clients-cross-config-project")
 	}()
 
 	// retrieve project struct
