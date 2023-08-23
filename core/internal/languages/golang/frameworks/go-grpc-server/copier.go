@@ -54,7 +54,7 @@ const MySQLGORMDBConfigFile = "mysql-gorm.go.tmpl"
 const SQLiteGORMDBConfigFile = "sqlite-gorm.go.tmpl"
 
 const ClientFile = "client.go.tmpl"
-const ConfigFile = "opentel-config.go.tmpl"
+const ConfigFile = "grpc-opentel-config.go.tmpl"
 
 // MongoDB nosql databases
 const MongoDB = "MongoDB"
@@ -165,21 +165,27 @@ func (c *Copier) createGrpcServerDirectories() error {
 	servicesDirectory := c.NodeDirectoryName + ServicesPath
 	daosDirectory := c.NodeDirectoryName + DaosPath
 	if err := utils.CreateDirectories(configDirectory); err != nil {
+		log.Debugf("error creating config directory: %v", err)
 		return err
 	}
 	if err := utils.CreateDirectories(apiDirectory); err != nil {
+		log.Debugf("error creating api directory: %v", err)
 		return err
 	}
 	if err := utils.CreateDirectories(controllersDirectory); err != nil {
+		log.Debugf("error creating controllers directory: %v", err)
 		return err
 	}
 	if err := utils.CreateDirectories(modelsDirectory); err != nil {
+		log.Debugf("error creating models directory: %v", err)
 		return err
 	}
 	if err := utils.CreateDirectories(servicesDirectory); err != nil {
+		log.Debugf("error creating services directory: %v", err)
 		return err
 	}
 	if err := utils.CreateDirectories(daosDirectory); err != nil {
+		log.Debugf("error creating daos directory: %v", err)
 		return err
 	}
 	if c.IsSQLDB {

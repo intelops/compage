@@ -1,19 +1,45 @@
 package main
 
 import (
+	"context"
 	server "github.com/intelops/compage/core/cmd/grpc"
+	"github.com/intelops/compage/core/config"
 	project "github.com/intelops/compage/core/gen/api/v1"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"golang.org/x/exp/slices"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
+var (
+	serviceName  = os.Getenv("SERVICE_NAME")
+	collectorURL = os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
+	insecure     = os.Getenv("INSECURE_MODE")
+)
+
 func main() {
+	// grpc server configuration
+	// Initialize the exporter
+	var grpcTraceProvider *sdktrace.TracerProvider
+	if len(serviceName) > 0 && len(collectorURL) > 0 {
+		// add opentel
+		grpcTraceProvider = config.InitGrpcTracer(serviceName, collectorURL, insecure)
+	}
+	defer func() {
+		if grpcTraceProvider != nil {
+			if err := grpcTraceProvider.Shutdown(context.Background()); err != nil {
+				log.Printf("Error shutting down tracer provider: %v", err)
+			}
+		}
+	}()
+
 	// check if the git submodules have been pulled (mainly need to check this on developer's machine)
 	if checkIfGitSubmodulesExist() {
 		log.Println("starting gRPC server...")
@@ -56,9 +82,9 @@ func startGrpcServer() {
 	if err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
-	var opts []grpc.ServerOption
 
-	grpcServer := grpc.NewServer(opts...)
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
+		grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()))
 	impl := server.New()
 	project.RegisterProjectServiceServer(grpcServer, impl)
 	reflection.Register(grpcServer)

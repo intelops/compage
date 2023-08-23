@@ -87,6 +87,9 @@ core:
     type: ClusterIP
     port: 50051
 
+  open-telemetry:
+    otelExporterOtlpEndpoint: "http://localhost:4317"
+
   resources:
     limits:
       cpu: 100m
