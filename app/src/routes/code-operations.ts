@@ -160,10 +160,12 @@ codeOperationsRouter.post('/generate', requireUserNameMiddleware, async (request
                 projectVersion: projectResource.spec.version,
                 generatedProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
                 existingProject: cloneExistingProjectFromGitServerRequest.clonedProjectPath + '/' + projectResource.spec.repository?.name,
-                userName: projectResource.spec.user.name,
-                email: projectResource.spec.user.email,
-                password,
-                repository: projectResource.spec.repository
+                gitInfo: {
+                    repository: projectResource.spec.repository,
+                    userName: projectResource.spec.user.name as string,
+                    password,
+                    email: projectResource.spec.user.email as string
+                }
             };
 
             error = await pushToExistingProjectOnGitServer(pushToExistingProjectOnGitServerRequest);

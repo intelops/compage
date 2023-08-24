@@ -7,7 +7,7 @@ import Logger from '../util/logger';
 const k8sOperationsRouter = Router();
 
 // returns current-context.
-k8sOperationsRouter.get('/current-context', requireUserNameMiddleware, async (request: Request, response: Response) => {
+k8sOperationsRouter.get('/current-context', requireUserNameMiddleware, async (_request: Request, response: Response) => {
     // TODO dummy delay given
     await new Promise(r => setTimeout(r, 1000));
     const contextName = await getCurrentContext();

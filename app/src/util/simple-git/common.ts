@@ -8,7 +8,7 @@ export const gitOperations = async (git: SimpleGit, repository: Repository, proj
     await git.add('.')
         .then(
             (success: any) => {
-                Logger.debug('git add succeeded');
+                Logger.debug(`git add succeeded: ${success}`);
             }, (failure: any) => {
                 Logger.debug(`git add failed: ${failure}`);
                 error = `git add failed: ${failure}`;
@@ -21,7 +21,7 @@ export const gitOperations = async (git: SimpleGit, repository: Repository, proj
     await git.commit(`commit by compage : generated files through compage for version: ${projectVersion}`)
         .then(
             (success: any) => {
-                Logger.debug('git commit succeeded');
+                Logger.debug(`git commit succeeded: ${success}`);
             }, (failure: any) => {
                 Logger.debug(`git commit failed: ${failure}`);
                 error = `git commit failed: ${failure}`;
@@ -34,7 +34,7 @@ export const gitOperations = async (git: SimpleGit, repository: Repository, proj
     await git.checkoutLocalBranch(repository.branch + '-' + projectVersion)
         .then(
             (success: any) => {
-                Logger.debug('git checkoutLocalBranch succeeded');
+                Logger.debug(`git checkoutLocalBranch succeeded: ${success}`);
             }, (failure: any) => {
                 Logger.debug(`git checkoutLocalBranch failed: ${failure}`);
                 error = `git checkoutLocalBranch failed: ${failure}`;
@@ -46,7 +46,7 @@ export const gitOperations = async (git: SimpleGit, repository: Repository, proj
     // Finally push to online repository
     await git.push('origin', repository.branch + '-' + projectVersion, {'--force': null})
         .then((success: any) => {
-            Logger.debug('git push succeeded');
+            Logger.debug(`git push succeeded: ${success}`);
         }, (failure: any) => {
             Logger.debug(`git push failed: ${failure}`);
             error = `git push failed: ${failure}`;

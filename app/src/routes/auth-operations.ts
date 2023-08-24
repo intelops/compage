@@ -23,16 +23,17 @@ authOperationsRouter.post('/login', async (req, res) => {
             code,
             redirect_uri: config.redirect_uri
         }
-    }).then(response => {
+    }).then(async response => {
         const params = new URLSearchParams(response.data);
         const accessToken = params.get('access_token');
         Logger.info('Access token retrieved');
         // Request to return data of a user that has been authenticated
-        return axios(`https://api.github.com/user`, {
-            headers: {
-                Authorization: `token ${accessToken}`,
-            },
-        }).then((resp) => {
+        try {
+            const resp = await axios(`https://api.github.com/user`, {
+                headers: {
+                    Authorization: `token ${accessToken}`,
+                },
+            });
             setToken(resp.data.login, resp.data.email, accessToken as string).then(userResource => {
                 if (userResource.apiVersion) {
                     Logger.info(`${userResource.metadata.name} user updated`);
@@ -42,9 +43,9 @@ authOperationsRouter.post('/login', async (req, res) => {
                     return res.status(400).json(getLoginError('error occurred while updating user to k8s resource'));
                 }
             });
-        }).catch((error) => {
+        } catch (error) {
             return res.status(400).json(getLoginError(JSON.stringify(error)));
-        });
+        }
     }).catch((error) => {
         return res.status(500).json(getLoginError(JSON.stringify(error)));
     });
