@@ -34,7 +34,7 @@ export const COMPAGE_LANGUAGE_SQL_DBS = {
 
 // compage template sql_dbs supported.
 export const COMPAGE_LANGUAGE_NOSQL_DBS = {
-    [GO]: ["MongoDB", "Map"],
+    [GO]: ["MongoDB"],
 };
 
 // openapi template frameworks supported.
