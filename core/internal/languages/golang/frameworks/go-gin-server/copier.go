@@ -52,6 +52,7 @@ const MySQLGORMDaoFile = "mysql-gorm-dao.go.tmpl"
 const SQLiteGORMDaoFile = "sqlite-gorm-dao.go.tmpl"
 const MySQLGORMDBConfigFile = "mysql-gorm.go.tmpl"
 const SQLiteGORMDBConfigFile = "sqlite-gorm.go.tmpl"
+const MapDBConfigFile = "map.go.tmpl"
 
 const ClientFile = "client.go.tmpl"
 const ConfigFile = "rest-opentel-config.go.tmpl"
@@ -62,7 +63,7 @@ const MongoDB = "MongoDB"
 // SQLite sql databases
 const SQLite = "SQLite"
 const MySQL = "MySQL"
-const InMemory = "InMemory"
+const Map = "Map"
 
 const SQLiteGORM = "SQLite-GORM"
 const MySQLGORM = "MySQL-GORM"
@@ -554,7 +555,16 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string
 			return nil, err
 		}
 		filePaths = append(filePaths, &targetResourceDaoFileName)
-	} else if c.SQLDB == InMemory {
+	} else if c.SQLDB == Map {
+		// model files
+		// copy model files to generated project
+		targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + strings.Replace(SQLModelFile, "sqls-", "", 1)
+		_, err = utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+SQLModelFile)
+		if err != nil {
+			log.Debugf("error copying model file: %v", err)
+			return nil, err
+		}
+		filePaths = append(filePaths, &targetResourceModelFileName)
 		targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + DaoFile
 		_, err := utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+DaoFile)
 		if err != nil {
@@ -693,6 +703,17 @@ func (c *Copier) CreateRestServer() error {
 					return err
 				}
 				filePaths = append(filePaths, targetMySQLConfigFileName)
+				return executor.Execute(filePaths, c.Data)
+			} else if c.SQLDB == Map {
+				var filePaths []string
+				// client files
+				targetMapConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + MapDBConfigFile
+				_, err := utils.CopyFile(targetMapConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MapDBConfigFile)
+				if err != nil {
+					log.Debugf("error copying map config file: %v", err)
+					return err
+				}
+				filePaths = append(filePaths, targetMapConfigFileName)
 				return executor.Execute(filePaths, c.Data)
 			}
 		} else if c.IsNoSQLDB {

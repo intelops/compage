@@ -22,15 +22,15 @@ FROM alpine:3.18.2
 # Create project directory (workdir)
 WORKDIR /app
 
-RUN apk update && apk add protoc && apk add dos2unix && apk add openjdk8 && apk add make && apk add bash && apk add curl && apk add jq && apk add --update go \
+RUN apk update && apk add protoc && apk add dos2unix && apk add openjdk11 && apk add make && apk add bash && apk add curl && apk add jq && apk add --update go \
     && curl https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/bin/utils/openapi-generator-cli.sh \
     > /app/openapi-generator-cli \
     && chmod a+x /app/openapi-generator-cli
 
 # Downloading and installing Maven
-ARG MAVEN_VERSION=3.9.3
+ARG MAVEN_VERSION=3.9.4
 ARG USER_HOME_DIR="/root"
-ARG BASE_URL=https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries
+ARG BASE_URL=https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries
 RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
   && echo "Downloading maven" \
   && curl -fsSL -o /tmp/apache-maven.tar.gz ${BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz \
