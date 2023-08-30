@@ -6,7 +6,7 @@ import {Home} from "../home/home";
 import Header from "../navbar/header";
 import {Account} from "../account/account";
 import {Grid} from "@mui/material";
-import LoadingOverlay from "react-loading-overlay";
+import LoadingOverlay from "react-loading-overlay-ts";
 import {useAppSelector} from "../../redux/hooks";
 import {
     selectCreateProjectStatus,

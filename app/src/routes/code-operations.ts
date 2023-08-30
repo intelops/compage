@@ -14,7 +14,7 @@ import {getProjectResource, patchProjectResource} from '../store/project-store';
 import config, {X_USER_NAME_HEADER} from '../util/constants';
 import {OldVersion} from '../store/models';
 import Logger from '../util/logger';
-import rimraf from 'rimraf';
+import {rimraf} from 'rimraf';
 import tar from 'tar';
 
 const codeOperationsRouter = Router();
