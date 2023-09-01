@@ -1,4 +1,5 @@
-import {Repository, User} from '../routes/models';
+import {Repository} from '../routes/models';
+import {GitPlatformDTO} from "../models/git-platform";
 
 export interface Resource {
     apiVersion: string;
@@ -14,13 +15,6 @@ export interface ResourceList {
     items: Resource[];
 }
 
-export interface ProjectResource {
-    apiVersion: string;
-    kind: string;
-    metadata: ProjectResourceMetadata;
-    spec: ProjectResourceSpec;
-}
-
 export interface UserResource {
     apiVersion: string;
     kind: string;
@@ -33,29 +27,35 @@ export interface UserResourceMetadata {
     namespace: string;
 }
 
+export interface UserResourceSpec {
+    email: string;
+    gitPlatforms: GitPlatformDTO[];
+}
+
+export interface UserResourceList {
+    apiVersion: string;
+    kind: string;
+    metadata: string;
+    items: UserResource[];
+}
+
+export interface ProjectResource {
+    apiVersion: string;
+    kind: string;
+    metadata: ProjectResourceMetadata;
+    spec: ProjectResourceSpec;
+}
+
 export interface ProjectResourceMetadata {
     name: string;
     namespace: string;
-    labels: {
-        userName: string;
-    };
-}
-
-export interface UserResourceSpec {
-    email: string;
-    token: string;
-}
-
-export interface OldVersion {
-    version: string;
-    json: string;
 }
 
 export interface ProjectResourceSpec {
     oldVersions: OldVersion[];
     id: string;
     displayName: string;
-    user: User;
+    ownerEmail: string;
     json: string;
     repository: Repository;
     metadata: string;
@@ -69,11 +69,9 @@ export interface ProjectResourceList {
     items: ProjectResource[];
 }
 
-export interface UserResourceList {
-    apiVersion: string;
-    kind: string;
-    metadata: string;
-    items: UserResource[];
+export interface OldVersion {
+    version: string;
+    json: string;
 }
 
 // user

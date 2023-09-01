@@ -4,8 +4,6 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectCreateProjectStatus, selectListProjectsData} from './slice';
 import Button from "@mui/material/Button";
 import {CreateProjectRequest, Repository, User} from "./model";
-import {selectAuthData} from "../auth-operations/slice";
-import {Navigate} from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import {createProjectAsync} from "./async-apis/createProject";
@@ -18,7 +16,6 @@ interface ArgTypes {
 
 export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
     const createProjectStatus = useAppSelector(selectCreateProjectStatus);
-    const authData = useAppSelector(selectAuthData);
     const listProjectsData = useAppSelector(selectListProjectsData);
 
     const dispatch = useAppDispatch();
@@ -31,10 +28,6 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
         // TODO ui for this yet to be added.
         metadata: new Map<string, string>()
     });
-
-    if (!authData.login) {
-        return <Navigate to="/login"/>;
-    }
 
     const handleCreateProjectClick = () => {
         const createProjectRequest: CreateProjectRequest = prepareCreateProjectRequest();
@@ -133,14 +126,21 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
     };
 
     const prepareCreateProjectRequest = () => {
+        // TODO below is a hack. Need to find a way to get the correct user details.
         const user: User = {
-            email: authData.email || authData.login,
-            name: authData.login
+            email: "mahendra.b@intelops.dev",
+            name: "Mahendra"
         };
         const repository: Repository = {
             branch: data.repositoryBranch || 'compage',
             name: data.repositoryName,
             isPublic: data.isPublicRepository,
+            gitPlatform: {
+                name: "github",
+                userName: "mahendraintelops",
+                url: 'https://api.github.com',
+                token: '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'
+            }
         };
         const json = getData(0, 0, "");
         const displayName = data.projectName;

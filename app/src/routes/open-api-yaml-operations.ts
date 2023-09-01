@@ -1,19 +1,19 @@
-import {requireUserNameMiddleware} from '../middlewares/auth';
+import {requireEmailMiddleware} from '../middlewares/auth';
 import {Request, Response, Router} from 'express';
-import {X_USER_NAME_HEADER} from '../util/constants';
 import multer from '../middlewares/multer';
 import * as fs from 'fs';
 import {ProjectEntity, UploadYamlError, UploadYamlRequest, UploadYamlResponse} from './models';
-import {getProject} from '../util/project-client';
-import Logger from '../util/logger';
+import {getProject} from '../utils/project-client';
+import Logger from '../utils/logger';
+import {X_EMAIL_HEADER} from '../utils/constants';
 
 const openApiYamlOperationsRouter = Router();
 
 // uploads openApiYaml file
-openApiYamlOperationsRouter.post('/upload', requireUserNameMiddleware, multer.single('file'), async (request: Request, response: Response) => {
-    const userName = request.header(X_USER_NAME_HEADER);
+openApiYamlOperationsRouter.post('/upload', requireEmailMiddleware, multer.single('file'), async (request: Request, response: Response) => {
+    const ownerEmail = request.header(X_EMAIL_HEADER);
     const uploadYamlRequest: UploadYamlRequest = request.body;
-    const projectEntity: ProjectEntity = await getProject(userName as string, uploadYamlRequest.projectId);
+    const projectEntity: ProjectEntity = await getProject(ownerEmail as string, uploadYamlRequest.projectId);
     // projectEntity is not present on server side (which is hardly true, unless someone has deleted the project from backend while the user is logged in.)
     if (projectEntity.id.length === 0) {
         return response.status(404).json();

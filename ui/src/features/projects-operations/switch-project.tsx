@@ -1,9 +1,6 @@
 import React, {ChangeEvent, useState} from 'react';
-
-import {useAppSelector} from '../../redux/hooks';
 import Button from "@mui/material/Button";
-import {selectAuthData} from "../auth-operations/slice";
-import {Navigate, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import Divider from "@mui/material/Divider";
@@ -12,6 +9,8 @@ import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import DialogActions from "@mui/material/DialogActions";
 import {SwitchToExistingProject} from "./switch-to-existing-project";
 import {SwitchToNewProject} from "./switch-to-new-project";
+import {useAppSelector} from "../../redux/hooks";
+import {selectListGitPlatformsData} from "../git-platforms-operations/slice";
 
 
 interface ArgTypes {
@@ -20,17 +19,13 @@ interface ArgTypes {
 }
 
 export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
-    const authData = useAppSelector(selectAuthData);
     const navigate = useNavigate();
+    const listGitPlatformsData = useAppSelector(selectListGitPlatformsData);
 
     const [data, setData] = useState({
         isNew: false,
         toggle: true,
     });
-
-    if (!authData.login) {
-        return <Navigate to="/login"/>;
-    }
 
     const handleDialogClose = async (e: any, reason: "backdropClick" | "escapeKeyDown") => {
         // this prevents dialog box from closing.
@@ -60,6 +55,10 @@ export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
         // TODO have toggled this here. When the dialog box is opened, the SwitchToExistingProject is shown (dont know why)
         return <SwitchToExistingProject handleClose={handleClose}/>;
     };
+
+    if (!listGitPlatformsData) {
+        navigate('/create-git-platform');
+    }
 
     return <React.Fragment>
         <Dialog disableEscapeKeyDown

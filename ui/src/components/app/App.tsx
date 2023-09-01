@@ -1,7 +1,6 @@
 import React from 'react';
 import './App.scss';
 import {BrowserRouter, Link, Route, Routes} from "react-router-dom";
-import {Login} from "../../features/auth-operations/component";
 import {Home} from "../home/home";
 import Header from "../navbar/header";
 import {Account} from "../account/account";
@@ -18,6 +17,7 @@ import {
 import {selectGenerateCodeStatus} from "../../features/code-operations/slice";
 import {selectUploadYamlStatus} from "../../features/open-api-yaml-operations/slice";
 import {selectGetCurrentContextStatus} from "../../features/k8s-operations/slice";
+import {CreateGitPlatform} from "../../features/git-platforms-operations/create-git-platform";
 
 export const App = () => {
     const createProjectStatus = useAppSelector(selectCreateProjectStatus);
@@ -65,7 +65,7 @@ export const App = () => {
                 <Header/>
                 <br/>
                 <Routes>
-                    <Route path="/login" element={<Login/>}/>
+                    <Route path="/create-git-platform" element={<CreateGitPlatform/>}/>
                     <Route path="/home" element={<Home/>}/>
                     <Route path="/account" element={<Account/>}/>
                     <Route path="/" element={<Home/>}/>

@@ -2,34 +2,21 @@ import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
-import Avatar from '@mui/material/Avatar';
-import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Logo from "../../compage-logo.svg";
 import {useAppSelector} from "../../redux/hooks";
 import {Link, useNavigate} from "react-router-dom";
-import {selectAuthData} from "../../features/auth-operations/slice";
 import {getCurrentProjectDetails} from "../../utils/localstorage-client";
 import {selectGetCurrentContextData} from "../../features/k8s-operations/slice";
 
-const settings = ['Account', 'Logout'];
+const settings = ['Account'];
 
 const Header = () => {
-    const authData = useAppSelector(selectAuthData);
     const getCurrentContextData = useAppSelector(selectGetCurrentContextData);
 
     const navigate = useNavigate();
-
-    const handleLogout = () => {
-        sessionStorage.clear();
-        localStorage.clear();
-        // TODO Call backend service to invalidate the token
-        handleCloseUserMenu();
-        window.location.reload();
-    };
 
     const handleAccount = () => {
         navigate("/account");
@@ -38,23 +25,11 @@ const Header = () => {
 
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
-    const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElUser(event.currentTarget);
-    };
-
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
 
     const getMenuItem = (setting: string) => {
-        if (setting === "Logout") {
-            if (authData.login) {
-                return <MenuItem key={setting} onClick={handleLogout}>
-                    <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>;
-            }
-            return "";
-        }
         if (setting === "Account") {
             return <MenuItem key={setting} onClick={handleAccount}>
                 <Typography textAlign="center">{setting}</Typography>
@@ -63,77 +38,60 @@ const Header = () => {
     };
 
     const getMenu = () => {
-        if (authData.login) {
-            return <Toolbar>
-                <Box sx={{flexGrow: 0}}>
-                    <Tooltip title="Account Details">
-                        <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                            <Avatar alt={authData.name} src={authData.avatar_url}/>
-                        </IconButton>
-                    </Tooltip>
-                    <Menu
-                        sx={{mt: '45px'}}
-                        id="menu-appbar"
-                        anchorEl={anchorElUser}
-                        anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        keepMounted
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        open={Boolean(anchorElUser)}
-                        onClose={handleCloseUserMenu}
-                    >
-                        <MenuItem key="username">
-                            <Typography textAlign="center">Welcome {authData.login}!!!</Typography>
-                        </MenuItem>
-                        {settings.map((setting) => getMenuItem(setting))}
-                    </Menu>
-                </Box>
-            </Toolbar>;
-        }
-        return "";
+        return <Toolbar>
+            <Box sx={{flexGrow: 0}}>
+                <Menu
+                    sx={{mt: '45px'}}
+                    id="menu-appbar"
+                    anchorEl={anchorElUser}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
+                >
+                    {settings.map((setting) => getMenuItem(setting))}
+                </Menu>
+            </Box>
+        </Toolbar>;
     };
 
     const getCurrentProjectSelected = () => {
-        if (authData.login) {
-            const currentProjectDetails = getCurrentProjectDetails();
-            if (currentProjectDetails) {
-                const userNameAndProjectAndVersion = currentProjectDetails.split("###");
-                return <Toolbar>
-                    <Box sx={{flexGrow: 0}}>
-                        <Typography variant={"h6"}>
-                            You have selected <u>{userNameAndProjectAndVersion[1]}</u> [<span style={{
-                            color: "yellow"
-                        }}>{getCurrentContextData?.contextName}</span>]
-                        </Typography>
-                    </Box>
-                </Toolbar>;
-            }
+        const currentProjectDetails = getCurrentProjectDetails();
+        if (currentProjectDetails) {
+            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
+            return <Toolbar>
+                <Box sx={{flexGrow: 0}}>
+                    <Typography variant={"h6"}>
+                        You have selected <u>{userNameAndProjectAndVersion[1]}</u> [<span style={{
+                        color: "yellow"
+                    }}>{getCurrentContextData?.contextName}</span>]
+                    </Typography>
+                </Box>
+            </Toolbar>;
         }
-        return "";
     };
 
     const getLogo = () => {
-        if (authData.login) {
-            return <Toolbar component="div" sx={{flexGrow: 1}}>
-                <Link to={"/home"}>
-                    <Box
-                        component="img"
-                        sx={{
-                            height: 64,
-                            width: "320px"
-                        }}
-                        alt="Compage by IntelOps"
-                        src={Logo}
-                    />
-                </Link>
-            </Toolbar>;
-        }
-        return "";
+        return <Toolbar component="div" sx={{flexGrow: 1}}>
+            <Link to={"/home"}>
+                <Box
+                    component="img"
+                    sx={{
+                        height: 64,
+                        width: "320px"
+                    }}
+                    alt="Compage by IntelOps"
+                    src={Logo}
+                />
+            </Link>
+        </Toolbar>;
     };
 
     return <AppBar position="absolute" style={{backgroundColor: "#174985"}}>

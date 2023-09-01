@@ -1,13 +1,13 @@
-import {requireUserNameMiddleware} from '../middlewares/auth';
+import {requireEmailMiddleware} from '../middlewares/auth';
 import {Request, Response, Router} from 'express';
 import {GetCurrentContextResponse, GetCurrentContextError} from './models';
 import {getCurrentContext} from '../store/kube-client';
-import Logger from '../util/logger';
+import Logger from '../utils/logger';
 
 const k8sOperationsRouter = Router();
 
 // returns current-context.
-k8sOperationsRouter.get('/current-context', requireUserNameMiddleware, async (_request: Request, response: Response) => {
+k8sOperationsRouter.get('/current-context', requireEmailMiddleware, async (_request: Request, response: Response) => {
     // TODO dummy delay given
     await new Promise(r => setTimeout(r, 1000));
     const contextName = await getCurrentContext();

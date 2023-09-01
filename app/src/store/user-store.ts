@@ -52,8 +52,12 @@ export const patchUserResource = async (namespace: string, name: string, payload
 };
 
 // listUsers lists user resource
-export const listUserResources = async (namespace: string) => {
-    const objects = await listObjects({group: USER_GROUP, version: USER_VERSION, plural: USER_PLURAL}, namespace);
+export const listUserResources = async (namespace: string, labelSelector: string) => {
+    const objects = await listObjects({
+        group: USER_GROUP,
+        version: USER_VERSION,
+        plural: USER_PLURAL
+    }, namespace, labelSelector);
     const userResources: UserResource[] = [];
     // tslint:disable-next-line: prefer-for-of
     for (let i = 0; i < objects.items.length; i++) {

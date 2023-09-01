@@ -2,28 +2,26 @@ import {getProjectGrpcClient} from '../grpc/project';
 import {Router} from 'express';
 import * as fs from 'fs';
 import * as os from 'os';
-import {
-    pushToExistingProjectOnGitServer,
-    PushToExistingProjectOnGitServerRequest
-} from '../util/simple-git/existing-project';
-import {getToken} from '../util/user-client';
-import {cloneExistingProjectFromGitServer, CloneExistingProjectFromGitServerRequest} from '../util/simple-git/clone';
+import {pushToExistingProjectOnGitServer,} from '../utils/simple-git/existing-project';
+import {cloneExistingProjectFromGitServer, CloneExistingProjectFromGitServerRequest} from '../utils/simple-git/clone';
 import {GenerateCodeError, GenerateCodeRequest, GenerateCodeResponse, Project} from './models';
-import {requireUserNameMiddleware} from '../middlewares/auth';
+import {requireEmailMiddleware} from '../middlewares/auth';
 import {getProjectResource, patchProjectResource} from '../store/project-store';
-import config, {X_USER_NAME_HEADER} from '../util/constants';
 import {OldVersion} from '../store/models';
-import Logger from '../util/logger';
+import Logger from '../utils/logger';
 import {rimraf} from 'rimraf';
 import tar from 'tar';
+import {getGitPlatformToken} from '../utils/user-client';
+import config, {X_EMAIL_HEADER} from '../utils/constants';
+import {PushToExistingProjectOnGitServerRequest} from '../utils/simple-git/models';
 
 const codeOperationsRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
 
 // generateCode (grpc calls to core)
-codeOperationsRouter.post('/generate', requireUserNameMiddleware, async (request, resource) => {
+codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, resource) => {
     // TODO the below || op is not required, as the check is already done in middleware.
-    const userName = request.header(X_USER_NAME_HEADER) || '';
+    const ownerEmail = request.header(X_EMAIL_HEADER) || '';
     const generateCodeRequest: GenerateCodeRequest = request.body;
     const projectId = generateCodeRequest.projectId;
     const nextVersion = (version: string): string => {
@@ -45,7 +43,7 @@ codeOperationsRouter.post('/generate', requireUserNameMiddleware, async (request
     };
 
     // retrieve project from k8s
-    const projectResource = await getProjectResource(config.system_namespace, projectId);
+    const projectResource = await getProjectResource(config.systemNamespace, projectId);
     if (!projectResource.apiVersion) {
         const message = `unable to generate code, no project found for id: ${projectId}`;
         return resource.status(500).json(getGenerateCodeError(message));
@@ -99,7 +97,7 @@ codeOperationsRouter.post('/generate', requireUserNameMiddleware, async (request
     // need to save project-name, compage-json version, github repo and latest commit to the db
     const payload: Project = {
         projectName: projectResource.spec.displayName,
-        userName: projectResource.spec.user.name,
+        userName: projectResource.spec.repository.gitPlatformUserName,
         json: projectResource.spec.json,
         repositoryName: projectResource.spec.repository.name,
         metadata: projectResource.spec.metadata
@@ -138,12 +136,12 @@ codeOperationsRouter.post('/generate', requireUserNameMiddleware, async (request
         fscrs.pipe(extract);
 
         extract.on('finish', async () => {
-            const password = await getToken(projectResource.spec.user?.name as string) as string;
+            const token = await getGitPlatformToken(projectResource.spec.ownerEmail as string, projectResource.spec.repository.gitPlatformName as string) as string;
             // clone existing repository
             const cloneExistingProjectFromGitServerRequest: CloneExistingProjectFromGitServerRequest = {
                 clonedProjectPath: `${downloadedProjectPath}`,
-                userName: projectResource.spec.user.name as string,
-                password,
+                userName: projectResource.spec.repository.gitPlatformUserName as string,
+                token,
                 repository: projectResource.spec.repository
             };
 
@@ -160,11 +158,16 @@ codeOperationsRouter.post('/generate', requireUserNameMiddleware, async (request
                 projectVersion: projectResource.spec.version,
                 generatedProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
                 existingProject: cloneExistingProjectFromGitServerRequest.clonedProjectPath + '/' + projectResource.spec.repository?.name,
-                gitInfo: {
-                    repository: projectResource.spec.repository,
-                    userName: projectResource.spec.user.name as string,
-                    password,
-                    email: projectResource.spec.user.email as string
+                gitCredentials: {
+                    repositoryBranch: projectResource.spec.repository.branch as string,
+                    repositoryName: projectResource.spec.repository.name as string,
+                    repositoryIsPublic: projectResource.spec.repository.isPublic as boolean,
+                    platformUserName: projectResource.spec.repository.gitPlatformUserName as string,
+                    platformPassword: token,
+                    platformEmail: projectResource.spec.ownerEmail as string,
+                    // TODO this change
+                    platformUrl: '',
+                    platformName: ''
                 }
             };
 
@@ -194,11 +197,11 @@ codeOperationsRouter.post('/generate', requireUserNameMiddleware, async (request
                 projectResource.spec.version = nextVersion(projectResource.spec.version);
                 projectResource.spec.oldVersions.push(oldVersion);
             }
-            const patchedProjectResource = await patchProjectResource(config.system_namespace, projectId, JSON.stringify(projectResource.spec));
+            const patchedProjectResource = await patchProjectResource(config.systemNamespace, projectId, JSON.stringify(projectResource.spec));
             if (patchedProjectResource.apiVersion) {
                 // send status back to ui
                 const msg = `successfully generated project for ${projectResource.spec.displayName}[${projectResource.metadata.name}] and saved in repository '${projectResource.spec.repository?.name}'.`;
-                return resource.status(200).json(getGenerateCodeResponse(userName, projectId, msg));
+                return resource.status(200).json(getGenerateCodeResponse(ownerEmail, projectId, msg));
             }
             // send error status back to ui
             const message = `generated project: ${projectResource.spec.displayName}[${projectResource.metadata.name}] and saved successfully in repository '${projectResource.spec.repository?.name}' but project couldn't get updated.`;
@@ -208,7 +211,7 @@ codeOperationsRouter.post('/generate', requireUserNameMiddleware, async (request
 });
 
 // updateProject (grpc calls to core)
-codeOperationsRouter.post('/regenerate', requireUserNameMiddleware, async (req, res) => {
+codeOperationsRouter.post('/regenerate', requireEmailMiddleware, async (req, res) => {
     const {repositoryName, json, projectName, userName} = req.body;
     try {
         const payload = {

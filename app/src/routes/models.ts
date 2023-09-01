@@ -108,8 +108,8 @@ export interface CompageJson {
 }
 
 export interface Repository {
-    provider?: string;
-    providerUrl?: string;
+    gitPlatformUserName: string;
+    gitPlatformName: string;
     name: string;
     branch: string;
     isPublic: boolean;
@@ -162,16 +162,11 @@ export interface ProjectEntity {
     id: string;
     displayName: string;
     version: string;
-    user: User;
+    ownerEmail: string;
     json: CompageJson;
     repository: Repository;
     // TODO temporary made optional.
     metadata?: Map<string, string>;
-}
-
-export interface User {
-    name: string;
-    email: string;
 }
 
 export interface GenerateCodeRequest {
@@ -185,10 +180,6 @@ export interface GenerateCodeResponse {
 }
 
 export interface GenerateCodeError {
-    message: string;
-}
-
-export interface LoginError {
     message: string;
 }
 
@@ -215,8 +206,13 @@ export interface DeleteProjectError {
 }
 
 export const initializeEmptyProjectEntity = () => {
-    const repository: Repository = {branch: '', name: '', isPublic: false, providerUrl: '', provider: ''};
-    const user: User = {email: '', name: ''};
+    const repository: Repository = {
+        branch: '',
+        name: '',
+        isPublic: false,
+        gitPlatformName: '',
+        gitPlatformUserName: ''
+    };
     const json: CompageJson = {
         edges: new Map<string, CompageEdge>(),
         nodes: new Map<string, CompageNode>(),
@@ -234,7 +230,7 @@ export const initializeEmptyProjectEntity = () => {
         id: '',
         metadata: new Map<string, string>(),
         repository,
-        user,
+        ownerEmail: '',
         version: '',
         json
     };

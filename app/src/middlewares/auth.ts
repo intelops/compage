@@ -1,30 +1,17 @@
-import {getToken} from '../util/user-client';
 import {NextFunction, Request, Response} from 'express';
-import {X_USER_NAME_HEADER} from '../util/constants';
+import {X_EMAIL_HEADER} from '../utils/constants';
 
-export const requireUserNameMiddleware = async (request: Request, response: Response, next: NextFunction) => {
+export const requireEmailMiddleware = async (request: Request, response: Response, next: NextFunction) => {
+    // below code is committed as we are not using it for now.
     const unauthorized = (message: string) => response.status(401).json({
         message
     });
 
-    const userName = request.header(X_USER_NAME_HEADER);
-    if (!userName) {
-        unauthorized(`Required ${X_USER_NAME_HEADER} header not found.`);
-        return;
-    }
-
-    try {
-        const token = await getToken(userName as string);
-        if (token === undefined || token === '' || token === null) {
-            unauthorized(`token lost from server, needs to re-login to github`);
-            return;
-        }
-        // TODO
-        // check with github api
-    } catch (e: any) {
-        unauthorized(`token lost from server, needs to re-login to github`);
-        return;
-    }
+    // const email = request.header(X_EMAIL_HEADER);
+    // if (!email) {
+    //     unauthorized(`Required ${X_EMAIL_HEADER} header not found.`);
+    //     return;
+    // }
 
     // Request has a valid or renewed session. Call next to continue to the authenticated route handler
     next();

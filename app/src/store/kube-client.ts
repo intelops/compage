@@ -11,8 +11,8 @@ import {
     USER_PLURAL,
     USER_VERSION
 } from './models';
-import Logger from '../util/logger';
-import config, {DEVELOPMENT} from '../util/constants';
+import Logger from '../utils/logger';
+import config, {DEVELOPMENT} from '../utils/constants';
 
 export const initializeKubeClient = () => {
     const kubeConfig = new k8s.KubeConfig();
@@ -198,7 +198,7 @@ export const checkIfCrdsInstalled = async () => {
             const object = await customObjectsApiClient.listNamespacedCustomObject(
                 crds[i].group,
                 crds[i].version,
-                config.system_namespace,
+                config.systemNamespace,
                 crds[i].plural,
                 'true',
                 false,

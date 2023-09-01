@@ -4,8 +4,6 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectGetProjectStatus, selectListProjectsData, selectListProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
 import {GetProjectRequest, ListProjectsRequest, ListProjectsResponse} from "./model";
-import {selectAuthData} from "../auth-operations/slice";
-import {Navigate} from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import {Stack} from "@mui/material";
@@ -19,7 +17,6 @@ interface ArgTypes {
 
 export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
     const listProjectsStatus = useAppSelector(selectListProjectsStatus);
-    const authData = useAppSelector(selectAuthData);
     const listProjectsData = useAppSelector(selectListProjectsData);
     const getProjectStatus = useAppSelector(selectGetProjectStatus);
     const dispatch = useAppDispatch();
@@ -33,10 +30,6 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
     const [data, setData] = useState({
         projectName: "",
     });
-
-    if (!authData.login) {
-        return <Navigate to="/login"/>;
-    }
 
     const handleExistingProjectsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setData({

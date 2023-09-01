@@ -26,7 +26,15 @@ export type CreateProjectError = {
 export interface CreateProjectRequest extends ProjectEntity {
 }
 
+export interface GitPlatform {
+    userName: string;
+    name: string;
+    url: string;
+    token: string;
+}
+
 export interface Repository {
+    gitPlatform: GitPlatform;
     name: string;
     branch: string;
     isPublic: boolean;

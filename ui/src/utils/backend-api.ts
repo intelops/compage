@@ -2,7 +2,7 @@ import axios from 'axios';
 import {config} from "./constants";
 import {getCurrentUserName} from "./sessionstorage-client";
 
-export const X_USER_NAME_HEADER = "X-User-Name";
+export const X_EMAIL_HEADER = "X-Email-ID";
 
 export const sanitizeString = (input: string) => {
     return input.split(" ").join("_");
@@ -16,8 +16,8 @@ export const K8sOperationsBackendApi = () => {
     });
 };
 
-export const AuthBackendApi = () => {
-    const path = "/auth";
+export const GitPlatformBackendApi = () => {
+    const path = "/git-platforms";
     return axios.create({
         baseURL: config.backend_base_url + path,
         headers: getHeaders()
@@ -51,13 +51,13 @@ export const ProjectsBackendApi = () => {
 const getHeaders = () => {
     return {
         post: {
-            [X_USER_NAME_HEADER]: getCurrentUserName()
+            [X_EMAIL_ID_HEADER]: getCurrentUserName()
         },
         get: {
-            [X_USER_NAME_HEADER]: getCurrentUserName()
+            [X_EMAIL_ID_HEADER]: getCurrentUserName()
         },
         put: {
-            [X_USER_NAME_HEADER]: getCurrentUserName()
+            [X_EMAIL_ID_HEADER]: getCurrentUserName()
         }
     };
 };

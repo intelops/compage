@@ -1,5 +1,4 @@
 import React, {useEffect} from "react";
-import {Navigate} from "react-router-dom";
 import {getData} from "../diagram-maker/data/BoundaryCircular/data";
 import {
     getCurrentConfig,
@@ -7,9 +6,8 @@ import {
     setCurrentConfig,
     setCurrentState
 } from "../../utils/localstorage-client";
-import {useAppDispatch, useAppSelector} from "../../redux/hooks";
+import {useAppDispatch} from "../../redux/hooks";
 import {DiagramMakerContainer} from "../diagram-maker/diagram-maker-container";
-import {selectAuthData} from "../../features/auth-operations/slice";
 import {SwitchProject} from "../../features/projects-operations/switch-project";
 import {getCurrentUserName} from "../../utils/sessionstorage-client";
 import {GetProjectRequest} from "../../features/projects-operations/model";
@@ -38,29 +36,22 @@ const loadExisting = (currentCnf: string) => {
 };
 
 export const Home = () => {
-    const authData = useAppSelector(selectAuthData);
     // const existsProjectError = useAppSelector(selectExistsProjectError);
 
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        if (authData.login) {
-            const currentProjectDetails: string = getCurrentProjectDetails();
-            if (currentProjectDetails) {
-                const userNameAndProjectAndVersion = currentProjectDetails.split("###");
-                const getProjectRequest: GetProjectRequest = {
-                    id: userNameAndProjectAndVersion[1]
-                };
-                dispatch(existsProjectAsync(getProjectRequest));
-                const getCurrentProjectContext: GetCurrentContextRequest = {};
-                dispatch(getCurrentContextAsync(getCurrentProjectContext));
-            }
+        const currentProjectDetails: string = getCurrentProjectDetails();
+        if (currentProjectDetails) {
+            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
+            const getProjectRequest: GetProjectRequest = {
+                id: userNameAndProjectAndVersion[1]
+            };
+            dispatch(existsProjectAsync(getProjectRequest));
+            const getCurrentProjectContext: GetCurrentContextRequest = {};
+            dispatch(getCurrentContextAsync(getCurrentProjectContext));
         }
     }, [dispatch]);
-
-    if (!authData.login) {
-        return <Navigate to="/login"/>;
-    }
 
     // const message = JSON.parse(existsProjectError)?.message;
 

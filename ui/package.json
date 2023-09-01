@@ -107,7 +107,6 @@
     "@types/react-dom": "^18.2.7",
     "@types/react-loading-overlay": "^1.0.1",
     "@types/react-redux": "^7.1.26",
-    "@types/react-router-dom": "^5.3.3",
     "axios": "^1.5.0",
     "babel-plugin-named-exports-order": "^0.0.2",
     "concurrently": "^8.2.1",

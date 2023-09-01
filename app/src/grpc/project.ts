@@ -1,6 +1,6 @@
 'use strict';
 
-import config from '../util/constants';
+import config from '../utils/constants';
 
 export const getProjectGrpcClient = () => {
     const PROTO_PATH = './protobufs/project.proto';
@@ -21,5 +21,5 @@ export const getProjectGrpcClient = () => {
     const ProjectService = grpc.loadPackageDefinition(
         packageDefinition).api.v1.ProjectService;
 
-    return new ProjectService(`${config.compage_core_url}`, grpc.credentials.createInsecure());
+    return new ProjectService(`${config.compageCoreUrl}`, grpc.credentials.createInsecure());
 };

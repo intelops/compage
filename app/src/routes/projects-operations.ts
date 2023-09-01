@@ -1,8 +1,9 @@
-import {requireUserNameMiddleware} from '../middlewares/auth';
+import {requireEmailMiddleware} from '../middlewares/auth';
 import {Request, Response, Router} from 'express';
-import {createProject, deleteProject, getProject, listProjects, updateProject} from '../util/project-client';
-import {X_USER_NAME_HEADER} from '../util/constants';
+import {createProject, deleteProject, getProject, listProjects, updateProject} from '../utils/project-client';
 import {
+    CompageEdge,
+    CompageNode,
     CreateProjectError,
     CreateProjectResponse,
     DeleteProjectError,
@@ -11,19 +12,43 @@ import {
     UpdateProjectResponse
 } from './models';
 import {commitCompageJson, createRepository, pullCompageJson} from '../integrations/git-providers/github';
-import Logger from '../util/logger';
+import Logger from '../utils/logger';
+import {X_EMAIL_HEADER} from '../utils/constants';
+import {
+    getCreateProjectError,
+    getCreateProjectResponse,
+    getDeleteProjectError,
+    getUpdateProjectError
+} from "../models/project";
 
 const projectsOperationsRouter = Router();
 
 // delete project by id for given user
-projectsOperationsRouter.delete('/:id', requireUserNameMiddleware, async (request: Request, response: Response) => {
-    const userName = request.header(X_USER_NAME_HEADER);
+projectsOperationsRouter.delete('/:id', requireEmailMiddleware, async (request: Request, response: Response) => {
+    const email = request.header(X_EMAIL_HEADER);
     const projectId = request.params.id;
-    const isDeleted = await deleteProject(userName as string, projectId);
+    const projectEntity: ProjectEntity = {
+        repository: {
+            gitPlatformUserName: '',
+            gitPlatformName: '',
+            name: '',
+            branch: '',
+            isPublic: false
+        },
+        id: projectId,
+        displayName: '',
+        version: '',
+        ownerEmail: email as string,
+        json: {
+            edges: new Map<string, CompageEdge>(),
+            nodes: new Map<string, CompageNode>()
+        },
+    };
+    const isDeleted = await deleteProject(projectEntity);
     if (isDeleted) {
         const msg = `'${projectId}' project deleted successfully.`;
         Logger.info(msg);
-        return response.status(204).json({message: msg});
+        return response.status(204).json();
     }
     const message = `'${projectId}' project couldn't be deleted.`;
     Logger.warn(message);
@@ -31,10 +56,10 @@ projectsOperationsRouter.delete('/:id', requireUserNameMiddleware, async (reques
 });
 
 // get project by id for given user
-projectsOperationsRouter.get('/:id', requireUserNameMiddleware, async (request: Request, response: Response) => {
-    const userName = request.header(X_USER_NAME_HEADER);
+projectsOperationsRouter.get('/:id', requireEmailMiddleware, async (request: Request, response: Response) => {
+    const email = request.header(X_EMAIL_HEADER);
     const projectId = request.params.id;
-    const projectEntity: ProjectEntity = await getProject(userName as string, projectId);
+    const projectEntity: ProjectEntity = await getProject(email as string, projectId);
     // check if there is id present in the object.
     if (projectEntity.id.length !== 0) {
         return await updateFromGithub(projectEntity, response);
@@ -43,16 +68,15 @@ projectsOperationsRouter.get('/:id', requireUserNameMiddleware, async (request: 
 });
 
 // list all projects for given user
-projectsOperationsRouter.get('/', requireUserNameMiddleware, async (request: Request, response: Response) => {
-    const userName = request.header(X_USER_NAME_HEADER);
-    return response.status(200).json(await listProjects(userName as string));
+projectsOperationsRouter.get('/', requireEmailMiddleware, async (request: Request, response: Response) => {
+    const email = request.header(X_EMAIL_HEADER);
+    return response.status(200).json(await listProjects(email as string));
 });
 
 // create project with details given in request
-projectsOperationsRouter.post('/', requireUserNameMiddleware, async (request: Request, response: Response) => {
-    const userName = request.header(X_USER_NAME_HEADER);
+projectsOperationsRouter.post('/', requireEmailMiddleware, async (request: Request, response: Response) => {
     const projectEntity: ProjectEntity = request.body;
-    const savedProjectEntity: ProjectEntity = await createProject(userName as string, projectEntity);
+    const savedProjectEntity: ProjectEntity = await createProject(projectEntity);
     if (savedProjectEntity.id.length !== 0) {
         // create repository on GitHub and .compage/config.json file/
         return await createOnGithub(savedProjectEntity, response);
@@ -63,11 +87,14 @@ projectsOperationsRouter.post('/', requireUserNameMiddleware, async (request: Re
 });
 
 // update project with details given in request
-projectsOperationsRouter.put('/:id', requireUserNameMiddleware, async (request: Request, response: Response) => {
-    const userName = request.header(X_USER_NAME_HEADER);
+projectsOperationsRouter.put('/:id', requireEmailMiddleware, async (request: Request, response: Response) => {
     const projectId = request.params.id;
     const projectEntity: ProjectEntity = request.body;
-    const updatedProjectEntity = await updateProject(projectId, userName as string, projectEntity);
+    // check if the received payload has same id as the one in the path.
+    if (projectId.length === 0 || (projectId !== projectEntity.id)) {
+        return response.status(400).json('id and payload aren\'t same.');
+    }
+    const updatedProjectEntity = await updateProject(projectEntity);
     if (updatedProjectEntity.id.length !== 0) {
         // update GitHub with .compage/config.json
         return await updateToGithub(updatedProjectEntity, response);
@@ -82,21 +109,12 @@ projectsOperationsRouter.put('/:id', requireUserNameMiddleware, async (request: 
 // commits first time changes in .compage/config.json in GitHub repository.
 const addToGithub = async (projectEntity: ProjectEntity, response: Response) => {
     const sha = '';
-    // base64 the json as it's required for GitHub api.
-    const buffer = Buffer.from(JSON.stringify(projectEntity.json));
-    const base64Json = buffer.toString('base64');
     try {
-        const resp = await commitCompageJson(
-            projectEntity.user.name,
-            projectEntity.user.email,
-            projectEntity.repository.name,
-            base64Json,
-            'first commit',
-            sha);
+        const resp = await commitCompageJson(projectEntity, 'first commit', sha);
         Logger.debug(`commitCompageJson Response: ${JSON.stringify(resp.data)}`);
         const message = `The .compage/config.json in Repository for '${projectEntity.displayName}' is committed, ${projectEntity.displayName}[${projectEntity.id}] project is created successfully.`;
         Logger.info(message);
-        return response.status(200).json(getCreateProjectResponse(projectEntity, message));
+        return response.status(201).json(getCreateProjectResponse(projectEntity));
     } catch (error) {
         const errorObject = JSON.parse(JSON.stringify(error));
         const msg = `The .compage/config.json in Repository for '${projectEntity.displayName}' couldn't be committed. Received error code while committing .compage/config.json in Github Repository: ${errorObject.status}`;
@@ -109,23 +127,17 @@ const addToGithub = async (projectEntity: ProjectEntity, response: Response) => 
 export const updateToGithub = async (projectEntity: ProjectEntity, response: Response) => {
     // update GitHub repo and save json to GitHub (project's json to GitHub repo)
     try {
-        const resp = await pullCompageJson(projectEntity.user.name, projectEntity.repository.name);
+        const resp = await pullCompageJson(projectEntity);
         const sha = resp.data.sha;
-        // base64 the json as it's required for GitHub api.
-        const buffer = Buffer.from(JSON.stringify(projectEntity.json));
-        const base64Json = buffer.toString('base64');
         try {
             const res = await commitCompageJson(
-                projectEntity.user.name,
-                projectEntity.user.email,
-                projectEntity.repository.name,
-                base64Json,
+                projectEntity,
                 'updated project from ui',
                 sha);
             Logger.debug(`commitCompageJson Response: ${JSON.stringify(res.data)}`);
             const message = `An update to .compage/config.json in Repository for '${projectEntity.displayName}' is committed, '${projectEntity.displayName}' is updated successfully`;
             Logger.info(message);
-            return response.status(200).json(getUpdateProjectResponse(projectEntity, message));
+            return response.status(204).json();
         } catch (error) {
             const errorObject = JSON.parse(JSON.stringify(error));
             const message = `An update to .compage/config.json in Repository for '${projectEntity.displayName}' couldn't be committed. Received error code while committing .compage/config.json in Github Repository: ${errorObject.status}`;
@@ -142,11 +154,11 @@ export const updateToGithub = async (projectEntity: ProjectEntity, response: Res
 // pulls .compage/config.json from GitHub repository and update it in k8s project.
 const updateFromGithub = async (projectEntity: ProjectEntity, response: Response) => {
     try {
-        const resp = await pullCompageJson(projectEntity.user.name, projectEntity.repository.name);
+        const resp = await pullCompageJson(projectEntity);
         const buff = Buffer.from(resp.data.content, 'base64');
         projectEntity.json = JSON.parse(buff.toString('ascii'));
         // updating project in k8s with latest json from GitHub.
-        const updatedProjectEntity = await updateProject(projectEntity.id, projectEntity.user.name as string, projectEntity);
+        const updatedProjectEntity = await updateProject(projectEntity);
         if (updatedProjectEntity.id.length !== 0) {
             const successMsg = `${updatedProjectEntity.displayName}[${updatedProjectEntity.id}] project is updated after pulling .compage/config.json in Github Repository.`;
             Logger.info(successMsg);
@@ -168,12 +180,13 @@ const updateFromGithub = async (projectEntity: ProjectEntity, response: Response
 const createOnGithub = async (projectEntity: ProjectEntity, response: Response) => {
     // TODO change description
     try {
-        const resp = await createRepository(projectEntity.user.name, projectEntity.repository.name, projectEntity.repository.name, projectEntity.repository.isPublic);
+        const resp = await createRepository(projectEntity);
         Logger.debug(`createRepository Response: ${JSON.stringify(resp.data)}`);
         return await addToGithub(projectEntity, response);
     } catch (error) {
+        Logger.debug('Error while creating repository on GitHub: ' + JSON.stringify(error));
         // delete project as it's going to be just there.
-        deleteProject(projectEntity.user.name, projectEntity.id).then();
+        deleteProject(projectEntity).then();
         const errorObject = JSON.parse(JSON.stringify(error));
         let message = `Repository for project '${projectEntity.displayName}' couldn't be created.`;
         if (errorObject.status === 422) {
@@ -186,41 +199,5 @@ const createOnGithub = async (projectEntity: ProjectEntity, response: Response) 
     }
 };
 
-const getCreateProjectResponse = (projectEntity: ProjectEntity, message: string) => {
-    const createProjectResponse: CreateProjectResponse = {
-        project: projectEntity,
-        message,
-    };
-    return createProjectResponse;
-};
-
-const getCreateProjectError = (message: string) => {
-    const createProjectError: CreateProjectError = {
-        message,
-    };
-    return createProjectError;
-};
-
-const getUpdateProjectResponse = (projectEntity: ProjectEntity, message: string) => {
-    const updateProjectResponse: UpdateProjectResponse = {
-        project: projectEntity,
-        message,
-    };
-    return updateProjectResponse;
-};
-
-const getUpdateProjectError = (message: string) => {
-    const updateProjectError: UpdateProjectError = {
-        message,
-    };
-    return updateProjectError;
-};
-
-const getDeleteProjectError = (message: string) => {
-    const deleteProjectError: DeleteProjectError = {
-        message,
-    };
-    return deleteProjectError;
-};
 
 export default projectsOperationsRouter;
