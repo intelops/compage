@@ -1,0 +1,40 @@
+.custom-drag-handle {
+  height: 12px;
+  opacity: 0.3;
+  width: 100%;
+  background-color: #e8f1ff;
+  width: 100%;
+  cursor: grab;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.customNode {
+  width: 300px;
+  height: 450px;
+  border: 1px solid #dbe2ed;
+  background-color: #f3f3fe;
+  box-shadow: 0 10px 10px #2d559c1a;
+  padding: 10px 10px;
+
+  .customNodeHeader {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    h1 {
+      flex: 1;
+      color: #020f1e;
+      font-size: 18px;
+      font-family: inherit;
+      font-weight: normal;
+    }
+    .delete-icon {
+      transform: scale(1.2);
+    }
+  }
+  .customNodeBody {
+    display: flex;
+    height: 100%;
+  }
+}

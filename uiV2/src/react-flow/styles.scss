@@ -1,0 +1,13 @@
+.node_item {
+  border: 1px dashed #dbe2ed;
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+  span {
+    color: #7d8695;
+    text-align: left;
+    font-size: 14px;
+    flex: 1;
+  }
+}
