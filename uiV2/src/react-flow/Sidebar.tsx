@@ -1,7 +1,10 @@
 import React from "react";
 import { CUSTOM_NODE } from "./types";
+import { TMicroServiceNodeData } from "./nodes/microservice/Microservice.node.types";
+import "./styles.scss";
+import { MdDragHandle } from "react-icons/md";
 interface SidebarProps {
-  addNode: (node: CUSTOM_NODE) => void;
+  addNode: <T>(type: CUSTOM_NODE, data: T) => void;
 }
 const Sidebar = (props: SidebarProps) => {
   const onDragStart = (
@@ -16,19 +19,25 @@ const Sidebar = (props: SidebarProps) => {
     <aside
       style={{
         width: "20%",
-        backgroundColor: "coral",
+        padding: "20px",
       }}
     >
-      <div className="description">
-        You can drag these nodes to the pane on the right.
-      </div>
       <div
-        className="dndnode "
+        className="node_item"
         onDragStart={(event) => onDragStart(event, "custom-node")}
-        onClick={() => props.addNode(CUSTOM_NODE.MICROSERVICE_NODE)}
+        onClick={() =>
+          props.addNode<TMicroServiceNodeData>(CUSTOM_NODE.MICROSERVICE_NODE, {
+            name: "Microservice",
+            description: "Microservice description",
+          })}
         draggable
       >
-        Custom Node
+        <span>
+          Micro Service Node
+        </span>
+        <MdDragHandle
+          size={20}
+        />
       </div>
     </aside>
   );

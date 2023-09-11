@@ -4,29 +4,24 @@ import ReactFlow, {
   BackgroundVariant,
   Controls,
   DefaultEdgeOptions,
-  MarkerType,
   MiniMap,
   Node,
   NodeTypes,
   ReactFlowInstance,
   ReactFlowProvider,
 } from "reactflow";
-import MicroService from "../../../../../react-flow/nodes/microservice/MicroService.node";
 import "reactflow/dist/style.css";
-import CustomConnecter from "../../../../../react-flow/connectors/CustomConnecter";
 import { nanoid } from "nanoid";
-import { CUSTOM_NODE } from "../../../../../react-flow/types";
 import Sidebar from "@/react-flow/Sidebar";
 import { useReactFlowStore } from "@/store";
+import { CUSTOM_NODE } from "@/react-flow/types";
+import MicroService from "@/react-flow/nodes/microservice/MicroService.node";
+import CustomConnecter from "@/react-flow/connectors/CustomConnecter";
 
 const defaultEdgeOptions: DefaultEdgeOptions = {
   animated: true,
-  style: { strokeWidth: 3, stroke: "black" },
+  style: { strokeWidth: 2, stroke: "#8fc3ff" },
   type: "floating",
-  markerEnd: {
-    type: MarkerType.ArrowClosed,
-    color: "black",
-  },
 };
 
 const nodeTypes: NodeTypes = {
@@ -46,18 +41,23 @@ function Flow() {
     ReactFlowInstance | null
   >(null);
   const reactFlowWrapperRef = useRef<HTMLDivElement>(null);
-  const addNode = useCallback((type: CUSTOM_NODE) => {
-    if (!reactFlowInstance) return;
-    const position = reactFlowInstance.project({ x: 200, y: 300 }); // Set default position or get it from somewhere
 
-    const newNode: Node = {
-      id: nanoid(),
-      position,
-      type,
-      data: { label: `${type} node` },
-    };
-    addNodeToStore(newNode);
-  }, [reactFlowInstance]);
+  const addNode = useCallback(
+    <T,>(type: CUSTOM_NODE, data: T) => {
+      if (!reactFlowInstance) return;
+      const position = reactFlowInstance.project({ x: 200, y: 300 }); // Set default position or get it from somewhere
+
+      const newNode: Node<T> = {
+        id: nanoid(),
+        position,
+        type,
+        data,
+        dragHandle: ".custom-drag-handle",
+      };
+      addNodeToStore(newNode);
+    },
+    [reactFlowInstance],
+  );
 
   return (
     <ReactFlowProvider>
@@ -80,7 +80,7 @@ function Flow() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          fitView
+          // fitView
           // fitViewOptions={fitViewOptions}
           defaultEdgeOptions={defaultEdgeOptions}
           nodeTypes={nodeTypes}
@@ -89,14 +89,20 @@ function Flow() {
             strokeWidth: 3,
             stroke: "black",
           }}
+          defaultViewport={{
+            x: 0,
+            y: 0,
+            zoom: 1,
+          }}
         >
           <Background color="#ccc" variant={BackgroundVariant.Dots} />
           <MiniMap
-            nodeColor="#ff0072"
+            nodeColor="#1D88FE"
             zoomable
             pannable
+            position="bottom-left"
           />
-          <Controls />
+          <Controls position="top-left" />
         </ReactFlow>
       </div>
     </ReactFlowProvider>

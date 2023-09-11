@@ -1,3 +1,4 @@
+import "./MicroService.node.styles.scss";
 import {
   Handle,
   NodeProps,
@@ -5,49 +6,58 @@ import {
   ReactFlowState,
   useStore,
 } from "reactflow";
+import { TMicroServiceNodeData } from "./Microservice.node.types";
+import { useReactFlowStore } from "@/store";
+import { ReactComponent as DeleteIcon } from "@/assets/deleteIcon.svg";
+import { ReactComponent as DragHandleIcon } from "@/assets/drag-handle.svg";
+import MicroServiceNodeForm from "./MicroService.node.form";
 
-type NodeData = {
-  value: number;
-};
-const sourceStyle = { zIndex: 1 };
-
-// type CustomNode = Node<NodeData>;
 const connectionNodeIdSelector = (state: ReactFlowState) =>
   state.connectionNodeId;
 
-function MicroService({ data, id }: NodeProps<NodeData>) {
+function MicroService({ data, id }: NodeProps<TMicroServiceNodeData>) {
   const connectionNodeId = useStore(connectionNodeIdSelector);
+  const { deleteNodeGivenAnUid } = useReactFlowStore();
   const isConnecting = !!connectionNodeId;
-  const isTarget = connectionNodeId && connectionNodeId !== id;
+
   return (
-    <div className="customNode">
-      <div
-        className="customNodeBody"
-        style={{
-          backgroundColor: isTarget ? "#ffcce3" : "#ccd9f6",
-          borderStyle: isTarget ? "dashed" : "solid",
-        }}
-      >
-        {!isConnecting && (
-          <Handle
-            className="customHandle"
-            position={Position.Right}
-            type="source"
-            style={sourceStyle}
-          />
-        )}
-
-        <Handle
-          id={`microservice-${id}-1}`}
-          className="customHandle"
-          position={Position.Left}
-          type="target"
-        />
-
-        <div className="customNodeTitle">MicroService</div>
-        <div className="customNodeContent">{data.value}</div>
+    <>
+      <div className="custom-drag-handle">
+        <DragHandleIcon />
       </div>
-    </div>
+      <div className="customNode">
+        <div className="customNodeHeader">
+          <h1>
+            {data.name}
+          </h1>
+
+          <DeleteIcon
+            className="delete-icon"
+            onClick={() => deleteNodeGivenAnUid(id)}
+          />
+        </div>
+
+        <div className="customNodeBody">
+          {!isConnecting && (
+            <Handle
+              className="customHandle"
+              position={Position.Right}
+              type="source"
+            />
+          )}
+
+          <Handle
+            id={`microservice-${id}-1}`}
+            className="customHandle"
+            position={Position.Left}
+            type="target"
+          />
+          <MicroServiceNodeForm
+            nodeId={id}
+          />
+        </div>
+      </div>
+    </>
   );
 }
 export default MicroService;

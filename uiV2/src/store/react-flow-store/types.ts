@@ -8,4 +8,5 @@ export type RFState = {
   onConnect: OnConnect;
   addNode: (node: Node) => void;
   getNodeGivenAnUid: (uid: string) => Node | undefined;
+  deleteNodeGivenAnUid: (uid: string) => void;
 };
