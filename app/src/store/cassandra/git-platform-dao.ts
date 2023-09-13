@@ -45,12 +45,11 @@ export const deleteGitPlatform = async (ownerEmail: string, name: string) => {
 
 }
 
-export const listGitPlatforms = async (owner_email: string) => {
-    console.log("owner_email: ", owner_email)
+export const listGitPlatforms = async (ownerEmail: string) => {
     const query = `SELECT *
                    FROM git_platforms
                    where owner_email = ? ALLOW FILTERING`;
-    const params = [owner_email];
+    const params = [ownerEmail];
     const resultSet = await cassandraClient.execute(query, params, {prepare: true});
     const rows = resultSet.rows;
     const gitPlatformEntities: GitPlatformEntity[] = [];

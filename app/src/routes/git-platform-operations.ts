@@ -30,7 +30,7 @@ gitPlatformsOperationsRouter.post('/users/:email/gitPlatforms', requireEmailMidd
     const gitPlatformDTO: GitPlatformDTO = request.body;
     // check if the received payload has same id as the one in the path.
     if ((ownerEmail.length === 0 || ownerEmail !== gitPlatformDTO.ownerEmail)) {
-        return response.status(400).json(getUpdateGitPlatformError('email and name in path and payload are not same'));
+        return response.status(400).json(getUpdateGitPlatformError('email in path and payload are not same'));
     }
     try {
         const gitPlatformEntity: GitPlatformEntity = await getGitPlatform(gitPlatformDTO.ownerEmail, gitPlatformDTO.name);
@@ -95,7 +95,7 @@ gitPlatformsOperationsRouter.get('/users/:email/gitPlatforms', requireEmailMiddl
 });
 
 // update gitPlatform with details given in request
-gitPlatformsOperationsRouter.put('/:name', requireEmailMiddleware, async (request: Request, response: Response) => {
+gitPlatformsOperationsRouter.put('/users/:email/gitPlatforms/:name', requireEmailMiddleware, async (request: Request, response: Response) => {
     const ownerEmail = request.params.email;
     const name = request.params.name;
     const gitPlatformDTO: GitPlatformDTO = request.body;

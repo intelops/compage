@@ -1,18 +1,41 @@
-import {CompageJson, Repository} from "../routes/models";
+import {CompageJson} from "../routes/models";
 
 // entities
 export interface ProjectEntity {
     id: string;
+    display_name: string;
+    version: string;
+    owner_email: string;
+    json: string;
+    metadata?: string;
+    git_platform_user_name: string;
+    git_platform_name: string;
+    repository_name: string;
+    repository_branch: string;
+    is_repository_public: boolean;
+    created_at?: string;
+    updated_at?: string;
+}
+
+export interface ProjectDTO {
+    id: string;
     displayName: string;
     version: string;
-    ownerEmail: string;
     json: CompageJson;
-    repository: Repository;
+    gitPlatformUserName: string;
+    gitPlatformName: string;
+    repositoryName: string;
+    repositoryBranch: string;
+    isRepositoryPublic: boolean;
+    // TODO temporary made optional.
     metadata?: Map<string, string>;
+    ownerEmail: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 // requests
-export interface CreateProjectRequest {
+export interface CreateProjectRequest extends ProjectDTO {
 
 }
 
@@ -20,7 +43,7 @@ export interface DeleteProjectRequest {
 
 }
 
-export interface UpdateProjectRequest {
+export interface UpdateProjectRequest extends ProjectDTO {
 
 }
 
@@ -28,33 +51,80 @@ export interface ListProjectsRequest {
 
 }
 
-// responses
-interface CreateProjectResponse {
-    project: ProjectEntity;
-}
-
-interface DeleteProjectResponse {
-}
-
-interface UpdateProjectResponse {
-}
-
 export const getCreateProjectResponse = (projectEntity: ProjectEntity) => {
-    const createProjectResponse: CreateProjectResponse = {
-        project: projectEntity,
-    };
-    return createProjectResponse;
+    const projectDTO: ProjectDTO = {
+        id: projectEntity.id,
+        displayName: projectEntity.display_name,
+        version: projectEntity.version,
+        json: JSON.parse(projectEntity.json),
+        ownerEmail: projectEntity.owner_email,
+        createdAt: projectEntity.created_at,
+        updatedAt: projectEntity.updated_at,
+        gitPlatformUserName: projectEntity.git_platform_user_name,
+        gitPlatformName: projectEntity.git_platform_name,
+        repositoryName: projectEntity.repository_name,
+        repositoryBranch: projectEntity.repository_branch,
+        isRepositoryPublic: projectEntity.is_repository_public,
+    }
+    return projectDTO;
+};
+
+export const getGetProjectResponse = (projectEntity: ProjectEntity) => {
+    const projectDTO: ProjectDTO = {
+        id: projectEntity.id,
+        displayName: projectEntity.display_name,
+        version: projectEntity.version,
+        json: JSON.parse(projectEntity.json),
+        ownerEmail: projectEntity.owner_email,
+        createdAt: projectEntity.created_at,
+        updatedAt: projectEntity.updated_at,
+        gitPlatformUserName: projectEntity.git_platform_user_name,
+        gitPlatformName: projectEntity.git_platform_name,
+        repositoryName: projectEntity.repository_name,
+        repositoryBranch: projectEntity.repository_branch,
+        isRepositoryPublic: projectEntity.is_repository_public,
+    }
+    return projectDTO;
 };
 
 export const getListProjectsResponse = (projectEntities: ProjectEntity[]) => {
-    const listProjectsResponse: ListProjectsResponse = {
-        projects: projectEntities
-    };
-    return listProjectsResponse;
+    const projectDTOs: ProjectDTO[] = [];
+    projectEntities.forEach((projectEntity: ProjectEntity) => {
+        const projectDTO: ProjectDTO = {
+            id: projectEntity.id,
+            displayName: projectEntity.display_name,
+            version: projectEntity.version,
+            json: JSON.parse(projectEntity.json),
+            ownerEmail: projectEntity.owner_email,
+            createdAt: projectEntity.created_at,
+            updatedAt: projectEntity.updated_at,
+            gitPlatformUserName: projectEntity.git_platform_user_name,
+            gitPlatformName: projectEntity.git_platform_name,
+            repositoryName: projectEntity.repository_name,
+            repositoryBranch: projectEntity.repository_branch,
+            isRepositoryPublic: projectEntity.is_repository_public,
+        }
+        projectDTOs.push(projectDTO);
+    });
+    return projectDTOs;
 };
 
-interface ListProjectsResponse {
-    projects: ProjectEntity[];
+export const getProjectEntity = (projectDTO: ProjectDTO) => {
+    const projectEntity: ProjectEntity = {
+        id: projectDTO.id,
+        display_name: projectDTO.displayName,
+        version: projectDTO.version,
+        json: JSON.stringify(projectDTO.json),
+        owner_email: projectDTO.ownerEmail,
+        created_at: projectDTO.createdAt,
+        updated_at: projectDTO.updatedAt,
+        git_platform_user_name: projectDTO.gitPlatformUserName,
+        git_platform_name: projectDTO.gitPlatformName,
+        repository_name: projectDTO.repositoryName,
+        repository_branch: projectDTO.repositoryBranch,
+        is_repository_public: projectDTO.isRepositoryPublic,
+    };
+    return projectEntity;
 }
 
 // errors
@@ -74,30 +144,41 @@ interface ListProjectsError {
     message: string;
 }
 
+interface GetProjectError {
+    message: string;
+}
+
 export const getCreateProjectError = (message: string) => {
     const createProjectError: CreateProjectError = {
-        message,
+        message: message,
     };
     return createProjectError;
 };
 
 export const getUpdateProjectError = (message: string) => {
     const updateProjectError: UpdateProjectError = {
-        message,
+        message: message,
     };
     return updateProjectError;
 };
 
 export const getDeleteProjectError = (message: string) => {
     const deleteProjectError: DeleteProjectError = {
-        message,
+        message: message,
     };
     return deleteProjectError;
 };
 
 export const getListProjectsError = (message: string) => {
     const listProjectsError: ListProjectsError = {
-        message,
+        message: message,
     };
     return listProjectsError;
+};
+
+export const getGetProjectError = (message: string) => {
+    const getProjectError: GetProjectError = {
+        message: message,
+    };
+    return getProjectError;
 };

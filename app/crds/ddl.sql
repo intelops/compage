@@ -43,8 +43,47 @@ values ('gitlab', 'https://gitlab.com', 'mahendraintelops', 'ghp_1q2w3e4r5t6y7u8
         toTimestamp(now()), toTimestamp(now()));
 
 INSERT INTO compage.git_platforms (name, url, user_name, personal_access_token, owner_email, created_at, updated_at)
-values ('github', 'https://github.com', 'chanduintelops', 'ghp_1q2w3e4r5t6y7u8i9o0p', 'chandu@intelops.dev', toTimestamp(now()),
+values ('github', 'https://github.com', 'chanduintelops', 'ghp_1q2w3e4r5t6y7u8i9o0p', 'chandu@intelops.dev',
+        toTimestamp(now()),
         toTimestamp(now()));
 
 select *
 from compage.git_platforms;
+
+
+-- projects Table
+DROP TABLE IF EXISTS compage.projects;
+CREATE TABLE IF NOT EXISTS compage.projects
+(
+    id                     TEXT,
+    display_name           TEXT,
+    version                TEXT,
+    owner_email            TEXT,
+    json                   TEXT,
+    metadata               TEXT,
+    git_platform_user_name TEXT,
+    git_platform_name      TEXT,
+    repository_name        TEXT,
+    repository_branch      TEXT,
+    is_repository_public   BOOLEAN,
+    created_at             TIMESTAMP,
+    updated_at             TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+INSERT INTO compage.projects (id, display_name, version, owner_email, json, metadata, git_platform_name,
+                              git_platform_user_name, repository_name, repository_branch, is_repository_public,
+                              created_at, updated_at)
+values ('1212122333', 'test-project', '1.0.0', 'mahendra.b@intelops.dev', '{}', '{}', 'github', 'mahendraintelops',
+        'test-project',
+        'compage', false, toTimestamp(now()), toTimestamp(now()));
+
+INSERT INTO compage.projects (id, display_name, version, owner_email, json, metadata, git_platform_name,
+                              git_platform_user_name, repository_name, repository_branch, is_repository_public,
+                              created_at, updated_at)
+values ('1212122334', 'test-project', '1.0.0', 'mahendra.b@intelops.dev', '{}', '{}', 'gitlab', 'mahendraintelops',
+        'test-project',
+        'compage', false, toTimestamp(now()), toTimestamp(now()));
+
+select *
+from compage.projects;

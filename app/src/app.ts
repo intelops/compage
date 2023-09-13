@@ -52,8 +52,8 @@ routes.use('/k8s', k8sOperationsRouter);
 routes.use('/code', codeOperationsRouter);
 routes.use('/openapi', openApiYamlOperationsRouter);
 
-routes.use('/projects', projectsOperationsRouter);
 routes.use('/users', usersOperationsRouter);
+routes.use('/', projectsOperationsRouter);
 routes.use('/', gitPlatformsOperationsRouter);
 
 app.use(routes);
