@@ -107,14 +107,7 @@ export interface CompageJson {
     editor?: any;
 }
 
-export interface Repository {
-    gitPlatformUserName: string;
-    gitPlatformName: string;
-    name: string;
-    branch: string;
-    isPublic: boolean;
-}
-
+// This is going to be used when the generate code request is sent to the server
 // all keys are of string format
 // grpc client request
 export interface Project {
@@ -123,50 +116,13 @@ export interface Project {
     json: string;
     repositoryName: string;
     metadata: string;
-}
-
-export interface UploadYamlRequest {
-    nodeId: string;
-    projectId: string;
-    file: any;
-}
-
-// This type describes the response object structure:
-export interface UploadYamlResponse {
-    nodeId: string;
-    projectId: string;
-    content: string;
-    message: string;
-}
-
-// This type describes the error object structure:
-export interface UploadYamlError {
-    message: string;
-}
-
-export interface GetCurrentContextRequest {
-}
-
-// This type describes the response object structure:
-export interface GetCurrentContextResponse {
-    contextName: string;
-}
-
-// This type describes the error object structure:
-export interface GetCurrentContextError {
-    message: string;
-}
-
-// ProjectEntity is for transferring info about projects from client to server
-export interface ProjectEntity {
-    id: string;
-    displayName: string;
-    version: string;
-    ownerEmail: string;
-    json: CompageJson;
-    repository: Repository;
-    // TODO temporary made optional.
-    metadata?: Map<string, string>;
+    repositoryIsPublic: boolean;
+    repositoryBranch: string;
+    platformName: string;
+    platformUrl: string;
+    platformUserName: string;
+    platformPersonalAccessToken: string;
+    platformEmail: string;
 }
 
 export interface GenerateCodeRequest {
@@ -183,56 +139,19 @@ export interface GenerateCodeError {
     message: string;
 }
 
-export interface CreateProjectResponse {
-    project: ProjectEntity;
-    message: string;
-}
 
-export interface CreateProjectError {
-    message: string;
-}
-
-export interface UpdateProjectResponse {
-    project: ProjectEntity;
-    message: string;
-}
-
-export interface UpdateProjectError {
-    message: string;
-}
-
-export interface DeleteProjectError {
-    message: string;
-}
-
-export const initializeEmptyProjectEntity = () => {
-    const repository: Repository = {
-        branch: '',
-        name: '',
-        isPublic: false,
-        gitPlatformName: '',
-        gitPlatformUserName: ''
+export const getGenerateCodeResponse = (userName: string, projectId: string, message: string) => {
+    const generateCodeResponse: GenerateCodeResponse = {
+        userName,
+        projectId,
+        message,
     };
-    const json: CompageJson = {
-        edges: new Map<string, CompageEdge>(),
-        nodes: new Map<string, CompageNode>(),
-        version: '',
-        editor: {},
-        panels: {},
-        plugins: {},
-        undoHistory: {},
-        workspace: {},
-        potentialEdge: {},
-        potentialNode: {}
+    return generateCodeResponse;
+};
+
+export const getGenerateCodeError = (message: string) => {
+    const generateCodeError: GenerateCodeError = {
+        message,
     };
-    const projectEntity: ProjectEntity = {
-        displayName: '',
-        id: '',
-        metadata: new Map<string, string>(),
-        repository,
-        ownerEmail: '',
-        version: '',
-        json
-    };
-    return projectEntity;
+    return generateCodeError;
 };

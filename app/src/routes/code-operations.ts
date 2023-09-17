@@ -2,18 +2,27 @@ import {getProjectGrpcClient} from '../grpc/project';
 import {Router} from 'express';
 import * as fs from 'fs';
 import * as os from 'os';
-import {pushToExistingProjectOnGitServer,} from '../utils/simple-git/existing-project';
-import {cloneExistingProjectFromGitServer, CloneExistingProjectFromGitServerRequest} from '../utils/simple-git/clone';
-import {GenerateCodeError, GenerateCodeRequest, GenerateCodeResponse, Project} from './models';
+import {
+    cloneExistingProjectFromGitServer,
+    pushToExistingProjectOnGitServer,
+} from '../integrations/simple-git/existing-project';
 import {requireEmailMiddleware} from '../middlewares/auth';
-import {getProjectResource, patchProjectResource} from '../store/project-store';
-import {OldVersion} from '../store/models';
 import Logger from '../utils/logger';
 import {rimraf} from 'rimraf';
 import tar from 'tar';
-import {getGitPlatformToken} from '../utils/user-client';
-import config, {X_EMAIL_HEADER} from '../utils/constants';
-import {PushToExistingProjectOnGitServerRequest} from '../utils/simple-git/models';
+import {X_EMAIL_HEADER} from '../utils/constants';
+import {
+    GenerateCodeError,
+    GenerateCodeRequest,
+    GenerateCodeResponse,
+    getGenerateCodeError, getGenerateCodeResponse,
+    Project
+} from "../models/code";
+import {getGitPlatform} from "../store/cassandra/git-platform-dao";
+import {GitPlatformEntity} from "../models/git-platform";
+import {getProject, updateProject} from "../store/cassandra/project-dao";
+import {OldVersion, ProjectEntity} from "../models/project";
+import {ExistingProjectGitServerRequest} from "../integrations/simple-git/models";
 
 const codeOperationsRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
@@ -43,33 +52,38 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
     };
 
     // retrieve project from k8s
-    const projectResource = await getProjectResource(config.systemNamespace, projectId);
-    if (!projectResource.apiVersion) {
+    const projectEntity: ProjectEntity = await getProject(projectId);
+    if (!projectEntity.id) {
         const message = `unable to generate code, no project found for id: ${projectId}`;
         return resource.status(500).json(getGenerateCodeError(message));
     }
 
-    if (!projectResource.spec.json
-        || projectResource.spec.json === '{}'
-        || projectResource.spec.json.length === 0
-        || !JSON.parse(projectResource.spec.json)?.nodes
-        || JSON.parse(projectResource.spec.json)?.nodes?.length === 0) {
-        const message = `unable to generate code, have at least a node added to your project: ${projectResource.spec.displayName}[${projectId}].`;
+    const hasNodes = (projectEntity: ProjectEntity) => {
+        return !projectEntity.json
+            || projectEntity.json === '{}'
+            || projectEntity.json.length === 0
+            || !JSON.parse(projectEntity.json)?.nodes
+            || JSON.parse(projectEntity.json)?.nodes?.length === 0;
+    };
+
+    if (!hasNodes(projectEntity)) {
+        const message = `unable to generate code, have at least a node added to your project: ${projectEntity.display_name}[${projectId}].`;
         return resource.status(500).json(getGenerateCodeError(message));
     }
 
     // check to decide whether to call core or not. This means that user has done no changes in this version since last code generation. Re-generating code for same diagram is not a good idea.
-    if (projectResource.spec.version !== 'v1') {
-        const currentVersion = projectResource.spec.version;
+    if (projectEntity.version !== 'v1') {
+        const currentVersion = projectEntity.version;
         const lastVersion = previousVersion(currentVersion);
-        const oldVersions = projectResource.spec.oldVersions;
+        const oldVersions = projectEntity.old_versions;
         // iterate over all oldVersions to find the last version in it.
-        for (const oldVersion of oldVersions) {
+        for (const oldVersion of oldVersions as string[]) {
+            const oldVersionJson = JSON.parse(oldVersion);
             // check if the lastVersion matches with current version
-            if (oldVersion.version === lastVersion) {
+            if (oldVersionJson.version === lastVersion) {
                 // remove unwanted keys and then do the equality check. This is needed to avoid keys used to render ui.
-                if (JSON.stringify(removeUnwantedKeys(oldVersion.json)) === JSON.stringify(removeUnwantedKeys(projectResource.spec.json))) {
-                    const message = `unable to generate code, No new changes found since last generation: ${projectResource.spec.displayName}[${projectId}].`;
+                if (JSON.stringify(removeUnwantedKeys(oldVersionJson.json)) === JSON.stringify(removeUnwantedKeys(projectEntity.json))) {
+                    const message = `unable to generate code, No new changes found since last generation: ${projectEntity.display_name}[${projectId}].`;
                     return resource.status(500).json(getGenerateCodeError(message));
                 }
             }
@@ -77,13 +91,13 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
     }
 
     // create directory hierarchy here itself as creating it after receiving data will not be proper.
-    const originalProjectPath = `${os.tmpdir()}/${projectResource.spec.displayName}`;
+    const originalProjectPath = `${os.tmpdir()}/${projectEntity.display_name}`;
     const downloadedProjectPath = `${originalProjectPath}_downloaded`;
     try {
         fs.mkdirSync(downloadedProjectPath, {recursive: true});
     } catch (err: any) {
         if (err.code !== 'EEXIST') {
-            const message = `unable to generate code for ${projectResource.spec.displayName}[${projectResource.metadata.name}] => ${err}`;
+            const message = `unable to generate code for ${projectEntity.display_name}[${projectEntity.id}] => ${err}`;
             return resource.status(500).json(getGenerateCodeError(message));
         } else {
             // first clean up and then recreate (it might be a residue of previous run)
@@ -91,16 +105,25 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
             fs.mkdirSync(downloadedProjectPath, {recursive: true});
         }
     }
-    const projectTarFilePath = `${downloadedProjectPath}/${projectResource.metadata.name}_downloaded.tar.gz`;
+    const projectTarFilePath = `${downloadedProjectPath}/${projectEntity.id}_downloaded.tar.gz`;
+
+    const gitPlatformEntity: GitPlatformEntity = await getGitPlatform(projectEntity.owner_email as string, projectEntity.git_platform_name as string);
 
     // save project metadata (in compage db or somewhere)
     // need to save project-name, compage-json version, github repo and latest commit to the db
     const payload: Project = {
-        projectName: projectResource.spec.displayName,
-        userName: projectResource.spec.repository.gitPlatformUserName,
-        json: projectResource.spec.json,
-        repositoryName: projectResource.spec.repository.name,
-        metadata: projectResource.spec.metadata
+        projectName: projectEntity.display_name,
+        userName: projectEntity.git_platform_user_name,
+        json: projectEntity.json,
+        repositoryName: projectEntity.repository_name,
+        metadata: projectEntity.metadata as string,
+        repositoryIsPublic: projectEntity.is_repository_public,
+        repositoryBranch: projectEntity.repository_branch,
+        platformName: projectEntity.git_platform_name,
+        platformUrl: gitPlatformEntity.url,
+        platformUserName: projectEntity.git_platform_user_name,
+        platformPersonalAccessToken: gitPlatformEntity.personal_access_token,
+        platformEmail: projectEntity.owner_email,
     };
 
     // call to grpc server to generate the project
@@ -117,7 +140,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
     // error while receiving the file from core component
     call.on('error', async (response: any) => {
         cleanup(downloadedProjectPath);
-        const message = `unable to generate code for ${projectResource.spec.displayName}[${projectResource.metadata.name}] => ${response.details}`;
+        const message = `unable to generate code for ${projectEntity.display_name}[${projectEntity.id}] => ${response.details}`;
         return resource.status(500).json(getGenerateCodeError(message));
     });
 
@@ -136,75 +159,68 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
         fscrs.pipe(extract);
 
         extract.on('finish', async () => {
-            const token = await getGitPlatformToken(projectResource.spec.ownerEmail as string, projectResource.spec.repository.gitPlatformName as string) as string;
             // clone existing repository
-            const cloneExistingProjectFromGitServerRequest: CloneExistingProjectFromGitServerRequest = {
+            const existingProjectGitServerRequest: ExistingProjectGitServerRequest = {
                 clonedProjectPath: `${downloadedProjectPath}`,
-                userName: projectResource.spec.repository.gitPlatformUserName as string,
-                token,
-                repository: projectResource.spec.repository
+                gitProviderDetails: {
+                    repositoryBranch: projectEntity.repository_branch as string,
+                    repositoryName: projectEntity.repository_name as string,
+                    repositoryIsPublic: projectEntity.is_repository_public as boolean,
+                    platformUserName: projectEntity.git_platform_user_name as string,
+                    platformPersonalAccessToken: gitPlatformEntity.personal_access_token as string,
+                    platformEmail: projectEntity.owner_email as string,
+                    platformUrl: gitPlatformEntity.url,
+                    platformName: gitPlatformEntity.name,
+                },
+                projectVersion: projectEntity.version,
+                generatedProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
+                existingProject: `${downloadedProjectPath}/projectEntity.repository_name`,
             };
 
-            let error: string = await cloneExistingProjectFromGitServer(cloneExistingProjectFromGitServerRequest);
+            let error: string = await cloneExistingProjectFromGitServer(existingProjectGitServerRequest);
             if (error.length > 0) {
                 cleanup(downloadedProjectPath);
                 // send status back to ui
-                const msg = `unable to generate code for ${projectResource.spec.displayName}[${projectResource.metadata.name}] => ${error}.`;
-                return resource.status(500).json(getGenerateCodeError(msg));
+                const message = `unable to generate code for ${projectEntity.display_name}[${projectEntity.id}] => ${error}.`;
+                Logger.error(message);
+                return resource.status(500).json(getGenerateCodeError(message));
             }
 
-            // save to GitHub
-            const pushToExistingProjectOnGitServerRequest: PushToExistingProjectOnGitServerRequest = {
-                projectVersion: projectResource.spec.version,
-                generatedProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
-                existingProject: cloneExistingProjectFromGitServerRequest.clonedProjectPath + '/' + projectResource.spec.repository?.name,
-                gitCredentials: {
-                    repositoryBranch: projectResource.spec.repository.branch as string,
-                    repositoryName: projectResource.spec.repository.name as string,
-                    repositoryIsPublic: projectResource.spec.repository.isPublic as boolean,
-                    platformUserName: projectResource.spec.repository.gitPlatformUserName as string,
-                    platformPassword: token,
-                    platformEmail: projectResource.spec.ownerEmail as string,
-                    // TODO this change
-                    platformUrl: '',
-                    platformName: ''
-                }
-            };
-
-            error = await pushToExistingProjectOnGitServer(pushToExistingProjectOnGitServerRequest);
+            error = await pushToExistingProjectOnGitServer(existingProjectGitServerRequest);
             if (error.length > 0) {
                 cleanup(downloadedProjectPath);
                 // send status back to ui
-                const msg = `unable to generate code for ${projectResource.spec.displayName}[${projectResource.metadata.name}] => ${error}.`;
-                return resource.status(500).json(getGenerateCodeError(msg));
+                const message = `unable to generate code for ${projectEntity.display_name}[${projectEntity.id}] => ${error}.`;
+                Logger.error(message);
+                return resource.status(500).json(getGenerateCodeError(message));
             }
 
             Logger.debug(`saved ${downloadedProjectPath} to github.`);
             cleanup(downloadedProjectPath);
 
             // update status in k8s
-            const metadata = JSON.parse(projectResource.spec.metadata);
+            const metadata = JSON.parse(projectEntity.metadata as string);
             metadata.isGenerated = true;
-            metadata.version = projectResource.spec.version;
-            // add metadata back to projectResource.spec
-            projectResource.spec.metadata = JSON.stringify(metadata);
+            metadata.version = projectEntity.version;
+            // add metadata back to projectEntity.spec
+            projectEntity.metadata = JSON.stringify(metadata);
             // change version now
-            if (projectResource.spec.oldVersions) {
+            if (projectEntity.old_versions) {
                 const oldVersion: OldVersion = {
-                    version: projectResource.spec.version,
-                    json: projectResource.spec.json
+                    version: projectEntity.version,
+                    json: projectEntity.json
                 };
-                projectResource.spec.version = nextVersion(projectResource.spec.version);
-                projectResource.spec.oldVersions.push(oldVersion);
+                projectEntity.version = nextVersion(projectEntity.version);
+                projectEntity.old_versions.push(JSON.stringify(oldVersion));
             }
-            const patchedProjectResource = await patchProjectResource(config.systemNamespace, projectId, JSON.stringify(projectResource.spec));
-            if (patchedProjectResource.apiVersion) {
+            const isUpdated = await updateProject(projectId, projectEntity);
+            if (isUpdated) {
                 // send status back to ui
-                const msg = `successfully generated project for ${projectResource.spec.displayName}[${projectResource.metadata.name}] and saved in repository '${projectResource.spec.repository?.name}'.`;
-                return resource.status(200).json(getGenerateCodeResponse(ownerEmail, projectId, msg));
+                const message = `successfully generated project for ${projectEntity.display_name}[${projectEntity.id}] and saved in repository '${projectEntity.repository_name}'.`;
+                return resource.status(200).json(getGenerateCodeResponse(ownerEmail, projectId, message));
             }
             // send error status back to ui
-            const message = `generated project: ${projectResource.spec.displayName}[${projectResource.metadata.name}] and saved successfully in repository '${projectResource.spec.repository?.name}' but project couldn't get updated.`;
+            const message = `generated project: ${projectEntity.display_name}[${projectEntity.id}] and saved successfully in repository '${projectEntity.repository_name}' but project couldn't get updated.`;
             return resource.status(500).json(getGenerateCodeError(message));
         });
     });
@@ -226,26 +242,10 @@ codeOperationsRouter.post('/regenerate', requireEmailMiddleware, async (req, res
             }
             return res.status(200).json({fileChunk: response.fileChunk.toString()});
         });
-    } catch (err) {
+    } catch (err: any) {
         return res.status(500).json(err);
     }
 });
-
-const getGenerateCodeResponse = (userName: string, projectId: string, message: string) => {
-    const generateCodeResponse: GenerateCodeResponse = {
-        userName,
-        projectId,
-        message,
-    };
-    return generateCodeResponse;
-};
-
-const getGenerateCodeError = (message: string) => {
-    const generateCodeError: GenerateCodeError = {
-        message,
-    };
-    return generateCodeError;
-};
 
 const removeUnwantedKeys = (state: string) => {
     if (state === undefined || state === null || (!state || state === '{}')) {

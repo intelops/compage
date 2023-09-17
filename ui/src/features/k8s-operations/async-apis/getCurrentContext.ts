@@ -11,12 +11,12 @@ export const getCurrentContextAsync = createAsyncThunk<GetCurrentContextResponse
         return getCurrentContext().then(response => {
             // Check if status is not okay:
             if (response.status !== 200) {
-                const msg = `Failed to retrieve context. Received: ${response.status}`;
-                console.log(msg);
-                toastr.error(`getCurrentContext [Failure]`, msg);
+                const message = `Failed to retrieve context. Received: ${response.status}`;
+                console.log(message);
+                toastr.error(`getCurrentContext [Failure]`, message);
                 // Return the error message:
                 return thunkApi.rejectWithValue({
-                    message: msg
+                    message: message
                 });
             }
             const message = `Successfully retrieved current context`;

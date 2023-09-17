@@ -113,9 +113,9 @@ usersOperationsRouter.delete('/:email', requireEmailMiddleware, async (request: 
     try {
         const isDeleted = await deleteUser(email);
         if (isDeleted) {
-            const msg = `'${email}' user deleted successfully.`;
-            Logger.info(msg);
-            return response.status(204).json({message: msg});
+            const message = `'${email}' user deleted successfully.`;
+            Logger.info(message);
+            return response.status(204).json({message: message});
         }
         const message = `'${email}' user couldn't be deleted.`;
         Logger.error(message);

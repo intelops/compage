@@ -1,18 +1,22 @@
 import * as k8s from '@kubernetes/client-node';
 
-import {coreV1ApiClient, currentContext, customObjectsApiClient} from '../app';
-import {
-    PROJECT_GROUP,
-    PROJECT_PLURAL,
-    PROJECT_VERSION,
-    Resource,
-    ResourceList,
-    USER_GROUP,
-    USER_PLURAL,
-    USER_VERSION
-} from './models';
+import {currentContext, customObjectsApiClient} from '../app';
 import Logger from '../utils/logger';
-import config, {DEVELOPMENT} from '../utils/constants';
+import {DEVELOPMENT} from '../utils/constants';
+
+export interface Resource {
+    apiVersion: string;
+    kind: string;
+    metadata: any;
+    spec: any;
+}
+
+export interface ResourceList {
+    apiVersion: string;
+    kind: string;
+    metadata: any;
+    items: Resource[];
+}
 
 export const initializeKubeClient = () => {
     const kubeConfig = new k8s.KubeConfig();
@@ -169,54 +173,11 @@ export const listObjects = async ({
     }
 };
 
-export const checkIfSystemNamespaceExists = async () => {
-    try {
-        const object = await coreV1ApiClient.listNamespace();
-        return JSON.parse(JSON.stringify(object.body));
-    } catch (e: any) {
-        Logger.debug(`error while listing namespace: ${JSON.stringify(e?.body)}`);
-        throw e;
-    }
-};
-
-export const checkIfCrdsInstalled = async () => {
-    interface Crd {
-        group: string;
-        version: string;
-        plural: string;
-    }
-
-    const projectCrd: Crd = {
-        group: PROJECT_GROUP,
-        version: PROJECT_VERSION,
-        plural: PROJECT_PLURAL
-    };
-    const userCrd: Crd = {group: USER_GROUP, version: USER_VERSION, plural: USER_PLURAL};
-    const crds: Crd[] = [projectCrd, userCrd];
-    for (let i = 0; i <= crds.length; i++) {
-        try {
-            const object = await customObjectsApiClient.listNamespacedCustomObject(
-                crds[i].group,
-                crds[i].version,
-                config.systemNamespace,
-                crds[i].plural,
-                'true',
-                false,
-                '',
-                '');
-            return JSON.parse(JSON.stringify(object.body));
-        } catch (e: any) {
-            Logger.debug(`error while listing custom object: ${JSON.stringify(e?.body)}`);
-            throw e;
-        }
-    }
-};
-
 export const getCurrentContext = async () => {
     try {
         return currentContext;
     } catch (e: any) {
-        Logger.debug(`error while retrieving context: ${JSON.stringify(e?.body)}`);
+        Logger.debug(`error while retrieving context[${JSON.stringify(e?.body)}]`);
         throw e;
     }
 };

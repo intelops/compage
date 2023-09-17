@@ -1,8 +1,8 @@
 import axios from 'axios';
-import {GITHUB} from '../../utils/supportedPlatforms';
 import {ProjectEntity} from "../../models/project";
 import {getGitPlatform} from "../../store/cassandra/git-platform-dao";
 import {GitPlatformEntity} from "../../models/git-platform";
+import {GITHUB} from "../supportedGitProviders";
 
 const ACCEPT = `application/vnd.github+json`;
 const USER_REPO_URL = `https://api.github.com/user/repos`;

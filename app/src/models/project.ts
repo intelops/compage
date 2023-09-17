@@ -1,6 +1,7 @@
-import {CompageJson} from "../routes/models";
-
 // entities
+// entities
+import {CompageJson} from "./code";
+
 export interface ProjectEntity {
     id: string;
     display_name: string;
@@ -13,8 +14,14 @@ export interface ProjectEntity {
     repository_name: string;
     repository_branch: string;
     is_repository_public: boolean;
+    old_versions?: string[];
     created_at?: string;
     updated_at?: string;
+}
+
+export interface OldVersion {
+    version: string;
+    json: string;
 }
 
 export interface ProjectDTO {
@@ -30,6 +37,7 @@ export interface ProjectDTO {
     // TODO temporary made optional.
     metadata?: Map<string, string>;
     ownerEmail: string;
+    oldVersions?: OldVersion[];
     createdAt?: string;
     updatedAt?: string;
 }

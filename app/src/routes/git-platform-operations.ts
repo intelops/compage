@@ -132,9 +132,9 @@ gitPlatformsOperationsRouter.delete('/users/:email/gitPlatforms/:name', requireE
     try {
         const isDeleted = await deleteGitPlatform(ownerEmail, name);
         if (isDeleted) {
-            const msg = `'${ownerEmail}' gitPlatform[${name}] deleted successfully.`;
-            Logger.info(msg);
-            return response.status(204).json({message: msg});
+            const message = `'${ownerEmail}' gitPlatform[${name}] deleted successfully.`;
+            Logger.info(message);
+            return response.status(204).json({message: message});
         }
         const message = `'${ownerEmail}' gitPlatform[${name}] couldn't be deleted.`;
         Logger.error(message);

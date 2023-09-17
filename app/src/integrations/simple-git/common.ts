@@ -1,5 +1,5 @@
 import {SimpleGit} from 'simple-git';
-import Logger from '../logger';
+import Logger from '../../utils/logger';
 
 export const gitOperations = async (git: SimpleGit, repositoryBranch: string, projectVersion: string): Promise<string> => {
     // Add all files for commit

@@ -1,24 +1,24 @@
-
-export interface GitCredentials {
+export interface GitProviderDetails {
     repositoryName: string;
     repositoryIsPublic: boolean;
     repositoryBranch: string;
     platformName: string;
     platformUrl: string;
     platformUserName: string;
-    platformPassword: string;
+    platformPersonalAccessToken: string;
     platformEmail: string;
 }
 
-export interface PushNewProjectToGitServerRequest {
+export interface NewProjectGitServerRequest {
     projectVersion: string;
     generatedProjectPath: string;
-    gitCredentials: GitCredentials;
+    gitProviderDetails: GitProviderDetails;
 }
 
-export interface PushToExistingProjectOnGitServerRequest {
+export interface ExistingProjectGitServerRequest {
+    clonedProjectPath: string;
+    existingProject: string;
     projectVersion: string;
     generatedProjectPath: string;
-    existingProject: string;
-    gitCredentials: GitCredentials;
+    gitProviderDetails: GitProviderDetails;
 }

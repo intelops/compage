@@ -14,6 +14,13 @@ message GenerateCodeRequest {
   string projectName = 3;
   string repositoryName = 4;
   string metadata = 5;
+  string repositoryIsPublic = 6;
+  string repositoryBranch = 7;
+  string platformName = 8;
+  string platformUrl = 9;
+  string platformUserName = 10;
+  string platformPassword = 11;
+  string platformEmail = 12 ;
 }
 
 message GenerateCodeResponse{

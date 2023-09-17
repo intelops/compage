@@ -116,7 +116,6 @@ projectsOperationsRouter.put('/users/:email/projects/:id', requireEmailMiddlewar
         Logger.error(message);
         return response.status(500).json(getUpdateProjectError(message));
     } catch (e: any) {
-        console.log(e)
         const message = `[${projectDTO.ownerEmail}] project[${projectDTO.id}] couldn't be updated[${e.message}].`;
         Logger.error(message);
         return response.status(500).json(getUpdateProjectError(message));
@@ -130,9 +129,9 @@ projectsOperationsRouter.delete('/users/:email/projects/:id', requireEmailMiddle
     try {
         const isDeleted = await deleteProject(id);
         if (isDeleted) {
-            const msg = `'${ownerEmail}' project[${id}] deleted successfully.`;
-            Logger.info(msg);
-            return response.status(204).json({message: msg});
+            const message = `'${ownerEmail}' project[${id}] deleted successfully.`;
+            Logger.info(message);
+            return response.status(204).json({message: message});
         }
         const message = `'${ownerEmail}' project[${id}] couldn't be deleted.`;
         Logger.error(message);

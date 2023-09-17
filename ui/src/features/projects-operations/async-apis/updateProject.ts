@@ -8,8 +8,8 @@ export const updateProjectAsync = createAsyncThunk<UpdateProjectResponse, Update
     async (updateProjectRequest: UpdateProjectRequest, thunkApi) => {
         return updateProject(updateProjectRequest).then(response => {
             if (response.status !== 200) {
-                const msg = `Failed to update project.`;
-                const errorMessage = `Status: ${response.status}, Message: ${msg}`;
+                const message = `Failed to update project.`;
+                const errorMessage = `Status: ${response.status}, Message: ${message}`;
                 console.log(errorMessage);
                 toastr.error(`updateProject [Failure]`, errorMessage);
                 return thunkApi.rejectWithValue({

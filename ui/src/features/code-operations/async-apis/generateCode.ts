@@ -16,8 +16,8 @@ export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, Generate
             };
             getProject(getProjectRequest).then(getProjectResp => {
                 if (getProjectResp.status !== 200) {
-                    const msg = `Failed to retrieve project.`;
-                    const errorMessage = `Status: ${getProjectResp.status}, Message: ${msg}`;
+                    const message = `Failed to retrieve project.`;
+                    const errorMessage = `Status: ${getProjectResp.status}, Message: ${message}`;
                     console.log(errorMessage);
                     toastr.error(`getProject [Failure]`, errorMessage);
                     return thunkApi.rejectWithValue({

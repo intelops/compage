@@ -11,8 +11,8 @@ export const listProjectsAsync = createAsyncThunk<ListProjectsResponse, ListProj
                 if (response.status === 401){
                     sessionStorage.clear();
                 }
-                const msg = `Failed to list projects.`;
-                const errorMessage = `Status: ${response.status}, Message: ${msg}`;
+                const message = `Failed to list projects.`;
+                const errorMessage = `Status: ${response.status}, Message: ${message}`;
                 console.log(errorMessage);
                 toastr.error(`listProjects [Failure]`, errorMessage);
                 return thunkApi.rejectWithValue({

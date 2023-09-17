@@ -12,12 +12,12 @@ export const createGitPlatformAsync = createAsyncThunk<CreateGitPlatformResponse
         return createGitPlatform(createGitPlatformRequest).then(response => {
             // Check if status is not okay:
             if (response.status !== 200) {
-                const msg = `Failed to create a git-platform. Received: ${response.status}`;
-                console.log(msg);
-                toastr.error(`createGitPlatform [Failure]`, `${msg}`);
+                const message = `Failed to create a git-platform. Received: ${response.status}`;
+                console.log(message);
+                toastr.error(`createGitPlatform [Failure]`, `${message}`);
                 // Return the error message:
                 return thunkApi.rejectWithValue({
-                    message: `${msg}`
+                    message: `${message}`
                 });
             }
 

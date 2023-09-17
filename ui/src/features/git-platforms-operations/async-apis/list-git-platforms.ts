@@ -11,12 +11,12 @@ export const listGitPlatformsAsync = createAsyncThunk<ListGitPlatformsResponse, 
         return listGitPlatforms(listGitPlatformsRequest).then(response => {
             // Check if status is not okay:
             if (response.status !== 200) {
-                const msg = `Failed to get a git-platform. Received: ${response.status}`;
-                console.log(msg);
-                toastr.error(`listGitPlatforms [Failure]`, `${msg}`);
+                const message = `Failed to get a git-platform. Received: ${response.status}`;
+                console.log(message);
+                toastr.error(`listGitPlatforms [Failure]`, `${message}`);
                 // Return the error message:
                 return thunkApi.rejectWithValue({
-                    message: `${msg}`
+                    message: `${message}`
                 });
             }
 
