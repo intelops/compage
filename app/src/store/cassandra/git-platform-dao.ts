@@ -20,30 +20,6 @@ export const createGitPlatform = async (gitPlatformEntity: GitPlatformEntity) =>
     return gitPlatformEntityError;
 }
 
-export const updateGitPlatform = async (owner_email: string, name: string, gitPlatformEntity: GitPlatformEntity) => {
-    const query = `UPDATE git_platforms
-                   SET name                  = ?,
-                       url                   = ?,
-                       user_name             = ?,
-                       personal_access_token = ?,
-                       updated_at            = ?
-                   WHERE owner_email = ?
-                     and name = ? IF EXISTS`;
-    const params = [gitPlatformEntity.name, gitPlatformEntity.url, gitPlatformEntity.user_name, gitPlatformEntity.personal_access_token, gitPlatformEntity.updated_at, owner_email, name];
-    const resultSet = await cassandraClient.execute(query, params, {prepare: true});
-    return resultSet.wasApplied();
-}
-
-export const deleteGitPlatform = async (ownerEmail: string, name: string) => {
-    const query = `DELETE
-                   FROM git_platforms
-                   WHERE owner_email = ?
-                     and name = ?`;
-    const params = [ownerEmail, name];
-    const resultSet = await cassandraClient.execute(query, params, {prepare: true});
-    return resultSet.wasApplied();
-
-}
 
 export const listGitPlatforms = async (ownerEmail: string) => {
     const query = `SELECT *
@@ -99,4 +75,28 @@ export const getGitPlatform = async (ownerEmail: string, name: string) => {
     };
 
     return gitPlatformEntity;
+}
+
+export const updateGitPlatform = async (owner_email: string, name: string, gitPlatformEntity: GitPlatformEntity) => {
+    const query = `UPDATE git_platforms
+                   SET url                   = ?,
+                       user_name             = ?,
+                       personal_access_token = ?,
+                       updated_at            = ?
+                   WHERE owner_email = ?
+                     and name = ? IF EXISTS`;
+    const params = [gitPlatformEntity.url, gitPlatformEntity.user_name, gitPlatformEntity.personal_access_token, gitPlatformEntity.updated_at, owner_email, name];
+    const resultSet = await cassandraClient.execute(query, params, {prepare: true});
+    return resultSet.wasApplied();
+}
+
+export const deleteGitPlatform = async (ownerEmail: string, name: string) => {
+    const query = `DELETE
+                   FROM git_platforms
+                   WHERE owner_email = ?
+                     and name = ?`;
+    const params = [ownerEmail, name];
+    const resultSet = await cassandraClient.execute(query, params, {prepare: true});
+    return resultSet.wasApplied();
+
 }

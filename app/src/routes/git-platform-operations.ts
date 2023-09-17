@@ -34,7 +34,6 @@ gitPlatformsOperationsRouter.post('/users/:email/gitPlatforms', requireEmailMidd
     }
     try {
         const gitPlatformEntity: GitPlatformEntity = await getGitPlatform(gitPlatformDTO.ownerEmail, gitPlatformDTO.name);
-        console.log(gitPlatformEntity)
         if (gitPlatformEntity.owner_email.length !== 0 || gitPlatformEntity.name.length !== 0) {
             const message = `[${gitPlatformDTO.ownerEmail}] gitPlatform[${gitPlatformDTO.name}] already exists.`;
             Logger.error(message);
@@ -54,7 +53,7 @@ gitPlatformsOperationsRouter.post('/users/:email/gitPlatforms', requireEmailMidd
         Logger.error(message);
         return response.status(500).json(getCreateGitPlatformError(message));
     } catch (e: any) {
-        const message = `${gitPlatformDTO.ownerEmail} gitPlatform [${gitPlatformDTO.name}] couldn't be created.`;
+        const message = `${gitPlatformDTO.ownerEmail} gitPlatform [${gitPlatformDTO.name}] couldn't be created[${e.message}].`;
         Logger.error(message);
         return response.status(500).json(getCreateGitPlatformError(message));
     }
@@ -64,7 +63,6 @@ gitPlatformsOperationsRouter.post('/users/:email/gitPlatforms', requireEmailMidd
 gitPlatformsOperationsRouter.get('/users/:email/gitPlatforms/:name', requireEmailMiddleware, async (request: Request, response: Response) => {
     const ownerEmail = request.params.email;
     const name = request.params.name;
-    console.log(ownerEmail, name)
     try {
         const gitPlatformEntity: GitPlatformEntity = await getGitPlatform(ownerEmail as string, name as string);
         // check if there is id present in the object.
@@ -75,7 +73,7 @@ gitPlatformsOperationsRouter.get('/users/:email/gitPlatforms/:name', requireEmai
         Logger.error(message);
         return response.status(404).json();
     } catch (e: any) {
-        const message = `gitPlatform couldn't be retrieved: ${e.message}.`;
+        const message = `gitPlatform couldn't be retrieved[${e.message}].`;
         Logger.error(message);
         return response.status(500).json(getGetGitPlatformError(message));
     }
@@ -88,7 +86,7 @@ gitPlatformsOperationsRouter.get('/users/:email/gitPlatforms', requireEmailMiddl
         const gitPlatformEntities = await listGitPlatforms(ownerEmail as string);
         return response.status(200).json(getListGitPlatformsResponse(gitPlatformEntities));
     } catch (e: any) {
-        const message = `gitPlatforms couldn't be listed: ${e.message}.`;
+        const message = `gitPlatforms couldn't be listed[${e.message}].`;
         Logger.error(message);
         return response.status(500).json(getListGitPlatformsError(message));
     }
@@ -121,7 +119,7 @@ gitPlatformsOperationsRouter.put('/users/:email/gitPlatforms/:name', requireEmai
         Logger.error(message);
         return response.status(500).json(getUpdateGitPlatformError(message));
     } catch (e: any) {
-        const message = `[${gitPlatformDTO.ownerEmail}] gitPlatform[${gitPlatformDTO.name}] couldn't be updated.`;
+        const message = `[${gitPlatformDTO.ownerEmail}] gitPlatform[${gitPlatformDTO.name}] couldn't be updated[${e.message}].`;
         Logger.error(message);
         return response.status(500).json(getUpdateGitPlatformError(message));
     }
@@ -142,7 +140,7 @@ gitPlatformsOperationsRouter.delete('/users/:email/gitPlatforms/:name', requireE
         Logger.error(message);
         return response.status(500).json(getDeleteGitPlatformError(message));
     } catch (e: any) {
-        const message = `'${ownerEmail}' gitPlatform[${name}] couldn't be deleted.`;
+        const message = `'${ownerEmail}' gitPlatform[${name}] couldn't be deleted[${e.message}].`;
         Logger.error(message);
         return response.status(500).json(getDeleteGitPlatformError(message));
     }
