@@ -15,8 +15,8 @@ export const existsProjectAsync = createAsyncThunk<ExistsProjectResponse, Exists
     async (existsProjectRequest: ExistsProjectRequest, thunkApi) => {
         return getProject(existsProjectRequest).then(response => {
             if (response.status !== 200) {
-                const message = `Failed to retrieve project.`;
-                const errorMessage = `Status: ${response.status}, Message: ${message}`;
+                const details = `Failed to retrieve project.`;
+                const errorMessage = `Status: ${response.status}, Message: ${details}`;
                 console.log(errorMessage);
                 toastr.error(`existsProject [Failure]`, errorMessage);
                 removeCurrentConfig();
@@ -27,9 +27,9 @@ export const existsProjectAsync = createAsyncThunk<ExistsProjectResponse, Exists
                     message: errorMessage
                 });
             }
-            const message = `Successfully retrieved project.`;
-            console.log(message);
-            toastr.success(`existsProject [Success]`, message);
+            const successMessage = `Successfully retrieved project.`;
+            console.log(successMessage);
+            toastr.success(`existsProject [Success]`, successMessage);
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;

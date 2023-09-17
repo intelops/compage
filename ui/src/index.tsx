@@ -13,6 +13,8 @@ import ReduxToastr from 'react-redux-toastr';
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
+// @ts-ignore
+// @ts-ignore
 root.render(
     <React.StrictMode>
         <Provider store={store}>
@@ -24,7 +26,6 @@ root.render(
                 newestOnTop={false}
                 preventDuplicates
                 position="bottom-left"
-                getState={(state) => state.toastr} // This is the default
                 transitionIn="fadeIn"
                 transitionOut="fadeOut"
                 progressBar

@@ -9,8 +9,8 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
     async (createProjectRequest: CreateProjectRequest, thunkApi) => {
         return createProject(createProjectRequest).then(response => {
             if (response.status !== 200) {
-                const message = `Failed to create project.`;
-                const errorMessage = `Status: ${response.status}, Message: ${message}`;
+                const details = `Failed to create project.`;
+                const errorMessage = `Status: ${response.status}, Message: ${details}`;
                 console.log(errorMessage);
                 toastr.error(`createProject [Failure]`, errorMessage);
                 // Return the error message:
@@ -20,12 +20,12 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
             }
             const createProjectResponse: CreateProjectResponse = response.data;
             // update details to localstorage client
-            setCurrentProjectDetails(createProjectResponse.project.id, createProjectResponse.project.version, createProjectResponse.project.repository.name);
-            setCurrentConfig(createProjectResponse.project.json);
-            setCurrentState(createProjectResponse.project.json);
-            const message = `Successfully created project: ${createProjectRequest.displayName}[${createProjectResponse.project.id}]`;
-            console.log(message);
-            toastr.success(`createProject [Success]`, message);
+            setCurrentProjectDetails(createProjectResponse.id, createProjectResponse.version, createProjectResponse.repositoryName);
+            setCurrentConfig(createProjectResponse.json);
+            setCurrentState(createProjectResponse.json);
+            const successMessage = `Successfully created project: ${createProjectRequest.displayName}[${createProjectResponse.id}]`;
+            console.log(successMessage);
+            toastr.success(`createProject [Success]`, successMessage);
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;

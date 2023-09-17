@@ -10,6 +10,8 @@ import {removeUnwantedKeys} from "../../components/diagram-maker/helper/helper";
 import * as _ from "lodash";
 import {CompageNode, GrpcConfig, RestClient, RestConfig} from "../../components/diagram-maker/models";
 import {isCompageTemplate} from "../../components/diagram-maker/node-properties/utils";
+import {GenerateCodeRequest} from "./model";
+import {getCurrentUser} from "../../utils/sessionstorage-client";
 
 export const GenerateCode = () => {
     const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
@@ -23,8 +25,9 @@ export const GenerateCode = () => {
         const currentProjectDetails: string = getCurrentProjectDetails();
         if (currentProjectDetails) {
             const userNameAndProjectAndVersion = currentProjectDetails.split("###");
-            const generateCodeRequest = {
-                projectId: userNameAndProjectAndVersion[1]
+            const generateCodeRequest: GenerateCodeRequest = {
+                projectId: userNameAndProjectAndVersion[1],
+                email: getCurrentUser(),
             };
             if (generateCodeStatus !== 'loading') {
                 dispatch(generateCodeAsync(generateCodeRequest));

@@ -3,7 +3,10 @@ import {GetProjectError, GetProjectRequest, GetProjectResponse} from "../model";
 import {getProject} from "../api";
 import {toastr} from 'react-redux-toastr';
 import {
-    removeCurrentConfig, removeCurrentProjectDetails, removeCurrentState, removeModifiedState,
+    removeCurrentConfig,
+    removeCurrentProjectDetails,
+    removeCurrentState,
+    removeModifiedState,
     setCurrentConfig,
     setCurrentProjectDetails,
     setCurrentState
@@ -15,8 +18,8 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
     async (getProjectRequest: GetProjectRequest, thunkApi) => {
         return getProject(getProjectRequest).then(response => {
             if (response.status !== 200) {
-                const message = `Failed to retrieve project.`;
-                const errorMessage = `Status: ${response.status}, Message: ${message}`;
+                const errorDetails = `Failed to retrieve project.`;
+                const errorMessage = `Status: ${response.status}, Message: ${errorDetails}`;
                 console.log(errorMessage);
                 toastr.error(`getProject [Failure]`, errorMessage);
                 removeCurrentConfig();
@@ -27,14 +30,14 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
                     message: errorMessage
                 });
             }
-            const message = `Successfully retrieved project.`;
-            console.log(message);
-            toastr.success(`getProject [Success]`, message);
+            const successDetails = `Successfully retrieved project.`;
+            console.log(successDetails);
+            toastr.success(`getProject [Success]`, successDetails);
             const getProjectResponse: GetProjectResponse = response.data;
             // update details to localstorage client
             setCurrentConfig(getProjectResponse.json);
             setCurrentState(getProjectResponse.json);
-            setCurrentProjectDetails(getProjectResponse.id, getProjectResponse.version, getProjectResponse.repository.name);
+            setCurrentProjectDetails(getProjectResponse.id, getProjectResponse.version, getProjectResponse.repositoryName);
             // set the modified state when the project is fetched. This is required when user logged out after adding
             // properties to nodes and edges. After re-login, the modified state is lost and user can't see props
             // added to nodes and edges.

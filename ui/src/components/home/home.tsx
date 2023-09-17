@@ -9,17 +9,18 @@ import {
 import {useAppDispatch} from "../../redux/hooks";
 import {DiagramMakerContainer} from "../diagram-maker/diagram-maker-container";
 import {SwitchProject} from "../../features/projects-operations/switch-project";
-import {getCurrentUserName} from "../../utils/sessionstorage-client";
+import {getCurrentUser} from "../../utils/sessionstorage-client";
 import {GetProjectRequest} from "../../features/projects-operations/model";
 import {existsProjectAsync} from "../../features/projects-operations/async-apis/existsProject";
 import {GetCurrentContextRequest} from "../../features/k8s-operations/model";
 import {getCurrentContextAsync} from "../../features/k8s-operations/async-apis/getCurrentContext";
+import {Login} from "../auth/login";
 
 const isSameUser = () => {
     const currentProjectDetails = getCurrentProjectDetails();
     if (currentProjectDetails) {
-        const userNameAndProjectAndVersion = currentProjectDetails.split("###");
-        return getCurrentUserName() === userNameAndProjectAndVersion[0];
+        const currentUserAndProjectAndVersion = currentProjectDetails.split("###");
+        return getCurrentUser() === currentUserAndProjectAndVersion[0];
     }
     return false;
 };
@@ -36,8 +37,6 @@ const loadExisting = (currentCnf: string) => {
 };
 
 export const Home = () => {
-    // const existsProjectError = useAppSelector(selectExistsProjectError);
-
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -45,15 +44,14 @@ export const Home = () => {
         if (currentProjectDetails) {
             const userNameAndProjectAndVersion = currentProjectDetails.split("###");
             const getProjectRequest: GetProjectRequest = {
-                id: userNameAndProjectAndVersion[1]
+                id: userNameAndProjectAndVersion[1],
+                email: getCurrentUser()
             };
             dispatch(existsProjectAsync(getProjectRequest));
             const getCurrentProjectContext: GetCurrentContextRequest = {};
             dispatch(getCurrentContextAsync(getCurrentProjectContext));
         }
     }, [dispatch]);
-
-    // const message = JSON.parse(existsProjectError)?.message;
 
     const getDiagramData = () => {
         let diagramMakerData;
@@ -70,13 +68,28 @@ export const Home = () => {
         return diagramMakerData;
     };
 
+    const isUserNotLoggedIn = () => {
+        const currentUser: string = getCurrentUser();
+        return (currentUser === null || currentUser === undefined
+            || currentUser.length === 0);
+    };
+
     const isProjectNotValid = () => {
         const currentProjectDetails: string = getCurrentProjectDetails();
         return (currentProjectDetails === null || currentProjectDetails === undefined
             || currentProjectDetails.length === 0);
     };
 
+    const handleLoginClose = () => {
+        // TODO hack to reload after getProject is loaded
+        window.location.reload();
+    };
+
     const getContent = (): React.ReactNode => {
+        if (isUserNotLoggedIn()) {
+            // TODO redirect to login page
+            return <Login isOpen={true} handleClose={handleLoginClose}></Login>;
+        }
         // below check is commented as the recent existsProject calls response is checked. Need to find a way to get the correct content here.
         if (isProjectNotValid() /*|| message?.includes("404")*/) {
             // choose from existing or create a new project

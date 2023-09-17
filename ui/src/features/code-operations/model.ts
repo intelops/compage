@@ -5,11 +5,12 @@ export interface GenerateCodeResponse {
 }
 
 // This type describes the error object structure:
-export type GenerateCodeError = {
+export interface GenerateCodeError {
     message: string;
-};
+}
 
 // generate code models
 export interface GenerateCodeRequest {
     projectId: string;
+    email: string;
 }

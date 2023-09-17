@@ -14,6 +14,7 @@ import {unauthenticatedMiddleware} from "./unauthenticatedMiddleware";
 import {RESET_STATE_ACTION_TYPE} from "./reset-state-action";
 import openApiYamlOperationsReducer from "../features/open-api-yaml-operations/slice";
 import k8sOperationsReducer from "../features/k8s-operations/slice";
+import usersOperationsReducer from "../features/users-operations/slice";
 
 const rootPersistConfig = {
     key: 'root',
@@ -32,6 +33,7 @@ const persistedRootReducer = combineReducers({
     codeOperations: persistReducer(rootPersistConfig, codeOperationsReducer),
     projectsOperations: persistReducer(rootPersistConfig, projectsReducer),
     gitPlatformsOperations: persistReducer(authenticationPersistConfig, gitPlatformsReducer),
+    usersOperations: persistReducer(authenticationPersistConfig, usersOperationsReducer),
     toastr: toastrReducer,
 });
 

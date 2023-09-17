@@ -69,7 +69,7 @@ import {cleanse, getParsedCurrentConfig, getParsedModifiedState, removeUnwantedK
 import * as _ from "lodash";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import {getCurrentUserName} from "../../utils/sessionstorage-client";
+import {getCurrentUser} from "../../utils/sessionstorage-client";
 import {useNavigate} from "react-router-dom";
 import {CompageEdge, CompageJson, CompageNode} from "./models";
 import {DEVELOPMENT} from "../../utils/constants";
@@ -517,15 +517,16 @@ export const DiagramMakerContainer = ({
     const handleSaveProjectClick = () => {
         const currentProjectDetails: string = getCurrentProjectDetails();
         if (currentProjectDetails) {
-            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
+            const currentUserAndProjectAndVersion = currentProjectDetails.split("###");
             // save in localstorage
             setCurrentConfig(JSON.parse(diagramMaker.config));
             setCurrentState(JSON.parse(diagramMaker.state));
             const prepareUpdateProjectRequest = () => {
                 const uPR: UpdateProjectRequest = {
-                    version: userNameAndProjectAndVersion[2],
-                    id: userNameAndProjectAndVersion[1],
-                    json: JSON.parse(getCurrentState())
+                    version: currentUserAndProjectAndVersion[2],
+                    id: currentUserAndProjectAndVersion[1],
+                    json: JSON.parse(getCurrentState()),
+                    ownerEmail: getCurrentUser()
                 };
                 return uPR;
             };
@@ -540,12 +541,12 @@ export const DiagramMakerContainer = ({
     function getProjectAndVersion(): React.ReactNode {
         const currentProjectDetails = getCurrentProjectDetails();
         if (currentProjectDetails) {
-            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
+            const currentUserAndProjectAndVersion = currentProjectDetails.split("###");
             return <a target="_blank" rel="noreferrer"
-                      href={"https://github1s.com/" + getCurrentUserName() + "/" + userNameAndProjectAndVersion[3]}>
+                      href={"https://github1s.com/" + getCurrentUser() + "/" + currentUserAndProjectAndVersion[3]}>
                 <Box sx={{flexGrow: 0}}>
                     <Typography variant={"subtitle1"}>
-                        {userNameAndProjectAndVersion[1]}[{userNameAndProjectAndVersion[2]}]
+                        {currentUserAndProjectAndVersion[1]}[{currentUserAndProjectAndVersion[2]}]
                     </Typography>
                 </Box>
             </a>;

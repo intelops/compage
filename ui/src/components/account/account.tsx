@@ -14,6 +14,7 @@ import {GetCurrentContextRequest} from "../../features/k8s-operations/model";
 import {getCurrentContextAsync} from "../../features/k8s-operations/async-apis/getCurrentContext";
 import TextField from "@mui/material/TextField";
 import {ListGitPlatforms} from "../../features/git-platforms-operations/list-git-platforms";
+import {getCurrentUser} from "../../utils/sessionstorage-client";
 
 export const Account = () => {
     const listProjectsData = useAppSelector(selectListProjectsData);
@@ -21,7 +22,9 @@ export const Account = () => {
 
     useEffect(() => {
         // dispatch listProjects
-        const listProjectsRequest: ListProjectsRequest = {};
+        const listProjectsRequest: ListProjectsRequest = {
+            email: getCurrentUser()
+        };
         dispatch(listProjectsAsync(listProjectsRequest));
         const getCurrentProjectContext: GetCurrentContextRequest = {};
         dispatch(getCurrentContextAsync(getCurrentProjectContext));

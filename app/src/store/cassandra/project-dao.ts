@@ -48,11 +48,12 @@ const generateProjectId = (projectEntity: ProjectEntity) => {
 };
 
 export const createProject = async (projectEntity: ProjectEntity) => {
+    projectEntity.id = generateProjectId(projectEntity);
     const query = `INSERT INTO projects (id, display_name, version, json, git_platform_name, git_platform_user_name,
                                          is_repository_public, repository_branch, repository_name, owner_email,
                                          created_at, updated_at)
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) IF NOT EXISTS`;
-    const params = [generateProjectId(projectEntity), projectEntity.display_name, projectEntity.version, projectEntity.json, projectEntity.git_platform_name, projectEntity.git_platform_user_name, projectEntity.is_repository_public, projectEntity.repository_branch, projectEntity.repository_name, projectEntity.owner_email, projectEntity.created_at, projectEntity.updated_at];
+    const params = [projectEntity.id, projectEntity.display_name, projectEntity.version, projectEntity.json, projectEntity.git_platform_name, projectEntity.git_platform_user_name, projectEntity.is_repository_public, projectEntity.repository_branch, projectEntity.repository_name, projectEntity.owner_email, projectEntity.created_at, projectEntity.updated_at];
     const resultSet = await cassandraClient.execute(query, params, {prepare: true});
     if (resultSet.wasApplied()) {
         return projectEntity;

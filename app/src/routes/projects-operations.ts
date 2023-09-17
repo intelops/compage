@@ -28,12 +28,6 @@ projectsOperationsRouter.post('/users/:email/projects', requireEmailMiddleware, 
         return response.status(400).json(getUpdateProjectError('email in path and payload are not same'));
     }
     try {
-        const projectEntity: ProjectEntity = await getProject(projectDTO.id);
-        if (projectEntity.id.length !== 0) {
-            const message = `[${projectDTO.ownerEmail}] project[${projectDTO.id}] already exists.`;
-            Logger.error(message);
-            return response.status(400).json(getCreateProjectError(message));
-        }
         // add createdAt and updatedAt
         projectDTO.createdAt = new Date().toISOString();
         projectDTO.updatedAt = new Date().toISOString();
@@ -42,15 +36,15 @@ projectsOperationsRouter.post('/users/:email/projects', requireEmailMiddleware, 
         if (savedProjectEntity.id.length !== 0) {
             const resp = await createRepository(savedProjectEntity);
             Logger.debug(`createRepository Response: ${JSON.stringify(resp.data)}`);
-            const message = `[${projectDTO.ownerEmail}] project[${projectDTO.id}] created.`;
+            const message = `[${savedProjectEntity.owner_email}] project[${savedProjectEntity.id}] created.`;
             Logger.info(message);
             return response.status(201).json(getCreateProjectResponse(savedProjectEntity));
         }
-        const message = `${projectDTO.ownerEmail} project [${projectDTO.id}] couldn't be created.`;
+        const message = `${projectDTO.ownerEmail} project [${projectDTO.displayName}] couldn't be created.`;
         Logger.error(message);
         return response.status(500).json(getCreateProjectError(message));
     } catch (e: any) {
-        const message = `${projectDTO.ownerEmail} project [${projectDTO.id}] couldn't be created[${e.message}]).`;
+        const message = `${projectDTO.ownerEmail} project [${projectDTO.displayName}] couldn't be created[${e.message}]).`;
         Logger.error(message);
         return response.status(500).json(getCreateProjectError(message));
     }

@@ -11,13 +11,7 @@ import Logger from '../utils/logger';
 import {rimraf} from 'rimraf';
 import tar from 'tar';
 import {X_EMAIL_HEADER} from '../utils/constants';
-import {
-    GenerateCodeError,
-    GenerateCodeRequest,
-    GenerateCodeResponse,
-    getGenerateCodeError, getGenerateCodeResponse,
-    Project
-} from "../models/code";
+import {GenerateCodeRequest, getGenerateCodeError, getGenerateCodeResponse, Project} from "../models/code";
 import {getGitPlatform} from "../store/cassandra/git-platform-dao";
 import {GitPlatformEntity} from "../models/git-platform";
 import {getProject, updateProject} from "../store/cassandra/project-dao";

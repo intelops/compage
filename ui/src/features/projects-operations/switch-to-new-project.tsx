@@ -3,12 +3,13 @@ import React, {ChangeEvent, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectCreateProjectStatus, selectListProjectsData} from './slice';
 import Button from "@mui/material/Button";
-import {CreateProjectRequest, Repository, User} from "./model";
+import {CreateProjectRequest} from "./model";
 import TextField from "@mui/material/TextField";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import {createProjectAsync} from "./async-apis/createProject";
 import {getData} from "../../components/diagram-maker/data/BoundaryCircular/data";
 import {sanitizeString} from "../../utils/backend-api";
+import {getCurrentUser} from "../../utils/sessionstorage-client";
 
 interface ArgTypes {
     handleClose: (...args: any) => void;
@@ -127,20 +128,11 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
 
     const prepareCreateProjectRequest = () => {
         // TODO below is a hack. Need to find a way to get the correct user details.
-        const user: User = {
-            email: "mahendra.b@intelops.dev",
-            name: "Mahendra"
-        };
-        const repository: Repository = {
-            branch: data.repositoryBranch || 'compage',
-            name: data.repositoryName,
-            isPublic: data.isPublicRepository,
-            gitPlatform: {
-                name: "github",
-                userName: "mahendraintelops",
-                url: 'https://api.github.com',
-                token: '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'
-            }
+        const gitPlatform = {
+            name: "github",
+            userName: "mahendraintelops",
+            url: 'https://api.github.com',
+            token: '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'
         };
         const json = getData(0, 0, "");
         const displayName = data.projectName;
@@ -149,9 +141,13 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             id: "",
             metadata,
             version: "v1",
-            repository,
+            gitPlatformName: gitPlatform.name,
+            gitPlatformUserName: gitPlatform.userName,
+            repositoryName: data.repositoryName,
+            repositoryBranch: data.repositoryBranch || 'compage',
+            isRepositoryPublic: data.isPublicRepository,
             displayName,
-            user,
+            ownerEmail: getCurrentUser(),
             json: JSON.parse(JSON.stringify(json))
         };
         return cPR;

@@ -1,8 +1,8 @@
 import * as k8s from '@kubernetes/client-node';
 
-import {currentContext, customObjectsApiClient} from '../app';
-import Logger from '../utils/logger';
-import {DEVELOPMENT} from '../utils/constants';
+import {currentContext, customObjectsApiClient} from '../../app';
+import Logger from '../../utils/logger';
+import {DEVELOPMENT} from '../../utils/constants';
 
 export interface Resource {
     apiVersion: string;

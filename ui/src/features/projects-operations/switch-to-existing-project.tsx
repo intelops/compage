@@ -3,13 +3,14 @@ import React, {ChangeEvent, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectGetProjectStatus, selectListProjectsData, selectListProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
-import {GetProjectRequest, ListProjectsRequest, ListProjectsResponse} from "./model";
+import {GetProjectRequest, ListProjectsRequest, ProjectDTO} from "./model";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import {Stack} from "@mui/material";
 import {getProjectAsync} from "./async-apis/getProject";
 import {listProjectsAsync} from "./async-apis/listProjects";
 import CircularProgress from '@mui/material/CircularProgress';
+import {getCurrentUser} from "../../utils/sessionstorage-client";
 
 interface ArgTypes {
     handleClose: (...args: any) => void;
@@ -23,7 +24,9 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
 
     useEffect(() => {
         // dispatch listProjects
-        const listProjectsRequest: ListProjectsRequest = {};
+        const listProjectsRequest: ListProjectsRequest = {
+            email: getCurrentUser()
+        };
         dispatch(listProjectsAsync(listProjectsRequest));
     }, [dispatch]);
 
@@ -42,7 +45,8 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
         // allow to choose project only when the project is chosen from drop-down
         if (data.projectName) {
             const getProjectRequest: GetProjectRequest = {
-                id: data.projectName
+                id: data.projectName,
+                email: getCurrentUser()
             };
             dispatch(getProjectAsync(getProjectRequest));
             if (handleClose) {
@@ -73,10 +77,10 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
             onChange={handleExistingProjectsChange}
             variant="outlined">
             {
-                listProjectsData && listProjectsData.map((listProjectsResponse: ListProjectsResponse) =>
+                listProjectsData && listProjectsData.map((projectDTO: ProjectDTO) =>
                     (
-                        <MenuItem key={listProjectsResponse.id} value={listProjectsResponse.id}>
-                            {listProjectsResponse.displayName} [{listProjectsResponse.id}]
+                        <MenuItem key={projectDTO.id} value={projectDTO.id}>
+                            {projectDTO.displayName} [{projectDTO.id}]
                         </MenuItem>
                     )
                 )

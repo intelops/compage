@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {config} from "./constants";
-import {getCurrentUserName} from "./sessionstorage-client";
+import {getCurrentUser} from "./sessionstorage-client";
 
 export const X_EMAIL_HEADER = "X-Email-ID";
 
@@ -17,7 +17,7 @@ export const K8sOperationsBackendApi = () => {
 };
 
 export const GitPlatformBackendApi = () => {
-    const path = "/git-platforms";
+    const path = "/";
     return axios.create({
         baseURL: config.backend_base_url + path,
         headers: getHeaders()
@@ -41,7 +41,15 @@ export const OpenApiYamlOperationsBackendApi = () => {
 };
 
 export const ProjectsBackendApi = () => {
-    const path = "/projects";
+    const path = "/";
+    return axios.create({
+        baseURL: config.backend_base_url + path,
+        headers: getHeaders()
+    },);
+};
+
+export const UserBackendApi = () => {
+    const path = "/users";
     return axios.create({
         baseURL: config.backend_base_url + path,
         headers: getHeaders()
@@ -51,13 +59,13 @@ export const ProjectsBackendApi = () => {
 const getHeaders = () => {
     return {
         post: {
-            [X_EMAIL_ID_HEADER]: getCurrentUserName()
+            [X_EMAIL_HEADER]: getCurrentUser()
         },
         get: {
-            [X_EMAIL_ID_HEADER]: getCurrentUserName()
+            [X_EMAIL_HEADER]: getCurrentUser()
         },
         put: {
-            [X_EMAIL_ID_HEADER]: getCurrentUserName()
+            [X_EMAIL_HEADER]: getCurrentUser()
         }
     };
 };

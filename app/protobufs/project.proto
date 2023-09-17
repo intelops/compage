@@ -13,14 +13,14 @@ message GenerateCodeRequest {
   string userName = 2;
   string projectName = 3;
   string repositoryName = 4;
-  string metadata = 5;
-  string repositoryIsPublic = 6;
-  string repositoryBranch = 7;
-  string platformName = 8;
-  string platformUrl = 9;
-  string platformUserName = 10;
-  string platformPassword = 11;
-  string platformEmail = 12 ;
+  string gitRepositoryIsPublic = 5;
+  string gitRepositoryBranch = 6;
+  string gitPlatformName = 7;
+  string gitPlatformUrl = 8;
+  string gitPlatformUserName = 9;
+  string gitPlatformPassword = 10;
+  string gitPlatformEmail = 11 ;
+  string metadata = 12;
 }
 
 message GenerateCodeResponse{

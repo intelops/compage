@@ -7,17 +7,20 @@ import {getProject} from "../../projects-operations/api";
 import {setCurrentConfig, setCurrentProjectDetails, setCurrentState} from "../../../utils/localstorage-client";
 import {updateModifiedState} from "../../projects-operations/populateModifiedState";
 
-export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, GenerateCodeRequest, { rejectValue: GenerateCodeError }>(
+export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, GenerateCodeRequest, {
+    rejectValue: GenerateCodeError
+}>(
     'code/generateCode',
     async (generateCodeRequest: GenerateCodeRequest, thunkApi) => {
         const retrieveProjectToUpdateState = (request: GenerateCodeRequest) => {
             const getProjectRequest: GetProjectRequest = {
-                id: request.projectId
+                id: request.projectId,
+                email: generateCodeRequest.email
             };
             getProject(getProjectRequest).then(getProjectResp => {
                 if (getProjectResp.status !== 200) {
-                    const message = `Failed to retrieve project.`;
-                    const errorMessage = `Status: ${getProjectResp.status}, Message: ${message}`;
+                    const detailedMessage = `Failed to retrieve project.`;
+                    const errorMessage = `Status: ${getProjectResp.status}, Message: ${detailedMessage}`;
                     console.log(errorMessage);
                     toastr.error(`getProject [Failure]`, errorMessage);
                     return thunkApi.rejectWithValue({
@@ -31,12 +34,12 @@ export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, Generate
                 // update details to localstorage client
                 setCurrentConfig(getProjectResponse.json);
                 setCurrentState(getProjectResponse.json);
-                setCurrentProjectDetails(getProjectResponse.id, getProjectResponse.version, getProjectResponse.repository.name);
+                setCurrentProjectDetails(getProjectResponse.id, getProjectResponse.version, getProjectResponse.repositoryName);
                 // set the modified state when the project is fetched. This is required when user logged out after adding
                 // properties to nodes and edges. After re-login, the modified state is lost and user can't see props
                 // added to nodes and edges.
                 updateModifiedState(getProjectResponse.json);
-            }).catch(e => {
+            }).catch((e: any) => {
                 const statusCode = e.response.status;
                 const message = e.response.data.message;
                 const errorMessage = `Status: ${statusCode}, Message: ${message}`;
@@ -64,7 +67,7 @@ export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, Generate
             // the below function retrieves project and updates the store.
             retrieveProjectToUpdateState(generateCodeRequest);
             return response.data;
-        }).catch(e => {
+        }).catch((e: any) => {
             const statusCode = e.response.status;
             const message = e.response.data.message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;

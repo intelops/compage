@@ -1,6 +1,6 @@
 import {requireEmailMiddleware} from '../middlewares/auth';
 import {Request, Response, Router} from 'express';
-import {getCurrentContext} from '../store/kube-client';
+import {getCurrentContext} from '../store/k8s/kube-client';
 import Logger from '../utils/logger';
 import {getGetCurrentContextError, getGetCurrentContextResponse} from "../models/k8s";
 

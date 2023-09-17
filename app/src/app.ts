@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import codeOperationsRouter from './routes/code-operations';
 import config from './utils/constants';
 import projectsOperationsRouter from './routes/projects-operations';
-import {initializeKubeClient} from './store/kube-client';
+import {initializeKubeClient} from './store/k8s/kube-client';
 import '@kubernetes/client-node';
 import openApiYamlOperationsRouter from './routes/open-api-yaml-operations';
 import Logger from './utils/logger';
