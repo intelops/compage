@@ -1,9 +1,9 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {toastr} from 'react-redux-toastr';
-import {ListGitPlatformsError, ListGitPlatformsRequest, ListGitPlatformsResponse} from "../model";
+import {GitPlatformDTO, ListGitPlatformsError, ListGitPlatformsRequest} from "../model";
 import {listGitPlatforms} from "../api";
 
-export const listGitPlatformsAsync = createAsyncThunk<ListGitPlatformsResponse, ListGitPlatformsRequest, {
+export const listGitPlatformsAsync = createAsyncThunk<GitPlatformDTO[], ListGitPlatformsRequest, {
     rejectValue: ListGitPlatformsError
 }>(
     'gitPlatform/listGitPlatforms',
@@ -20,8 +20,8 @@ export const listGitPlatformsAsync = createAsyncThunk<ListGitPlatformsResponse, 
                 });
             }
 
-            const listGitPlatformsResponse: ListGitPlatformsResponse = response.data;
-            console.log(listGitPlatformsResponse);
+            const gitPlatformDTOs: GitPlatformDTO[] = response.data;
+            console.log(gitPlatformDTOs);
             const successMessage = `[listGitPlatforms] listed a git-platform successfully.`;
             console.log(successMessage);
             toastr.success(`listGitPlatforms [Success]`, `${successMessage}`);

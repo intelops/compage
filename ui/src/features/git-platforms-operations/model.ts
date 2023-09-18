@@ -12,9 +12,6 @@ export interface GitPlatformDTO {
 export interface CreateGitPlatformRequest extends GitPlatformDTO{
 }
 
-export interface CreateGitPlatformResponse {
-}
-
 // This type describes the error object structure:
 export interface CreateGitPlatformError {
     message: string;
@@ -23,9 +20,6 @@ export interface CreateGitPlatformError {
 // create project models
 export interface ListGitPlatformsRequest {
     email: string;
-}
-
-export interface ListGitPlatformsResponse {
 }
 
 // This type describes the error object structure:

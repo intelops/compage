@@ -10,7 +10,7 @@ export const createUserAsync = createAsyncThunk<CreateUserResponse, CreateUserRe
     async (createUserRequest: CreateUserRequest, thunkApi) => {
         return createUser(createUserRequest).then(response => {
             // Check if status is not okay:
-            if (response.status !== 200) {
+            if (response.status !== 201) {
                 const errorMessage = `Failed to create a user. Received: ${response.status}`;
                 console.log(errorMessage);
                 toastr.error(`createUser [Failure]`, `${errorMessage}`);
@@ -22,7 +22,6 @@ export const createUserAsync = createAsyncThunk<CreateUserResponse, CreateUserRe
 
             const createUserResponse: CreateUserResponse = response.data;
             console.log(createUserResponse);
-
             const successMessage = `[createUser] created a user successfully.`;
             console.log(successMessage);
             toastr.success(`createUser [Success]`, `${successMessage}`);

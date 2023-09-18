@@ -21,12 +21,6 @@ export const Projects = () => {
         dispatch(listProjectsAsync(listProjectsRequest));
     }, [dispatch]);
 
-    const listItems = listProjectsData && listProjectsData.map((d) =>
-        <li key={d.id}>
-            {d.displayName}[{d.id}] at {d.version} <a target="_blank" href={d.repositoryUrl}>{d.repositoryUrl}</a>
-        </li>
-    );
-
     return <>
         <Stack direction="column" spacing={2}>
             <Box sx={{flexGrow: 0}}>
