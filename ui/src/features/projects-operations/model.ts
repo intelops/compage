@@ -11,6 +11,7 @@ export interface ProjectDTO {
     repositoryName?: string;
     repositoryBranch?: string;
     isRepositoryPublic?: boolean;
+    repositoryUrl?: string;
     // TODO temporary made optional.
     metadata?: Map<string, string>;
     ownerEmail: string;

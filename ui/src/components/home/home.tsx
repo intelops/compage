@@ -48,7 +48,9 @@ export const Home = () => {
                 email: getCurrentUser()
             };
             dispatch(existsProjectAsync(getProjectRequest));
-            const getCurrentProjectContext: GetCurrentContextRequest = {};
+            const getCurrentProjectContext: GetCurrentContextRequest = {
+                email: getCurrentUser()
+            };
             dispatch(getCurrentContextAsync(getCurrentProjectContext));
         }
     }, [dispatch]);

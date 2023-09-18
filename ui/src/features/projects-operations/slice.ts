@@ -5,25 +5,26 @@ import {listProjectsAsync} from "./async-apis/listProjects";
 import {getProjectAsync} from "./async-apis/getProject";
 import {updateProjectAsync} from './async-apis/updateProject';
 import {existsProjectAsync} from "./async-apis/existsProject";
+import {ProjectDTO} from "./model";
 
 export interface ProjectState {
     createProject: {
-        data: any,
+        data: ProjectDTO,
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
     };
     listProjects: {
-        data: any,
+        data: ProjectDTO[],
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
     };
     getProject: {
-        data: any,
+        data: ProjectDTO,
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
     };
     existsProject: {
-        data: any,
+        data: ProjectDTO,
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
     };
@@ -41,12 +42,12 @@ const initialState: ProjectState = {
         error: null
     },
     getProject: {
-        data: {},
+        data: {} as ProjectDTO,
         status: 'idle',
         error: null
     },
     existsProject: {
-        data: {},
+        data: {} as ProjectDTO,
         status: 'idle',
         error: null
     },
@@ -56,7 +57,7 @@ const initialState: ProjectState = {
         error: null
     },
     createProject: {
-        data: {},
+        data: {} as ProjectDTO,
         status: 'idle',
         error: null
     },
@@ -83,7 +84,7 @@ export const projectsSlice = createSlice({
         }).addCase(listProjectsAsync.fulfilled, (state, action) => {
             state.listProjects.status = 'idle';
             state.listProjects.error = null;
-            state.listProjects.data = action.payload;
+            state.listProjects.data = action.payload as ProjectDTO[];
         }).addCase(listProjectsAsync.rejected, (state, action) => {
             state.listProjects.status = 'failed';
             if (action.payload) state.listProjects.error = JSON.stringify(action.payload);

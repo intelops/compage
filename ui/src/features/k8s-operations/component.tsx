@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import {getCurrentContextAsync} from "./async-apis/getCurrentContext";
 import {getCurrentProjectDetails} from "../../utils/localstorage-client";
 import {GetCurrentContextRequest} from "./model";
+import {getCurrentUser} from "../../utils/sessionstorage-client";
 
 export const K8sOperations = () => {
     const getGetCurrentContextStatus = useAppSelector(selectGetCurrentContextStatus);
@@ -17,7 +18,9 @@ export const K8sOperations = () => {
         const currentProjectDetails: string = getCurrentProjectDetails();
         if (currentProjectDetails) {
             if (getGetCurrentContextStatus !== 'loading') {
-                const getCurrentContextRequest: GetCurrentContextRequest = {};
+                const getCurrentContextRequest: GetCurrentContextRequest = {
+                    email: getCurrentUser()
+                };
                 dispatch(getCurrentContextAsync(getCurrentContextRequest));
             }
         }
@@ -25,7 +28,8 @@ export const K8sOperations = () => {
 
     return (
         <>
-            <Button variant="contained" disabled={getGetCurrentContextStatus === "loading"} onClick={handleGetCurrentContextClick}>
+            <Button variant="contained" disabled={getGetCurrentContextStatus === "loading"}
+                    onClick={handleGetCurrentContextClick}>
                 {getGetCurrentContextStatus === "loading"
                     ? "Getting K8s context"
                     : "Current K8s context"}

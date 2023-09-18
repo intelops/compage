@@ -14,6 +14,7 @@ export interface ProjectEntity {
     repository_name: string;
     repository_branch: string;
     is_repository_public: boolean;
+    repository_url: string;
     old_versions?: string[];
     created_at?: string;
     updated_at?: string;
@@ -34,6 +35,7 @@ export interface ProjectDTO {
     repositoryName: string;
     repositoryBranch: string;
     isRepositoryPublic: boolean;
+    repositoryUrl: string;
     // TODO temporary made optional.
     metadata?: Map<string, string>;
     ownerEmail: string;
@@ -73,6 +75,7 @@ export const getCreateProjectResponse = (projectEntity: ProjectEntity) => {
         repositoryName: projectEntity.repository_name,
         repositoryBranch: projectEntity.repository_branch,
         isRepositoryPublic: projectEntity.is_repository_public,
+        repositoryUrl: projectEntity.repository_url,
     }
     return projectDTO;
 };
@@ -91,6 +94,7 @@ export const getGetProjectResponse = (projectEntity: ProjectEntity) => {
         repositoryName: projectEntity.repository_name,
         repositoryBranch: projectEntity.repository_branch,
         isRepositoryPublic: projectEntity.is_repository_public,
+        repositoryUrl: projectEntity.repository_url,
     }
     return projectDTO;
 };
@@ -111,6 +115,7 @@ export const getListProjectsResponse = (projectEntities: ProjectEntity[]) => {
             repositoryName: projectEntity.repository_name,
             repositoryBranch: projectEntity.repository_branch,
             isRepositoryPublic: projectEntity.is_repository_public,
+            repositoryUrl: projectEntity.repository_url,
         }
         projectDTOs.push(projectDTO);
     });
@@ -131,6 +136,7 @@ export const getProjectEntity = (projectDTO: ProjectDTO) => {
         repository_name: projectDTO.repositoryName,
         repository_branch: projectDTO.repositoryBranch,
         is_repository_public: projectDTO.isRepositoryPublic,
+        repository_url: projectDTO.repositoryUrl,
     };
     return projectEntity;
 }

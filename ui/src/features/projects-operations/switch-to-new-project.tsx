@@ -146,6 +146,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             repositoryName: data.repositoryName,
             repositoryBranch: data.repositoryBranch || 'compage',
             isRepositoryPublic: data.isPublicRepository,
+            repositoryUrl: gitPlatform.url + '/' + gitPlatform.userName + '/' + data.repositoryName,
             displayName,
             ownerEmail: getCurrentUser(),
             json: JSON.parse(JSON.stringify(json))

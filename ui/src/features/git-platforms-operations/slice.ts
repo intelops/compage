@@ -1,17 +1,17 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {RootState} from '../../redux/store';
 import {createGitPlatformAsync} from "./async-apis/create-git-platform";
-import {CreateGitPlatformResponse, ListGitPlatformsResponse} from "./model";
+import {CreateGitPlatformResponse, GitPlatformDTO, ListGitPlatformsResponse} from "./model";
 import {listGitPlatformsAsync} from "./async-apis/list-git-platforms";
 
 export interface GitPlatformState {
     createGitPlatform: {
-        data: CreateGitPlatformResponse,
+        data: GitPlatformDTO,
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
     };
     listGitPlatforms: {
-        data: ListGitPlatformsResponse,
+        data: GitPlatformDTO[],
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
     };
@@ -19,16 +19,12 @@ export interface GitPlatformState {
 
 const initialState: GitPlatformState = {
     createGitPlatform: {
-        data: {
-            gitPlatforms: []
-        },
+        data: {} as GitPlatformDTO,
         status: 'idle',
         error: null
     },
     listGitPlatforms: {
-        data: {
-            gitPlatforms: []
-        },
+        data: [] as GitPlatformDTO[],
         status: 'idle',
         error: null
     }
@@ -45,7 +41,7 @@ export const gitPlatformsSlice = createSlice({
         }).addCase(createGitPlatformAsync.fulfilled, (state, action) => {
             state.createGitPlatform.status = 'idle';
             state.createGitPlatform.error = null;
-            state.createGitPlatform.data = action.payload;
+            state.createGitPlatform.data = action.payload as GitPlatformDTO;
         }).addCase(createGitPlatformAsync.rejected, (state, action) => {
             state.createGitPlatform.status = 'failed';
             if (action.payload) state.createGitPlatform.error = JSON.stringify(action.payload);
@@ -55,7 +51,7 @@ export const gitPlatformsSlice = createSlice({
         }).addCase(listGitPlatformsAsync.fulfilled, (state, action) => {
             state.listGitPlatforms.status = 'idle';
             state.listGitPlatforms.error = null;
-            state.listGitPlatforms.data = action.payload;
+            state.listGitPlatforms.data = action.payload as GitPlatformDTO[];
         }).addCase(listGitPlatformsAsync.rejected, (state, action) => {
             state.listGitPlatforms.status = 'failed';
             if (action.payload) state.listGitPlatforms.error = JSON.stringify(action.payload);

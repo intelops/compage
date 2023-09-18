@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS compage.projects
     repository_name        TEXT,
     repository_branch      TEXT,
     is_repository_public   BOOLEAN,
+    repository_url         TEXT,
     created_at             TIMESTAMP,
     updated_at             TIMESTAMP,
     PRIMARY KEY (id)
@@ -73,17 +74,21 @@ CREATE TABLE IF NOT EXISTS compage.projects
 
 INSERT INTO compage.projects (id, display_name, version, owner_email, json, metadata, git_platform_name,
                               git_platform_user_name, repository_name, repository_branch, is_repository_public,
+                              repository_url,
                               created_at, updated_at)
 values ('1212122333', 'test-project', '1.0.0', 'mahendra.b@intelops.dev', '{}', '{}', 'github', 'mahendraintelops',
         'test-project',
-        'compage', false, toTimestamp(now()), toTimestamp(now()));
+        'compage', false, 'https://github.com/mahendraintelops/test-project.git', toTimestamp(now()),
+        toTimestamp(now()));
 
 INSERT INTO compage.projects (id, display_name, version, owner_email, json, metadata, git_platform_name,
                               git_platform_user_name, repository_name, repository_branch, is_repository_public,
+                              repository_url,
                               created_at, updated_at)
 values ('1212122334', 'test-project', '1.0.0', 'mahendra.b@intelops.dev', '{}', '{}', 'gitlab', 'mahendraintelops',
         'test-project',
-        'compage', false, toTimestamp(now()), toTimestamp(now()));
+        'compage', false, 'https://gitlab.com/mahendraintelops/test-project.git', toTimestamp(now()),
+        toTimestamp(now()));
 
 select *
 from compage.projects;

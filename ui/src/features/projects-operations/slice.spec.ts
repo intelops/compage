@@ -1,4 +1,5 @@
 import projectsReducer, {ProjectState} from './slice';
+import {ProjectDTO} from "./model";
 
 describe('projects reducer', () => {
     const initialState: ProjectState = {
@@ -8,12 +9,12 @@ describe('projects reducer', () => {
             error: null
         },
         getProject: {
-            data: {},
+            data: {} as ProjectDTO,
             status: 'idle',
             error: null
         },
         existsProject: {
-            data: {},
+            data: {} as ProjectDTO,
             status: 'idle',
             error: null
         },
@@ -23,7 +24,7 @@ describe('projects reducer', () => {
             error: null
         },
         createProject: {
-            data: {},
+            data: {} as ProjectDTO,
             status: 'idle',
             error: null
         },

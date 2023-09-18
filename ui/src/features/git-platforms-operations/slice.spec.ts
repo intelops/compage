@@ -1,19 +1,15 @@
 import authReducer, {GitPlatformState} from './slice';
+import {GitPlatformDTO} from "./model";
 
 describe('git-platform reducer', () => {
     const initialState: GitPlatformState = {
         createGitPlatform: {
-            data: {
-                email: '',
-                gitPlatforms: []
-            },
+            data: {} as GitPlatformDTO,
             status: 'idle',
             error: null
         },
         listGitPlatforms: {
-            data: {
-                gitPlatforms: []
-            },
+            data: [] as GitPlatformDTO[],
             status: 'idle',
             error: null
         }

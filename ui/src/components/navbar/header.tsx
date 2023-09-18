@@ -3,15 +3,11 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import Logo from "../../compage-logo.svg";
 import {useAppSelector} from "../../redux/hooks";
 import {Link, useNavigate} from "react-router-dom";
 import {getCurrentProjectDetails} from "../../utils/localstorage-client";
 import {selectGetCurrentContextData} from "../../features/k8s-operations/slice";
-
-const settings = ['Account'];
 
 const Header = () => {
     const getCurrentContextData = useAppSelector(selectGetCurrentContextData);
@@ -20,46 +16,6 @@ const Header = () => {
 
     const handleAccount = () => {
         navigate("/account");
-        handleCloseUserMenu();
-    };
-
-    const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-
-    const handleCloseUserMenu = () => {
-        setAnchorElUser(null);
-    };
-
-    const getMenuItem = (setting: string) => {
-        if (setting === "Account") {
-            return <MenuItem key={setting} onClick={handleAccount}>
-                <Typography textAlign="center">{setting}</Typography>
-            </MenuItem>;
-        }
-    };
-
-    const getMenu = () => {
-        return <Toolbar>
-            <Box sx={{flexGrow: 0}}>
-                <Menu
-                    sx={{mt: '45px'}}
-                    id="menu-appbar"
-                    anchorEl={anchorElUser}
-                    anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }}
-                    keepMounted
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }}
-                    open={Boolean(anchorElUser)}
-                    onClose={handleCloseUserMenu}
-                >
-                    {settings.map((setting) => getMenuItem(setting))}
-                </Menu>
-            </Box>
-        </Toolbar>;
     };
 
     const getCurrentProjectSelected = () => {
@@ -98,7 +54,13 @@ const Header = () => {
         <Toolbar disableGutters>
             {getLogo()}
             {getCurrentProjectSelected()}
-            {getMenu()}
+            <Toolbar component="nav" variant="dense" sx={{flexGrow: 0}}>
+                <Box sx={{flexGrow: 0}}>
+                    <Typography variant={"h6"}>
+                        <span onClick={handleAccount}>Settings</span>
+                    </Typography>
+                </Box>
+            </Toolbar>
         </Toolbar>
     </AppBar>;
 };

@@ -1,4 +1,5 @@
 export interface GetCurrentContextRequest {
+    email: string;
 }
 
 // This type describes the response object structure:

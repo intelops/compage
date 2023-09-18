@@ -16,7 +16,7 @@ export const getCurrentContextAsync = createAsyncThunk<GetCurrentContextResponse
                 toastr.error(`getCurrentContext [Failure]`, errorMessage);
                 // Return the error message:
                 return thunkApi.rejectWithValue({
-                    errorMessage
+                    message: errorMessage
                 });
             }
             const successMessage = `Successfully retrieved current context`;

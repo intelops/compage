@@ -1,9 +1,11 @@
 export interface GitPlatformDTO {
-    userName: string;
     name: string;
     url: string;
-    token: string;
+    userName: string;
+    personalAccessToken: string;
     ownerEmail: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 // create project models
@@ -11,8 +13,6 @@ export interface CreateGitPlatformRequest extends GitPlatformDTO{
 }
 
 export interface CreateGitPlatformResponse {
-    email?: string;
-    gitPlatforms: GitPlatformDTO[];
 }
 
 // This type describes the error object structure:
@@ -26,7 +26,6 @@ export interface ListGitPlatformsRequest {
 }
 
 export interface ListGitPlatformsResponse {
-    gitPlatforms: GitPlatformDTO[];
 }
 
 // This type describes the error object structure:
