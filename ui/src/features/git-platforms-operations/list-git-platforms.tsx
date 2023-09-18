@@ -4,6 +4,7 @@ import {listGitPlatformsAsync} from "./async-apis/list-git-platforms";
 import {ListGitPlatformsRequest} from "./model";
 import {selectListGitPlatformsData} from "./slice";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import Typography from "@mui/material/Typography";
 
 export const ListGitPlatforms = () => {
     const listGitPlatformsData = useAppSelector(selectListGitPlatformsData);
@@ -18,7 +19,7 @@ export const ListGitPlatforms = () => {
 
     return <>
         <TableContainer component={Paper}>
-            <TableHead>List of GitPlatforms</TableHead>
+            <Typography >List of GitPlatforms</Typography>
             <Table sx={{minWidth: 650}} aria-label="simple table">
                 <TableHead>
                     <TableRow>
