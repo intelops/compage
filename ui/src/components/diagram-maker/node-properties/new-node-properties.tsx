@@ -5,7 +5,7 @@ import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import {getCurrentConfig, setModifiedState} from "../../../utils/localstorage-client";
+import {getCurrentConfig, setModifiedState} from "../../../utils/localstorageClient";
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
@@ -38,7 +38,7 @@ import {AddOrUpdateRestServerResource} from "./add-or-update-rest-server-resourc
 import {useAppSelector} from "../../../redux/hooks";
 import {selectUploadYamlData, selectUploadYamlStatus} from "../../../features/open-api-yaml-operations/slice";
 import {updateModifiedState} from "../../../features/projects-operations/populateModifiedState";
-import {sanitizeString} from "../../../utils/backend-api";
+import {sanitizeString} from "../../../utils/backendApi";
 import {UploadYaml} from "../../../features/open-api-yaml-operations/component";
 import {
     COMPAGE,

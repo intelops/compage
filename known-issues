@@ -16,15 +16,15 @@ git clone failed
             ^
 GitConstructError: Cannot use simple-git on a directory that does not exist
     at gitInstanceFactory (/home/mahendra/DevEnv/compage-dev/compage/compage/node_modules/simple-git/src/lib/git-factory.ts:48:13)
-    at /home/mahendra/DevEnv/compage-dev/compage/compage/src/util/simple-git/existing-project.ts:23:37
+    at /home/mahendra/DevEnv/compage-dev/compage/compage/src/util/simple-git/existingProject.ts:23:37
     at Generator.next (<anonymous>)
-    at /home/mahendra/DevEnv/compage-dev/compage/compage/src/util/simple-git/existing-project.ts:31:71
+    at /home/mahendra/DevEnv/compage-dev/compage/compage/src/util/simple-git/existingProject.ts:31:71
     at new Promise (<anonymous>)
-    at __awaiter (/home/mahendra/DevEnv/compage-dev/compage/compage/src/util/simple-git/existing-project.ts:27:12)
-    at pushToExistingProjectOnGithub (/home/mahendra/DevEnv/compage-dev/compage/compage/src/util/simple-git/existing-project.ts:14:131)
-    at /home/mahendra/DevEnv/compage-dev/compage/compage/src/routes/code-operations.ts:137:48
+    at __awaiter (/home/mahendra/DevEnv/compage-dev/compage/compage/src/util/simple-git/existingProject.ts:27:12)
+    at pushToExistingProjectOnGithub (/home/mahendra/DevEnv/compage-dev/compage/compage/src/util/simple-git/existingProject.ts:14:131)
+    at /home/mahendra/DevEnv/compage-dev/compage/compage/src/routes/codeOperations.ts:137:48
     at Generator.next (<anonymous>)
-    at fulfilled (/home/mahendra/DevEnv/compage-dev/compage/compage/src/routes/code-operations.ts:28:58) {
+    at fulfilled (/home/mahendra/DevEnv/compage-dev/compage/compage/src/routes/codeOperations.ts:28:58) {
   task: undefined,
   config: {
     baseDir: '/tmp/first-project_downloaded/first-project',

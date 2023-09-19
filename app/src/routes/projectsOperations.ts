@@ -14,7 +14,7 @@ import {
     ProjectDTO,
     ProjectEntity
 } from "../models/project";
-import {createProject, deleteProject, getProject, listProjects, updateProject} from "../store/cassandra/project-dao";
+import {createProject, deleteProject, getProject, listProjects, updateProject} from "../store/cassandra/projectDao";
 import {createRepository} from "../integrations/git-providers";
 
 const projectsOperationsRouter = Router();

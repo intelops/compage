@@ -7,7 +7,7 @@ import Divider from "@mui/material/Divider";
 import DialogContent from "@mui/material/DialogContent";
 import {Stack} from "@mui/material";
 import TextField from "@mui/material/TextField";
-import {setCurrentUser} from "../../utils/sessionstorage-client";
+import {setCurrentUser} from "../../utils/sessionstorageClient";
 
 interface ArgTypes {
     isOpen: boolean;

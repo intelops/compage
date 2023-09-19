@@ -1,5 +1,5 @@
 import {ProjectEntity} from "../../models/project";
-import {cassandraClient} from "./cassandra-client";
+import {cassandraClient} from "./cassandraClient";
 import {generateProjectId} from "./utils";
 
 export const createProject = async (projectEntity: ProjectEntity) => {

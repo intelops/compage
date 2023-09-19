@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectUploadYamlData, selectUploadYamlStatus} from './slice';
 import Button from "@mui/material/Button";
 import {uploadYamlAsync} from "./async-apis/uploadYaml";
-import {getCurrentProjectDetails} from "../../utils/localstorage-client";
+import {getCurrentProjectDetails} from "../../utils/localstorageClient";
 import {UploadYamlRequest} from "./model";
 
 interface ArgTypes {

@@ -1,5 +1,5 @@
 import {UploadYamlRequest} from "./model";
-import {OpenApiYamlOperationsBackendApi} from "../../utils/backend-api";
+import {OpenApiYamlOperationsBackendApi} from "../../utils/backendApi";
 
 // Sync apis (async apis are in thunk)
 export const uploadYaml = (uploadYamlRequest: UploadYamlRequest) => {

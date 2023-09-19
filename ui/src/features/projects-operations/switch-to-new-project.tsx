@@ -8,8 +8,8 @@ import TextField from "@mui/material/TextField";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import {createProjectAsync} from "./async-apis/createProject";
 import {getData} from "../../components/diagram-maker/data/BoundaryCircular/data";
-import {sanitizeString} from "../../utils/backend-api";
-import {getCurrentUser} from "../../utils/sessionstorage-client";
+import {sanitizeString} from "../../utils/backendApi";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
 
 interface ArgTypes {
     handleClose: (...args: any) => void;

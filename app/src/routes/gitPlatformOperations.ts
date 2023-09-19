@@ -13,14 +13,14 @@ import {
     getUpdateGitPlatformError,
     GitPlatformDTO,
     GitPlatformEntity
-} from "../models/git-platform";
+} from "../models/gitPlatform";
 import {
     createGitPlatform,
     deleteGitPlatform,
     getGitPlatform,
     listGitPlatforms,
     updateGitPlatform
-} from "../store/cassandra/git-platform-dao";
+} from "../store/cassandra/gitPlatformDao";
 
 const gitPlatformsOperationsRouter = Router();
 

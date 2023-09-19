@@ -4,9 +4,9 @@ import multer from '../middlewares/multer';
 import * as fs from 'fs';
 import Logger from '../utils/logger';
 import {X_EMAIL_HEADER} from '../utils/constants';
-import {getUploadYamlError, getUploadYamlResponse, UploadYamlRequest} from "../models/open-api-yaml";
+import {getUploadYamlError, getUploadYamlResponse, UploadYamlRequest} from "../models/openApiYaml";
 import {ProjectEntity} from "../models/project";
-import {getProject} from "../store/cassandra/project-dao";
+import {getProject} from "../store/cassandra/projectDao";
 
 const openApiYamlOperationsRouter = Router();
 

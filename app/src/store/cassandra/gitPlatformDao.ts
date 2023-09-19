@@ -1,5 +1,5 @@
-import {GitPlatformEntity} from "../../models/git-platform";
-import {cassandraClient} from "./cassandra-client";
+import {GitPlatformEntity} from "../../models/gitPlatform";
+import {cassandraClient} from "./cassandraClient";
 
 export const createGitPlatform = async (gitPlatformEntity: GitPlatformEntity) => {
     const query = `INSERT INTO git_platforms (name, url, user_name, personal_access_token, owner_email, created_at,

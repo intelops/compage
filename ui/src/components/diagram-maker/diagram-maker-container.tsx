@@ -46,7 +46,7 @@ import {
     setModifiedState,
     setReset,
     shouldReset
-} from "../../utils/localstorage-client";
+} from "../../utils/localstorageClient";
 import {ToolPanel} from "./custom/tool-panel";
 import {LibraryPanel} from "./custom/library-panel";
 import {ContextNode} from "./custom/context-node";
@@ -55,7 +55,7 @@ import {ContextPanel} from "./custom/context-panel";
 import {ContextWorkspace} from "./custom/context-workspace";
 import {EdgeBadge} from "./custom/edge-badge";
 import {PotentialNode} from "./custom/potential-node";
-import {getNodeTypeConfig} from "./helper/node-type-ui";
+import {getNodeTypeConfig} from "./helper/nodeTypeUi";
 import {NewEdgeProperties} from "./edge-properties/new-edge-properties";
 import {NewNodeProperties} from "./node-properties/new-node-properties";
 import JSONPretty from "react-json-pretty";
@@ -69,7 +69,7 @@ import {cleanse, getParsedCurrentConfig, getParsedModifiedState, removeUnwantedK
 import * as _ from "lodash";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import {getCurrentUser} from "../../utils/sessionstorage-client";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
 import {useNavigate} from "react-router-dom";
 import {CompageEdge, CompageJson, CompageNode} from "./models";
 import {DEVELOPMENT} from "../../utils/constants";

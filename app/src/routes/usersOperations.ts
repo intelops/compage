@@ -1,6 +1,6 @@
 import {requireEmailMiddleware} from '../middlewares/auth';
 import {Request, Response, Router} from 'express';
-import {createUser, deleteUser, getUser, listUsers, updateUser} from '../store/cassandra/user-dao';
+import {createUser, deleteUser, getUser, listUsers, updateUser} from '../store/cassandra/userDao';
 import Logger from '../utils/logger';
 import {
     getCreateUserError,

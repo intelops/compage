@@ -1,8 +1,8 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {RootState} from '../../redux/store';
-import {createUserAsync} from "./async-apis/create-user";
+import {createUserAsync} from "./async-apis/createUser";
 import {UserDTO} from "./model";
-import {listUsersAsync} from "./async-apis/list-users";
+import {listUsersAsync} from "./async-apis/listUsers";
 
 export interface UserState {
     createUser: {

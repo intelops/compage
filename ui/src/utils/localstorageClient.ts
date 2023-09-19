@@ -1,5 +1,5 @@
 import {CompageJson} from "../components/diagram-maker/models";
-import {getCurrentUser} from "./sessionstorage-client";
+import {getCurrentUser} from "./sessionstorageClient";
 
 export const CURRENT_STATE = "STATE";
 export const CURRENT_CONFIG = "CONFIG";

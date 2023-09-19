@@ -2,7 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {CreateProjectError, CreateProjectRequest, CreateProjectResponse} from "../model";
 import {createProject} from "../api";
 import {toastr} from 'react-redux-toastr';
-import {setCurrentConfig, setCurrentProjectDetails, setCurrentState} from "../../../utils/localstorage-client";
+import {setCurrentConfig, setCurrentProjectDetails, setCurrentState} from "../../../utils/localstorageClient";
 
 export const createProjectAsync = createAsyncThunk<CreateProjectResponse, CreateProjectRequest, { rejectValue: CreateProjectError }>(
     'projects/createProject',

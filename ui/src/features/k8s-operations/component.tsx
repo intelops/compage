@@ -4,9 +4,9 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectGetCurrentContextData, selectGetCurrentContextStatus} from './slice';
 import Button from "@mui/material/Button";
 import {getCurrentContextAsync} from "./async-apis/getCurrentContext";
-import {getCurrentProjectDetails} from "../../utils/localstorage-client";
+import {getCurrentProjectDetails} from "../../utils/localstorageClient";
 import {GetCurrentContextRequest} from "./model";
-import {getCurrentUser} from "../../utils/sessionstorage-client";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
 
 export const K8sOperations = () => {
     const getGetCurrentContextStatus = useAppSelector(selectGetCurrentContextStatus);

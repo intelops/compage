@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {config} from "./constants";
-import {getCurrentUser} from "./sessionstorage-client";
+import {getCurrentUser} from "./sessionstorageClient";
 
 export const X_EMAIL_HEADER = "X-Email-ID";
 

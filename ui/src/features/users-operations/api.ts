@@ -1,4 +1,4 @@
-import {UserBackendApi} from "../../utils/backend-api";
+import {UserBackendApi} from "../../utils/backendApi";
 import {CreateUserRequest, ListUsersRequest} from "./model";
 
 // Sync apis (async apis are in thunk)

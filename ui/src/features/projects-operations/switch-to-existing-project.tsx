@@ -10,7 +10,7 @@ import {Stack} from "@mui/material";
 import {getProjectAsync} from "./async-apis/getProject";
 import {listProjectsAsync} from "./async-apis/listProjects";
 import CircularProgress from '@mui/material/CircularProgress';
-import {getCurrentUser} from "../../utils/sessionstorage-client";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
 
 interface ArgTypes {
     handleClose: (...args: any) => void;

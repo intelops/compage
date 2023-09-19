@@ -1,4 +1,4 @@
-import {GitPlatformBackendApi} from "../../utils/backend-api";
+import {GitPlatformBackendApi} from "../../utils/backendApi";
 import {CreateGitPlatformRequest, ListGitPlatformsRequest} from "./model";
 
 // Sync apis (async apis are in thunk)

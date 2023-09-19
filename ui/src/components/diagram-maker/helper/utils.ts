@@ -1,6 +1,6 @@
 import {DiagramMakerNode, Event, WorkspaceActions} from 'diagram-maker';
 import {Action, AnyAction} from 'redux';
-import {getModifiedState} from "../../../utils/localstorage-client";
+import {getModifiedState} from "../../../utils/localstorageClient";
 import {DEVELOPMENT} from "../../../utils/constants";
 
 export function createDivWithText(text: string) {

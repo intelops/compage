@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {selectListProjectsData} from "./slice";
 import {ListProjectsRequest, ProjectDTO} from "./model";
-import {getCurrentUser} from "../../utils/sessionstorage-client";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
 import {listProjectsAsync} from "./async-apis/listProjects";
 import {Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import Box from "@mui/material/Box";

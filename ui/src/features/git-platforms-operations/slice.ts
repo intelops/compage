@@ -1,8 +1,8 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {RootState} from '../../redux/store';
-import {createGitPlatformAsync} from "./async-apis/create-git-platform";
+import {createGitPlatformAsync} from "./async-apis/createGitPlatform";
 import {GitPlatformDTO} from "./model";
-import {listGitPlatformsAsync} from "./async-apis/list-git-platforms";
+import {listGitPlatformsAsync} from "./async-apis/listGitPlatforms";
 
 export interface GitPlatformState {
     createGitPlatform: {

@@ -4,7 +4,7 @@ import {generateCode} from "../api";
 import {toastr} from 'react-redux-toastr';
 import {GetProjectRequest, GetProjectResponse} from "../../projects-operations/model";
 import {getProject} from "../../projects-operations/api";
-import {setCurrentConfig, setCurrentProjectDetails, setCurrentState} from "../../../utils/localstorage-client";
+import {setCurrentConfig, setCurrentProjectDetails, setCurrentState} from "../../../utils/localstorageClient";
 import {updateModifiedState} from "../../projects-operations/populateModifiedState";
 
 export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, GenerateCodeRequest, {

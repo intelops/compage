@@ -4,7 +4,7 @@ import {useAppDispatch} from "../../redux/hooks";
 import {Stack} from "@mui/material";
 import {GetCurrentContextRequest} from "../../features/k8s-operations/model";
 import {getCurrentContextAsync} from "../../features/k8s-operations/async-apis/getCurrentContext";
-import {getCurrentUser} from "../../utils/sessionstorage-client";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
 import {GitPlatforms} from "../../features/git-platforms-operations/git-platforms";
 import {Projects} from "../../features/projects-operations/projects";
 

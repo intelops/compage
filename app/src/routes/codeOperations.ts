@@ -5,16 +5,16 @@ import * as os from 'os';
 import {
     cloneExistingProjectFromGitServer,
     pushToExistingProjectOnGitServer,
-} from '../integrations/simple-git/existing-project';
+} from '../integrations/simple-git/existingProject';
 import {requireEmailMiddleware} from '../middlewares/auth';
 import Logger from '../utils/logger';
 import {rimraf} from 'rimraf';
 import tar from 'tar';
 import {X_EMAIL_HEADER} from '../utils/constants';
 import {GenerateCodeRequest, getGenerateCodeError, getGenerateCodeResponse, Project} from "../models/code";
-import {getGitPlatform} from "../store/cassandra/git-platform-dao";
-import {GitPlatformEntity} from "../models/git-platform";
-import {getProject, updateProject} from "../store/cassandra/project-dao";
+import {getGitPlatform} from "../store/cassandra/gitPlatformDao";
+import {GitPlatformEntity} from "../models/gitPlatform";
+import {getProject, updateProject} from "../store/cassandra/projectDao";
 import {OldVersion, ProjectEntity} from "../models/project";
 import {ExistingProjectGitServerRequest} from "../integrations/simple-git/models";
 

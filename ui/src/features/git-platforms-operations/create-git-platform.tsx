@@ -2,12 +2,12 @@ import React, {ChangeEvent} from "react";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {Stack} from "@mui/material";
 import TextField from "@mui/material/TextField";
-import {sanitizeString} from "../../utils/backend-api";
+import {sanitizeString} from "../../utils/backendApi";
 import Button from "@mui/material/Button";
 import {selectCreateGitPlatformStatus} from "./slice";
 import {CreateGitPlatformRequest} from "./model";
-import {getCurrentUser} from "../../utils/sessionstorage-client";
-import {createGitPlatformAsync} from "./async-apis/create-git-platform";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
+import {createGitPlatformAsync} from "./async-apis/createGitPlatform";
 
 export const CreateGitPlatform = () => {
     const dispatch = useAppDispatch();

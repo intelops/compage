@@ -7,7 +7,7 @@ import {
     removeCurrentProjectDetails,
     removeCurrentState,
     removeModifiedState
-} from "../../../utils/localstorage-client";
+} from "../../../utils/localstorageClient";
 
 // this is separately added even though this resembles to getProjectAsync. getProjectAsync updates the localstorage but existsProjectAsync doesn't.
 export const existsProjectAsync = createAsyncThunk<ExistsProjectResponse, ExistsProjectRequest, { rejectValue: ExistsProjectError }>(

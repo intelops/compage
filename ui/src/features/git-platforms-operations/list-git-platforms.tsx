@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
-import {listGitPlatformsAsync} from "./async-apis/list-git-platforms";
+import {listGitPlatformsAsync} from "./async-apis/listGitPlatforms";
 import {ListGitPlatformsRequest} from "./model";
 import {selectListGitPlatformsData} from "./slice";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";

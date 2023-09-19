@@ -4,14 +4,14 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectGenerateCodeStatus} from './slice';
 import Button from "@mui/material/Button";
 import {generateCodeAsync} from "./async-apis/generateCode";
-import {getCurrentProjectDetails, getCurrentState} from "../../utils/localstorage-client";
+import {getCurrentProjectDetails, getCurrentState} from "../../utils/localstorageClient";
 import {selectGetProjectData, selectUpdateProjectData} from "../projects-operations/slice";
 import {removeUnwantedKeys} from "../../components/diagram-maker/helper/helper";
 import * as _ from "lodash";
 import {CompageNode, GrpcConfig, RestClient, RestConfig} from "../../components/diagram-maker/models";
 import {isCompageTemplate} from "../../components/diagram-maker/node-properties/utils";
 import {GenerateCodeRequest} from "./model";
-import {getCurrentUser} from "../../utils/sessionstorage-client";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
 
 export const GenerateCode = () => {
     const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);

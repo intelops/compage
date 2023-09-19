@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
-import {listUsersAsync} from "./async-apis/list-users";
+import {listUsersAsync} from "./async-apis/listUsers";
 import {ListUsersRequest, UserDTO} from "./model";
 import {selectListUsersData} from "./slice";
 

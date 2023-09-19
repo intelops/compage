@@ -10,7 +10,7 @@ import {
     setCurrentConfig,
     setCurrentProjectDetails,
     setCurrentState
-} from "../../../utils/localstorage-client";
+} from "../../../utils/localstorageClient";
 import {updateModifiedState} from "../populateModifiedState";
 
 export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRequest, { rejectValue: GetProjectError }>(

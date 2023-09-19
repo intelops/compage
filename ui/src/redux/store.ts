@@ -11,7 +11,7 @@ import codeOperationsReducer from "../features/code-operations/slice";
 import projectsReducer from "../features/projects-operations/slice";
 import gitPlatformsReducer from "../features/git-platforms-operations/slice";
 import {unauthenticatedMiddleware} from "./unauthenticatedMiddleware";
-import {RESET_STATE_ACTION_TYPE} from "./reset-state-action";
+import {RESET_STATE_ACTION_TYPE} from "./resetStateAction";
 import openApiYamlOperationsReducer from "../features/open-api-yaml-operations/slice";
 import k8sOperationsReducer from "../features/k8s-operations/slice";
 import usersOperationsReducer from "../features/users-operations/slice";

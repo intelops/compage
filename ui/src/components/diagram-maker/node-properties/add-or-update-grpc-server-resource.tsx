@@ -23,7 +23,7 @@ import Button from "@mui/material/Button";
 import React, {ChangeEvent} from "react";
 import {Resource} from "../models";
 import TextField from "@mui/material/TextField";
-import {sanitizeString} from "../../../utils/backend-api";
+import {sanitizeString} from "../../../utils/backendApi";
 import {BOOL, COMPLEX, FLOAT, goDataTypes, INT, STRING, STRUCT} from "./go-resource";
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';

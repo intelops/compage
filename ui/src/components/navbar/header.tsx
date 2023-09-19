@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import Logo from "../../compage-logo.svg";
 import {useAppSelector} from "../../redux/hooks";
 import {Link, useNavigate} from "react-router-dom";
-import {getCurrentProjectDetails} from "../../utils/localstorage-client";
+import {getCurrentProjectDetails} from "../../utils/localstorageClient";
 import {selectGetCurrentContextData} from "../../features/k8s-operations/slice";
 
 const Header = () => {

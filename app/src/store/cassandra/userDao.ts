@@ -1,5 +1,5 @@
 import {UserEntity} from "../../models/user";
-import {cassandraClient} from "./cassandra-client";
+import {cassandraClient} from "./cassandraClient";
 
 export const createUser = async (userEntity: UserEntity) => {
     const query = `INSERT INTO users (email, first_name, last_name, role, status, created_at, updated_at)

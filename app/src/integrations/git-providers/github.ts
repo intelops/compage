@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {ProjectEntity} from "../../models/project";
-import {getGitPlatform} from "../../store/cassandra/git-platform-dao";
-import {GitPlatformEntity} from "../../models/git-platform";
+import {getGitPlatform} from "../../store/cassandra/gitPlatformDao";
+import {GitPlatformEntity} from "../../models/gitPlatform";
 import {GITHUB} from "../supportedGitProviders";
 
 const ACCEPT = `application/vnd.github+json`;

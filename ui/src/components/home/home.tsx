@@ -5,11 +5,11 @@ import {
     getCurrentProjectDetails,
     setCurrentConfig,
     setCurrentState
-} from "../../utils/localstorage-client";
+} from "../../utils/localstorageClient";
 import {useAppDispatch} from "../../redux/hooks";
 import {DiagramMakerContainer} from "../diagram-maker/diagram-maker-container";
 import {SwitchProject} from "../../features/projects-operations/switch-project";
-import {getCurrentUser} from "../../utils/sessionstorage-client";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
 import {GetProjectRequest} from "../../features/projects-operations/model";
 import {existsProjectAsync} from "../../features/projects-operations/async-apis/existsProject";
 import {GetCurrentContextRequest} from "../../features/k8s-operations/model";
