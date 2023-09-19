@@ -1,5 +1,5 @@
-import {ProjectEntity} from "../../models/project";
-import {createGithubRepository} from "./github";
+import {ProjectEntity} from '../../models/project';
+import {createGithubRepository} from './github';
 
 export const createRepository = async (projectEntity: ProjectEntity) => {
     switch (projectEntity.git_platform_name) {
@@ -12,4 +12,4 @@ export const createRepository = async (projectEntity: ProjectEntity) => {
         default:
             throw new Error('Unsupported git platform');
     }
-}
+};

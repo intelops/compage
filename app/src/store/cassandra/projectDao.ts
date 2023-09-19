@@ -1,6 +1,6 @@
-import {ProjectEntity} from "../../models/project";
-import {cassandraClient} from "./cassandraClient";
-import {generateProjectId} from "./utils";
+import {ProjectEntity} from '../../models/project';
+import {cassandraClient} from './cassandraClient';
+import {generateProjectId} from './utils';
 
 export const createProject = async (projectEntity: ProjectEntity) => {
     projectEntity.id = generateProjectId(projectEntity);
@@ -15,22 +15,22 @@ export const createProject = async (projectEntity: ProjectEntity) => {
         return projectEntity;
     }
     const projectEntityError: ProjectEntity = {
-        id: "",
-        display_name: "",
-        version: "",
-        json: "",
-        git_platform_name: "",
-        git_platform_user_name: "",
+        id: '',
+        display_name: '',
+        version: '',
+        json: '',
+        git_platform_name: '',
+        git_platform_user_name: '',
         is_repository_public: false,
-        repository_branch: "",
-        repository_name: "",
-        repository_url: "",
-        owner_email: "",
-        created_at: "",
-        updated_at: "",
-    }
+        repository_branch: '',
+        repository_name: '',
+        repository_url: '',
+        owner_email: '',
+        created_at: '',
+        updated_at: '',
+    };
     return projectEntityError;
-}
+};
 
 export const updateProject = async (id: string, projectEntity: ProjectEntity) => {
     const query = `UPDATE projects
@@ -42,7 +42,7 @@ export const updateProject = async (id: string, projectEntity: ProjectEntity) =>
     const params = [projectEntity.display_name, projectEntity.version, projectEntity.json, projectEntity.updated_at, id];
     const resultSet = await cassandraClient.execute(query, params, {prepare: true});
     return resultSet.wasApplied();
-}
+};
 
 export const deleteProject = async (id: string) => {
     const query = `DELETE
@@ -52,7 +52,7 @@ export const deleteProject = async (id: string) => {
     const resultSet = await cassandraClient.execute(query, params, {prepare: true});
     return resultSet.wasApplied();
 
-}
+};
 
 export const listProjects = async (ownerEmail: string) => {
     const query = `SELECT *
@@ -82,7 +82,7 @@ export const listProjects = async (ownerEmail: string) => {
     });
 
     return projectEntities;
-}
+};
 
 export const getProject = async (id: string) => {
     const query = `SELECT *
@@ -92,22 +92,22 @@ export const getProject = async (id: string) => {
     const resultSet = await cassandraClient.execute(query, params, {prepare: true});
     const row = resultSet.first();
     if (!row) {
-        const projectEntity: ProjectEntity = {
-            id: "",
-            display_name: "",
-            version: "",
-            json: "",
-            git_platform_name: "",
-            git_platform_user_name: "",
+        const emptyProjectEntity: ProjectEntity = {
+            id: '',
+            display_name: '',
+            version: '',
+            json: '',
+            git_platform_name: '',
+            git_platform_user_name: '',
             is_repository_public: false,
-            repository_branch: "",
-            repository_name: "",
-            repository_url: "",
-            owner_email: "",
-            created_at: "",
-            updated_at: "",
-        }
-        return projectEntity;
+            repository_branch: '',
+            repository_name: '',
+            repository_url: '',
+            owner_email: '',
+            created_at: '',
+            updated_at: '',
+        };
+        return emptyProjectEntity;
     }
 
     const projectEntity: ProjectEntity = {
@@ -127,4 +127,4 @@ export const getProject = async (id: string) => {
     };
 
     return projectEntity;
-}
+};

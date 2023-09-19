@@ -2,7 +2,7 @@ import {requireEmailMiddleware} from '../middlewares/auth';
 import {Request, Response, Router} from 'express';
 import {getCurrentContext} from '../store/k8s/kubeClient';
 import Logger from '../utils/logger';
-import {getGetCurrentContextError, getGetCurrentContextResponse} from "../models/k8s";
+import {getGetCurrentContextError, getGetCurrentContextResponse} from '../models/k8s';
 
 const k8sOperationsRouter = Router();
 

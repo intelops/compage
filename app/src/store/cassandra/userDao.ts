@@ -1,5 +1,5 @@
-import {UserEntity} from "../../models/user";
-import {cassandraClient} from "./cassandraClient";
+import {UserEntity} from '../../models/user';
+import {cassandraClient} from './cassandraClient';
 
 export const createUser = async (userEntity: UserEntity) => {
     const query = `INSERT INTO users (email, first_name, last_name, role, status, created_at, updated_at)
@@ -11,9 +11,9 @@ export const createUser = async (userEntity: UserEntity) => {
     }
     const userEntityError: UserEntity = {
         email: '',
-    }
+    };
     return userEntityError;
-}
+};
 
 export const updateUser = async (email: string, userEntity: UserEntity) => {
     const query = `UPDATE users
@@ -26,7 +26,7 @@ export const updateUser = async (email: string, userEntity: UserEntity) => {
     const params = [userEntity.first_name, userEntity.last_name, userEntity.role, userEntity.status, userEntity.updated_at, email];
     const resultSet = await cassandraClient.execute(query, params, {prepare: true});
     return resultSet.wasApplied();
-}
+};
 
 export const deleteUser = async (email: string) => {
     const query = `DELETE
@@ -36,7 +36,7 @@ export const deleteUser = async (email: string) => {
     const resultSet = await cassandraClient.execute(query, params, {prepare: true});
     return resultSet.wasApplied();
 
-}
+};
 
 export const listUsers = async () => {
     const query = `SELECT *
@@ -57,7 +57,7 @@ export const listUsers = async () => {
         userEntities.push(userEntity);
     });
     return userEntities;
-}
+};
 
 export const getUser = async (email: string) => {
     const query = `SELECT *
@@ -67,10 +67,10 @@ export const getUser = async (email: string) => {
     const resultSet = await cassandraClient.execute(query, params, {prepare: true});
     const row = resultSet.first();
     if (!row) {
-        const userEntity: UserEntity = {
+        const emptyUserEntity: UserEntity = {
             email: '',
-        }
-        return userEntity;
+        };
+        return emptyUserEntity;
     }
 
     const userEntity: UserEntity = {
@@ -84,4 +84,4 @@ export const getUser = async (email: string) => {
     };
 
     return userEntity;
-}
+};

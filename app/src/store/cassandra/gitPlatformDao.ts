@@ -1,5 +1,5 @@
-import {GitPlatformEntity} from "../../models/gitPlatform";
-import {cassandraClient} from "./cassandraClient";
+import {GitPlatformEntity} from '../../models/gitPlatform';
+import {cassandraClient} from './cassandraClient';
 
 export const createGitPlatform = async (gitPlatformEntity: GitPlatformEntity) => {
     const query = `INSERT INTO git_platforms (name, url, user_name, personal_access_token, owner_email, created_at,
@@ -11,14 +11,14 @@ export const createGitPlatform = async (gitPlatformEntity: GitPlatformEntity) =>
         return gitPlatformEntity;
     }
     const gitPlatformEntityError: GitPlatformEntity = {
-        name: "",
-        url: "",
-        user_name: "",
-        personal_access_token: "",
-        owner_email: ""
-    }
+        name: '',
+        url: '',
+        user_name: '',
+        personal_access_token: '',
+        owner_email: ''
+    };
     return gitPlatformEntityError;
-}
+};
 
 
 export const listGitPlatforms = async (ownerEmail: string) => {
@@ -43,7 +43,7 @@ export const listGitPlatforms = async (ownerEmail: string) => {
     });
 
     return gitPlatformEntities;
-}
+};
 
 export const getGitPlatform = async (ownerEmail: string, name: string) => {
     const query = `SELECT *
@@ -54,14 +54,14 @@ export const getGitPlatform = async (ownerEmail: string, name: string) => {
     const resultSet = await cassandraClient.execute(query, params, {prepare: true});
     const row = resultSet.first();
     if (!row) {
-        const gitPlatformEntity: GitPlatformEntity = {
-            name: "",
-            url: "",
-            user_name: "",
-            personal_access_token: "",
-            owner_email: ""
-        }
-        return gitPlatformEntity;
+        const emptyGitPlatformEntity: GitPlatformEntity = {
+            name: '',
+            url: '',
+            user_name: '',
+            personal_access_token: '',
+            owner_email: ''
+        };
+        return emptyGitPlatformEntity;
     }
 
     const gitPlatformEntity: GitPlatformEntity = {
@@ -75,9 +75,9 @@ export const getGitPlatform = async (ownerEmail: string, name: string) => {
     };
 
     return gitPlatformEntity;
-}
+};
 
-export const updateGitPlatform = async (owner_email: string, name: string, gitPlatformEntity: GitPlatformEntity) => {
+export const updateGitPlatform = async (ownerEmail: string, name: string, gitPlatformEntity: GitPlatformEntity) => {
     const query = `UPDATE git_platforms
                    SET url                   = ?,
                        user_name             = ?,
@@ -85,10 +85,10 @@ export const updateGitPlatform = async (owner_email: string, name: string, gitPl
                        updated_at            = ?
                    WHERE owner_email = ?
                      and name = ? IF EXISTS`;
-    const params = [gitPlatformEntity.url, gitPlatformEntity.user_name, gitPlatformEntity.personal_access_token, gitPlatformEntity.updated_at, owner_email, name];
+    const params = [gitPlatformEntity.url, gitPlatformEntity.user_name, gitPlatformEntity.personal_access_token, gitPlatformEntity.updated_at, ownerEmail, name];
     const resultSet = await cassandraClient.execute(query, params, {prepare: true});
     return resultSet.wasApplied();
-}
+};
 
 export const deleteGitPlatform = async (ownerEmail: string, name: string) => {
     const query = `DELETE
@@ -98,5 +98,4 @@ export const deleteGitPlatform = async (ownerEmail: string, name: string) => {
     const params = [ownerEmail, name];
     const resultSet = await cassandraClient.execute(query, params, {prepare: true});
     return resultSet.wasApplied();
-
-}
+};

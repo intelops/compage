@@ -1,6 +1,6 @@
 // entities
 // entities
-import {CompageJson} from "./code";
+import {CompageJson} from './code';
 
 export interface ProjectEntity {
     id: string;
@@ -76,7 +76,7 @@ export const getCreateProjectResponse = (projectEntity: ProjectEntity) => {
         repositoryBranch: projectEntity.repository_branch,
         isRepositoryPublic: projectEntity.is_repository_public,
         repositoryUrl: projectEntity.repository_url,
-    }
+    };
     return projectDTO;
 };
 
@@ -95,7 +95,7 @@ export const getGetProjectResponse = (projectEntity: ProjectEntity) => {
         repositoryBranch: projectEntity.repository_branch,
         isRepositoryPublic: projectEntity.is_repository_public,
         repositoryUrl: projectEntity.repository_url,
-    }
+    };
     return projectDTO;
 };
 
@@ -116,7 +116,7 @@ export const getListProjectsResponse = (projectEntities: ProjectEntity[]) => {
             repositoryBranch: projectEntity.repository_branch,
             isRepositoryPublic: projectEntity.is_repository_public,
             repositoryUrl: projectEntity.repository_url,
-        }
+        };
         projectDTOs.push(projectDTO);
     });
     return projectDTOs;
@@ -139,7 +139,7 @@ export const getProjectEntity = (projectDTO: ProjectDTO) => {
         repository_url: projectDTO.repositoryUrl,
     };
     return projectEntity;
-}
+};
 
 // errors
 interface CreateProjectError {
@@ -164,35 +164,35 @@ interface GetProjectError {
 
 export const getCreateProjectError = (message: string) => {
     const createProjectError: CreateProjectError = {
-        message: message,
+        message,
     };
     return createProjectError;
 };
 
 export const getUpdateProjectError = (message: string) => {
     const updateProjectError: UpdateProjectError = {
-        message: message,
+        message,
     };
     return updateProjectError;
 };
 
 export const getDeleteProjectError = (message: string) => {
     const deleteProjectError: DeleteProjectError = {
-        message: message,
+        message,
     };
     return deleteProjectError;
 };
 
 export const getListProjectsError = (message: string) => {
     const listProjectsError: ListProjectsError = {
-        message: message,
+        message,
     };
     return listProjectsError;
 };
 
 export const getGetProjectError = (message: string) => {
     const getProjectError: GetProjectError = {
-        message: message,
+        message,
     };
     return getProjectError;
 };

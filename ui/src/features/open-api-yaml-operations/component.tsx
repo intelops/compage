@@ -14,6 +14,7 @@ interface ArgTypes {
 export const UploadYaml = ({nodeId}: ArgTypes) => {
     const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
     const uploadYamlData = useAppSelector(selectUploadYamlData);
+    console.log("uploadYamlData", uploadYamlData);
     const [openApiYamlFile, setOpenApiYamlFile] = React.useState("");
     const dispatch = useAppDispatch();
 

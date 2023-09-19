@@ -8,4 +8,4 @@ export const GitPlatforms = () => {
         <ListGitPlatforms/>
         <CreateGitPlatform/>
     </Stack>;
-}
+};

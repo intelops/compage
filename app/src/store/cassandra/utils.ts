@@ -1,4 +1,4 @@
-import {ProjectEntity} from "../../models/project";
+import {ProjectEntity} from '../../models/project';
 
 const lengthOfChars = 5;
 

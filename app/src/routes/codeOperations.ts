@@ -11,12 +11,12 @@ import Logger from '../utils/logger';
 import {rimraf} from 'rimraf';
 import tar from 'tar';
 import {X_EMAIL_HEADER} from '../utils/constants';
-import {GenerateCodeRequest, getGenerateCodeError, getGenerateCodeResponse, Project} from "../models/code";
-import {getGitPlatform} from "../store/cassandra/gitPlatformDao";
-import {GitPlatformEntity} from "../models/gitPlatform";
-import {getProject, updateProject} from "../store/cassandra/projectDao";
-import {OldVersion, ProjectEntity} from "../models/project";
-import {ExistingProjectGitServerRequest} from "../integrations/simple-git/models";
+import {GenerateCodeRequest, getGenerateCodeError, getGenerateCodeResponse, Project} from '../models/code';
+import {getGitPlatform} from '../store/cassandra/gitPlatformDao';
+import {GitPlatformEntity} from '../models/gitPlatform';
+import {getProject, updateProject} from '../store/cassandra/projectDao';
+import {OldVersion, ProjectEntity} from '../models/project';
+import {ExistingProjectGitServerRequest} from '../integrations/simple-git/models';
 
 const codeOperationsRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
@@ -52,12 +52,12 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
         return resource.status(500).json(getGenerateCodeError(message));
     }
 
-    const hasNodes = (projectEntity: ProjectEntity) => {
-        return !projectEntity.json
-            || projectEntity.json === '{}'
-            || projectEntity.json.length === 0
-            || !JSON.parse(projectEntity.json)?.nodes
-            || JSON.parse(projectEntity.json)?.nodes?.length === 0;
+    const hasNodes = (entity: ProjectEntity) => {
+        return !entity.json
+            || entity.json === '{}'
+            || entity.json.length === 0
+            || !JSON.parse(entity.json)?.nodes
+            || JSON.parse(entity.json)?.nodes?.length === 0;
     };
 
     if (!hasNodes(projectEntity)) {
@@ -175,18 +175,18 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
             if (error.length > 0) {
                 cleanup(downloadedProjectPath);
                 // send status back to ui
-                const message = `unable to generate code for ${projectEntity.display_name}[${projectEntity.id}] => ${error}.`;
-                Logger.error(message);
-                return resource.status(500).json(getGenerateCodeError(message));
+                const clonedErrorMessage = `unable to generate code for ${projectEntity.display_name}[${projectEntity.id}] => ${error}.`;
+                Logger.error(clonedErrorMessage);
+                return resource.status(500).json(getGenerateCodeError(clonedErrorMessage));
             }
 
             error = await pushToExistingProjectOnGitServer(existingProjectGitServerRequest);
             if (error.length > 0) {
                 cleanup(downloadedProjectPath);
                 // send status back to ui
-                const message = `unable to generate code for ${projectEntity.display_name}[${projectEntity.id}] => ${error}.`;
-                Logger.error(message);
-                return resource.status(500).json(getGenerateCodeError(message));
+                const pushErrorMessage = `unable to generate code for ${projectEntity.display_name}[${projectEntity.id}] => ${error}.`;
+                Logger.error(pushErrorMessage);
+                return resource.status(500).json(getGenerateCodeError(pushErrorMessage));
             }
 
             Logger.debug(`saved ${downloadedProjectPath} to github.`);
@@ -210,8 +210,8 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
             const isUpdated = await updateProject(projectId, projectEntity);
             if (isUpdated) {
                 // send status back to ui
-                const message = `successfully generated project for ${projectEntity.display_name}[${projectEntity.id}] and saved in repository '${projectEntity.repository_name}'.`;
-                return resource.status(200).json(getGenerateCodeResponse(ownerEmail, projectId, message));
+                const successMessage = `successfully generated project for ${projectEntity.display_name}[${projectEntity.id}] and saved in repository '${projectEntity.repository_name}'.`;
+                return resource.status(200).json(getGenerateCodeResponse(ownerEmail, projectId, successMessage));
             }
             // send error status back to ui
             const message = `generated project: ${projectEntity.display_name}[${projectEntity.id}] and saved successfully in repository '${projectEntity.repository_name}' but project couldn't get updated.`;

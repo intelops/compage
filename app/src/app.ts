@@ -12,12 +12,10 @@ import Logger from './utils/logger';
 import morganMiddleware from './utils/morganMiddleware';
 import k8sOperationsRouter from './routes/k8sOperations';
 import gitPlatformsOperationsRouter from './routes/gitPlatformOperations';
-import usersOperationsRouter from "./routes/usersOperations";
-import {initializeCassandraClient} from "./store/cassandra/cassandraClient";
+import usersOperationsRouter from './routes/usersOperations';
+import {initializeCassandraClient} from './store/cassandra/cassandraClient';
 
 export const {customObjectsApiClient, coreV1ApiClient, currentContext} = initializeKubeClient();
-export const {cassandraClient} = initializeCassandraClient();
-
 const app: Application = express();
 
 app.use(bodyParser.json());

@@ -2,7 +2,7 @@ import {simpleGit, SimpleGit, SimpleGitOptions} from 'simple-git';
 import * as fs from 'fs';
 import {gitOperations} from './common';
 import Logger from '../../utils/logger';
-import {ExistingProjectGitServerRequest} from "./models";
+import {ExistingProjectGitServerRequest} from './models';
 
 export const cloneExistingProjectFromGitServer = async (existingProjectGitServerRequest: ExistingProjectGitServerRequest): Promise<string> => {
     const options: Partial<SimpleGitOptions> = {

@@ -3,8 +3,9 @@ import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {listGitPlatformsAsync} from "./async-apis/listGitPlatforms";
 import {ListGitPlatformsRequest} from "./model";
 import {selectListGitPlatformsData} from "./slice";
-import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import {Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 
 export const ListGitPlatforms = () => {
     const listGitPlatformsData = useAppSelector(selectListGitPlatformsData);
@@ -15,11 +16,33 @@ export const ListGitPlatforms = () => {
             email: "mahendra.b@intelops.dev"
         };
         dispatch(listGitPlatformsAsync(listGitPlatformsRequest));
-    }, []);
+    }, [dispatch]);
+
+    const handleEditClick = () => {
+        console.log("Edit clicked");
+    };
+
+    const handleDeleteClick = () => {
+        console.log("delete clicked");
+    };
+
+    const getActionButtons = (): React.ReactNode => {
+        return <Stack direction="row" gap="3">
+            <Button variant="contained"
+                    onClick={handleEditClick}>
+                Edit
+            </Button>
+            <Button variant="contained"
+                    color="error"
+                    onClick={handleDeleteClick}>
+                Delete
+            </Button>
+        </Stack>;
+    };
 
     return <>
         <TableContainer component={Paper}>
-            <Typography >List of GitPlatforms</Typography>
+            <Typography>List of GitPlatforms</Typography>
             <Table sx={{minWidth: 650}} aria-label="simple table">
                 <TableHead>
                     <TableRow>
@@ -28,6 +51,7 @@ export const ListGitPlatforms = () => {
                         <TableCell align="right">OwnerEmail</TableCell>
                         <TableCell align="right">Url</TableCell>
                         <TableCell align="right">Personal Access Token</TableCell>
+                        <TableCell align="right">Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -43,6 +67,7 @@ export const ListGitPlatforms = () => {
                             <TableCell align="right">{row.ownerEmail}</TableCell>
                             <TableCell align="right">{row.url}</TableCell>
                             <TableCell align="right">{row.personalAccessToken}</TableCell>
+                            <TableCell align="right">{getActionButtons()}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

@@ -45,7 +45,7 @@ export const getCreateGitPlatformResponse = (gitPlatformEntity: GitPlatformEntit
         ownerEmail: gitPlatformEntity.owner_email,
         createdAt: gitPlatformEntity.created_at,
         updatedAt: gitPlatformEntity.updated_at,
-    }
+    };
     return gitPlatformDTO;
 };
 
@@ -58,7 +58,7 @@ export const getGetGitPlatformResponse = (gitPlatformEntity: GitPlatformEntity) 
         ownerEmail: gitPlatformEntity.owner_email,
         createdAt: gitPlatformEntity.created_at,
         updatedAt: gitPlatformEntity.updated_at,
-    }
+    };
     return gitPlatformDTO;
 };
 
@@ -73,7 +73,7 @@ export const getListGitPlatformsResponse = (gitPlatformEntities: GitPlatformEnti
             ownerEmail: gitPlatformEntity.owner_email,
             createdAt: gitPlatformEntity.created_at,
             updatedAt: gitPlatformEntity.updated_at,
-        }
+        };
         gitPlatformDTOs.push(gitPlatformDTO);
     });
     return gitPlatformDTOs;
@@ -90,7 +90,7 @@ export const getGitPlatformEntity = (gitPlatformDTO: GitPlatformDTO) => {
         updated_at: gitPlatformDTO.updatedAt,
     };
     return gitPlatformEntity;
-}
+};
 
 // errors
 interface CreateGitPlatformError {
@@ -115,35 +115,35 @@ interface GetGitPlatformError {
 
 export const getCreateGitPlatformError = (message: string) => {
     const createGitPlatformError: CreateGitPlatformError = {
-        message: message,
+        message,
     };
     return createGitPlatformError;
 };
 
 export const getUpdateGitPlatformError = (message: string) => {
     const updateGitPlatformError: UpdateGitPlatformError = {
-        message: message,
+        message,
     };
     return updateGitPlatformError;
 };
 
 export const getDeleteGitPlatformError = (message: string) => {
     const deleteGitPlatformError: DeleteGitPlatformError = {
-        message: message,
+        message,
     };
     return deleteGitPlatformError;
 };
 
 export const getListGitPlatformsError = (message: string) => {
     const listGitPlatformsError: ListGitPlatformsError = {
-        message: message,
+        message,
     };
     return listGitPlatformsError;
 };
 
 export const getGetGitPlatformError = (message: string) => {
     const getGitPlatformError: GetGitPlatformError = {
-        message: message,
+        message,
     };
     return getGitPlatformError;
 };

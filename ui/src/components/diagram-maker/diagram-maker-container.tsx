@@ -320,6 +320,7 @@ export const DiagramMakerContainer = ({
                         }
                     }
                 };
+                // eslint-disable-next-line
                 const removeWsClient = (srcNode: CompageNode, destNode: CompageNode) => {
                     if (destNode.consumerData.wsConfig && destNode.consumerData.wsConfig.clients) {
                         for (let i = 0; i < destNode.consumerData.wsConfig.clients.length; i++) {
@@ -510,7 +511,7 @@ export const DiagramMakerContainer = ({
             const state = diagramMakerRef.current.store.getState();
             setData(JSON.stringify(state));
         });
-
+        // eslint-disable-next-line
     }, [plugin, initialData]);
 
     // When clicked, save the state of project to backend.

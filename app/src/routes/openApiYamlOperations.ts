@@ -4,14 +4,14 @@ import multer from '../middlewares/multer';
 import * as fs from 'fs';
 import Logger from '../utils/logger';
 import {X_EMAIL_HEADER} from '../utils/constants';
-import {getUploadYamlError, getUploadYamlResponse, UploadYamlRequest} from "../models/openApiYaml";
-import {ProjectEntity} from "../models/project";
-import {getProject} from "../store/cassandra/projectDao";
+import {getUploadYamlError, getUploadYamlResponse, UploadYamlRequest} from '../models/openApiYaml';
+import {ProjectEntity} from '../models/project';
+import {getProject} from '../store/cassandra/projectDao';
 
 const openApiYamlOperationsRouter = Router();
 
 // uploads openApiYaml file
-openApiYamlOperationsRouter.post('/upload', requireEmailMiddleware, multer.single('file'), async (request: Request, response: Response) => {
+openApiYamlOperationsRouter.post('/upload', requireEmailMiddleware, async (request: Request, response: Response) => {
     const ownerEmail = request.header(X_EMAIL_HEADER);
     const uploadYamlRequest: UploadYamlRequest = request.body;
     const projectEntity: ProjectEntity = await getProject(uploadYamlRequest.projectId);
@@ -24,20 +24,20 @@ openApiYamlOperationsRouter.post('/upload', requireEmailMiddleware, multer.singl
             const content = fs.readFileSync(request.file.path, 'utf8');
             // delete file once content is extracted
             fs.rmSync(request.file.path);
-            const message = `File got uploaded.`;
-            Logger.info(message);
+            const successMessage = `File got uploaded.`;
+            Logger.info(successMessage);
             // TODO the upload happens so quickly that artificial delay is required and it will help for better experience.
             await new Promise(r => setTimeout(r, 1000));
-            return response.status(200).json(getUploadYamlResponse(uploadYamlRequest.projectId, uploadYamlRequest.nodeId, content, message));
+            return response.status(200).json(getUploadYamlResponse(uploadYamlRequest.projectId, uploadYamlRequest.nodeId, content, successMessage));
         } catch (e: any) {
-            const message = `File couldn't be uploaded[${e.message}].`;
-            Logger.error(message);
-            return response.status(500).json(getUploadYamlError(message));
+            const errorMessage = `File couldn't be uploaded[${e.message}].`;
+            Logger.error(errorMessage);
+            return response.status(500).json(getUploadYamlError(errorMessage));
         }
     }
     const message = `File couldn't be uploaded.`;
     Logger.warn(message);
     return response.status(500).json(getUploadYamlError(message));
-});
+}, multer.single('file'));
 
 export default openApiYamlOperationsRouter;

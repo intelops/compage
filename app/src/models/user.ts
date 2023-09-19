@@ -50,7 +50,7 @@ export const getCreateUserResponse = (userEntity: UserEntity) => {
         status: userEntity.status,
         createdAt: userEntity.created_at,
         updatedAt: userEntity.updated_at,
-    }
+    };
     return userDTO;
 };
 
@@ -63,7 +63,7 @@ export const getGetUserResponse = (userEntity: UserEntity) => {
         status: userEntity.status,
         createdAt: userEntity.created_at,
         updatedAt: userEntity.updated_at,
-    }
+    };
     return userDTO;
 };
 
@@ -78,7 +78,7 @@ export const getListUsersResponse = (userEntities: UserEntity[]) => {
             status: userEntity.status,
             createdAt: userEntity.created_at,
             updatedAt: userEntity.updated_at,
-        }
+        };
         userDTOs.push(userDTO);
     });
     return userDTOs;
@@ -95,7 +95,7 @@ export const getUserEntity = (userDTO: UserDTO) => {
         updated_at: userDTO.updatedAt,
     };
     return userEntity;
-}
+};
 
 // errors
 interface CreateUserError {
@@ -120,35 +120,35 @@ interface GetUserError {
 
 export const getCreateUserError = (message: string) => {
     const createUserError: CreateUserError = {
-        message: message,
+        message,
     };
     return createUserError;
 };
 
 export const getUpdateUserError = (message: string) => {
     const updateUserError: UpdateUserError = {
-        message: message,
+        message,
     };
     return updateUserError;
 };
 
 export const getDeleteUserError = (message: string) => {
     const deleteUserError: DeleteUserError = {
-        message: message,
+        message,
     };
     return deleteUserError;
 };
 
 export const getListUsersError = (message: string) => {
     const listUsersError: ListUsersError = {
-        message: message,
+        message,
     };
     return listUsersError;
 };
 
 export const getGetUserError = (message: string) => {
     const getUserError: GetUserError = {
-        message: message,
+        message,
     };
     return getUserError;
 };

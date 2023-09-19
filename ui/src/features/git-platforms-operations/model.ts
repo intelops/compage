@@ -8,8 +8,8 @@ export interface GitPlatformDTO {
     updatedAt?: string;
 }
 
-// create project models
-export interface CreateGitPlatformRequest extends GitPlatformDTO{
+// create gitPlatform models
+export interface CreateGitPlatformRequest extends GitPlatformDTO {
 }
 
 // This type describes the error object structure:
@@ -17,12 +17,31 @@ export interface CreateGitPlatformError {
     message: string;
 }
 
-// create project models
+// List gitPlatforms models
 export interface ListGitPlatformsRequest {
     email: string;
 }
 
 // This type describes the error object structure:
 export interface ListGitPlatformsError {
+    message: string;
+}
+
+// delete gitPlatform models
+export interface DeleteGitPlatformRequest {
+    email: string;
+}
+
+// This type describes the error object structure:
+export interface DeleteGitPlatformError {
+    message: string;
+}
+
+// update gitPlatform models
+export interface UpdateGitPlatformRequest extends GitPlatformDTO {
+}
+
+// This type describes the error object structure:
+export interface UpdateGitPlatformError {
     message: string;
 }

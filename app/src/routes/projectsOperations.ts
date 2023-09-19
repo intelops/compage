@@ -13,9 +13,9 @@ import {
     getUpdateProjectError,
     ProjectDTO,
     ProjectEntity
-} from "../models/project";
-import {createProject, deleteProject, getProject, listProjects, updateProject} from "../store/cassandra/projectDao";
-import {createRepository} from "../integrations/git-providers";
+} from '../models/project';
+import {createProject, deleteProject, getProject, listProjects, updateProject} from '../store/cassandra/projectDao';
+import {createRepository} from '../integrations/git-providers';
 
 const projectsOperationsRouter = Router();
 
@@ -36,13 +36,13 @@ projectsOperationsRouter.post('/users/:email/projects', requireEmailMiddleware, 
         if (savedProjectEntity.id.length !== 0) {
             const resp = await createRepository(savedProjectEntity);
             Logger.debug(`createRepository Response: ${JSON.stringify(resp.data)}`);
-            const message = `[${savedProjectEntity.owner_email}] project[${savedProjectEntity.id}] created.`;
-            Logger.info(message);
+            const successMessage = `[${savedProjectEntity.owner_email}] project[${savedProjectEntity.id}] created.`;
+            Logger.info(successMessage);
             return response.status(201).json(getCreateProjectResponse(savedProjectEntity));
         }
-        const message = `${projectDTO.ownerEmail} project [${projectDTO.displayName}] couldn't be created.`;
-        Logger.error(message);
-        return response.status(500).json(getCreateProjectError(message));
+        const errorMessage = `${projectDTO.ownerEmail} project [${projectDTO.displayName}] couldn't be created.`;
+        Logger.error(errorMessage);
+        return response.status(500).json(getCreateProjectError(errorMessage));
     } catch (e: any) {
         const message = `${projectDTO.ownerEmail} project [${projectDTO.displayName}] couldn't be created[${e.message}]).`;
         Logger.error(message);
@@ -95,15 +95,15 @@ projectsOperationsRouter.put('/users/:email/projects/:id', requireEmailMiddlewar
     try {
         const projectEntity: ProjectEntity = await getProject(projectDTO.id);
         if (projectEntity.owner_email.length === 0 || projectEntity.id.length === 0) {
-            const message = `[${projectDTO.ownerEmail}] project[${projectDTO.id}] don't exist.`;
-            Logger.error(message);
-            return response.status(400).json(getUpdateProjectError(message));
+            const errorMessage = `[${projectDTO.ownerEmail}] project[${projectDTO.id}] don't exist.`;
+            Logger.error(errorMessage);
+            return response.status(400).json(getUpdateProjectError(errorMessage));
         }
         projectDTO.updatedAt = new Date().toISOString();
         const isUpdated = await updateProject(id, getProjectEntity(projectDTO));
         if (isUpdated) {
-            const message = `[${projectDTO.ownerEmail}] project[${projectDTO.id}] updated.`;
-            Logger.info(message);
+            const successMessage = `[${projectDTO.ownerEmail}] project[${projectDTO.id}] updated.`;
+            Logger.info(successMessage);
             return response.status(204).json();
         }
         const message = `[${projectDTO.ownerEmail}] project[${projectDTO.id}] couldn't be updated.`;
@@ -123,13 +123,13 @@ projectsOperationsRouter.delete('/users/:email/projects/:id', requireEmailMiddle
     try {
         const isDeleted = await deleteProject(id);
         if (isDeleted) {
-            const message = `'${ownerEmail}' project[${id}] deleted successfully.`;
-            Logger.info(message);
-            return response.status(204).json({message: message});
+            const successMessage = `'${ownerEmail}' project[${id}] deleted successfully.`;
+            Logger.info(successMessage);
+            return response.status(204).json();
         }
-        const message = `'${ownerEmail}' project[${id}] couldn't be deleted.`;
-        Logger.error(message);
-        return response.status(500).json(getDeleteProjectError(message));
+        const errorMessage = `'${ownerEmail}' project[${id}] couldn't be deleted.`;
+        Logger.error(errorMessage);
+        return response.status(500).json(getDeleteProjectError(errorMessage));
     } catch (e: any) {
         const message = `'${ownerEmail}' project[${id}] couldn't be deleted[${e.message}].`;
         Logger.error(message);
