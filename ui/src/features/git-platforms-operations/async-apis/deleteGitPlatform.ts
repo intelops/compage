@@ -2,6 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {toastr} from 'react-redux-toastr';
 import {DeleteGitPlatformError, DeleteGitPlatformRequest, GitPlatformDTO} from "../model";
 import {deleteGitPlatform} from "../api";
+import {refreshGitPlatformsList} from "./refresh";
 
 export const deleteGitPlatformAsync = createAsyncThunk<GitPlatformDTO, DeleteGitPlatformRequest, {
     rejectValue: DeleteGitPlatformError
@@ -10,7 +11,7 @@ export const deleteGitPlatformAsync = createAsyncThunk<GitPlatformDTO, DeleteGit
     async (deleteGitPlatformRequest: DeleteGitPlatformRequest, thunkApi) => {
         return deleteGitPlatform(deleteGitPlatformRequest).then(response => {
             // Check if status is not okay:
-            if (response.status !== 201) {
+            if (response.status !== 204) {
                 const errorMessage = `Failed to delete a git-platform. Received: ${response.status}`;
                 console.log(errorMessage);
                 toastr.error(`deleteGitPlatform [Failure]`, `${errorMessage}`);
@@ -26,6 +27,8 @@ export const deleteGitPlatformAsync = createAsyncThunk<GitPlatformDTO, DeleteGit
             const successMessage = `[deleteGitPlatform] deleted a git-platform successfully.`;
             console.log(successMessage);
             toastr.success(`deleteGitPlatform [Success]`, `${successMessage}`);
+            // refresh the list of Git Platforms
+            thunkApi.dispatch(refreshGitPlatformsList());
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;

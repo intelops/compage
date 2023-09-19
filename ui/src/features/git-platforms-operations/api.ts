@@ -24,5 +24,5 @@ export const updateGitPlatform = (updateGitPlatformRequest: UpdateGitPlatformReq
 
 // Sync apis (async apis are in thunk)
 export const deleteGitPlatform = (deleteGitPlatformRequest: DeleteGitPlatformRequest) => {
-    return GitPlatformBackendApi().delete("/users/" + deleteGitPlatformRequest.email + "/gitPlatforms");
+    return GitPlatformBackendApi().delete("/users/" + deleteGitPlatformRequest.email + "/gitPlatforms/" + deleteGitPlatformRequest.name);
 };

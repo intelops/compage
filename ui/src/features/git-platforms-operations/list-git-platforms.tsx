@@ -1,11 +1,13 @@
 import React, {useEffect} from "react";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {listGitPlatformsAsync} from "./async-apis/listGitPlatforms";
-import {ListGitPlatformsRequest} from "./model";
+import {DeleteGitPlatformRequest, GitPlatformDTO, ListGitPlatformsRequest} from "./model";
 import {selectListGitPlatformsData} from "./slice";
 import {Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import {deleteGitPlatformAsync} from "./async-apis/deleteGitPlatform";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
 
 export const ListGitPlatforms = () => {
     const listGitPlatformsData = useAppSelector(selectListGitPlatformsData);
@@ -22,11 +24,15 @@ export const ListGitPlatforms = () => {
         console.log("Edit clicked");
     };
 
-    const handleDeleteClick = () => {
-        console.log("delete clicked");
+    const handleDeleteClick = (gitPlatformName: string) => {
+        const deleteGitPlatformRequest: DeleteGitPlatformRequest = {
+            email: getCurrentUser(),
+            name: gitPlatformName
+        }
+        dispatch(deleteGitPlatformAsync(deleteGitPlatformRequest));
     };
 
-    const getActionButtons = (): React.ReactNode => {
+    const getActionButtons = (gitPlatform: GitPlatformDTO): React.ReactNode => {
         return <Stack direction="row" gap="3">
             <Button variant="contained"
                     onClick={handleEditClick}>
@@ -34,7 +40,9 @@ export const ListGitPlatforms = () => {
             </Button>
             <Button variant="contained"
                     color="error"
-                    onClick={handleDeleteClick}>
+                    onClick={() => {
+                        handleDeleteClick(gitPlatform.name)
+                    }}>
                 Delete
             </Button>
         </Stack>;
@@ -67,7 +75,7 @@ export const ListGitPlatforms = () => {
                             <TableCell align="right">{row.ownerEmail}</TableCell>
                             <TableCell align="right">{row.url}</TableCell>
                             <TableCell align="right">{row.personalAccessToken}</TableCell>
-                            <TableCell align="right">{getActionButtons()}</TableCell>
+                            <TableCell align="right">{getActionButtons(row)}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

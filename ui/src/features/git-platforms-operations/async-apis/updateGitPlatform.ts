@@ -2,6 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {toastr} from 'react-redux-toastr';
 import {UpdateGitPlatformError, UpdateGitPlatformRequest, GitPlatformDTO} from "../model";
 import {updateGitPlatform} from "../api";
+import {refreshGitPlatformsList} from "./refresh";
 
 export const updateGitPlatformAsync = createAsyncThunk<GitPlatformDTO, UpdateGitPlatformRequest, {
     rejectValue: UpdateGitPlatformError
@@ -10,7 +11,7 @@ export const updateGitPlatformAsync = createAsyncThunk<GitPlatformDTO, UpdateGit
     async (updateGitPlatformRequest: UpdateGitPlatformRequest, thunkApi) => {
         return updateGitPlatform(updateGitPlatformRequest).then(response => {
             // Check if status is not okay:
-            if (response.status !== 201) {
+            if (response.status !== 204) {
                 const errorMessage = `Failed to update a git-platform. Received: ${response.status}`;
                 console.log(errorMessage);
                 toastr.error(`updateGitPlatform [Failure]`, `${errorMessage}`);
@@ -26,6 +27,8 @@ export const updateGitPlatformAsync = createAsyncThunk<GitPlatformDTO, UpdateGit
             const successMessage = `[updateGitPlatform] updated a git-platform successfully.`;
             console.log(successMessage);
             toastr.success(`updateGitPlatform [Success]`, `${successMessage}`);
+            // refresh the list of Git Platforms
+            thunkApi.dispatch(refreshGitPlatformsList());
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;

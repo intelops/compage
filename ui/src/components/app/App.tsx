@@ -18,13 +18,23 @@ import {selectGenerateCodeStatus} from "../../features/code-operations/slice";
 import {selectUploadYamlStatus} from "../../features/open-api-yaml-operations/slice";
 import {selectGetCurrentContextStatus} from "../../features/k8s-operations/slice";
 import {CreateGitPlatform} from "../../features/git-platforms-operations/create-git-platform";
+import {
+    selectCreateGitPlatformStatus,
+    selectDeleteGitPlatformStatus,
+    selectListGitPlatformsStatus,
+    selectUpdateGitPlatformStatus
+} from "../../features/git-platforms-operations/slice";
 
 export const App = () => {
     const createProjectStatus = useAppSelector(selectCreateProjectStatus);
     const getProjectStatus = useAppSelector(selectGetProjectStatus);
     const existsProjectStatus = useAppSelector(selectExistsProjectStatus);
-    const listProjectsStatus = useAppSelector(selectListProjectsStatus);
     const updateProjectStatus = useAppSelector(selectUpdateProjectStatus);
+    const listProjectsStatus = useAppSelector(selectListProjectsStatus);
+    const createGitPlatformStatus = useAppSelector(selectCreateGitPlatformStatus);
+    const listGitPlatformsStatus = useAppSelector(selectListGitPlatformsStatus);
+    const updateGitPlatformStatus = useAppSelector(selectUpdateGitPlatformStatus);
+    const deleteGitPlatformStatus = useAppSelector(selectDeleteGitPlatformStatus);
     const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
     const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
     const getCurrentContextStatus = useAppSelector(selectGetCurrentContextStatus);
@@ -33,10 +43,14 @@ export const App = () => {
         return createProjectStatus === 'loading'
             || getProjectStatus === 'loading'
             || listProjectsStatus === 'loading'
+            || existsProjectStatus === 'loading'
             || updateProjectStatus === 'loading'
+            || createGitPlatformStatus === 'loading'
+            || listGitPlatformsStatus === 'loading'
+            || updateGitPlatformStatus === 'loading'
+            || deleteGitPlatformStatus === 'loading'
             || uploadYamlStatus === 'loading'
             || generateCodeStatus === 'loading'
-            || existsProjectStatus === 'loading'
             || getCurrentContextStatus === 'loading';
     };
 

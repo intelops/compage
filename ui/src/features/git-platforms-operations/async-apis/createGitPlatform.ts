@@ -2,6 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {toastr} from 'react-redux-toastr';
 import {CreateGitPlatformError, CreateGitPlatformRequest, GitPlatformDTO} from "../model";
 import {createGitPlatform} from "../api";
+import {refreshGitPlatformsList} from "./refresh";
 
 export const createGitPlatformAsync = createAsyncThunk<GitPlatformDTO, CreateGitPlatformRequest, {
     rejectValue: CreateGitPlatformError
@@ -26,6 +27,8 @@ export const createGitPlatformAsync = createAsyncThunk<GitPlatformDTO, CreateGit
             const successMessage = `[createGitPlatform] created a git-platform successfully.`;
             console.log(successMessage);
             toastr.success(`createGitPlatform [Success]`, `${successMessage}`);
+            // refresh the list of Git Platforms
+            thunkApi.dispatch(refreshGitPlatformsList());
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;

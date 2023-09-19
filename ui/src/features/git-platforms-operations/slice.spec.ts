@@ -12,6 +12,16 @@ describe('git-platform reducer', () => {
             data: [] as GitPlatformDTO[],
             status: 'idle',
             error: null
+        },
+        updateGitPlatform: {
+            data: {},
+            status: 'idle',
+            error: null
+        },
+        deleteGitPlatform: {
+            data: {},
+            status: 'idle',
+            error: null
         }
     };
 

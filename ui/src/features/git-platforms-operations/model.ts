@@ -27,21 +27,22 @@ export interface ListGitPlatformsError {
     message: string;
 }
 
-// delete gitPlatform models
-export interface DeleteGitPlatformRequest {
-    email: string;
-}
-
-// This type describes the error object structure:
-export interface DeleteGitPlatformError {
-    message: string;
-}
-
 // update gitPlatform models
 export interface UpdateGitPlatformRequest extends GitPlatformDTO {
 }
 
 // This type describes the error object structure:
 export interface UpdateGitPlatformError {
+    message: string;
+}
+
+// delete gitPlatform models
+export interface DeleteGitPlatformRequest {
+    email: string;
+    name: string;
+}
+
+// This type describes the error object structure:
+export interface DeleteGitPlatformError {
     message: string;
 }
