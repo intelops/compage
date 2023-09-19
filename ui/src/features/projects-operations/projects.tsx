@@ -3,11 +3,13 @@ import {useEffect} from 'react';
 import Typography from '@mui/material/Typography';
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {selectListProjectsData} from "./slice";
-import {ListProjectsRequest, ProjectDTO} from "./model";
+import {DeleteProjectRequest, ListProjectsRequest, ProjectDTO} from "./model";
 import {getCurrentUser} from "../../utils/sessionstorageClient";
 import {listProjectsAsync} from "./async-apis/listProjects";
 import {Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import {deleteProjectAsync} from "./async-apis/deleteProject";
 
 export const Projects = () => {
     const listProjectsData = useAppSelector(selectListProjectsData);
@@ -20,6 +22,34 @@ export const Projects = () => {
         };
         dispatch(listProjectsAsync(listProjectsRequest));
     }, [dispatch]);
+
+    const handleEditClick = () => {
+        console.log("Edit clicked");
+    };
+
+    const handleDeleteClick = (projectId: string) => {
+        const deleteProjectRequest: DeleteProjectRequest = {
+            email: getCurrentUser(),
+            id: projectId
+        }
+        dispatch(deleteProjectAsync(deleteProjectRequest));
+    };
+
+    const getActionButtons = (projectDTO: ProjectDTO): React.ReactNode => {
+        return <Stack direction="row" spacing="3">
+            <Button variant="contained"
+                    onClick={handleEditClick}>
+                Edit
+            </Button>
+            <Button variant="contained"
+                    color="error"
+                    onClick={() => {
+                        handleDeleteClick(projectDTO.id)
+                    }}>
+                Delete
+            </Button>
+        </Stack>;
+    };
 
     return <>
         <Stack direction="column" spacing={2}>
@@ -34,6 +64,7 @@ export const Projects = () => {
                                 <TableCell align="right">Repository URL</TableCell>
                                 <TableCell align="right">Is Repository Public?</TableCell>
                                 <TableCell align="right">Version</TableCell>
+                                <TableCell align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -49,6 +80,7 @@ export const Projects = () => {
                                     <TableCell align="right">{projectDTO.repositoryUrl}</TableCell>
                                     <TableCell align="right">{projectDTO.isRepositoryPublic ? "Yes" : "No"}</TableCell>
                                     <TableCell align="right">{projectDTO.version}</TableCell>
+                                    <TableCell align="right">{getActionButtons(projectDTO)}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

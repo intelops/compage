@@ -17,7 +17,8 @@ export interface ProjectDTO {
     ownerEmail: string;
 }
 
-export interface CreateProjectResponse extends ProjectDTO {
+// create project models
+export interface CreateProjectRequest extends ProjectDTO {
 }
 
 // This type describes the error object structure:
@@ -25,17 +26,10 @@ export type CreateProjectError = {
     message: string;
 };
 
-// create project models
-export interface CreateProjectRequest extends ProjectDTO {
-}
-
 // listProjects models (the structure matches as of now with CreateProjectRequest but have kept it
 // separate for future customizations)
 export interface ListProjectsRequest {
     email: string;
-}
-
-export interface ListProjectsResponse {
 }
 
 // This type describes the error object structure:
@@ -50,9 +44,6 @@ export interface ExistsProjectRequest {
     email: string;
 }
 
-export interface ExistsProjectResponse extends ProjectDTO {
-}
-
 // This type describes the error object structure:
 export interface ExistsProjectError {
     message: string;
@@ -65,9 +56,6 @@ export interface GetProjectRequest {
     email: string;
 }
 
-export interface GetProjectResponse extends ProjectDTO {
-}
-
 // This type describes the error object structure:
 export interface GetProjectError {
     message: string;
@@ -78,10 +66,20 @@ export interface GetProjectError {
 export interface UpdateProjectRequest extends ProjectDTO {
 }
 
-export interface UpdateProjectResponse {
+// This type describes the error object structure:
+export type UpdateProjectError = {
+    message: string;
+};
+
+
+// deleteProject models (the structure matches as of now with DeleteProjectRequest but have kept it
+// separate for future customizations)
+export interface DeleteProjectRequest {
+    id: string;
+    email: string;
 }
 
 // This type describes the error object structure:
-export type UpdateProjectError = {
+export type DeleteProjectError = {
     message: string;
 };

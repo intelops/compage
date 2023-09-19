@@ -1,4 +1,10 @@
-import {CreateProjectRequest, GetProjectRequest, ListProjectsRequest, UpdateProjectRequest} from "./model";
+import {
+    CreateProjectRequest,
+    DeleteProjectRequest,
+    GetProjectRequest,
+    ListProjectsRequest,
+    UpdateProjectRequest
+} from "./model";
 import {ProjectsBackendApi} from "../../utils/backendApi";
 
 // Sync apis (async apis are in thunk)
@@ -19,4 +25,9 @@ export const getProject = (getProjectRequest: GetProjectRequest) => {
 // Sync apis (async apis are in thunk)
 export const updateProject = (updateProjectRequest: UpdateProjectRequest) => {
     return ProjectsBackendApi().put("/users/" + updateProjectRequest.ownerEmail + "/projects/" + updateProjectRequest.id, updateProjectRequest);
+};
+
+// Sync apis (async apis are in thunk)
+export const deleteProject = (deleteProjectRequest: DeleteProjectRequest) => {
+    return ProjectsBackendApi().delete("/users/" + deleteProjectRequest.email + "/projects/" + deleteProjectRequest.id);
 };

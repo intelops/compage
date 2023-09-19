@@ -1,9 +1,9 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {ListProjectsError, ListProjectsRequest, ListProjectsResponse} from "../model";
+import {ListProjectsError, ListProjectsRequest, ProjectDTO} from "../model";
 import {listProjects} from "../api";
 import {toastr} from 'react-redux-toastr';
 
-export const listProjectsAsync = createAsyncThunk<ListProjectsResponse, ListProjectsRequest, {
+export const listProjectsAsync = createAsyncThunk<ProjectDTO[], ListProjectsRequest, {
     rejectValue: ListProjectsError
 }>(
     'projects/listProjects',
@@ -25,7 +25,7 @@ export const listProjectsAsync = createAsyncThunk<ListProjectsResponse, ListProj
             console.log(successMessage);
             toastr.success(`listProjects [Success]`, successMessage);
             return response.data;
-        }).catch(e => {
+        }).catch((e: any) => {
             const statusCode = e.response.status;
             if (statusCode === 401) {
                 sessionStorage.clear();

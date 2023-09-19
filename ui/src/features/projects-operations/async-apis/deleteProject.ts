@@ -1,27 +1,27 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {UpdateProjectError, UpdateProjectRequest} from "../model";
-import {updateProject} from "../api";
+import {DeleteProjectError, DeleteProjectRequest} from "../model";
+import {deleteProject} from "../api";
 import {toastr} from 'react-redux-toastr';
 import {refreshProjectsList} from "./refresh";
 
-export const updateProjectAsync = createAsyncThunk<any, UpdateProjectRequest, {
-    rejectValue: UpdateProjectError
+export const deleteProjectAsync = createAsyncThunk<any, DeleteProjectRequest, {
+    rejectValue: DeleteProjectError
 }>(
-    'projects/updateProject',
-    async (updateProjectRequest: UpdateProjectRequest, thunkApi) => {
-        return updateProject(updateProjectRequest).then(response => {
+    'projects/deleteProject',
+    async (deleteProjectRequest: DeleteProjectRequest, thunkApi) => {
+        return deleteProject(deleteProjectRequest).then(response => {
             if (response.status !== 204) {
-                const details = `Failed to update project.`;
+                const details = `Failed to delete project.`;
                 const errorMessage = `Status: ${response.status}, Message: ${details}`;
                 console.log(errorMessage);
-                toastr.error(`updateProject [Failure]`, errorMessage);
+                toastr.error(`deleteProject [Failure]`, errorMessage);
                 return thunkApi.rejectWithValue({
                     message: errorMessage
                 });
             }
-            const message = `Successfully update project.`;
+            const message = `Successfully delete project.`;
             console.log(message);
-            toastr.success(`updateProject [Success]`, message);
+            toastr.success(`deleteProject [Success]`, message);
             // no need to save state in localstorage for this type of request.
             // refresh the list of Projects
             thunkApi.dispatch(refreshProjectsList());
@@ -31,7 +31,7 @@ export const updateProjectAsync = createAsyncThunk<any, UpdateProjectRequest, {
             const message = e.response.data.message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;
             console.log(errorMessage);
-            toastr.error(`updateProject [Failure]`, errorMessage);
+            toastr.error(`deleteProject [Failure]`, errorMessage);
             return thunkApi.rejectWithValue({
                 message: errorMessage
             });

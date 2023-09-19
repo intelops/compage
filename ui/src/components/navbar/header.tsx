@@ -8,6 +8,7 @@ import {useAppSelector} from "../../redux/hooks";
 import {Link, useNavigate} from "react-router-dom";
 import {getCurrentProjectDetails} from "../../utils/localstorageClient";
 import {selectGetCurrentContextData} from "../../features/k8s-operations/slice";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
 
 const Header = () => {
     const getCurrentContextData = useAppSelector(selectGetCurrentContextData);
@@ -57,7 +58,7 @@ const Header = () => {
             <Toolbar component="nav" variant="dense" sx={{flexGrow: 0}}>
                 <Box sx={{flexGrow: 0}}>
                     <Typography variant={"h6"}>
-                        <span onClick={handleAccount}>Settings</span>
+                        <span onClick={handleAccount}>Account({getCurrentUser()})</span>
                     </Typography>
                 </Box>
             </Toolbar>

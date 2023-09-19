@@ -124,12 +124,12 @@ export const CreateGitPlatform = () => {
         return <Button variant="contained"
                        onClick={handleCreateGitPlatformClick}
                        disabled={createGitPlatformStatus === 'loading' || payload.name === "" || payload.url === "" || payload.personalAccessToken === "" || payload.userName === ""}>
-            Add GitPlatform
+            Add a GitPlatform
         </Button>;
     };
 
     return <>
-        Create a GitPlatform
+        Add a GitPlatform
         <Stack direction="column" spacing={2}>
             {getName()}
             {getURL()}

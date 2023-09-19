@@ -1,5 +1,5 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {ExistsProjectError, ExistsProjectRequest, ExistsProjectResponse} from "../model";
+import {ExistsProjectError, ExistsProjectRequest, ProjectDTO} from "../model";
 import {getProject} from "../api";
 import {toastr} from 'react-redux-toastr';
 import {
@@ -10,7 +10,7 @@ import {
 } from "../../../utils/localstorageClient";
 
 // this is separately added even though this resembles to getProjectAsync. getProjectAsync updates the localstorage but existsProjectAsync doesn't.
-export const existsProjectAsync = createAsyncThunk<ExistsProjectResponse, ExistsProjectRequest, { rejectValue: ExistsProjectError }>(
+export const existsProjectAsync = createAsyncThunk<ProjectDTO, ExistsProjectRequest, { rejectValue: ExistsProjectError }>(
     'projects/existsProject',
     async (existsProjectRequest: ExistsProjectRequest, thunkApi) => {
         return getProject(existsProjectRequest).then(response => {
@@ -31,7 +31,7 @@ export const existsProjectAsync = createAsyncThunk<ExistsProjectResponse, Exists
             console.log(successMessage);
             toastr.success(`existsProject [Success]`, successMessage);
             return response.data;
-        }).catch(e => {
+        }).catch((e: any) => {
             const statusCode = e.response.status;
             const message = e.response.data.message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;

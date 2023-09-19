@@ -1,5 +1,5 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {GetProjectError, GetProjectRequest, GetProjectResponse} from "../model";
+import {GetProjectError, GetProjectRequest, ProjectDTO} from "../model";
 import {getProject} from "../api";
 import {toastr} from 'react-redux-toastr';
 import {
@@ -13,7 +13,7 @@ import {
 } from "../../../utils/localstorageClient";
 import {updateModifiedState} from "../populateModifiedState";
 
-export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRequest, { rejectValue: GetProjectError }>(
+export const getProjectAsync = createAsyncThunk<ProjectDTO, GetProjectRequest, { rejectValue: GetProjectError }>(
     'projects/getProject',
     async (getProjectRequest: GetProjectRequest, thunkApi) => {
         return getProject(getProjectRequest).then(response => {
@@ -33,17 +33,17 @@ export const getProjectAsync = createAsyncThunk<GetProjectResponse, GetProjectRe
             const successDetails = `Successfully retrieved project.`;
             console.log(successDetails);
             toastr.success(`getProject [Success]`, successDetails);
-            const getProjectResponse: GetProjectResponse = response.data;
+            const projectDTO: ProjectDTO = response.data;
             // update details to localstorage client
-            setCurrentConfig(getProjectResponse.json);
-            setCurrentState(getProjectResponse.json);
-            setCurrentProjectDetails(getProjectResponse.id, getProjectResponse.version, getProjectResponse.repositoryName);
+            setCurrentConfig(projectDTO.json);
+            setCurrentState(projectDTO.json);
+            setCurrentProjectDetails(projectDTO.id, projectDTO.version, projectDTO.repositoryName);
             // set the modified state when the project is fetched. This is required when user logged out after adding
             // properties to nodes and edges. After re-login, the modified state is lost and user can't see props
             // added to nodes and edges.
-            updateModifiedState(getProjectResponse.json);
+            updateModifiedState(projectDTO.json);
             return response.data;
-        }).catch(e => {
+        }).catch((e: any) => {
             const statusCode = e.response.status;
             const message = e.response.data.message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;

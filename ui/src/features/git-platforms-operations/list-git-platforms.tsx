@@ -33,7 +33,7 @@ export const ListGitPlatforms = () => {
     };
 
     const getActionButtons = (gitPlatform: GitPlatformDTO): React.ReactNode => {
-        return <Stack direction="row" gap="3">
+        return <Stack direction="row" spacing="3">
             <Button variant="contained"
                     onClick={handleEditClick}>
                 Edit
@@ -63,19 +63,19 @@ export const ListGitPlatforms = () => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {listGitPlatformsData.map((row) => (
+                    {listGitPlatformsData.map((gitPlatformDTO: GitPlatformDTO) => (
                         <TableRow
-                            key={row.name}
+                            key={gitPlatformDTO.name}
                             sx={{'&:last-child td, &:last-child th': {border: 0}}}
                         >
                             <TableCell component="th" scope="row">
-                                {row.name}
+                                {gitPlatformDTO.name}
                             </TableCell>
-                            <TableCell align="right">{row.userName}</TableCell>
-                            <TableCell align="right">{row.ownerEmail}</TableCell>
-                            <TableCell align="right">{row.url}</TableCell>
-                            <TableCell align="right">{row.personalAccessToken}</TableCell>
-                            <TableCell align="right">{getActionButtons(row)}</TableCell>
+                            <TableCell align="right">{gitPlatformDTO.userName}</TableCell>
+                            <TableCell align="right">{gitPlatformDTO.ownerEmail}</TableCell>
+                            <TableCell align="right">{gitPlatformDTO.url}</TableCell>
+                            <TableCell align="right">{gitPlatformDTO.personalAccessToken}</TableCell>
+                            <TableCell align="right">{getActionButtons(gitPlatformDTO)}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
