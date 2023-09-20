@@ -27,7 +27,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
 
     const dispatch = useAppDispatch();
 
-    const [data, setData] = useState({
+    const [payload, setPayload] = useState({
         projectName: "",
         repositoryName: "",
         isPublicRepository: true,
@@ -43,18 +43,18 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
 
     const prepareCreateProjectRequest = () => {
         const json = getData(0, 0, "");
-        const displayName = data.projectName;
-        const metadata = data.metadata;
+        const displayName = payload.projectName;
+        const metadata = payload.metadata;
         const cPR: CreateProjectRequest = {
             id: "",
             metadata,
             version: "v1",
-            gitPlatformName: data.gitPlatform.name,
-            gitPlatformUserName: data.gitPlatform.userName,
-            repositoryName: data.repositoryName,
-            repositoryBranch: data.repositoryBranch || 'compage',
-            isRepositoryPublic: data.isPublicRepository,
-            repositoryUrl: data.gitPlatform.url + '/' + data.gitPlatform.userName + '/' + data.repositoryName,
+            gitPlatformName: payload.gitPlatform.name,
+            gitPlatformUserName: payload.gitPlatform.userName,
+            repositoryName: payload.repositoryName,
+            repositoryBranch: payload.repositoryBranch || 'compage',
+            isRepositoryPublic: payload.isPublicRepository,
+            repositoryUrl: payload.gitPlatform.url + '/' + payload.gitPlatform.userName + '/' + payload.repositoryName,
             displayName,
             ownerEmail: getCurrentUser(),
             json: JSON.parse(JSON.stringify(json))
@@ -74,8 +74,8 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
         const gitPlatformName = event.target.value;
         const gitPlatform = listGitPlatformsData.find((gitPlatformDTO: GitPlatformDTO) => gitPlatformDTO.name === gitPlatformName);
         if (gitPlatform) {
-            setData({
-                ...data,
+            setPayload({
+                ...payload,
                 gitPlatform: {
                     name: gitPlatform.name,
                     userName: gitPlatform.userName,
@@ -86,36 +86,36 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
     };
 
     const handleProjectNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setData({
-            ...data,
+        setPayload({
+            ...payload,
             projectName: sanitizeString(event.target.value)
         });
     };
 
     const handleRepositoryBranchChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setData({
-            ...data,
+        setPayload({
+            ...payload,
             repositoryBranch: sanitizeString(event.target.value)
         });
     };
 
     const handleRepositoryNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setData({
-            ...data,
+        setPayload({
+            ...payload,
             repositoryName: sanitizeString(event.target.value)
         });
     };
 
     const handleIsPublicRepositoryChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setData({
-            ...data,
+        setPayload({
+            ...payload,
             isPublicRepository: event.target.checked
         });
     };
 
     const isValid = () => {
         for (const project of listProjectsData) {
-            if (data.projectName === project.id) {
+            if (payload.projectName === project.id) {
                 return false;
             }
         }
@@ -130,7 +130,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             id="projectName"
             label="Name"
             type="text"
-            value={data.projectName}
+            value={payload.projectName}
             onChange={handleProjectNameChange}
             variant="outlined"
         />;
@@ -151,7 +151,6 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
                     id="gitPlatform"
                     label="Git Platforms"
                     type="text"
-                    // value={data.gitPlatform}
                     onChange={handleGitPlatformsChange}
                     variant="outlined">
                     {
@@ -175,7 +174,6 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             id="gitPlatform"
             label="Git Platforms"
             type="text"
-            // value={data.gitPlatform}
             onChange={handleGitPlatformsChange}
             variant="outlined">
             {
@@ -197,7 +195,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             id="repositoryName"
             label="Repository Name"
             type="text"
-            value={data.repositoryName}
+            value={payload.repositoryName}
             onChange={handleRepositoryNameChange}
             variant="outlined"
         />;
@@ -210,7 +208,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             id="repositoryBranch"
             label="Repository Branch"
             type="text"
-            value={data.repositoryBranch}
+            value={payload.repositoryBranch}
             onChange={handleRepositoryBranchChange}
             variant="outlined"
         />;
@@ -221,7 +219,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             label="Is Public Repository?"
             control={<Checkbox
                 id="isPublicRepository"
-                size="medium" checked={data.isPublicRepository}
+                size="medium" checked={payload.isPublicRepository}
                 onChange={handleIsPublicRepositoryChange}
             />}
         />;
@@ -230,7 +228,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
     const getActionButtons = (): React.ReactNode => {
         return <Button variant="contained"
                        onClick={handleCreateProjectClick}
-                       disabled={createProjectStatus === 'loading' || data.projectName === "" || data.gitPlatform.name === "" || !isValid()}>
+                       disabled={createProjectStatus === 'loading' || payload.projectName === "" || payload.gitPlatform.name === "" || !isValid()}>
             Create Project
         </Button>;
     };

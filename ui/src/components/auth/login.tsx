@@ -16,13 +16,13 @@ interface ArgTypes {
 
 export const Login = ({isOpen, handleClose}: ArgTypes) => {
     const navigate = useNavigate();
-    const [data, setData] = useState({
+    const [payload, setPayload] = useState({
         email: "",
     });
 
     const handleEmailChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setData({
-            ...data,
+        setPayload({
+            ...payload,
             email: event.target.value
         });
     };
@@ -48,7 +48,7 @@ export const Login = ({isOpen, handleClose}: ArgTypes) => {
             id="email"
             label="Email"
             type="text"
-            value={data.email}
+            value={payload.email}
             onChange={handleEmailChange}
             variant="outlined"
         />;
@@ -63,7 +63,7 @@ export const Login = ({isOpen, handleClose}: ArgTypes) => {
 
     const handleLoginClick = () => {
         // TODO change this later - username -> email
-        setCurrentUser(data.email);
+        setCurrentUser(payload.email);
         if (handleClose) {
             handleClose();
         }

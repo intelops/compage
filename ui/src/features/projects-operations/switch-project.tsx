@@ -19,7 +19,7 @@ interface ArgTypes {
 export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
     const navigate = useNavigate();
 
-    const [data, setData] = useState({
+    const [payload, setPayload] = useState({
         isNew: false,
         toggle: true,
     });
@@ -32,21 +32,21 @@ export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
         if (handleClose) {
             handleClose();
         }
-        setData({...data, toggle: false});
+        setPayload({...payload, toggle: false});
         // TODO hack to reload after getProject is loaded
         await new Promise(r => setTimeout(r, 2000));
         navigate('/home');
     };
 
     const handleIsNewChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setData({
-            ...data,
+        setPayload({
+            ...payload,
             isNew: event.target.checked
         });
     };
 
     const getContent = () => {
-        if (data.isNew) {
+        if (payload.isNew) {
             return <SwitchToNewProject handleClose={handleClose}/>;
         }
         // TODO have toggled this here. When the dialog box is opened, the SwitchToExistingProject is shown (dont know why)
@@ -55,7 +55,7 @@ export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
 
     return <React.Fragment>
         <Dialog disableEscapeKeyDown
-                open={isOpen && data.toggle}
+                open={isOpen && payload.toggle}
                 onClose={handleDialogClose}>
             <DialogTitle>Switch Project [Create or Choose]</DialogTitle>
             <Divider/>
@@ -65,7 +65,7 @@ export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
                         label="Create new?"
                         control={<Checkbox
                             size="medium"
-                            checked={data.isNew}
+                            checked={payload.isNew}
                             onChange={handleIsNewChange}
                         />}
                     />

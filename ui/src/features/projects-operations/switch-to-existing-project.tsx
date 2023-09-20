@@ -21,7 +21,7 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
     const listProjectsData = useAppSelector(selectListProjectsData);
     const getProjectStatus = useAppSelector(selectGetProjectStatus);
     const dispatch = useAppDispatch();
-    const [data, setData] = useState({
+    const [payload, setPayload] = useState({
         projectName: "",
     });
 
@@ -35,9 +35,9 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
 
     const handleChooseProjectClick = () => {
         // allow to choose project only when the project is chosen from drop-down
-        if (data.projectName) {
+        if (payload.projectName) {
             const getProjectRequest: GetProjectRequest = {
-                id: data.projectName,
+                id: payload.projectName,
                 email: getCurrentUser()
             };
             dispatch(getProjectAsync(getProjectRequest));
@@ -48,8 +48,8 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
     };
 
     const handleExistingProjectsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setData({
-            ...data,
+        setPayload({
+            ...payload,
             projectName: event.target.value
         });
     };
@@ -71,7 +71,7 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
             id="projectName"
             label="Existing Projects"
             type="text"
-            value={data.projectName}
+            value={payload.projectName}
             onChange={handleExistingProjectsChange}
             variant="outlined">
             {
@@ -88,7 +88,7 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
 
     const getActionButtons = (): React.ReactNode => {
         return <Button variant="contained"
-                       disabled={listProjectsStatus === 'loading' || getProjectStatus === 'loading' || data.projectName === ''}
+                       disabled={listProjectsStatus === 'loading' || getProjectStatus === 'loading' || payload.projectName === ''}
                        onClick={handleChooseProjectClick}>
             Choose Project
         </Button>;
