@@ -7,20 +7,26 @@ import {Container, Paper, Stack, Table, TableBody, TableCell, TableContainer, Ta
 import Button from "@mui/material/Button";
 import {deleteGitPlatformAsync} from "./async-apis/deleteGitPlatform";
 import {getCurrentUser} from "../../utils/sessionstorageClient";
+import {useNavigate} from "react-router-dom";
 
 export const GitPlatforms = () => {
     const listGitPlatformsData = useAppSelector(selectListGitPlatformsData);
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const listGitPlatformsRequest: ListGitPlatformsRequest = {
-            email: "mahendra.b@intelops.dev"
+            email: getCurrentUser()
         };
         dispatch(listGitPlatformsAsync(listGitPlatformsRequest));
     }, [dispatch]);
 
+    const handleNewClick = () => {
+        navigate('/git-platforms/new');
+    };
+
     const handleEditClick = () => {
-        console.log("Edit clicked");
+        navigate('/git-platforms/edit');
     };
 
     const handleDeleteClick = (gitPlatformName: string) => {
@@ -49,7 +55,7 @@ export const GitPlatforms = () => {
 
     return <Container>
         <Button variant="outlined"
-                onClick={handleEditClick}>
+                onClick={handleNewClick}>
             Add new GitPlatform
         </Button>
         <TableContainer component={Paper}>

@@ -117,8 +117,9 @@ const Header = () => {
                     aria-controls={open ? 'composition-menu' : undefined}
                     aria-expanded={open ? 'true' : undefined}
                     aria-haspopup="true"
+                    variant={"contained"}
                     onClick={handleToggle}>
-                    Dashboard
+                    Settings
                 </Button>
                 <Popper
                     open={open}

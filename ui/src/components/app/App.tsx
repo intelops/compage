@@ -17,7 +17,7 @@ import {
 import {selectGenerateCodeStatus} from "../../features/code-operations/slice";
 import {selectUploadYamlStatus} from "../../features/open-api-yaml-operations/slice";
 import {selectGetCurrentContextStatus} from "../../features/k8s-operations/slice";
-import {CreateGitPlatform} from "../../features/git-platforms-operations/create-git-platform";
+import {AddOrUpdateGitPlatform} from "../../features/git-platforms-operations/add-or-update-git-platform";
 import {
     selectCreateGitPlatformStatus,
     selectDeleteGitPlatformStatus,
@@ -86,10 +86,10 @@ export const App = () => {
                 <br/>
                 <Routes>
                     <Route path="/login" element={<Login/>}/>
-                    <Route path="/create-git-platform" element={<CreateGitPlatform/>}/>
                     <Route path="/switch-project" element={<SwitchProject/>}/>
                     <Route path="/projects" element={<Projects/>}/>
                     <Route path="/git-platforms" element={<GitPlatforms/>}/>
+                    <Route path="/git-platforms/new" element={<AddOrUpdateGitPlatform/>}/>
                     <Route path="/home" element={<Home/>}/>
                     <Route path="/account" element={<Account/>}/>
                     <Route path="/" element={<Home/>}/>
