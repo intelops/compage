@@ -1,9 +1,9 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {toastr} from 'react-redux-toastr';
-import {ListUsersError, ListUsersRequest, ListUsersResponse} from "../model";
+import {ListUsersError, ListUsersRequest, UserDTO} from "../model";
 import {listUsers} from "../api";
 
-export const listUsersAsync = createAsyncThunk<ListUsersResponse, ListUsersRequest, {
+export const listUsersAsync = createAsyncThunk<UserDTO[], ListUsersRequest, {
     rejectValue: ListUsersError
 }>(
     'user/listUsers',
@@ -20,8 +20,8 @@ export const listUsersAsync = createAsyncThunk<ListUsersResponse, ListUsersReque
                 });
             }
 
-            const listUsersResponse: ListUsersResponse = response.data;
-            console.log(listUsersResponse);
+            const userDTOs: UserDTO[] = response.data;
+            console.log(userDTOs);
             const successMessage = `[listUsers] listed a user successfully.`;
             console.log(successMessage);
             toastr.success(`listUsers [Success]`, `${successMessage}`);

@@ -11,28 +11,25 @@ import {SwitchToExistingProject} from "./switch-to-existing-project";
 import {SwitchToNewProject} from "./switch-to-new-project";
 
 
-interface ArgTypes {
-    isOpen: boolean;
-    handleClose?: (...args: any) => void;
+interface SwitchProjectProps {
 }
 
-export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
+export const SwitchProject = (_switchProjectProps: SwitchProjectProps) => {
     const navigate = useNavigate();
 
     const [payload, setPayload] = useState({
         isNew: false,
-        toggle: true,
     });
 
-    const handleDialogClose = async (e: any, reason: "backdropClick" | "escapeKeyDown") => {
+    const handleClose = () => {
+        navigate('/home');
+    };
+
+    const handleDialogClose = async (_e: any, reason: "backdropClick" | "escapeKeyDown") => {
         // this prevents dialog box from closing.
         if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
         }
-        if (handleClose) {
-            handleClose();
-        }
-        setPayload({...payload, toggle: false});
         // TODO hack to reload after getProject is loaded
         await new Promise(r => setTimeout(r, 2000));
         navigate('/home');
@@ -47,15 +44,15 @@ export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
 
     const getContent = () => {
         if (payload.isNew) {
-            return <SwitchToNewProject handleClose={handleClose}/>;
+            return <SwitchToNewProject/>;
         }
         // TODO have toggled this here. When the dialog box is opened, the SwitchToExistingProject is shown (dont know why)
-        return <SwitchToExistingProject handleClose={handleClose}/>;
+        return <SwitchToExistingProject/>;
     };
 
     return <React.Fragment>
         <Dialog disableEscapeKeyDown
-                open={isOpen && payload.toggle}
+                open={true}
                 onClose={handleDialogClose}>
             <DialogTitle>Switch Project [Create or Choose]</DialogTitle>
             <Divider/>

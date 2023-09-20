@@ -6,6 +6,7 @@ import {getProjectAsync} from "./async-apis/getProject";
 import {updateProjectAsync} from './async-apis/updateProject';
 import {existsProjectAsync} from "./async-apis/existsProject";
 import {ProjectDTO} from "./model";
+import {deleteProjectAsync} from "./async-apis/deleteProject";
 
 export interface ProjectState {
     createProject: {
@@ -33,11 +34,21 @@ export interface ProjectState {
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
     };
+    deleteProject: {
+        data: any,
+        status: 'idle' | 'loading' | 'failed';
+        error: string | null;
+    };
 }
 
 const initialState: ProjectState = {
-    updateProject: {
-        data: {},
+    createProject: {
+        data: {} as ProjectDTO,
+        status: 'idle',
+        error: null
+    },
+    listProjects: {
+        data: [],
         status: 'idle',
         error: null
     },
@@ -51,16 +62,16 @@ const initialState: ProjectState = {
         status: 'idle',
         error: null
     },
-    listProjects: {
-        data: [],
+    updateProject: {
+        data: {},
         status: 'idle',
         error: null
     },
-    createProject: {
-        data: {} as ProjectDTO,
+    deleteProject: {
+        data: {},
         status: 'idle',
         error: null
-    },
+    }
 };
 
 export const projectsSlice = createSlice({
@@ -121,6 +132,16 @@ export const projectsSlice = createSlice({
         }).addCase(updateProjectAsync.rejected, (state, action) => {
             state.updateProject.status = 'failed';
             if (action.payload) state.updateProject.error = JSON.stringify(action.payload);
+        }).addCase(deleteProjectAsync.pending, (state) => {
+            state.deleteProject.status = 'loading';
+            state.deleteProject.error = null;
+        }).addCase(deleteProjectAsync.fulfilled, (state, action) => {
+            state.deleteProject.status = 'idle';
+            state.deleteProject.error = null;
+            state.deleteProject.data = action.payload;
+        }).addCase(deleteProjectAsync.rejected, (state, action) => {
+            state.deleteProject.status = 'failed';
+            if (action.payload) state.deleteProject.error = JSON.stringify(action.payload);
         });
     },
 });
@@ -144,5 +165,9 @@ export const selectExistsProjectStatus = (state: RootState) => state.projectsOpe
 export const selectUpdateProjectData = (state: RootState) => state.projectsOperations.updateProject.data;
 export const selectUpdateProjectError = (state: RootState) => state.projectsOperations.updateProject.error;
 export const selectUpdateProjectStatus = (state: RootState) => state.projectsOperations.updateProject.status;
+
+export const selectDeleteProjectData = (state: RootState) => state.projectsOperations.deleteProject.data;
+export const selectDeleteProjectError = (state: RootState) => state.projectsOperations.deleteProject.error;
+export const selectDeleteProjectStatus = (state: RootState) => state.projectsOperations.deleteProject.status;
 
 export default projectsSlice.reducer;

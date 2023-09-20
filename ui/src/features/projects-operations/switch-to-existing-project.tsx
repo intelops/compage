@@ -10,28 +10,32 @@ import {Stack} from "@mui/material";
 import {getProjectAsync} from "./async-apis/getProject";
 import {listProjectsAsync} from "./async-apis/listProjects";
 import CircularProgress from '@mui/material/CircularProgress';
-import {getCurrentUser} from "../../utils/sessionstorageClient";
+import {getCurrentUser, isUserNotLoggedIn} from "../../utils/sessionstorageClient";
+import {useNavigate} from "react-router-dom";
 
-interface ArgTypes {
-    handleClose: (...args: any) => void;
+interface SwitchToExistingProjectProps {
 }
 
-export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
+export const SwitchToExistingProject = (_switchToExistingProjectProps: SwitchToExistingProjectProps) => {
     const listProjectsStatus = useAppSelector(selectListProjectsStatus);
     const listProjectsData = useAppSelector(selectListProjectsData);
     const getProjectStatus = useAppSelector(selectGetProjectStatus);
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const [payload, setPayload] = useState({
         projectName: "",
     });
 
     useEffect(() => {
+        if (isUserNotLoggedIn()) {
+            navigate('/login');
+        }
         // dispatch listProjects
         const listProjectsRequest: ListProjectsRequest = {
             email: getCurrentUser()
         };
         dispatch(listProjectsAsync(listProjectsRequest));
-    }, [dispatch]);
+    }, [dispatch, navigate]);
 
     const handleChooseProjectClick = () => {
         // allow to choose project only when the project is chosen from drop-down
@@ -41,10 +45,9 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
                 email: getCurrentUser()
             };
             dispatch(getProjectAsync(getProjectRequest));
-            if (handleClose) {
-                handleClose();
-            }
         }
+        console.log("handleChooseProjectClick called");
+        navigate('/home');
     };
 
     const handleExistingProjectsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {

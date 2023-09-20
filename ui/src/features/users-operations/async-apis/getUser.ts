@@ -1,19 +1,19 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {toastr} from 'react-redux-toastr';
-import {CreateUserError, CreateUserRequest, UserDTO} from "../model";
-import {createUser} from "../api";
+import {GetUserError, GetUserRequest, UserDTO} from "../model";
+import {getUser} from "../api";
 
-export const createUserAsync = createAsyncThunk<UserDTO, CreateUserRequest, {
-    rejectValue: CreateUserError
+export const getUserAsync = createAsyncThunk<UserDTO, GetUserRequest, {
+    rejectValue: GetUserError
 }>(
-    'user/createUser',
-    async (createUserRequest: CreateUserRequest, thunkApi) => {
-        return createUser(createUserRequest).then(response => {
+    'user/getUser',
+    async (getUserRequest: GetUserRequest, thunkApi) => {
+        return getUser(getUserRequest).then(response => {
             // Check if status is not okay:
-            if (response.status !== 201) {
-                const errorMessage = `Failed to create a user. Received: ${response.status}`;
+            if (response.status !== 200) {
+                const errorMessage = `Failed to get a user. Received: ${response.status}`;
                 console.log(errorMessage);
-                toastr.error(`createUser [Failure]`, `${errorMessage}`);
+                toastr.error(`getUser [Failure]`, `${errorMessage}`);
                 // Return the error message:
                 return thunkApi.rejectWithValue({
                     message: `${errorMessage}`
@@ -22,16 +22,16 @@ export const createUserAsync = createAsyncThunk<UserDTO, CreateUserRequest, {
 
             const userDTO: UserDTO = response.data;
             console.log(userDTO);
-            const successMessage = `[createUser] created a user successfully.`;
+            const successMessage = `[getUser] got a user successfully.`;
             console.log(successMessage);
-            toastr.success(`createUser [Success]`, `${successMessage}`);
+            toastr.success(`getUser [Success]`, `${successMessage}`);
             return response.data;
         }).catch(e => {
             const statusCode = e.response.status;
             const message = e.response.data.message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;
             console.log(errorMessage);
-            toastr.error(`createUser [Failure]`, `${errorMessage}`);
+            toastr.error(`getUser [Failure]`, `${errorMessage}`);
             // Return the error message:
             return thunkApi.rejectWithValue({
                 message: `${message}`

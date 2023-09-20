@@ -15,11 +15,10 @@ import {selectListGitPlatformsData, selectListGitPlatformsStatus} from "../git-p
 import {GitPlatformDTO} from "../git-platforms-operations/model";
 import {Link} from "react-router-dom";
 
-interface ArgTypes {
-    handleClose: (...args: any) => void;
+interface SwitchToNewProjectProps {
 }
 
-export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
+export const SwitchToNewProject = (_switchToNewProjectProps: SwitchToNewProjectProps) => {
     const createProjectStatus = useAppSelector(selectCreateProjectStatus);
     const listProjectsData = useAppSelector(selectListProjectsData);
     const listGitPlatformsData = useAppSelector(selectListGitPlatformsData);
@@ -65,9 +64,6 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
     const handleCreateProjectClick = () => {
         const createProjectRequest: CreateProjectRequest = prepareCreateProjectRequest();
         dispatch(createProjectAsync(createProjectRequest));
-        if (handleClose) {
-            handleClose();
-        }
     };
 
     const handleGitPlatformsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
@@ -139,7 +135,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
     const getGitPlatforms = (): React.ReactNode => {
         if (listGitPlatformsData && listGitPlatformsData.length === 0) {
             return <>
-                <Link to="/account">
+                <Link to="/git-platforms">
                     Add Git Platform
                 </Link>
                 <TextField
@@ -151,6 +147,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
                     id="gitPlatform"
                     label="Git Platforms"
                     type="text"
+                    value={payload.gitPlatform.name}
                     onChange={handleGitPlatformsChange}
                     variant="outlined">
                     {

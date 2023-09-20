@@ -62,3 +62,9 @@ export const getModifiedState = () => {
 export const removeModifiedState = () => {
     localStorage.removeItem(MODIFIED_STATE);
 };
+
+export const isProjectNotValid = () => {
+    const currentProjectDetails: string = getCurrentProjectDetails();
+    return (currentProjectDetails === null || currentProjectDetails === undefined
+        || currentProjectDetails.length === 0);
+};

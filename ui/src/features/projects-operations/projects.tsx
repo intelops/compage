@@ -5,7 +5,7 @@ import {selectListProjectsData} from "./slice";
 import {DeleteProjectRequest, ListProjectsRequest, ProjectDTO} from "./model";
 import {getCurrentUser} from "../../utils/sessionstorageClient";
 import {listProjectsAsync} from "./async-apis/listProjects";
-import {Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import {Container, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import Button from "@mui/material/Button";
 import {deleteProjectAsync} from "./async-apis/deleteProject";
 
@@ -49,7 +49,7 @@ export const Projects = () => {
         </Stack>;
     };
 
-    return <>
+    return <Container>
         <Button variant="outlined"
                 onClick={handleEditClick}>
             Add new project
@@ -85,5 +85,5 @@ export const Projects = () => {
                 </TableBody>
             </Table>
         </TableContainer>
-    </>;
+    </Container>;
 };

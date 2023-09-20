@@ -9,12 +9,10 @@ import {Stack} from "@mui/material";
 import TextField from "@mui/material/TextField";
 import {setCurrentUser} from "../../utils/sessionstorageClient";
 
-interface ArgTypes {
-    isOpen: boolean;
-    handleClose?: (...args: any) => void;
+interface LoginProps {
 }
 
-export const Login = ({isOpen, handleClose}: ArgTypes) => {
+export const Login = (_loginProps: LoginProps) => {
     const navigate = useNavigate();
     const [payload, setPayload] = useState({
         email: "",
@@ -27,13 +25,10 @@ export const Login = ({isOpen, handleClose}: ArgTypes) => {
         });
     };
 
-    const handleDialogClose = async (e: any, reason: "backdropClick" | "escapeKeyDown") => {
+    const handleDialogClose = async (_e: any, reason: "backdropClick" | "escapeKeyDown") => {
         // this prevents dialog box from closing.
         if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
-        }
-        if (handleClose) {
-            handleClose();
         }
         // TODO hack to reload after getProject is loaded
         await new Promise(r => setTimeout(r, 2000));
@@ -62,16 +57,13 @@ export const Login = ({isOpen, handleClose}: ArgTypes) => {
     };
 
     const handleLoginClick = () => {
-        // TODO change this later - username -> email
         setCurrentUser(payload.email);
-        if (handleClose) {
-            handleClose();
-        }
+        navigate('/home');
     };
 
     return <React.Fragment>
         <Dialog disableEscapeKeyDown
-                open={isOpen}
+                open={true}
                 onClose={handleDialogClose}>
             <DialogTitle>Add your email to create projects</DialogTitle>
             <Divider/>

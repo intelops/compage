@@ -9,7 +9,12 @@ describe('user reducer', () => {
             error: null
         },
         listUsers: {
-            data:[],
+            data: [],
+            status: 'idle',
+            error: null
+        },
+        getUser: {
+            data: {} as UserDTO,
             status: 'idle',
             error: null
         }

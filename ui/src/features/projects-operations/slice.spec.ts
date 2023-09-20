@@ -3,8 +3,13 @@ import {ProjectDTO} from "./model";
 
 describe('projects reducer', () => {
     const initialState: ProjectState = {
-        updateProject: {
-            data: {},
+        createProject: {
+            data: {} as ProjectDTO,
+            status: 'idle',
+            error: null
+        },
+        listProjects: {
+            data: [],
             status: 'idle',
             error: null
         },
@@ -18,13 +23,13 @@ describe('projects reducer', () => {
             status: 'idle',
             error: null
         },
-        listProjects: {
-            data: [],
+        updateProject: {
+            data: {},
             status: 'idle',
             error: null
         },
-        createProject: {
-            data: {} as ProjectDTO,
+        deleteProject: {
+            data: {},
             status: 'idle',
             error: null
         },
@@ -32,8 +37,13 @@ describe('projects reducer', () => {
 
     it('should handle initial state', () => {
         expect(projectsReducer(undefined, {type: 'unknown'})).toEqual({
-            updateProject: {
+            createProject: {
                 data: {},
+                status: 'idle',
+                error: null
+            },
+            listProjects: {
+                data: [],
                 status: 'idle',
                 error: null
             },
@@ -47,12 +57,12 @@ describe('projects reducer', () => {
                 status: 'idle',
                 error: null
             },
-            listProjects: {
-                data: [],
+            updateProject: {
+                data: {},
                 status: 'idle',
                 error: null
             },
-            createProject: {
+            deleteProject: {
                 data: {},
                 status: 'idle',
                 error: null

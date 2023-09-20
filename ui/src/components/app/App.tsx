@@ -8,7 +8,7 @@ import {Grid} from "@mui/material";
 import LoadingOverlay from "react-loading-overlay-ts";
 import {useAppSelector} from "../../redux/hooks";
 import {
-    selectCreateProjectStatus,
+    selectCreateProjectStatus, selectDeleteProjectStatus,
     selectExistsProjectStatus,
     selectGetProjectStatus,
     selectListProjectsStatus,
@@ -24,13 +24,18 @@ import {
     selectListGitPlatformsStatus,
     selectUpdateGitPlatformStatus
 } from "../../features/git-platforms-operations/slice";
+import {SwitchProject} from "../../features/projects-operations/switch-project";
+import {Login} from "../auth/login";
+import {Projects} from "../../features/projects-operations/projects";
+import {GitPlatforms} from "../../features/git-platforms-operations/git-platforms";
 
 export const App = () => {
     const createProjectStatus = useAppSelector(selectCreateProjectStatus);
+    const listProjectsStatus = useAppSelector(selectListProjectsStatus);
     const getProjectStatus = useAppSelector(selectGetProjectStatus);
     const existsProjectStatus = useAppSelector(selectExistsProjectStatus);
     const updateProjectStatus = useAppSelector(selectUpdateProjectStatus);
-    const listProjectsStatus = useAppSelector(selectListProjectsStatus);
+    const deleteProjectStatus = useAppSelector(selectDeleteProjectStatus);
     const createGitPlatformStatus = useAppSelector(selectCreateGitPlatformStatus);
     const listGitPlatformsStatus = useAppSelector(selectListGitPlatformsStatus);
     const updateGitPlatformStatus = useAppSelector(selectUpdateGitPlatformStatus);
@@ -41,10 +46,11 @@ export const App = () => {
 
     const isActive = () => {
         return createProjectStatus === 'loading'
-            || getProjectStatus === 'loading'
             || listProjectsStatus === 'loading'
+            || getProjectStatus === 'loading'
             || existsProjectStatus === 'loading'
             || updateProjectStatus === 'loading'
+            || deleteProjectStatus === 'loading'
             || createGitPlatformStatus === 'loading'
             || listGitPlatformsStatus === 'loading'
             || updateGitPlatformStatus === 'loading'
@@ -79,7 +85,11 @@ export const App = () => {
                 <Header/>
                 <br/>
                 <Routes>
+                    <Route path="/login" element={<Login/>}/>
                     <Route path="/create-git-platform" element={<CreateGitPlatform/>}/>
+                    <Route path="/switch-project" element={<SwitchProject/>}/>
+                    <Route path="/projects" element={<Projects/>}/>
+                    <Route path="/git-platforms" element={<GitPlatforms/>}/>
                     <Route path="/home" element={<Home/>}/>
                     <Route path="/account" element={<Account/>}/>
                     <Route path="/" element={<Home/>}/>

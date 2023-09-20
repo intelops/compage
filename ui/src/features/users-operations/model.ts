@@ -14,10 +14,7 @@ export interface UserDTO {
 }
 
 // create project models
-export interface CreateUserRequest extends UserDTO{
-}
-
-export interface CreateUserResponse extends UserDTO {
+export interface CreateUserRequest extends UserDTO {
 }
 
 // This type describes the error object structure:
@@ -25,14 +22,21 @@ export interface CreateUserError {
     message: string;
 }
 
-// create project models
+// create user models
 export interface ListUsersRequest {
-}
-
-export interface ListUsersResponse {
 }
 
 // This type describes the error object structure:
 export interface ListUsersError {
+    message: string;
+}
+
+// create user models
+export interface GetUserRequest {
+    email: string;
+}
+
+// This type describes the error object structure:
+export interface GetUserError {
     message: string;
 }

@@ -1,5 +1,5 @@
 import {UserBackendApi} from "../../utils/backendApi";
-import {CreateUserRequest, ListUsersRequest} from "./model";
+import {CreateUserRequest, GetUserRequest, ListUsersRequest} from "./model";
 
 // Sync apis (async apis are in thunk)
 export const createUser = (createUserRequest: CreateUserRequest) => {
@@ -10,4 +10,9 @@ export const createUser = (createUserRequest: CreateUserRequest) => {
 // Sync apis (async apis are in thunk)
 export const listUsers = (_listUsersRequest: ListUsersRequest) => {
     return UserBackendApi().get("/users");
+};
+
+// Sync apis (async apis are in thunk)
+export const getUser = (getUserRequest: GetUserRequest) => {
+    return UserBackendApi().get("/users/"+getUserRequest.email);
 };

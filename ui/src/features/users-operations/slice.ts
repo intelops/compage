@@ -3,6 +3,7 @@ import {RootState} from '../../redux/store';
 import {createUserAsync} from "./async-apis/createUser";
 import {UserDTO} from "./model";
 import {listUsersAsync} from "./async-apis/listUsers";
+import {getUserAsync} from "./async-apis/getUser";
 
 export interface UserState {
     createUser: {
@@ -15,6 +16,11 @@ export interface UserState {
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
     };
+    getUser: {
+        data: UserDTO,
+        status: 'idle' | 'loading' | 'failed';
+        error: string | null;
+    };
 }
 
 const initialState: UserState = {
@@ -24,7 +30,12 @@ const initialState: UserState = {
         error: null
     },
     listUsers: {
-        data:  [],
+        data: [],
+        status: 'idle',
+        error: null
+    },
+    getUser: {
+        data: {} as UserDTO,
         status: 'idle',
         error: null
     }
@@ -55,6 +66,16 @@ export const usersSlice = createSlice({
         }).addCase(listUsersAsync.rejected, (state, action) => {
             state.listUsers.status = 'failed';
             if (action.payload) state.listUsers.error = JSON.stringify(action.payload);
+        }).addCase(getUserAsync.pending, (state) => {
+            state.getUser.status = 'loading';
+            state.getUser.error = null;
+        }).addCase(getUserAsync.fulfilled, (state, action) => {
+            state.getUser.status = 'idle';
+            state.getUser.error = null;
+            state.getUser.data = action.payload as UserDTO;
+        }).addCase(getUserAsync.rejected, (state, action) => {
+            state.getUser.status = 'failed';
+            if (action.payload) state.getUser.error = JSON.stringify(action.payload);
         });
     },
 });
@@ -66,5 +87,9 @@ export const selectCreateUserStatus = (state: RootState) => state.usersOperation
 export const selectListUsersData = (state: RootState) => state.usersOperations.listUsers.data;
 export const selectListUsersError = (state: RootState) => state.usersOperations.listUsers.error;
 export const selectListUsersStatus = (state: RootState) => state.usersOperations.listUsers.status;
+
+export const selectGetUserData = (state: RootState) => state.usersOperations.getUser.data;
+export const selectGetUserError = (state: RootState) => state.usersOperations.getUser.error;
+export const selectGetUserStatus = (state: RootState) => state.usersOperations.getUser.status;
 
 export default usersSlice.reducer;
