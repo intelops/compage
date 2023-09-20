@@ -7,11 +7,11 @@ export const refreshGitPlatformsList = () => {
         try {
             const listGitPlatformsRequest: ListGitPlatformsRequest = {
                 email: getCurrentUser()
-            }
+            };
             dispatch(listGitPlatformsAsync(listGitPlatformsRequest));
         } catch (error) {
             // Handle error if necessary
-            console.log(error)
+            console.log(error);
         }
     };
 };

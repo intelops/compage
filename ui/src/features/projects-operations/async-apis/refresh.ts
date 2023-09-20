@@ -7,11 +7,11 @@ export const refreshProjectsList = () => {
         try {
             const listProjectsRequest: ListProjectsRequest = {
                 email: getCurrentUser()
-            }
+            };
             dispatch(listProjectsAsync(listProjectsRequest));
         } catch (error) {
             // Handle error if necessary
-            console.log(error)
+            console.log(error);
         }
     };
 };

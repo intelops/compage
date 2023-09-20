@@ -9,8 +9,6 @@ import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import DialogActions from "@mui/material/DialogActions";
 import {SwitchToExistingProject} from "./switch-to-existing-project";
 import {SwitchToNewProject} from "./switch-to-new-project";
-import {useAppSelector} from "../../redux/hooks";
-import {selectListGitPlatformsData} from "../git-platforms-operations/slice";
 
 
 interface ArgTypes {
@@ -20,7 +18,6 @@ interface ArgTypes {
 
 export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
     const navigate = useNavigate();
-    const listGitPlatformsData = useAppSelector(selectListGitPlatformsData);
 
     const [data, setData] = useState({
         isNew: false,
@@ -55,10 +52,6 @@ export const SwitchProject = ({isOpen, handleClose}: ArgTypes) => {
         // TODO have toggled this here. When the dialog box is opened, the SwitchToExistingProject is shown (dont know why)
         return <SwitchToExistingProject handleClose={handleClose}/>;
     };
-
-    if (!listGitPlatformsData) {
-        navigate('/create-git-platform');
-    }
 
     return <React.Fragment>
         <Dialog disableEscapeKeyDown

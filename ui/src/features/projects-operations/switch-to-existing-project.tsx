@@ -21,6 +21,9 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
     const listProjectsData = useAppSelector(selectListProjectsData);
     const getProjectStatus = useAppSelector(selectGetProjectStatus);
     const dispatch = useAppDispatch();
+    const [data, setData] = useState({
+        projectName: "",
+    });
 
     useEffect(() => {
         // dispatch listProjects
@@ -29,17 +32,6 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
         };
         dispatch(listProjectsAsync(listProjectsRequest));
     }, [dispatch]);
-
-    const [data, setData] = useState({
-        projectName: "",
-    });
-
-    const handleExistingProjectsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setData({
-            ...data,
-            projectName: event.target.value
-        });
-    };
 
     const handleChooseProjectClick = () => {
         // allow to choose project only when the project is chosen from drop-down
@@ -55,12 +47,18 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
         }
     };
 
-    const getActionButtons = (): React.ReactNode => {
-        return <Button variant="contained"
-                       disabled={listProjectsStatus === 'loading' || getProjectStatus === 'loading' || data.projectName === ''}
-                       onClick={handleChooseProjectClick}>
-            Choose Project
-        </Button>;
+    const handleExistingProjectsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setData({
+            ...data,
+            projectName: event.target.value
+        });
+    };
+
+    const getLoadingIcon = (): React.ReactNode => {
+        if (listProjectsStatus === 'loading') {
+            return <CircularProgress/>;
+        }
+        return "";
     };
 
     const getExistingProjects = (): React.ReactNode => {
@@ -88,11 +86,12 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
         </TextField>;
     };
 
-    const getLoadingIcon = () => {
-        if (listProjectsStatus === 'loading') {
-            return <CircularProgress/>;
-        }
-        return;
+    const getActionButtons = (): React.ReactNode => {
+        return <Button variant="contained"
+                       disabled={listProjectsStatus === 'loading' || getProjectStatus === 'loading' || data.projectName === ''}
+                       onClick={handleChooseProjectClick}>
+            Choose Project
+        </Button>;
     };
 
     return <React.Fragment>

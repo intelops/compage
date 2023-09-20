@@ -83,7 +83,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
                 }
             });
         }
-    }
+    };
 
     const handleProjectNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setData({
@@ -164,7 +164,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
                         )
                     }
                 </TextField>
-            </>
+            </>;
         }
         return <TextField
             required

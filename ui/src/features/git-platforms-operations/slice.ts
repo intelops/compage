@@ -21,12 +21,12 @@ export interface GitPlatformState {
         data: {},
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
-    },
+    };
     deleteGitPlatform: {
         data: {},
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
-    }
+    };
 }
 
 const initialState: GitPlatformState = {

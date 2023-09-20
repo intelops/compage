@@ -4,7 +4,6 @@ import {listGitPlatformsAsync} from "./async-apis/listGitPlatforms";
 import {DeleteGitPlatformRequest, GitPlatformDTO, ListGitPlatformsRequest} from "./model";
 import {selectListGitPlatformsData} from "./slice";
 import {Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import {deleteGitPlatformAsync} from "./async-apis/deleteGitPlatform";
 import {getCurrentUser} from "../../utils/sessionstorageClient";
@@ -28,7 +27,7 @@ export const ListGitPlatforms = () => {
         const deleteGitPlatformRequest: DeleteGitPlatformRequest = {
             email: getCurrentUser(),
             name: gitPlatformName
-        }
+        };
         dispatch(deleteGitPlatformAsync(deleteGitPlatformRequest));
     };
 
@@ -41,7 +40,7 @@ export const ListGitPlatforms = () => {
             <Button variant="contained"
                     color="error"
                     onClick={() => {
-                        handleDeleteClick(gitPlatform.name)
+                        handleDeleteClick(gitPlatform.name);
                     }}>
                 Delete
             </Button>
@@ -49,8 +48,11 @@ export const ListGitPlatforms = () => {
     };
 
     return <>
+        <Button variant="outlined"
+                onClick={handleEditClick}>
+            Add new GitPlatform
+        </Button>
         <TableContainer component={Paper}>
-            <Typography>List of GitPlatforms</Typography>
             <Table sx={{minWidth: 650}} aria-label="simple table">
                 <TableHead>
                     <TableRow>
