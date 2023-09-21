@@ -7,21 +7,21 @@ import Button from "@mui/material/Button";
 import React from "react";
 import {Resource} from "../models";
 
-interface DeleteGrpcServerResourceProperties {
+interface DeleteGrpcServerResourceProps {
     isOpen: boolean;
     resource: Resource;
     onDeleteGrpcServerResourceClose: () => void;
     handleDeleteGrpcServerResource: () => void;
 }
 
-export const DeleteGrpcServerResource = (props: DeleteGrpcServerResourceProperties) => {
+export const DeleteGrpcServerResource = (deleteGrpcServerResourceProps: DeleteGrpcServerResourceProps) => {
     return <Dialog
-        open={props.isOpen}
+        open={deleteGrpcServerResourceProps.isOpen}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
     >
         <DialogTitle id="alert-dialog-title">
-            Delete Resource: {props.resource.name}?
+            Delete Resource: {deleteGrpcServerResourceProps.resource.name}?
         </DialogTitle>
         <DialogContent>
             <DialogContentText id="alert-dialog-description">
@@ -30,10 +30,10 @@ export const DeleteGrpcServerResource = (props: DeleteGrpcServerResourceProperti
         </DialogContent>
         <DialogActions>
             <Button variant="outlined" color="secondary"
-                    onClick={props.onDeleteGrpcServerResourceClose}>Cancel</Button>
+                    onClick={deleteGrpcServerResourceProps.onDeleteGrpcServerResourceClose}>Cancel</Button>
             <Button color="error"
                     variant="contained"
-                    onClick={props.handleDeleteGrpcServerResource} autoFocus>
+                    onClick={deleteGrpcServerResourceProps.handleDeleteGrpcServerResource} autoFocus>
                 Delete
             </Button>
         </DialogActions>

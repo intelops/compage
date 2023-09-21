@@ -17,11 +17,12 @@ interface SwitchToExistingProjectProps {
 }
 
 export const SwitchToExistingProject = (_switchToExistingProjectProps: SwitchToExistingProjectProps) => {
-    const listProjectsStatus = useAppSelector(selectListProjectsStatus);
-    const listProjectsData = useAppSelector(selectListProjectsData);
-    const getProjectStatus = useAppSelector(selectGetProjectStatus);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const listProjectsData = useAppSelector(selectListProjectsData);
+    const listProjectsStatus = useAppSelector(selectListProjectsStatus);
+    const getProjectStatus = useAppSelector(selectGetProjectStatus);
+
     const [payload, setPayload] = useState({
         projectName: "",
     });

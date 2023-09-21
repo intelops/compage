@@ -97,11 +97,11 @@ export const DiagramMakerContainer = ({
                                           plugin,
                                           onAction,
                                       }: ArgTypes) => {
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const updateProjectStatus = useAppSelector(selectUpdateProjectStatus);
     const containerRef = useRef() as any;
     const diagramMakerRef = useRef() as any;
-    const dispatch = useAppDispatch();
-    const updateProjectStatus = useAppSelector(selectUpdateProjectStatus);
-    const navigate = useNavigate();
 
     // handle ctrl+s in window
     const handleKeyDown = (event) => {

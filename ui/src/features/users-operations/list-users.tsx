@@ -5,14 +5,16 @@ import {ListUsersRequest, UserDTO} from "./model";
 import {selectListUsersData} from "./slice";
 
 export const ListUsers = () => {
-    const listUsersData = useAppSelector(selectListUsersData);
     const dispatch = useAppDispatch();
+    const listUsersData = useAppSelector(selectListUsersData);
+
     useEffect(() => {
         const listUsersRequest: ListUsersRequest = {
             email: "mahendra.b@intelops.dev"
         };
         dispatch(listUsersAsync(listUsersRequest));
     }, []);
+
     const listUserItems = listUsersData && listUsersData.map((userDTO: UserDTO) =>
         <li key={userDTO.email}>
             {userDTO.firstName} | {userDTO.lastName} | {userDTO.role} | {userDTO.email}

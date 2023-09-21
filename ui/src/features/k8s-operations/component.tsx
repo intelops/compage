@@ -9,9 +9,8 @@ import {GetCurrentContextRequest} from "./model";
 import {getCurrentUser} from "../../utils/sessionstorageClient";
 
 export const K8sOperations = () => {
-    const getGetCurrentContextStatus = useAppSelector(selectGetCurrentContextStatus);
-    const getGetCurrentContextData = useAppSelector(selectGetCurrentContextData);
     const dispatch = useAppDispatch();
+    const getGetCurrentContextStatus = useAppSelector(selectGetCurrentContextStatus);
 
     // When clicked, dispatch `uploadYaml`
     const handleGetCurrentContextClick = () => {

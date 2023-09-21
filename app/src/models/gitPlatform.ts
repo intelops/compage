@@ -49,27 +49,15 @@ export const getCreateGitPlatformResponse = (gitPlatformEntity: GitPlatformEntit
     return gitPlatformDTO;
 };
 
-export const getGetGitPlatformResponse = (gitPlatformEntity: GitPlatformEntity) => {
-    const gitPlatformDTO: GitPlatformDTO = {
-        name: gitPlatformEntity.name,
-        url: gitPlatformEntity.url,
-        userName: gitPlatformEntity.user_name,
-        personalAccessToken: gitPlatformEntity.personal_access_token,
-        ownerEmail: gitPlatformEntity.owner_email,
-        createdAt: gitPlatformEntity.created_at,
-        updatedAt: gitPlatformEntity.updated_at,
-    };
-    return gitPlatformDTO;
-};
-
 export const getListGitPlatformsResponse = (gitPlatformEntities: GitPlatformEntity[]) => {
     const gitPlatformDTOs: GitPlatformDTO[] = [];
     gitPlatformEntities.forEach((gitPlatformEntity: GitPlatformEntity) => {
+        const length = gitPlatformEntity.personal_access_token.length;
         const gitPlatformDTO: GitPlatformDTO = {
             name: gitPlatformEntity.name,
             url: gitPlatformEntity.url,
             userName: gitPlatformEntity.user_name,
-            personalAccessToken: gitPlatformEntity.personal_access_token,
+            personalAccessToken: '*'.repeat(length),
             ownerEmail: gitPlatformEntity.owner_email,
             createdAt: gitPlatformEntity.created_at,
             updatedAt: gitPlatformEntity.updated_at,
@@ -77,6 +65,20 @@ export const getListGitPlatformsResponse = (gitPlatformEntities: GitPlatformEnti
         gitPlatformDTOs.push(gitPlatformDTO);
     });
     return gitPlatformDTOs;
+};
+
+export const getGetGitPlatformResponse = (gitPlatformEntity: GitPlatformEntity) => {
+    const length = gitPlatformEntity.personal_access_token.length;
+    const gitPlatformDTO: GitPlatformDTO = {
+        name: gitPlatformEntity.name,
+        url: gitPlatformEntity.url,
+        userName: gitPlatformEntity.user_name,
+        personalAccessToken: '*'.repeat(length),
+        ownerEmail: gitPlatformEntity.owner_email,
+        createdAt: gitPlatformEntity.created_at,
+        updatedAt: gitPlatformEntity.updated_at,
+    };
+    return gitPlatformDTO;
 };
 
 export const getGitPlatformEntity = (gitPlatformDTO: GitPlatformDTO) => {

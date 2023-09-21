@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {listGitPlatformsAsync} from "./async-apis/listGitPlatforms";
 import {DeleteGitPlatformRequest, GitPlatformDTO, ListGitPlatformsRequest} from "./model";
@@ -8,11 +8,18 @@ import Button from "@mui/material/Button";
 import {deleteGitPlatformAsync} from "./async-apis/deleteGitPlatform";
 import {getCurrentUser} from "../../utils/sessionstorageClient";
 import {useNavigate} from "react-router-dom";
+import Typography from "@mui/material/Typography";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import {DeleteGitPlatform} from "./delete-git-platform";
 
 export const GitPlatforms = () => {
-    const listGitPlatformsData = useAppSelector(selectListGitPlatformsData);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const listGitPlatformsData = useAppSelector(selectListGitPlatformsData);
+    const [payload, setPayload] = useState({
+        isDeleteGitPlatformDialogOpen: false,
+        currentGitPlatform: {} as GitPlatformDTO
+    });
 
     useEffect(() => {
         const listGitPlatformsRequest: ListGitPlatformsRequest = {
@@ -25,35 +32,56 @@ export const GitPlatforms = () => {
         navigate('/git-platforms/new');
     };
 
-    const handleEditClick = () => {
-        navigate('/git-platforms/edit');
+    const handleDeleteClick = (gitPlatformDTO: GitPlatformDTO) => {
+        setPayload({
+            ...payload,
+            currentGitPlatform: gitPlatformDTO,
+            isDeleteGitPlatformDialogOpen: !payload.isDeleteGitPlatformDialogOpen
+        });
     };
 
-    const handleDeleteClick = (gitPlatformName: string) => {
+    const handleDeleteGitPlatform = () => {
         const deleteGitPlatformRequest: DeleteGitPlatformRequest = {
             email: getCurrentUser(),
-            name: gitPlatformName
+            name: payload.currentGitPlatform.name
         };
         dispatch(deleteGitPlatformAsync(deleteGitPlatformRequest));
+        setPayload({
+            ...payload,
+            currentGitPlatform: {} as GitPlatformDTO,
+            isDeleteGitPlatformDialogOpen: !payload.isDeleteGitPlatformDialogOpen
+        });
+    };
+
+    const onDeleteGitPlatformClose = () => {
+        setPayload({
+            ...payload,
+            currentGitPlatform: {} as GitPlatformDTO,
+            isDeleteGitPlatformDialogOpen: !payload.isDeleteGitPlatformDialogOpen
+        });
     };
 
     const getActionButtons = (gitPlatform: GitPlatformDTO): React.ReactNode => {
         return <Stack direction="row" spacing="3">
             <Button variant="contained"
-                    onClick={handleEditClick}>
-                Edit
-            </Button>
-            <Button variant="contained"
                     color="error"
                     onClick={() => {
-                        handleDeleteClick(gitPlatform.name);
+                        handleDeleteClick(gitPlatform);
                     }}>
-                Delete
+                <DeleteOutlineIcon/>
             </Button>
         </Stack>;
     };
 
     return <Container>
+        {payload.isDeleteGitPlatformDialogOpen && (
+            <DeleteGitPlatform isOpen={payload.isDeleteGitPlatformDialogOpen}
+                               gitPlatform={payload.currentGitPlatform}
+                               onDeleteGitPlatformClose={onDeleteGitPlatformClose}
+                               handleDeleteGitPlatform={handleDeleteGitPlatform}/>
+        )}
+        <Typography variant="h4">Git Platforms</Typography>
+        <hr/>
         <Button variant="outlined"
                 onClick={handleNewClick}>
             Add new GitPlatform

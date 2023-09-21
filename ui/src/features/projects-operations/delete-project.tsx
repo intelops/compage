@@ -5,35 +5,35 @@ import {DialogContentText} from "@mui/material";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import React from "react";
-import {Resource} from "../models";
+import {ProjectDTO} from "./model";
 
-interface DeleteRestServerResourceProps {
+interface DeleteProjectProps {
     isOpen: boolean;
-    resource: Resource;
-    onDeleteRestServerResourceClose: () => void;
-    handleDeleteRestServerResource: () => void;
+    project: ProjectDTO;
+    onDeleteProjectClose: () => void;
+    handleDeleteProject: () => void;
 }
 
-export const DeleteRestServerResource = (deleteRestServerResourceProperties: DeleteRestServerResourceProps) => {
+export const DeleteProject = (deleteProjectProps: DeleteProjectProps) => {
     return <Dialog
-        open={deleteRestServerResourceProperties.isOpen}
+        open={deleteProjectProps.isOpen}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
     >
         <DialogTitle id="alert-dialog-title">
-            Delete Resource: {deleteRestServerResourceProperties.resource.name}?
+            Delete Project: {deleteProjectProps.project.displayName}?
         </DialogTitle>
         <DialogContent>
             <DialogContentText id="alert-dialog-description">
-                Are you sure to delete this resource?
+                Are you sure to delete this project?
             </DialogContentText>
         </DialogContent>
         <DialogActions>
             <Button variant="outlined" color="secondary"
-                    onClick={deleteRestServerResourceProperties.onDeleteRestServerResourceClose}>Cancel</Button>
+                    onClick={deleteProjectProps.onDeleteProjectClose}>Cancel</Button>
             <Button color="error"
                     variant="contained"
-                    onClick={deleteRestServerResourceProperties.handleDeleteRestServerResource} autoFocus>
+                    onClick={deleteProjectProps.handleDeleteProject} autoFocus>
                 Delete
             </Button>
         </DialogActions>

@@ -19,12 +19,11 @@ interface SwitchToNewProjectProps {
 }
 
 export const SwitchToNewProject = (_switchToNewProjectProps: SwitchToNewProjectProps) => {
-    const createProjectStatus = useAppSelector(selectCreateProjectStatus);
+    const dispatch = useAppDispatch();
     const listProjectsData = useAppSelector(selectListProjectsData);
     const listGitPlatformsData = useAppSelector(selectListGitPlatformsData);
+    const createProjectStatus = useAppSelector(selectCreateProjectStatus);
     const listGitPlatformsStatus = useAppSelector(selectListGitPlatformsStatus);
-
-    const dispatch = useAppDispatch();
 
     const [payload, setPayload] = useState({
         projectName: "",

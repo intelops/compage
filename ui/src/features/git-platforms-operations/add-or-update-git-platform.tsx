@@ -21,16 +21,16 @@ interface AddOrUpdateGitPlatformProps {
 }
 
 export const AddOrUpdateGitPlatform = (addOrUpdateGitPlatformProps: AddOrUpdateGitPlatformProps) => {
-    const createGitPlatformStatus = useAppSelector(selectCreateGitPlatformStatus);
-    const updateGitPlatformStatus = useAppSelector(selectUpdateGitPlatformStatus);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const createGitPlatformStatus = useAppSelector(selectCreateGitPlatformStatus);
+    const updateGitPlatformStatus = useAppSelector(selectUpdateGitPlatformStatus);
 
     const [payload, setPayload] = React.useState({
         name: addOrUpdateGitPlatformProps.name || "",
         url: addOrUpdateGitPlatformProps.url || "",
-        personalAccessToken: addOrUpdateGitPlatformProps.personalAccessToken || "",
         userName: addOrUpdateGitPlatformProps.userName || "",
+        personalAccessToken: addOrUpdateGitPlatformProps.personalAccessToken || "",
     });
 
     interface SupportedGitPlatform {
@@ -40,15 +40,15 @@ export const AddOrUpdateGitPlatform = (addOrUpdateGitPlatformProps: AddOrUpdateG
 
     const supportedGitPlatforms = [
         {
-            name: "Github",
+            name: "github",
             url: "https://github.com"
         },
         {
-            name: "Gitlab",
+            name: "gitlab",
             url: "https://gitlab.com"
         },
         {
-            name: "Bitbucket",
+            name: "bitbucket",
             url: "https://bitbucket.org"
         }
     ];
@@ -101,17 +101,17 @@ export const AddOrUpdateGitPlatform = (addOrUpdateGitPlatformProps: AddOrUpdateG
         });
     };
 
-    const handlePersonalAccessTokenChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setPayload({
-            ...payload,
-            personalAccessToken: event.target.value
-        });
-    };
-
     const handleUserNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         setPayload({
             ...payload,
             userName: event.target.value
+        });
+    };
+
+    const handlePersonalAccessTokenChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        setPayload({
+            ...payload,
+            personalAccessToken: event.target.value
         });
     };
 

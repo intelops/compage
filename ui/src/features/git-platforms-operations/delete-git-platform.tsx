@@ -5,35 +5,35 @@ import {DialogContentText} from "@mui/material";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import React from "react";
-import {Resource} from "../models";
+import {GitPlatformDTO} from "./model";
 
-interface DeleteRestServerResourceProps {
+interface DeleteGitPlatformProps {
     isOpen: boolean;
-    resource: Resource;
-    onDeleteRestServerResourceClose: () => void;
-    handleDeleteRestServerResource: () => void;
+    gitPlatform: GitPlatformDTO;
+    onDeleteGitPlatformClose: () => void;
+    handleDeleteGitPlatform: () => void;
 }
 
-export const DeleteRestServerResource = (deleteRestServerResourceProperties: DeleteRestServerResourceProps) => {
+export const DeleteGitPlatform = (deleteGitPlatformProps: DeleteGitPlatformProps) => {
     return <Dialog
-        open={deleteRestServerResourceProperties.isOpen}
+        open={deleteGitPlatformProps.isOpen}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
     >
         <DialogTitle id="alert-dialog-title">
-            Delete Resource: {deleteRestServerResourceProperties.resource.name}?
+            Delete GitPlatform: {deleteGitPlatformProps.gitPlatform.name}?
         </DialogTitle>
         <DialogContent>
             <DialogContentText id="alert-dialog-description">
-                Are you sure to delete this resource?
+                Are you sure to delete this gitPlatform?
             </DialogContentText>
         </DialogContent>
         <DialogActions>
             <Button variant="outlined" color="secondary"
-                    onClick={deleteRestServerResourceProperties.onDeleteRestServerResourceClose}>Cancel</Button>
+                    onClick={deleteGitPlatformProps.onDeleteGitPlatformClose}>Cancel</Button>
             <Button color="error"
                     variant="contained"
-                    onClick={deleteRestServerResourceProperties.handleDeleteRestServerResource} autoFocus>
+                    onClick={deleteGitPlatformProps.handleDeleteGitPlatform} autoFocus>
                 Delete
             </Button>
         </DialogActions>

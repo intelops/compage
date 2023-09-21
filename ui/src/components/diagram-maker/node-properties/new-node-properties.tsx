@@ -154,7 +154,7 @@ const getNodeTypesConfig = (currentNodeState: CompageNode): NodeTypesConfig => {
     return nodeTypesConfig;
 };
 
-export const NewNodeProperties = (props: NewNodePropertiesProps) => {
+export const NewNodeProperties = (newNodePropertiesProps: NewNodePropertiesProps) => {
     const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
     const uploadYamlData = useAppSelector(selectUploadYamlData);
     let parsedModifiedState: CompageJson = getParsedModifiedState();
@@ -163,7 +163,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         updateModifiedState(JSON.parse(getCurrentConfig()));
         parsedModifiedState = getParsedModifiedState();
     }
-    const currentNodeState: CompageNode = parsedModifiedState.nodes[props.nodeId];
+    const currentNodeState: CompageNode = parsedModifiedState.nodes[newNodePropertiesProps.nodeId];
     const nodeTypesConfig: NodeTypesConfig = getNodeTypesConfig(currentNodeState);
     const [payload, setPayload] = React.useState({
         name: {
@@ -216,7 +216,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             // tslint:disable-next-line: forin
             for (const key in parsedModifiedState.nodes) {
                 const node: CompageNode = parsedModifiedState.nodes[key];
-                if (props.nodeId !== key
+                if (newNodePropertiesProps.nodeId !== key
                     && node.consumerData.name === payload.name.value) {
                     newPayload = {
                         ...newPayload,
@@ -325,9 +325,9 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
 
             // update modifiedState with current fields on dialog box
             // P.S. - We will have the fields in consumerData which are on dialogBox, so we can assign them directly. We also refer the older values when payload state is initialized, so the older values will be persisted as they are if not changed.
-            if (!(props.nodeId in parsedModifiedState.nodes)) {
+            if (!(newNodePropertiesProps.nodeId in parsedModifiedState.nodes)) {
                 // adding consumerData to new node in modifiedState
-                parsedModifiedState.nodes[props.nodeId] = {
+                parsedModifiedState.nodes[newNodePropertiesProps.nodeId] = {
                     consumerData: {
                         name: payload.name.value,
                         language: payload.language,
@@ -335,19 +335,19 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 };
             } else {
                 // adding consumerData to existing node in modifiedState
-                parsedModifiedState.nodes[props.nodeId].consumerData = {
+                parsedModifiedState.nodes[newNodePropertiesProps.nodeId].consumerData = {
                     name: payload.name.value,
                     language: payload.language,
                 };
             }
             if (Object.keys(restConfig).length > 0) {
-                parsedModifiedState.nodes[props.nodeId].consumerData.restConfig = restConfig;
+                parsedModifiedState.nodes[newNodePropertiesProps.nodeId].consumerData.restConfig = restConfig;
             }
             if (Object.keys(grpcConfig).length > 0) {
-                parsedModifiedState.nodes[props.nodeId].consumerData.grpcConfig = grpcConfig;
+                parsedModifiedState.nodes[newNodePropertiesProps.nodeId].consumerData.grpcConfig = grpcConfig;
             }
             if (Object.keys(wsConfig).length > 0) {
-                parsedModifiedState.nodes[props.nodeId].consumerData.wsConfig = wsConfig;
+                parsedModifiedState.nodes[newNodePropertiesProps.nodeId].consumerData.wsConfig = wsConfig;
             }
             // image to node display
             // const nodeElement = document.getElementById(props.nodeId);
@@ -383,7 +383,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 isDeleteGrpcServerResourceOpen: false,
                 currentGrpcServerResource: EmptyCurrentGrpcResource
             });
-            props.onNodePropertiesClose();
+            newNodePropertiesProps.onNodePropertiesClose();
         }
     };
 
@@ -803,7 +803,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
             </React.Fragment>;
         } else {
             return <React.Fragment>
-                <UploadYaml nodeId={props.nodeId}/>
+                <UploadYaml nodeId={newNodePropertiesProps.nodeId}/>
             </React.Fragment>;
         }
     };
@@ -1437,7 +1437,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
         if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
         }
-        props.onNodePropertiesClose();
+        newNodePropertiesProps.onNodePropertiesClose();
     };
 
     const getRestServerResourceNames = () => {
@@ -1464,7 +1464,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 resource={payload.currentRestServerResource}
                 resourceNames={getRestServerResourceNames()}
                 onAddOrUpdateRestServerResourceClose={onAddOrUpdateRestServerResourceClose}
-                nodeId={props.nodeId}
+                nodeId={newNodePropertiesProps.nodeId}
                 handleAddOrUpdateRestServerResource={handleAddOrUpdateRestServerResource}/>
         )}
         {payload.isDeleteGrpcServerResourceOpen && (
@@ -1479,12 +1479,12 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                 resource={payload.currentGrpcServerResource}
                 resourceNames={getGrpcServerResourceNames()}
                 onAddOrUpdateGrpcServerResourceClose={onAddOrUpdateGrpcServerResourceClose}
-                nodeId={props.nodeId}
+                nodeId={newNodePropertiesProps.nodeId}
                 handleAddOrUpdateGrpcServerResource={handleAddOrUpdateGrpcServerResource}/>
         )}
-        {props.isOpen && (
-            <Dialog open={props.isOpen} onClose={onClose}>
-                <DialogTitle>Node Properties : {props.nodeId}</DialogTitle>
+        {newNodePropertiesProps.isOpen && (
+            <Dialog open={newNodePropertiesProps.isOpen} onClose={onClose}>
+                <DialogTitle>Node Properties : {newNodePropertiesProps.nodeId}</DialogTitle>
                 <Divider/>
                 <DialogContent style={{
                     height: "500px",
@@ -1567,7 +1567,7 @@ export const NewNodeProperties = (props: NewNodePropertiesProps) => {
                     </Stack>
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="outlined" color="secondary" onClick={props.onNodePropertiesClose}>Cancel</Button>
+                    <Button variant="outlined" color="secondary" onClick={newNodePropertiesProps.onNodePropertiesClose}>Cancel</Button>
                     <Button variant="contained"
                             onClick={handleNodeUpdate}
                             disabled={payload.name.value === '' || payload.language === '' || uploadYamlStatus === 'loading'}>Update

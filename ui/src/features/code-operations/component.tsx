@@ -14,11 +14,10 @@ import {GenerateCodeRequest} from "./model";
 import {getCurrentUser} from "../../utils/sessionstorageClient";
 
 export const GenerateCode = () => {
-    const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
+    const dispatch = useAppDispatch();
     const getProjectData = useAppSelector(selectGetProjectData);
     const updateProjectData = useAppSelector(selectUpdateProjectData);
-
-    const dispatch = useAppDispatch();
+    const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
 
     // When clicked, dispatch `generateCode`
     const handleGenerateCodeClick = () => {
