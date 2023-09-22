@@ -14,10 +14,11 @@ import {
     ProjectDTO,
     ProjectEntity
 } from '../models/project';
-import {createProject, deleteProject, getProject, listProjects, updateProject} from '../store/cassandra/projectDao';
-import {createRepository} from '../integrations/git-providers';
+import {createRepository} from '../integrations/git-platforms';
+import {ProjectService} from '../services/projectService';
 
 const projectsOperationsRouter = Router();
+const projectService = new ProjectService();
 
 // create project for owner_email with details given in request
 projectsOperationsRouter.post('/users/:email/projects', requireEmailMiddleware, async (request: Request, response: Response) => {
@@ -32,7 +33,7 @@ projectsOperationsRouter.post('/users/:email/projects', requireEmailMiddleware, 
         projectDTO.createdAt = new Date().toISOString();
         projectDTO.updatedAt = new Date().toISOString();
 
-        const savedProjectEntity: ProjectEntity = await createProject(getProjectEntity(projectDTO));
+        const savedProjectEntity: ProjectEntity = await projectService.createProject(getProjectEntity(projectDTO));
         if (savedProjectEntity.id.length !== 0) {
             const resp = await createRepository(savedProjectEntity);
             Logger.debug(`createRepository Response: ${JSON.stringify(resp.data)}`);
@@ -40,9 +41,9 @@ projectsOperationsRouter.post('/users/:email/projects', requireEmailMiddleware, 
             Logger.info(successMessage);
             return response.status(201).json(getCreateProjectResponse(savedProjectEntity));
         }
-        const errorMessage = `${projectDTO.ownerEmail} project [${projectDTO.displayName}] couldn't be created.`;
-        Logger.error(errorMessage);
-        return response.status(500).json(getCreateProjectError(errorMessage));
+        const message = `${projectDTO.ownerEmail} project [${projectDTO.displayName}] couldn't be created.`;
+        Logger.error(message);
+        return response.status(500).json(getCreateProjectError(message));
     } catch (e: any) {
         const message = `${projectDTO.ownerEmail} project [${projectDTO.displayName}] couldn't be created[${e.message}]).`;
         Logger.error(message);
@@ -55,7 +56,7 @@ projectsOperationsRouter.get('/users/:email/projects/:id', requireEmailMiddlewar
     const ownerEmail = request.params.email;
     const id = request.params.id;
     try {
-        const projectEntity: ProjectEntity = await getProject(id as string);
+        const projectEntity: ProjectEntity = await projectService.getProject(id as string);
         // check if there is id present in the object.
         if (projectEntity.id.length !== 0) {
             return response.status(200).json(getGetProjectResponse(projectEntity));
@@ -74,7 +75,7 @@ projectsOperationsRouter.get('/users/:email/projects/:id', requireEmailMiddlewar
 projectsOperationsRouter.get('/users/:email/projects', requireEmailMiddleware, async (request: Request, response: Response) => {
     const ownerEmail = request.params.email;
     try {
-        const projectEntities = await listProjects(ownerEmail as string);
+        const projectEntities = await projectService.listProjects(ownerEmail as string);
         return response.status(200).json(getListProjectsResponse(projectEntities));
     } catch (e: any) {
         const message = `projects couldn't be listed[${e.message}].`;
@@ -93,14 +94,14 @@ projectsOperationsRouter.put('/users/:email/projects/:id', requireEmailMiddlewar
         return response.status(400).json(getUpdateProjectError('email and id in path and payload are not same'));
     }
     try {
-        const projectEntity: ProjectEntity = await getProject(projectDTO.id);
+        const projectEntity: ProjectEntity = await projectService.getProject(projectDTO.id);
         if (projectEntity.owner_email.length === 0 || projectEntity.id.length === 0) {
             const errorMessage = `[${projectDTO.ownerEmail}] project[${projectDTO.id}] don't exist.`;
             Logger.error(errorMessage);
             return response.status(400).json(getUpdateProjectError(errorMessage));
         }
         projectDTO.updatedAt = new Date().toISOString();
-        const isUpdated = await updateProject(id, getProjectEntity(projectDTO));
+        const isUpdated = await projectService.updateProject(id, getProjectEntity(projectDTO));
         if (isUpdated) {
             const successMessage = `[${projectDTO.ownerEmail}] project[${projectDTO.id}] updated.`;
             Logger.info(successMessage);
@@ -121,7 +122,7 @@ projectsOperationsRouter.delete('/users/:email/projects/:id', requireEmailMiddle
     const ownerEmail = request.params.email;
     const id = request.params.id;
     try {
-        const isDeleted = await deleteProject(id);
+        const isDeleted = await projectService.deleteProject(id);
         if (isDeleted) {
             const successMessage = `'${ownerEmail}' project[${id}] deleted successfully.`;
             Logger.info(successMessage);

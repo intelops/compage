@@ -12,17 +12,3 @@ export const cassandraClient = new cassandra.Client({
     localDataCenter,
     keyspace
 });
-
-// TODO add a condition here later to non development condition
-export const initializeCassandraClient = () => {
-    const client = new cassandra.Client({
-        contactPoints,
-        authProvider,
-        localDataCenter,
-        keyspace
-    });
-    client.connect().then(r => console.log('Cassandra client connected'));
-    return {
-        cassandraClient: client
-    };
-};

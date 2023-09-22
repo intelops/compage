@@ -1,6 +1,5 @@
 import {requireEmailMiddleware} from '../middlewares/auth';
 import {Request, Response, Router} from 'express';
-import {createUser, deleteUser, getUser, listUsers, updateUser} from '../store/cassandra/userDao';
 import Logger from '../utils/logger';
 import {
     getCreateUserError,
@@ -15,14 +14,17 @@ import {
     UserDTO,
     UserEntity
 } from '../models/user';
+import {UserService} from '../services/userService';
 
 const usersOperationsRouter = Router();
+
+const userService = new UserService();
 
 // create user with details given in request
 usersOperationsRouter.post('/', requireEmailMiddleware, async (request: Request, response: Response) => {
     const userDTO: UserDTO = request.body;
     try {
-        const userEntity: UserEntity = await getUser(userDTO.email);
+        const userEntity: UserEntity = await userService.getUser(userDTO.email);
         if (userEntity.email.length !== 0) {
             const errorMessage = `[${userDTO.email}] user already exists.`;
             Logger.error(errorMessage);
@@ -30,7 +32,7 @@ usersOperationsRouter.post('/', requireEmailMiddleware, async (request: Request,
         }
         userDTO.createdAt = new Date().toISOString();
         userDTO.updatedAt = new Date().toISOString();
-        const savedUserEntity: UserEntity = await createUser(getUserEntity(userDTO));
+        const savedUserEntity: UserEntity = await userService.createUser(getUserEntity(userDTO));
         if (savedUserEntity.email.length !== 0) {
             const successMessage = `[${userDTO.email}] user created.`;
             Logger.info(successMessage);
@@ -40,9 +42,21 @@ usersOperationsRouter.post('/', requireEmailMiddleware, async (request: Request,
         Logger.error(message);
         return response.status(500).json(getCreateUserError(message));
     } catch (e: any) {
-        const message = `${userDTO.email} user couldn't be created[${e.message}].`;
+        const message = `${userDTO.email} user couldn't be created[${JSON.stringify(e)}].`;
         Logger.error(message);
         return response.status(500).json(getCreateUserError(message));
+    }
+});
+
+// list all users for given user
+usersOperationsRouter.get('/', requireEmailMiddleware, async (_request: Request, response: Response) => {
+    try {
+        const userEntities = await userService.listUsers();
+        return response.status(200).json(getListUsersResponse(userEntities));
+    } catch (e: any) {
+        const message = `users couldn't be listed[${e.message}].`;
+        Logger.error(message);
+        return response.status(500).json(getListUsersError(message));
     }
 });
 
@@ -50,7 +64,7 @@ usersOperationsRouter.post('/', requireEmailMiddleware, async (request: Request,
 usersOperationsRouter.get('/:email', requireEmailMiddleware, async (request: Request, response: Response) => {
     const email = request.params.email;
     try {
-        const userEntity: UserEntity = await getUser(email as string);
+        const userEntity: UserEntity = await userService.getUser(email as string);
         // check if there is id present in the object.
         if (userEntity.email.length !== 0) {
             return response.status(200).json(getGetUserResponse(userEntity));
@@ -63,18 +77,6 @@ usersOperationsRouter.get('/:email', requireEmailMiddleware, async (request: Req
     }
 });
 
-// list all users for given user
-usersOperationsRouter.get('/', requireEmailMiddleware, async (_request: Request, response: Response) => {
-    try {
-        const userEntities = await listUsers();
-        return response.status(200).json(getListUsersResponse(userEntities));
-    } catch (e: any) {
-        const message = `users couldn't be listed[${e.message}].`;
-        Logger.error(message);
-        return response.status(500).json(getListUsersError(message));
-    }
-});
-
 // update user with details given in request
 usersOperationsRouter.put('/:email', requireEmailMiddleware, async (request: Request, response: Response) => {
     const email = request.params.email;
@@ -84,14 +86,14 @@ usersOperationsRouter.put('/:email', requireEmailMiddleware, async (request: Req
         return response.status(400).json(getUpdateUserError('email in path and payload are not same'));
     }
     try {
-        const userEntity: UserEntity = await getUser(userDTO.email);
+        const userEntity: UserEntity = await userService.getUser(userDTO.email);
         if (userEntity.email.length === 0) {
             const errorMessage = `[${userDTO.email}] user doesn't exist.`;
             Logger.error(errorMessage);
             return response.status(400).json(getUpdateUserError(errorMessage));
         }
         userDTO.updatedAt = new Date().toISOString();
-        const isUpdated: boolean = await updateUser(email, getUserEntity(userDTO));
+        const isUpdated: boolean = await userService.updateUser(email, getUserEntity(userDTO));
         if (isUpdated) {
             const successMessage = `[${userDTO.email}] user updated.`;
             Logger.info(successMessage);
@@ -111,7 +113,7 @@ usersOperationsRouter.put('/:email', requireEmailMiddleware, async (request: Req
 usersOperationsRouter.delete('/:email', requireEmailMiddleware, async (request: Request, response: Response) => {
     const email = request.params.email;
     try {
-        const isDeleted = await deleteUser(email);
+        const isDeleted = await userService.deleteUser(email);
         if (isDeleted) {
             const successMessage = `'${email}' user deleted successfully.`;
             Logger.info(successMessage);

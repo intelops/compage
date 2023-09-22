@@ -1,15 +1,16 @@
 import axios from 'axios';
 import {ProjectEntity} from '../../models/project';
-import {getGitPlatform} from '../../store/cassandra/gitPlatformDao';
 import {GitPlatformEntity} from '../../models/gitPlatform';
-import {GITHUB} from '../supportedGitProviders';
+import {GITHUB} from '../supportedGitPlatforms';
+import {GitPlatformService} from '../../services/gitPlatformService';
 
 const ACCEPT = `application/vnd.github+json`;
 const USER_REPO_URL = `https://api.github.com/user/repos`;
+const gitPlatformService = new GitPlatformService();
 
 export const createGithubRepository = async (projectEntity: ProjectEntity) => {
     const email = projectEntity.owner_email;
-    const gitPlatformEntity: GitPlatformEntity = await getGitPlatform(email, GITHUB);
+    const gitPlatformEntity: GitPlatformEntity = await gitPlatformService.getGitPlatform(email, GITHUB);
     return axios({
         headers: {
             Accept: ACCEPT,

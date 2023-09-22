@@ -1,11 +1,10 @@
 import {NextFunction, Request, Response} from 'express';
-import {X_EMAIL_HEADER} from '../utils/constants';
 
-export const requireEmailMiddleware = async (request: Request, response: Response, next: NextFunction) => {
+export const requireEmailMiddleware = async (_request: Request, _response: Response, next: NextFunction) => {
     // below code is committed as we are not using it for now.
-    const unauthorized = (message: string) => response.status(401).json({
-        message
-    });
+    // const unauthorized = (message: string) => response.status(401).json({
+    //     message
+    // });
 
     // const email = request.header(X_EMAIL_HEADER);
     // if (!email) {

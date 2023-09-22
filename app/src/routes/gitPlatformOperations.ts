@@ -14,15 +14,10 @@ import {
     GitPlatformDTO,
     GitPlatformEntity
 } from '../models/gitPlatform';
-import {
-    createGitPlatform,
-    deleteGitPlatform,
-    getGitPlatform,
-    listGitPlatforms,
-    updateGitPlatform
-} from '../store/cassandra/gitPlatformDao';
+import {GitPlatformService} from '../services/gitPlatformService';
 
 const gitPlatformsOperationsRouter = Router();
+const gitPlatformService = new GitPlatformService();
 
 // create gitPlatform for owner_email with details given in request
 gitPlatformsOperationsRouter.post('/users/:email/gitPlatforms', requireEmailMiddleware, async (request: Request, response: Response) => {
@@ -33,7 +28,7 @@ gitPlatformsOperationsRouter.post('/users/:email/gitPlatforms', requireEmailMidd
         return response.status(400).json(getUpdateGitPlatformError('email in path and payload are not same'));
     }
     try {
-        const gitPlatformEntity: GitPlatformEntity = await getGitPlatform(gitPlatformDTO.ownerEmail, gitPlatformDTO.name);
+        const gitPlatformEntity: GitPlatformEntity = await gitPlatformService.getGitPlatform(gitPlatformDTO.ownerEmail, gitPlatformDTO.name);
         if (gitPlatformEntity.owner_email.length !== 0 || gitPlatformEntity.name.length !== 0) {
             const errorMessage = `[${gitPlatformDTO.ownerEmail}] gitPlatform[${gitPlatformDTO.name}] already exists.`;
             Logger.error(errorMessage);
@@ -43,7 +38,7 @@ gitPlatformsOperationsRouter.post('/users/:email/gitPlatforms', requireEmailMidd
         gitPlatformDTO.createdAt = new Date().toISOString();
         gitPlatformDTO.updatedAt = new Date().toISOString();
 
-        const savedGitPlatformEntity: GitPlatformEntity = await createGitPlatform(getGitPlatformEntity(gitPlatformDTO));
+        const savedGitPlatformEntity: GitPlatformEntity = await gitPlatformService.createGitPlatform(getGitPlatformEntity(gitPlatformDTO));
         if (savedGitPlatformEntity.name.length !== 0) {
             const successMessage = `[${gitPlatformDTO.ownerEmail}] gitPlatform[${gitPlatformDTO.name}] created.`;
             Logger.info(successMessage);
@@ -64,7 +59,7 @@ gitPlatformsOperationsRouter.get('/users/:email/gitPlatforms/:name', requireEmai
     const ownerEmail = request.params.email;
     const name = request.params.name;
     try {
-        const gitPlatformEntity: GitPlatformEntity = await getGitPlatform(ownerEmail as string, name as string);
+        const gitPlatformEntity: GitPlatformEntity = await gitPlatformService.getGitPlatform(ownerEmail as string, name as string);
         // check if there is id present in the object.
         if (gitPlatformEntity.owner_email.length !== 0 && gitPlatformEntity.name.length !== 0) {
             return response.status(200).json(getGetGitPlatformResponse(gitPlatformEntity));
@@ -83,7 +78,7 @@ gitPlatformsOperationsRouter.get('/users/:email/gitPlatforms/:name', requireEmai
 gitPlatformsOperationsRouter.get('/users/:email/gitPlatforms', requireEmailMiddleware, async (request: Request, response: Response) => {
     const ownerEmail = request.params.email;
     try {
-        const gitPlatformEntities = await listGitPlatforms(ownerEmail as string);
+        const gitPlatformEntities = await gitPlatformService.listGitPlatforms(ownerEmail as string);
         return response.status(200).json(getListGitPlatformsResponse(gitPlatformEntities));
     } catch (e: any) {
         const message = `gitPlatforms couldn't be listed[${e.message}].`;
@@ -102,14 +97,14 @@ gitPlatformsOperationsRouter.put('/users/:email/gitPlatforms/:name', async (requ
         return response.status(400).json(getUpdateGitPlatformError('email and name in path and payload are not same'));
     }
     try {
-        const gitPlatformEntity: GitPlatformEntity = await getGitPlatform(gitPlatformDTO.ownerEmail, gitPlatformDTO.name);
+        const gitPlatformEntity: GitPlatformEntity = await gitPlatformService.getGitPlatform(gitPlatformDTO.ownerEmail, gitPlatformDTO.name);
         if (gitPlatformEntity.owner_email.length === 0 || gitPlatformEntity.name.length === 0) {
             const errorMessage = `[${gitPlatformDTO.ownerEmail}] gitPlatform[${gitPlatformDTO.name}] don't exist.`;
             Logger.error(errorMessage);
             return response.status(400).json(getUpdateGitPlatformError(errorMessage));
         }
         gitPlatformDTO.updatedAt = new Date().toISOString();
-        const isUpdated = await updateGitPlatform(ownerEmail, name, getGitPlatformEntity(gitPlatformDTO));
+        const isUpdated = await gitPlatformService.updateGitPlatform(ownerEmail, name, getGitPlatformEntity(gitPlatformDTO));
         if (isUpdated) {
             const successMessage = `[${gitPlatformDTO.ownerEmail}] gitPlatform[${gitPlatformDTO.name}] updated.`;
             Logger.info(successMessage);
@@ -130,7 +125,7 @@ gitPlatformsOperationsRouter.delete('/users/:email/gitPlatforms/:name', requireE
     const ownerEmail = request.params.email;
     const name = request.params.name;
     try {
-        const isDeleted = await deleteGitPlatform(ownerEmail, name);
+        const isDeleted = await gitPlatformService.deleteGitPlatform(ownerEmail, name);
         if (isDeleted) {
             const successMessage = `'${ownerEmail}' gitPlatform[${name}] deleted successfully.`;
             Logger.info(successMessage);

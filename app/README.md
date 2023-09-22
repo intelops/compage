@@ -23,3 +23,5 @@
 ```
 - If you find some other error apart from the above one, that means the installation of CRDs didn't succeed.
 - Run `npm run dev` command to start the express-server. This command will auto-reload the changes you make to app directory.
+- Kill process on port 5000
+```sudo kill -9 `sudo lsof -t -i:5000```

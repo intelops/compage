@@ -12,3 +12,4 @@
 openapitools.json
 /core/openapitools.json
 /ui/.env.kind.cluster
+/app/compage-app.sqlite3

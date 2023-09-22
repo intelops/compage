@@ -22,7 +22,7 @@ const Header = () => {
     const anchorRef = React.useRef<HTMLButtonElement>(null);
 
     const handleToggle = () => {
-        setOpen((prevOpen) => !prevOpen);
+        setOpen((prevOpenToggle) => !prevOpenToggle);
     };
 
     const handleClose = (event: Event | React.SyntheticEvent) => {

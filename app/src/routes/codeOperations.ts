@@ -12,14 +12,16 @@ import {rimraf} from 'rimraf';
 import tar from 'tar';
 import {X_EMAIL_HEADER} from '../utils/constants';
 import {GenerateCodeRequest, getGenerateCodeError, getGenerateCodeResponse, Project} from '../models/code';
-import {getGitPlatform} from '../store/cassandra/gitPlatformDao';
 import {GitPlatformEntity} from '../models/gitPlatform';
-import {getProject, updateProject} from '../store/cassandra/projectDao';
 import {OldVersion, ProjectEntity} from '../models/project';
 import {ExistingProjectGitServerRequest} from '../integrations/simple-git/models';
+import {ProjectService} from '../services/projectService';
+import {GitPlatformService} from '../services/gitPlatformService';
 
 const codeOperationsRouter = Router();
 const projectGrpcClient = getProjectGrpcClient();
+const projectService = new ProjectService();
+const gitPlatformService = new GitPlatformService();
 
 // generateCode (grpc calls to core)
 codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, resource) => {
@@ -46,7 +48,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
     };
 
     // retrieve project from k8s
-    const projectEntity: ProjectEntity = await getProject(projectId);
+    const projectEntity: ProjectEntity = await projectService.getProject(projectId);
     if (!projectEntity.id) {
         const message = `unable to generate code, no project found for id: ${projectId}`;
         return resource.status(500).json(getGenerateCodeError(message));
@@ -101,7 +103,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
     }
     const projectTarFilePath = `${downloadedProjectPath}/${projectEntity.id}_downloaded.tar.gz`;
 
-    const gitPlatformEntity: GitPlatformEntity = await getGitPlatform(projectEntity.owner_email as string, projectEntity.git_platform_name as string);
+    const gitPlatformEntity: GitPlatformEntity = await gitPlatformService.getGitPlatform(projectEntity.owner_email as string, projectEntity.git_platform_name as string);
 
     // save project metadata (in compage db or somewhere)
     // need to save project-name, compage-json version, github repo and latest commit to the db
@@ -207,7 +209,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
                 projectEntity.version = nextVersion(projectEntity.version);
                 projectEntity.old_versions.push(JSON.stringify(oldVersion));
             }
-            const isUpdated = await updateProject(projectId, projectEntity);
+            const isUpdated = await projectService.updateProject(projectId, projectEntity);
             if (isUpdated) {
                 // send status back to ui
                 const successMessage = `successfully generated project for ${projectEntity.display_name}[${projectEntity.id}] and saved in repository '${projectEntity.repository_name}'.`;
