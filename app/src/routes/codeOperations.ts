@@ -59,7 +59,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
             || entity.json === '{}'
             || entity.json.length === 0
             || !JSON.parse(entity.json)?.nodes
-            || JSON.parse(entity.json)?.nodes?.length === 0;
+            || JSON.parse(entity.json)?.nodes?.length !== 0;
     };
 
     if (!hasNodes(projectEntity)) {
