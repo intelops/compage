@@ -5,7 +5,7 @@ import {selectGenerateCodeStatus} from './slice';
 import Button from "@mui/material/Button";
 import {generateCodeAsync} from "./async-apis/generateCode";
 import {getCurrentProjectDetails, getCurrentState} from "../../utils/localstorageClient";
-import {selectGetProjectData, selectUpdateProjectData} from "../projects-operations/slice";
+import {selectGetProjectData} from "../projects-operations/slice";
 import {removeUnwantedKeys} from "../../components/diagram-maker/helper/helper";
 import * as _ from "lodash";
 import {CompageNode, GrpcConfig, RestClient, RestConfig} from "../../components/diagram-maker/models";
@@ -16,7 +16,6 @@ import {getCurrentUser} from "../../utils/sessionstorageClient";
 export const GenerateCode = () => {
     const dispatch = useAppDispatch();
     const getProjectData = useAppSelector(selectGetProjectData);
-    const updateProjectData = useAppSelector(selectUpdateProjectData);
     const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
 
     // When clicked, dispatch `generateCode`
@@ -104,12 +103,6 @@ export const GenerateCode = () => {
             return true;
         }
 
-        if (updateProjectData?.project?.json) {
-            const removeUnwantedKeyUpdateProject = removeUnwantedKeys(JSON.stringify(updateProjectData.project.json));
-            if (_.isEqual(removeUnwantedKeyUpdateProject, removeUnwantedKeysGetCurrentState) && Object.keys(updateProjectData.project.json?.nodes).length !== 0) {
-                return false;
-            }
-        }
         // check if the get project data is different.
         if (getProjectData?.json) {
             const removeUnwantedKeyGetProject = removeUnwantedKeys(JSON.stringify(getProjectData?.json));

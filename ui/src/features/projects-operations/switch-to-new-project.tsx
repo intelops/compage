@@ -13,13 +13,14 @@ import {getCurrentUser} from "../../utils/sessionstorageClient";
 import MenuItem from "@mui/material/MenuItem";
 import {selectListGitPlatformsData, selectListGitPlatformsStatus} from "../git-platforms-operations/slice";
 import {GitPlatformDTO} from "../git-platforms-operations/model";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 interface SwitchToNewProjectProps {
 }
 
 export const SwitchToNewProject = (_switchToNewProjectProps: SwitchToNewProjectProps) => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const listProjectsData = useAppSelector(selectListProjectsData);
     const listGitPlatformsData = useAppSelector(selectListGitPlatformsData);
     const createProjectStatus = useAppSelector(selectCreateProjectStatus);
@@ -63,6 +64,7 @@ export const SwitchToNewProject = (_switchToNewProjectProps: SwitchToNewProjectP
     const handleCreateProjectClick = () => {
         const createProjectRequest: CreateProjectRequest = prepareCreateProjectRequest();
         dispatch(createProjectAsync(createProjectRequest));
+        navigate('/home');
     };
 
     const handleGitPlatformsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
