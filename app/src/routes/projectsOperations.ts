@@ -28,12 +28,12 @@ projectsOperationsRouter.post('/users/:email/projects', requireEmailMiddleware, 
     if ((ownerEmail.length === 0 || ownerEmail !== projectDTO.ownerEmail)) {
         return response.status(400).json(getUpdateProjectError('email in path and payload are not same'));
     }
+    let savedProjectEntity: ProjectEntity = {} as ProjectEntity;
     try {
         // add createdAt and updatedAt
         projectDTO.createdAt = new Date().toISOString();
         projectDTO.updatedAt = new Date().toISOString();
-
-        const savedProjectEntity: ProjectEntity = await projectService.createProject(getProjectEntity(projectDTO));
+        savedProjectEntity = await projectService.createProject(getProjectEntity(projectDTO));
         if (savedProjectEntity.id.length !== 0) {
             const resp = await createRepository(savedProjectEntity);
             Logger.debug(`createRepository Response: ${JSON.stringify(resp.data)}`);
@@ -45,6 +45,15 @@ projectsOperationsRouter.post('/users/:email/projects', requireEmailMiddleware, 
         Logger.error(message);
         return response.status(500).json(getCreateProjectError(message));
     } catch (e: any) {
+        if (e.response && e.response.data && e.response.data.message && e.response.data.message.includes('Repository creation failed.')) {
+            if (savedProjectEntity?.id.length !== 0) {
+                const isDeleted = await projectService.deleteProject(savedProjectEntity?.id);
+                if (isDeleted) {
+                    const successMessage = `'${ownerEmail}' project[${savedProjectEntity?.id}] deleted successfully.`;
+                    Logger.info(successMessage);
+                }
+            }
+        }
         const message = `${projectDTO.ownerEmail} project [${projectDTO.displayName}] couldn't be created[${e.message}]).`;
         Logger.error(message);
         return response.status(500).json(getCreateProjectError(message));
