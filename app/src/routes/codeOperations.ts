@@ -111,15 +111,13 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
         projectName: projectEntity.display_name,
         userName: projectEntity.git_platform_user_name,
         json: projectEntity.json,
-        repositoryName: projectEntity.repository_name,
+        gitRepositoryName: projectEntity.repository_name,
         metadata: projectEntity.metadata as string,
-        repositoryIsPublic: projectEntity.is_repository_public,
-        repositoryBranch: projectEntity.repository_branch,
-        platformName: projectEntity.git_platform_name,
-        platformUrl: gitPlatformEntity.url,
-        platformUserName: projectEntity.git_platform_user_name,
-        platformPersonalAccessToken: gitPlatformEntity.personal_access_token,
-        platformEmail: projectEntity.owner_email,
+        gitRepositoryIsPublic: projectEntity.is_repository_public,
+        gitRepositoryBranch: projectEntity.repository_branch,
+        gitPlatformName: projectEntity.git_platform_name,
+        gitPlatformURL: gitPlatformEntity.url,
+        gitPlatformUserName: projectEntity.git_platform_user_name,
     };
 
     // call to grpc server to generate the project

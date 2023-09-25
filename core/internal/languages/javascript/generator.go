@@ -78,8 +78,8 @@ func Generate(ctx context.Context) error {
 }
 
 func getIntegrationsCopier(javascriptValues Values) map[string]interface{} {
-	userName := javascriptValues.Values.Get(languages.UserName)
-	repositoryName := javascriptValues.Values.Get(languages.RepositoryName)
+	gitPlatformUserName := javascriptValues.Values.Get(languages.GitPlatformUserName)
+	gitRepositoryName := javascriptValues.Values.Get(languages.GitRepositoryName)
 	nodeName := javascriptValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := javascriptValues.Values.NodeDirectoryName
 	isRestServer := javascriptValues.JavaScriptNode.RestConfig.Server != nil
@@ -88,16 +88,16 @@ func getIntegrationsCopier(javascriptValues Values) map[string]interface{} {
 	projectDirectoryName := utils.GetProjectDirectoryName(javascriptValues.Values.ProjectName)
 
 	// create javascript specific dockerCopier
-	dockerCopier := docker.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	dockerCopier := docker.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	// create javascript specific k8sCopier
-	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	// create javascript specific githubActionsCopier
-	githubActionsCopier := githubactions.NewCopier(userName, repositoryName, projectDirectoryName, nodeName, nodeDirectoryName, path)
+	githubActionsCopier := githubactions.NewCopier(gitPlatformUserName, gitRepositoryName, projectDirectoryName, nodeName, nodeDirectoryName, path)
 
 	// create javascript specific devspaceCopier
-	devspaceCopier := devspace.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	devspaceCopier := devspace.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	return map[string]interface{}{
 		"docker":        dockerCopier,

@@ -1,8 +1,8 @@
 Issue : The below error occurs when grpc server is unreachable.
 // error response on ui
 {
-    "repositoryName": "first-project",
-    "userName": "mahendraintelops",
+    "gitRepositoryName": "first-project",
+    "gitPlatformUserName": "mahendraintelops",
     "projectName": "first-project",
     "message": "unable to generate code : first-project",
     "error": "No connection established"

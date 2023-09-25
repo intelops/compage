@@ -22,14 +22,14 @@ type Copier struct {
 	GrpcServerPort    string
 }
 
-func NewCopier(userName,
-	repositoryName, projectName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isGrpcServer bool, grpcServerPort string) *Copier {
+func NewCopier(gitPlatformUserName,
+	gitRepositoryName, projectName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isGrpcServer bool, grpcServerPort string) *Copier {
 	// populate map to replace templates
 	data := map[string]interface{}{
-		"ProjectName":    projectName,
-		"RepositoryName": repositoryName,
-		"NodeName":       strings.ToLower(nodeName),
-		"UserName":       userName,
+		"ProjectName":         projectName,
+		"GitRepositoryName":   gitRepositoryName,
+		"NodeName":            strings.ToLower(nodeName),
+		"GitPlatformUserName": gitPlatformUserName,
 	}
 
 	data["RestServerPort"] = restServerPort

@@ -188,8 +188,9 @@ func generateRESTConfig(ctx context.Context, goValues *GoValues) error {
 }
 
 func getCommonFilesCopier(goValues GoValues) *commonfiles.Copier {
-	userName := goValues.Values.Get(languages.UserName)
-	repositoryName := goValues.Values.Get(languages.RepositoryName)
+	gitPlatformURL := goValues.Values.Get(languages.GitPlatformURL)
+	gitPlatformUserName := goValues.Values.Get(languages.GitPlatformUserName)
+	gitRepositoryName := goValues.Values.Get(languages.GitRepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := goValues.Values.NodeDirectoryName
 	path := GetGoTemplatesRootPath() + "/frameworks/" + CommonFiles
@@ -247,13 +248,15 @@ func getCommonFilesCopier(goValues GoValues) *commonfiles.Copier {
 		grpcClients = []*corenode.GrpcClient{}
 	}
 	// create golang specific commonFilesCopier
-	copier := commonfiles.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort, isRestSQLDB, restSQLDB, isGrpcSQLDB, grpcSQLDB, isRestNoSQLDB, restNoSQLDB, isGrpcNoSQLDB, grpcNoSQLDB, restResources, grpcResources, restClients, grpcClients)
+	copier := commonfiles.NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort, isRestSQLDB, restSQLDB, isGrpcSQLDB, grpcSQLDB, isRestNoSQLDB, restNoSQLDB, isGrpcNoSQLDB, grpcNoSQLDB, restResources, grpcResources, restClients, grpcClients)
 	return copier
 }
 
 func getGoGrpcServerCopier(goValues *GoValues) *gogrpcserver.Copier {
-	userName := goValues.Values.Get(languages.UserName)
-	repositoryName := goValues.Values.Get(languages.RepositoryName)
+	//gitPlatformName := goValues.Values.Get(languages.GitPlatformName)
+	gitPlatformURL := goValues.Values.Get(languages.GitPlatformURL)
+	gitPlatformUserName := goValues.Values.Get(languages.GitPlatformUserName)
+	gitRepositoryName := goValues.Values.Get(languages.GitRepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := goValues.Values.NodeDirectoryName
 	isGrpcServer := goValues.LGoLangNode.GrpcConfig != nil && goValues.LGoLangNode.GrpcConfig.Server != nil
@@ -283,13 +286,14 @@ func getGoGrpcServerCopier(goValues *GoValues) *gogrpcserver.Copier {
 	grpcClients := goValues.LGoLangNode.GrpcConfig.Clients
 	path := GetGoTemplatesRootPath() + "/frameworks/" + GoGrpcServerFramework
 	// create golang specific copier
-	copier := gogrpcserver.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isGrpcServer, grpcServerPort, isGrpcSQLDB, grpcSQLDB, isGrpcNoSQLDB, grpcNoSQLDB, grpcResources, grpcClients)
+	copier := gogrpcserver.NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isGrpcServer, grpcServerPort, isGrpcSQLDB, grpcSQLDB, isGrpcNoSQLDB, grpcNoSQLDB, grpcResources, grpcClients)
 	return copier
 }
 
 func getGoGinServerCopier(goValues *GoValues) *goginserver.Copier {
-	userName := goValues.Values.Get(languages.UserName)
-	repositoryName := goValues.Values.Get(languages.RepositoryName)
+	gitPlatformURL := goValues.Values.Get(languages.GitPlatformURL)
+	gitPlatformUserName := goValues.Values.Get(languages.GitPlatformUserName)
+	gitRepositoryName := goValues.Values.Get(languages.GitRepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := goValues.Values.NodeDirectoryName
 
@@ -319,13 +323,13 @@ func getGoGinServerCopier(goValues *GoValues) *goginserver.Copier {
 	restClients := goValues.LGoLangNode.RestConfig.Clients
 	path := GetGoTemplatesRootPath() + "/frameworks/" + GoGinServerFramework
 	// create golang specific copier
-	copier := goginserver.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isRestSQLDB, restSQLDB, isRestNoSQLDB, restNoSQLDB, restResources, restClients)
+	copier := goginserver.NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isRestSQLDB, restSQLDB, isRestNoSQLDB, restNoSQLDB, restResources, restClients)
 	return copier
 }
 
 func getIntegrationsCopier(goValues *GoValues) map[string]interface{} {
-	userName := goValues.Values.Get(languages.UserName)
-	repositoryName := goValues.Values.Get(languages.RepositoryName)
+	gitPlatformUserName := goValues.Values.Get(languages.GitPlatformUserName)
+	gitRepositoryName := goValues.Values.Get(languages.GitRepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := goValues.Values.NodeDirectoryName
 	// rest
@@ -351,19 +355,19 @@ func getIntegrationsCopier(goValues *GoValues) map[string]interface{} {
 	projectName := goValues.Values.ProjectName
 
 	// create golang specific dockerCopier
-	dockerCopier := docker.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
+	dockerCopier := docker.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
 	// create golang specific k8sCopier
-	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
+	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
 	// create golang specific githubActionsCopier
-	githubActionsCopier := githubactions.NewCopier(userName, repositoryName, projectDirectoryName, nodeName, nodeDirectoryName, path)
+	githubActionsCopier := githubactions.NewCopier(gitPlatformUserName, gitRepositoryName, projectDirectoryName, nodeName, nodeDirectoryName, path)
 
 	// create golang specific devspaceCopier
-	devspaceCopier := devspace.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
+	devspaceCopier := devspace.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
 	// create golang specific devContainerCopier
-	devContainerCopier := devcontainer.NewCopier(userName, repositoryName, projectName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
+	devContainerCopier := devcontainer.NewCopier(gitPlatformUserName, gitRepositoryName, projectName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
 	return map[string]interface{}{
 		"docker":        dockerCopier,

@@ -114,15 +114,13 @@ export interface Project {
     projectName: string;
     userName: string;
     json: string;
-    repositoryName: string;
+    gitRepositoryName: string;
+    gitRepositoryIsPublic: boolean;
+    gitRepositoryBranch: string;
+    gitPlatformName: string;
+    gitPlatformURL: string;
+    gitPlatformUserName: string;
     metadata: string;
-    repositoryIsPublic: boolean;
-    repositoryBranch: string;
-    platformName: string;
-    platformUrl: string;
-    platformUserName: string;
-    platformPersonalAccessToken: string;
-    platformEmail: string;
 }
 
 export interface GenerateCodeRequest {

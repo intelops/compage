@@ -69,8 +69,8 @@ func Generate(ctx context.Context) error {
 }
 
 func getIntegrationsCopier(javaValues Values) map[string]interface{} {
-	userName := javaValues.Values.Get(languages.UserName)
-	repositoryName := javaValues.Values.Get(languages.RepositoryName)
+	gitPlatformUserName := javaValues.Values.Get(languages.GitPlatformUserName)
+	gitRepositoryName := javaValues.Values.Get(languages.GitRepositoryName)
 	nodeName := javaValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := javaValues.Values.NodeDirectoryName
 	isRestServer := javaValues.JavaNode.RestConfig.Server != nil
@@ -87,13 +87,13 @@ func getIntegrationsCopier(javaValues Values) map[string]interface{} {
 	}
 
 	// create java specific dockerCopier
-	dockerCopier := docker.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, generatedJarName, isRestServer, restServerPort)
+	dockerCopier := docker.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, generatedJarName, isRestServer, restServerPort)
 
 	// create java specific k8sCopier
-	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	// create java specific devspaceCopier
-	devspaceCopier := devspace.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	devspaceCopier := devspace.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	return map[string]interface{}{
 		"docker":   dockerCopier,
