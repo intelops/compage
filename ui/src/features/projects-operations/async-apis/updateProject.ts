@@ -2,7 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {UpdateProjectError, UpdateProjectRequest} from "../model";
 import {updateProject} from "../api";
 import {toastr} from 'react-redux-toastr';
-import {refreshProjectsList} from "./refresh";
+import {refreshCurrentProject, refreshProjectsList} from "./refresh";
 
 export const updateProjectAsync = createAsyncThunk<any, UpdateProjectRequest, {
     rejectValue: UpdateProjectError
@@ -25,6 +25,7 @@ export const updateProjectAsync = createAsyncThunk<any, UpdateProjectRequest, {
             // no need to save state in localstorage for this type of request.
             // refresh the list of Projects
             thunkApi.dispatch(refreshProjectsList());
+            thunkApi.dispatch(refreshCurrentProject(updateProjectRequest.id));
             return response.data;
         }).catch((e: any) => {
             const statusCode = e.response.status;

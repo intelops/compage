@@ -106,7 +106,7 @@ export const GenerateCode = () => {
         // check if the get project data is different.
         if (getProjectData?.json) {
             const removeUnwantedKeyGetProject = removeUnwantedKeys(JSON.stringify(getProjectData?.json));
-            if (_.isEqual(removeUnwantedKeyGetProject, removeUnwantedKeysGetCurrentState)) {
+            if (_.isEqual(removeUnwantedKeyGetProject?.consumerData, removeUnwantedKeysGetCurrentState?.consumerData)) {
                 return false;
             }
         }

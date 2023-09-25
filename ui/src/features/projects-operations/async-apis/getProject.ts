@@ -33,7 +33,9 @@ export const getProjectAsync = createAsyncThunk<ProjectDTO, GetProjectRequest, {
             const successDetails = `Successfully retrieved project.`;
             console.log(successDetails);
             toastr.success(`getProject [Success]`, successDetails);
-            const projectDTO: ProjectDTO = response.data;
+            // the below json conversion is required as response
+            // doesn't get automatically converted to nested interface structure
+            const projectDTO: ProjectDTO = JSON.parse(JSON.stringify(response.data));
             // update details to localstorage client
             setCurrentConfig(projectDTO.json);
             setCurrentState(projectDTO.json);
@@ -42,7 +44,7 @@ export const getProjectAsync = createAsyncThunk<ProjectDTO, GetProjectRequest, {
             // properties to nodes and edges. After re-login, the modified state is lost and user can't see props
             // added to nodes and edges.
             updateModifiedState(projectDTO.json);
-            return response.data;
+            return projectDTO;
         }).catch((e: any) => {
             const statusCode = e.response.status;
             const message = e.response.data.message;

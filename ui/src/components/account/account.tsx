@@ -34,7 +34,6 @@ export const Account = () => {
                 email: getCurrentUser()
             };
             dispatch(getCurrentContextAsync(getCurrentProjectContext));
-
         }
         // eslint-disable-next-line
     }, [dispatch, navigate]);

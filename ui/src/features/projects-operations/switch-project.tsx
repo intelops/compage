@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useState} from 'react';
+import React, {ChangeEvent, useEffect, useState} from 'react';
 import Button from "@mui/material/Button";
 import {useNavigate} from "react-router-dom";
 import Dialog from "@mui/material/Dialog";
@@ -9,6 +9,11 @@ import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import DialogActions from "@mui/material/DialogActions";
 import {SwitchToExistingProject} from "./switch-to-existing-project";
 import {SwitchToNewProject} from "./switch-to-new-project";
+import {ListGitPlatformsRequest} from "../git-platforms-operations/model";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
+import {listGitPlatformsAsync} from "../git-platforms-operations/async-apis/listGitPlatforms";
+import {useAppDispatch, useAppSelector} from "../../redux/hooks";
+import {selectListGitPlatformsStatus} from "../git-platforms-operations/slice";
 
 
 interface SwitchProjectProps {
@@ -16,6 +21,18 @@ interface SwitchProjectProps {
 
 export const SwitchProject = (_switchProjectProps: SwitchProjectProps) => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const listGitPlatformsStatus = useAppSelector(selectListGitPlatformsStatus);
+
+    useEffect(() => {
+        const listGitPlatformsRequest: ListGitPlatformsRequest = {
+            email: getCurrentUser()
+        };
+        if (listGitPlatformsStatus !== 'loading') {
+            dispatch(listGitPlatformsAsync(listGitPlatformsRequest));
+        }
+        // eslint-disable-next-line
+    }, [dispatch]);
 
     const [payload, setPayload] = useState({
         isNew: false,

@@ -64,7 +64,9 @@ export const SwitchToNewProject = (_switchToNewProjectProps: SwitchToNewProjectP
     const handleCreateProjectClick = () => {
         const createProjectRequest: CreateProjectRequest = prepareCreateProjectRequest();
         dispatch(createProjectAsync(createProjectRequest));
-        navigate('/home');
+        setTimeout(() => {
+            navigate('/home');
+        }, 2000);
     };
 
     const handleGitPlatformsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
