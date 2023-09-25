@@ -109,8 +109,10 @@ projectsOperationsRouter.put('/users/:email/projects/:id', requireEmailMiddlewar
             Logger.error(errorMessage);
             return response.status(400).json(getUpdateProjectError(errorMessage));
         }
-        projectDTO.updatedAt = new Date().toISOString();
-        const isUpdated = await projectService.updateProject(id, getProjectEntity(projectDTO));
+        projectEntity.updated_at = new Date().toISOString();
+        projectEntity.json = JSON.stringify(projectDTO.json);
+        projectEntity.version = projectDTO.version;
+        const isUpdated = await projectService.updateProject(id, projectEntity);
         if (isUpdated) {
             const successMessage = `[${projectDTO.ownerEmail}] project[${projectDTO.id}] updated.`;
             Logger.info(successMessage);

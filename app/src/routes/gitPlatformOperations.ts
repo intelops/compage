@@ -103,8 +103,9 @@ gitPlatformsOperationsRouter.put('/users/:email/gitPlatforms/:name', async (requ
             Logger.error(errorMessage);
             return response.status(400).json(getUpdateGitPlatformError(errorMessage));
         }
-        gitPlatformDTO.updatedAt = new Date().toISOString();
-        const isUpdated = await gitPlatformService.updateGitPlatform(ownerEmail, name, getGitPlatformEntity(gitPlatformDTO));
+        gitPlatformEntity.updated_at = new Date().toISOString();
+        gitPlatformEntity.personal_access_token = gitPlatformDTO.personalAccessToken;
+        const isUpdated = await gitPlatformService.updateGitPlatform(ownerEmail, name, gitPlatformEntity);
         if (isUpdated) {
             const successMessage = `[${gitPlatformDTO.ownerEmail}] gitPlatform[${gitPlatformDTO.name}] updated.`;
             Logger.info(successMessage);

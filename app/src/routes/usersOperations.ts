@@ -92,8 +92,11 @@ usersOperationsRouter.put('/:email', requireEmailMiddleware, async (request: Req
             Logger.error(errorMessage);
             return response.status(400).json(getUpdateUserError(errorMessage));
         }
-        userDTO.updatedAt = new Date().toISOString();
-        const isUpdated: boolean = await userService.updateUser(email, getUserEntity(userDTO));
+        userEntity.updated_at = new Date().toISOString();
+        userEntity.first_name = userDTO.firstName;
+        userEntity.last_name = userDTO.lastName;
+        userEntity.role = userDTO.role;
+        const isUpdated: boolean = await userService.updateUser(email, userEntity);
         if (isUpdated) {
             const successMessage = `[${userDTO.email}] user updated.`;
             Logger.info(successMessage);
