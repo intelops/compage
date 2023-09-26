@@ -7,8 +7,8 @@ export class SqliteProjectDaoImpl implements ProjectDao {
     async createProject(projectEntity: ProjectEntity): Promise<ProjectEntity> {
         projectEntity.id = generateProjectId(projectEntity);
         return new Promise((resolve, reject) => {
-            const stmt = db.prepare('INSERT INTO projects (id, display_name, version, json, git_platform_name, git_platform_user_name, is_repository_public, repository_branch, repository_name, owner_email, repository_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-            stmt.run(projectEntity.id, projectEntity.display_name, projectEntity.version, projectEntity.json, projectEntity.git_platform_name, projectEntity.git_platform_user_name, projectEntity.is_repository_public, projectEntity.repository_branch, projectEntity.repository_name, projectEntity.owner_email, projectEntity.repository_url, projectEntity.created_at, projectEntity.updated_at, (err: any) => {
+            const stmt = db.prepare('INSERT INTO projects (id, display_name, version, json, git_platform_name, git_platform_user_name, is_repository_public, repository_branch, repository_name, owner_email, repository_url, metadata, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+            stmt.run(projectEntity.id, projectEntity.display_name, projectEntity.version, projectEntity.json, projectEntity.git_platform_name, projectEntity.git_platform_user_name, projectEntity.is_repository_public, projectEntity.repository_branch, projectEntity.repository_name, projectEntity.owner_email, projectEntity.repository_url, projectEntity.metadata, projectEntity.created_at, projectEntity.updated_at, (err: any) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -63,7 +63,9 @@ export class SqliteProjectDaoImpl implements ProjectDao {
                         repository_name: '',
                         repository_branch: '',
                         is_repository_public: false,
-                        repository_url: ''
+                        repository_url: '',
+                        metadata: '',
+                        old_versions: [],
                     };
                     resolve(projectEntity);
                 }
@@ -76,11 +78,13 @@ export class SqliteProjectDaoImpl implements ProjectDao {
                        SET display_name = ?,
                            version      = ?,
                            json         = ?,
+                           metadata     = ?,
+                           old_versions = ?,
                            updated_at   = ?
                        WHERE id = ?`;
         return new Promise<boolean>((resolve, reject) => {
             const stmt = db.prepare(query);
-            stmt.run(projectEntity.display_name, projectEntity.version, projectEntity.json, projectEntity.updated_at, id, (err: any) => {
+            stmt.run(projectEntity.display_name, projectEntity.version, projectEntity.json, projectEntity.metadata, projectEntity.old_versions, projectEntity.updated_at, id, (err: any) => {
                 if (err) {
                     reject(err);
                 } else {

@@ -10,7 +10,7 @@ service ProjectService {
 
 message GenerateCodeRequest {
   string projectName = 1;
-  string projectJson = 2;
+  string projectJSON = 2;
   string gitRepositoryName = 3;
   string gitPlatformName = 4;
   string gitPlatformURL = 5;

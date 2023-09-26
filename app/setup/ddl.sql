@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS compage.projects
     owner_email            TEXT,
     json                   TEXT,
     metadata               TEXT,
+    old_versions           TEXT,
     git_platform_user_name TEXT,
     git_platform_name      TEXT,
     repository_name        TEXT,

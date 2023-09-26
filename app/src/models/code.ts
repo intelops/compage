@@ -112,8 +112,7 @@ export interface CompageJson {
 // grpc client request
 export interface Project {
     projectName: string;
-    userName: string;
-    json: string;
+    projectJSON: string;
     gitRepositoryName: string;
     gitRepositoryIsPublic: boolean;
     gitRepositoryBranch: string;

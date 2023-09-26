@@ -25,7 +25,6 @@ const gitPlatformService = new GitPlatformService();
 
 // generateCode (grpc calls to core)
 codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, resource) => {
-    // TODO the below || op is not required, as the check is already done in middleware.
     const ownerEmail = request.header(X_EMAIL_HEADER) || '';
     const generateCodeRequest: GenerateCodeRequest = request.body;
     const projectId = generateCodeRequest.projectId;
@@ -90,6 +89,9 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
     const originalProjectPath = `${os.tmpdir()}/${projectEntity.display_name}`;
     const downloadedProjectPath = `${originalProjectPath}_downloaded`;
     try {
+        if (fs.existsSync(downloadedProjectPath)) {
+            cleanup(downloadedProjectPath);
+        }
         fs.mkdirSync(downloadedProjectPath, {recursive: true});
     } catch (err: any) {
         if (err.code !== 'EEXIST') {
@@ -101,7 +103,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
             fs.mkdirSync(downloadedProjectPath, {recursive: true});
         }
     }
-    const projectTarFilePath = `${downloadedProjectPath}/${projectEntity.id}_downloaded.tar.gz`;
+    const projectTarFilePath = `${downloadedProjectPath}_downloaded.tar.gz`;
 
     const gitPlatformEntity: GitPlatformEntity = await gitPlatformService.getGitPlatform(projectEntity.owner_email as string, projectEntity.git_platform_name as string);
 
@@ -109,8 +111,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
     // need to save project-name, compage-json version, github repo and latest commit to the db
     const payload: Project = {
         projectName: projectEntity.display_name,
-        userName: projectEntity.git_platform_user_name,
-        json: projectEntity.json,
+        projectJSON: projectEntity.json,
         gitRepositoryName: projectEntity.repository_name,
         metadata: projectEntity.metadata as string,
         gitRepositoryIsPublic: projectEntity.is_repository_public,
@@ -168,7 +169,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
                 },
                 projectVersion: projectEntity.version,
                 generatedProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
-                existingProject: `${downloadedProjectPath}/projectEntity.repository_name`,
+                existingProject: `${downloadedProjectPath}/${projectEntity.display_name}`,
             };
 
             let error: string = await cloneExistingProjectFromGitServer(existingProjectGitServerRequest);
@@ -192,8 +193,8 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
             Logger.debug(`saved ${downloadedProjectPath} to github.`);
             cleanup(downloadedProjectPath);
 
-            // update status in k8s
-            const metadata = JSON.parse(projectEntity.metadata as string);
+            // update status of projectEntity
+            const metadata = JSON.parse(projectEntity.metadata as string) || new Map<string, string>();
             metadata.isGenerated = true;
             metadata.version = projectEntity.version;
             // add metadata back to projectEntity.spec
@@ -207,6 +208,8 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
                 projectEntity.version = nextVersion(projectEntity.version);
                 projectEntity.old_versions.push(JSON.stringify(oldVersion));
             }
+            console.log("projectEntity", projectEntity);
+
             const isUpdated = await projectService.updateProject(projectId, projectEntity);
             if (isUpdated) {
                 // send status back to ui

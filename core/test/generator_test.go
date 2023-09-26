@@ -71,7 +71,7 @@ func TestRestServerGeneratorNoSql(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-rest-server-project-nosql",
-		ProjectJson:         restServerConfigJSON,
+		ProjectJSON:         restServerConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-rest-server-project-nosql")
@@ -150,7 +150,7 @@ func TestRestServerGeneratorSqlMap(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-rest-server-project-map",
-		ProjectJson:         restServerConfigJSON,
+		ProjectJSON:         restServerConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-rest-server-project-map")
@@ -229,7 +229,7 @@ func TestRestServerGeneratorSqlSQLite(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-rest-server-project-sqlite",
-		ProjectJson:         restServerConfigJSON,
+		ProjectJSON:         restServerConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-rest-server-project-sqlite")
@@ -308,7 +308,7 @@ func TestRestServerGeneratorSqlMySQL(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-rest-server-project-mysql",
-		ProjectJson:         restServerConfigJSON,
+		ProjectJSON:         restServerConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-rest-server-project-mysql")
@@ -387,7 +387,7 @@ func TestRestServerGeneratorSqlSQLiteGORM(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-rest-server-project-sqlite-gorm",
-		ProjectJson:         restServerConfigJSON,
+		ProjectJSON:         restServerConfigJSON,
 	}
 	defer func() {
 		//_ = os.RemoveAll("/tmp/first-rest-server-project-sqlite-gorm")
@@ -466,7 +466,7 @@ func TestRestServerGeneratorSqlMySQLGORM(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-rest-server-project-mysql-gorm",
-		ProjectJson:         restServerConfigJSON,
+		ProjectJSON:         restServerConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-rest-server-project-mysql-gorm")
@@ -535,7 +535,7 @@ func TestRestServerWithOpenApiGenerator(t *testing.T) {
 				GitPlatformUserName: "mahendraintelops",
 				GitRepositoryName:   "first-project-github",
 				ProjectName:         "first-openapi-based-project-" + tt.language,
-				ProjectJson:         replacedConfig,
+				ProjectJSON:         replacedConfig,
 			}
 			defer func() {
 				_ = os.RemoveAll("/tmp/first-openapi-based-project-" + tt.language)
@@ -612,7 +612,7 @@ func TestGrpcServerGeneratorNoSql(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-grpc-server-project-nosql",
-		ProjectJson:         grpcServerConfigJSON,
+		ProjectJSON:         grpcServerConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-grpc-server-project-nosql")
@@ -685,7 +685,7 @@ func TestGrpcServerGeneratorSqlMap(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-grpc-server-project-map",
-		ProjectJson:         grpcServerConfigJSON,
+		ProjectJSON:         grpcServerConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-grpc-server-project-map")
@@ -758,7 +758,7 @@ func TestGrpcServerGeneratorSqlSQLite(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-grpc-server-project-sqlite",
-		ProjectJson:         grpcServerConfigJSON,
+		ProjectJSON:         grpcServerConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-grpc-server-project-sqlite")
@@ -831,7 +831,7 @@ func TestGrpcServerGeneratorSqlMySQL(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-grpc-server-project-mysql",
-		ProjectJson:         grpcServerConfigJSON,
+		ProjectJSON:         grpcServerConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-grpc-server-project-mysql")
@@ -904,7 +904,7 @@ func TestGrpcServerGeneratorSqlSQLiteGORM(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-grpc-server-project-sqlite-gorm",
-		ProjectJson:         grpcServerConfigJSON,
+		ProjectJSON:         grpcServerConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-grpc-server-project-sqlite-gorm")
@@ -977,7 +977,7 @@ func TestGrpcServerGeneratorSqlMySQLGORM(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-grpc-server-project-mysql-gorm",
-		ProjectJson:         grpcServerConfigJSON,
+		ProjectJSON:         grpcServerConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-grpc-server-project-mysql-gorm")
@@ -1169,7 +1169,7 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-rest-server-clients-and-grpc-server-clients-cross-config-project",
-		ProjectJson:         restGrpcServerClientsCrossConfigJSON,
+		ProjectJSON:         restGrpcServerClientsCrossConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-rest-server-clients-and-grpc-server-clients-cross-config-project")
@@ -1290,7 +1290,7 @@ func TestRestClientAndGrpcClientCrossConfigGenerator(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-rest-client-and-grpc-client-cross-config-project",
-		ProjectJson:         restGrpcClientCrossConfigJSON,
+		ProjectJSON:         restGrpcClientCrossConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-rest-client-and-grpc-client-cross-config-project")
@@ -1369,7 +1369,7 @@ func TestRestAndGrpcServerGenerator(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-rest-and-grpc-server-project",
-		ProjectJson:         restAndGrpcServerConfigJSON,
+		ProjectJSON:         restAndGrpcServerConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-rest-and-grpc-server-project")
@@ -1430,7 +1430,7 @@ func TestWsServerGenerator(t *testing.T) {
 		GitPlatformUserName: "mahendraintelops",
 		GitRepositoryName:   "first-project-github",
 		ProjectName:         "first-ws-server-project",
-		ProjectJson:         wsServerConfigJSON,
+		ProjectJSON:         wsServerConfigJSON,
 	}
 	defer func() {
 		_ = os.RemoveAll("/tmp/first-ws-server-project")
