@@ -33,7 +33,7 @@ export const pushNewProjectToGitServer = async (newProjectGitServerRequest: NewP
 
     // TODO when the support for other git providers will be added, need to change below hardcoded string.
     // Set up GitHub url like this so no manual entry of user pass needed
-    const gitServerUrl = `https://${newProjectGitServerRequest.gitProviderDetails.platformUserName}:${newProjectGitServerRequest.gitProviderDetails.platformPersonalAccessToken}@${newProjectGitServerRequest.gitProviderDetails.platformUrl}/${newProjectGitServerRequest.gitProviderDetails.platformUserName}/${newProjectGitServerRequest.gitProviderDetails.repositoryName}.git`;
+    const gitServerUrl = `https://${newProjectGitServerRequest.gitProviderDetails.platformUserName}:${newProjectGitServerRequest.gitProviderDetails.platformPersonalAccessToken}@${newProjectGitServerRequest.gitProviderDetails.platformUrl.replace('https://', '')}/${newProjectGitServerRequest.gitProviderDetails.platformUserName}/${newProjectGitServerRequest.gitProviderDetails.repositoryName}.git`;
 
     // Add remote repository url as origin to repository
     await git.addRemote('origin', gitServerUrl).then(
@@ -48,5 +48,6 @@ export const pushNewProjectToGitServer = async (newProjectGitServerRequest: NewP
     }
 
     // add, commit and push
-    return await gitOperations(git, newProjectGitServerRequest.gitProviderDetails.repositoryBranch, newProjectGitServerRequest.projectVersion);
+    // default branch is main
+    return await gitOperations(git);
 };

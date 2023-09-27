@@ -14,7 +14,7 @@ import {
     ProjectDTO,
     ProjectEntity
 } from '../models/project';
-import {createRepository} from '../integrations/git-platforms';
+import {createRepository, makeInitialCommit} from '../integrations/git-platforms';
 import {ProjectService} from '../services/projectService';
 
 const projectsOperationsRouter = Router();
@@ -35,7 +35,9 @@ projectsOperationsRouter.post('/users/:email/projects', requireEmailMiddleware, 
         projectDTO.updatedAt = new Date().toISOString();
         savedProjectEntity = await projectService.createProject(getProjectEntity(projectDTO));
         if (savedProjectEntity.id.length !== 0) {
-            await createRepository(savedProjectEntity);
+            const createRepositoryResponse = await createRepository(savedProjectEntity);
+            Logger.debug(`createRepositoryResponse: ${JSON.stringify(createRepositoryResponse.data)}`);
+            await makeInitialCommit(savedProjectEntity);
             const successMessage = `[${savedProjectEntity.owner_email}] project[${savedProjectEntity.id}] created.`;
             Logger.info(successMessage);
             return response.status(201).json(getCreateProjectResponse(savedProjectEntity));
@@ -62,7 +64,6 @@ projectsOperationsRouter.post('/users/:email/projects', requireEmailMiddleware, 
 
 // get project by owner_email and id for given project
 projectsOperationsRouter.get('/users/:email/projects/:id', requireEmailMiddleware, async (request: Request, response: Response) => {
-    const ownerEmail = request.params.email;
     const id = request.params.id;
     try {
         const projectEntity: ProjectEntity = await projectService.getProject(id as string);
