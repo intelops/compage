@@ -35,8 +35,7 @@ projectsOperationsRouter.post('/users/:email/projects', requireEmailMiddleware, 
         projectDTO.updatedAt = new Date().toISOString();
         savedProjectEntity = await projectService.createProject(getProjectEntity(projectDTO));
         if (savedProjectEntity.id.length !== 0) {
-            const resp = await createRepository(savedProjectEntity);
-            Logger.debug(`createRepository Response: ${JSON.stringify(resp.data)}`);
+            await createRepository(savedProjectEntity);
             const successMessage = `[${savedProjectEntity.owner_email}] project[${savedProjectEntity.id}] created.`;
             Logger.info(successMessage);
             return response.status(201).json(getCreateProjectResponse(savedProjectEntity));
@@ -45,15 +44,16 @@ projectsOperationsRouter.post('/users/:email/projects', requireEmailMiddleware, 
         Logger.error(message);
         return response.status(500).json(getCreateProjectError(message));
     } catch (e: any) {
-        if (e.response && e.response.data && e.response.data.message && e.response.data.message.includes('Repository creation failed.')) {
-            if (savedProjectEntity?.id.length !== 0) {
-                const isDeleted = await projectService.deleteProject(savedProjectEntity?.id);
-                if (isDeleted) {
-                    const successMessage = `'${ownerEmail}' project[${savedProjectEntity?.id}] deleted successfully.`;
-                    Logger.info(successMessage);
-                }
+        console.log('e', e);
+        // if (e.response && e.response.data && e.response.data.message && e.response.data.message.includes('Repository creation failed.')) {
+        if (savedProjectEntity?.id.length !== 0) {
+            const isDeleted = await projectService.deleteProject(savedProjectEntity?.id);
+            if (isDeleted) {
+                const successMessage = `'${ownerEmail}' project[${savedProjectEntity?.id}] deleted successfully.`;
+                Logger.info(successMessage);
             }
         }
+        // }
         const message = `${projectDTO.ownerEmail} project [${projectDTO.displayName}] couldn't be created[${e.message}]).`;
         Logger.error(message);
         return response.status(500).json(getCreateProjectError(message));

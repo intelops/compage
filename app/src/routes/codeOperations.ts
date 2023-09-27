@@ -169,7 +169,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
                 },
                 projectVersion: projectEntity.version,
                 generatedProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
-                existingProject: `${downloadedProjectPath}/${projectEntity.display_name}`,
+                existingProject: `${downloadedProjectPath}/${projectEntity.repository_name}`,
             };
 
             let error: string = await cloneExistingProjectFromGitServer(existingProjectGitServerRequest);
@@ -208,7 +208,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
                 projectEntity.version = nextVersion(projectEntity.version);
                 projectEntity.old_versions.push(JSON.stringify(oldVersion));
             }
-            console.log("projectEntity", projectEntity);
+            console.log('projectEntity', projectEntity);
 
             const isUpdated = await projectService.updateProject(projectId, projectEntity);
             if (isUpdated) {
