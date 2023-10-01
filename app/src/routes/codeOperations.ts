@@ -54,11 +54,11 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
     }
 
     const hasNodes = (entity: ProjectEntity) => {
-        return !entity.json
-            || entity.json === '{}'
-            || entity.json.length === 0
-            || !JSON.parse(entity.json)?.nodes
-            || JSON.parse(entity.json)?.nodes?.length !== 0;
+        return entity.json
+            && entity.json !== '{}'
+            && entity.json.length !== 0
+            && JSON.parse(entity.json).nodes
+            && Object.keys(JSON.parse(entity.json).nodes).length !== 0;
     };
 
     if (!hasNodes(projectEntity)) {
