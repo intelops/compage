@@ -30,8 +30,9 @@ export const cloneExistingProjectFromGitServer = async (existingProjectGitServer
 };
 
 export const pushToExistingProjectOnGitServer = async (existingProjectGitServerRequest: ExistingProjectGitServerRequest): Promise<string> => {
+    const baseDir = existingProjectGitServerRequest.clonedProjectPath + '/' + existingProjectGitServerRequest.projectName;
     const options: Partial<SimpleGitOptions> = {
-        baseDir: existingProjectGitServerRequest.existingProject,
+        baseDir,
         binary: 'git',
         maxConcurrentProcesses: 6,
         trimmed: false,
@@ -45,8 +46,8 @@ export const pushToExistingProjectOnGitServer = async (existingProjectGitServerR
     await git.addConfig('user.name', existingProjectGitServerRequest.gitProviderDetails.platformUserName);
 
     // copy over the new files to this cloned files.
-    fs.cpSync(existingProjectGitServerRequest.generatedProjectPath, existingProjectGitServerRequest.existingProject, {recursive: true});
-    Logger.info(`${existingProjectGitServerRequest.generatedProjectPath} files copied to ${existingProjectGitServerRequest.existingProject}`);
+    fs.cpSync(existingProjectGitServerRequest.generatedProjectPath, baseDir, {recursive: true});
+    Logger.info(`${existingProjectGitServerRequest.generatedProjectPath} files copied to ${baseDir}`);
 
     // add, commit and push
     return await gitOperations(git, existingProjectGitServerRequest.gitProviderDetails.repositoryBranch, existingProjectGitServerRequest.projectVersion);

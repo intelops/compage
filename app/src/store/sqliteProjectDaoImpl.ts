@@ -7,8 +7,8 @@ export class SqliteProjectDaoImpl implements ProjectDao {
     async createProject(projectEntity: ProjectEntity): Promise<ProjectEntity> {
         projectEntity.id = generateProjectId(projectEntity);
         return new Promise((resolve, reject) => {
-            const stmt = db.prepare('INSERT INTO projects (id, display_name, version, json, git_platform_name, git_platform_user_name, is_repository_public, repository_branch, repository_name, owner_email, repository_url, metadata, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-            stmt.run(projectEntity.id, projectEntity.display_name, projectEntity.version, projectEntity.json, projectEntity.git_platform_name, projectEntity.git_platform_user_name, projectEntity.is_repository_public, projectEntity.repository_branch, projectEntity.repository_name, projectEntity.owner_email, projectEntity.repository_url, projectEntity.metadata, projectEntity.created_at, projectEntity.updated_at, (err: any) => {
+            const stmt = db.prepare('INSERT INTO projects (id, display_name, version, json, git_platform_name, git_platform_user_name, is_repository_public, repository_branch, repository_name, owner_email, repository_url, metadata, old_versions, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+            stmt.run(projectEntity.id, projectEntity.display_name, projectEntity.version, projectEntity.json, projectEntity.git_platform_name, projectEntity.git_platform_user_name, projectEntity.is_repository_public, projectEntity.repository_branch, projectEntity.repository_name, projectEntity.owner_email, projectEntity.repository_url, projectEntity.metadata, projectEntity.old_versions, projectEntity.created_at, projectEntity.updated_at, (err: any) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -65,7 +65,7 @@ export class SqliteProjectDaoImpl implements ProjectDao {
                         is_repository_public: false,
                         repository_url: '',
                         metadata: '',
-                        old_versions: [],
+                        old_versions: '',
                     };
                     resolve(projectEntity);
                 }

@@ -14,7 +14,7 @@ export class CassandraProjectDaoImpl implements ProjectDao {
                                              old_versions,
                                              created_at, updated_at)
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) IF NOT EXISTS`;
-        const params = [projectEntity.id, projectEntity.display_name, projectEntity.version, projectEntity.json, projectEntity.git_platform_name, projectEntity.git_platform_user_name, projectEntity.is_repository_public, projectEntity.repository_branch, projectEntity.repository_name, projectEntity.owner_email, projectEntity.repository_url, projectEntity.metadata, projectEntity.created_at, projectEntity.updated_at];
+        const params = [projectEntity.id, projectEntity.display_name, projectEntity.version, projectEntity.json, projectEntity.git_platform_name, projectEntity.git_platform_user_name, projectEntity.is_repository_public, projectEntity.repository_branch, projectEntity.repository_name, projectEntity.owner_email, projectEntity.repository_url, projectEntity.metadata,projectEntity.old_versions, projectEntity.created_at, projectEntity.updated_at];
         const resultSet = await cassandraClient.execute(query, params, {prepare: true});
         if (resultSet.wasApplied()) {
             return projectEntity;
@@ -32,7 +32,7 @@ export class CassandraProjectDaoImpl implements ProjectDao {
             repository_url: '',
             owner_email: '',
             metadata: '',
-            old_versions: [],
+            old_versions: '',
             created_at: '',
             updated_at: '',
         };
@@ -93,7 +93,7 @@ export class CassandraProjectDaoImpl implements ProjectDao {
                 repository_url: '',
                 owner_email: '',
                 metadata: '',
-                old_versions: [],
+                old_versions: '',
                 created_at: '',
                 updated_at: '',
             };

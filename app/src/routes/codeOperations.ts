@@ -13,7 +13,7 @@ import tar from 'tar';
 import {X_EMAIL_HEADER} from '../utils/constants';
 import {GenerateCodeRequest, getGenerateCodeError, getGenerateCodeResponse, Project} from '../models/code';
 import {GitPlatformEntity} from '../models/gitPlatform';
-import {OldVersion, ProjectEntity} from '../models/project';
+import {Metadata, OldVersion, ProjectEntity} from '../models/project';
 import {ExistingProjectGitServerRequest} from '../integrations/simple-git/models';
 import {ProjectService} from '../services/projectService';
 import {GitPlatformService} from '../services/gitPlatformService';
@@ -72,8 +72,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
         const lastVersion = previousVersion(currentVersion);
         const oldVersions = projectEntity.old_versions;
         // iterate over all oldVersions to find the last version in it.
-        for (const oldVersion of oldVersions as string[]) {
-            const oldVersionJson = JSON.parse(oldVersion);
+        for (const oldVersionJson of JSON.parse(oldVersions) as OldVersion[]) {
             // check if the lastVersion matches with current version
             if (oldVersionJson.version === lastVersion) {
                 // remove unwanted keys and then do the equality check. This is needed to avoid keys used to render ui.
@@ -87,23 +86,39 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
 
     // create directory hierarchy here itself as creating it after receiving data will not be proper.
     const originalProjectPath = `${os.tmpdir()}/${projectEntity.display_name}`;
+    // this is path where project will be downloaded
     const downloadedProjectPath = `${originalProjectPath}_downloaded`;
+    // this is path where project will be cloned
+    const clonedProjectPath = `${originalProjectPath}_cloned`;
+    // this is path in tar file
+    const generatedProjectPath = `${downloadedProjectPath}` + `${originalProjectPath}`;
+    // this is path where tar file will be saved
+    const downloadedProjectTarFilePath = `${originalProjectPath}_downloaded.tar.gz`;
     try {
+        // create downloadedProjectPath
         if (fs.existsSync(downloadedProjectPath)) {
             cleanup(downloadedProjectPath);
         }
         fs.mkdirSync(downloadedProjectPath, {recursive: true});
+        // create clonedProjectPath
+        if (fs.existsSync(clonedProjectPath)) {
+            cleanup(clonedProjectPath);
+        }
+        fs.mkdirSync(clonedProjectPath, {recursive: true});
     } catch (err: any) {
         if (err.code !== 'EEXIST') {
             const message = `unable to generate code for ${projectEntity.display_name}[${projectEntity.id}] => ${err}`;
             return resource.status(500).json(getGenerateCodeError(message));
         } else {
             // first clean up and then recreate (it might be a residue of previous run)
+            // create downloadedProjectPath
             cleanup(downloadedProjectPath);
             fs.mkdirSync(downloadedProjectPath, {recursive: true});
+            // create clonedProjectPath
+            cleanup(clonedProjectPath);
+            fs.mkdirSync(clonedProjectPath, {recursive: true});
         }
     }
-    const projectTarFilePath = `${downloadedProjectPath}_downloaded.tar.gz`;
 
     const gitPlatformEntity: GitPlatformEntity = await gitPlatformService.getGitPlatform(projectEntity.owner_email as string, projectEntity.git_platform_name as string);
 
@@ -127,8 +142,8 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
     call.on('data', async (response: { fileChunk: any }) => {
         // chunk is available, append it to the given path.
         if (response.fileChunk) {
-            fs.appendFileSync(projectTarFilePath, response.fileChunk);
-            Logger.debug(`writing tar file chunk to: ${projectTarFilePath}`);
+            fs.appendFileSync(downloadedProjectTarFilePath, response.fileChunk);
+            Logger.debug(`writing tar file chunk to: ${downloadedProjectTarFilePath}`);
         }
     });
 
@@ -147,7 +162,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
             C: downloadedProjectPath
         });
         // stream on extraction on tar file
-        const fscrs = fs.createReadStream(projectTarFilePath);
+        const fscrs = fs.createReadStream(downloadedProjectTarFilePath);
         fscrs.on('error', (err: any) => {
             Logger.error(JSON.stringify(err));
         });
@@ -156,7 +171,8 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
         extract.on('finish', async () => {
             // clone existing repository
             const existingProjectGitServerRequest: ExistingProjectGitServerRequest = {
-                clonedProjectPath: `${downloadedProjectPath}`,
+                projectName: projectEntity.display_name,
+                projectVersion: projectEntity.version,
                 gitProviderDetails: {
                     repositoryBranch: projectEntity.repository_branch as string,
                     repositoryName: projectEntity.repository_name as string,
@@ -167,9 +183,8 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
                     platformUrl: gitPlatformEntity.url,
                     platformName: gitPlatformEntity.name,
                 },
-                projectVersion: projectEntity.version,
-                generatedProjectPath: `${downloadedProjectPath}` + `${originalProjectPath}`,
-                existingProject: `${downloadedProjectPath}/${projectEntity.repository_name}`,
+                clonedProjectPath: `${clonedProjectPath}`,
+                generatedProjectPath: `${generatedProjectPath}`,
             };
 
             let error: string = await cloneExistingProjectFromGitServer(existingProjectGitServerRequest);
@@ -189,26 +204,26 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
                 Logger.error(pushErrorMessage);
                 return resource.status(500).json(getGenerateCodeError(pushErrorMessage));
             }
-
             Logger.debug(`saved ${downloadedProjectPath} to github.`);
             cleanup(downloadedProjectPath);
+            cleanup(clonedProjectPath);
+            cleanup(downloadedProjectTarFilePath);
 
             // update status of projectEntity
-            const metadata = JSON.parse(projectEntity.metadata as string) || new Map<string, string>();
+            const metadata = JSON.parse(projectEntity.metadata as string) || {} as Metadata;
             metadata.isGenerated = true;
             metadata.version = projectEntity.version;
             // add metadata back to projectEntity.spec
             projectEntity.metadata = JSON.stringify(metadata);
             // change version now
-            if (projectEntity.old_versions) {
-                const oldVersion: OldVersion = {
-                    version: projectEntity.version,
-                    json: projectEntity.json
-                };
-                projectEntity.version = nextVersion(projectEntity.version);
-                projectEntity.old_versions.push(JSON.stringify(oldVersion));
-            }
-            console.log('projectEntity', projectEntity);
+            const oldVersion: OldVersion = {
+                version: projectEntity.version,
+                json: projectEntity.json
+            };
+            const oldVersions = JSON.parse(projectEntity.old_versions) as OldVersion[];
+            projectEntity.version = nextVersion(projectEntity.version);
+            oldVersions.push(oldVersion);
+            projectEntity.old_versions = JSON.stringify(oldVersions);
 
             const isUpdated = await projectService.updateProject(projectId, projectEntity);
             if (isUpdated) {

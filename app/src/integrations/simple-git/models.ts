@@ -11,14 +11,14 @@ export interface GitProviderDetails {
 
 export interface NewProjectGitServerRequest {
     projectVersion: string;
-    generatedProjectPath: string;
     gitProviderDetails: GitProviderDetails;
+    generatedProjectPath: string;
 }
 
 export interface ExistingProjectGitServerRequest {
-    clonedProjectPath: string;
-    existingProject: string;
+    projectName: string;
     projectVersion: string;
-    generatedProjectPath: string;
     gitProviderDetails: GitProviderDetails;
+    clonedProjectPath: string;
+    generatedProjectPath: string;
 }

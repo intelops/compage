@@ -15,14 +15,17 @@ export interface ProjectEntity {
     repository_branch: string;
     is_repository_public: boolean;
     repository_url: string;
-    old_versions: string[];
+    old_versions: string;
     created_at?: string;
     updated_at?: string;
 }
 
 export interface OldVersion {
-    version: string;
-    json: string;
+    [key: string]: string;
+}
+
+export interface Metadata {
+    [key: string]: string;
 }
 
 export interface ProjectDTO {
@@ -37,7 +40,7 @@ export interface ProjectDTO {
     isRepositoryPublic: boolean;
     repositoryUrl: string;
     // TODO temporary made optional.
-    metadata?: Map<string, string>;
+    metadata?: Metadata;
     ownerEmail: string;
     oldVersions?: OldVersion[];
     createdAt?: string;
@@ -76,6 +79,8 @@ export const getCreateProjectResponse = (projectEntity: ProjectEntity) => {
         repositoryBranch: projectEntity.repository_branch,
         isRepositoryPublic: projectEntity.is_repository_public,
         repositoryUrl: projectEntity.repository_url,
+        metadata: JSON.parse(projectEntity.metadata),
+        oldVersions: JSON.parse(projectEntity.old_versions),
     };
     return projectDTO;
 };
@@ -95,6 +100,8 @@ export const getGetProjectResponse = (projectEntity: ProjectEntity) => {
         repositoryBranch: projectEntity.repository_branch,
         isRepositoryPublic: projectEntity.is_repository_public,
         repositoryUrl: projectEntity.repository_url,
+        metadata: JSON.parse(projectEntity.metadata),
+        oldVersions: JSON.parse(projectEntity.old_versions),
     };
     return projectDTO;
 };
@@ -106,7 +113,7 @@ export const getListProjectsResponse = (projectEntities: ProjectEntity[]) => {
             id: projectEntity.id,
             displayName: projectEntity.display_name,
             version: projectEntity.version,
-            json: JSON.parse(projectEntity.json),
+            json: JSON.parse(JSON.stringify(projectEntity.json)),
             ownerEmail: projectEntity.owner_email,
             createdAt: projectEntity.created_at,
             updatedAt: projectEntity.updated_at,
@@ -117,9 +124,7 @@ export const getListProjectsResponse = (projectEntities: ProjectEntity[]) => {
             isRepositoryPublic: projectEntity.is_repository_public,
             repositoryUrl: projectEntity.repository_url,
             metadata: JSON.parse(projectEntity.metadata),
-            oldVersions: projectEntity.old_versions ? projectEntity.old_versions.map((oldVersion) => {
-                return JSON.parse(oldVersion);
-            }) : [],
+            oldVersions: JSON.parse(projectEntity.old_versions),
         };
         projectDTOs.push(projectDTO);
     });
@@ -142,12 +147,10 @@ export const getProjectEntity = (projectDTO: ProjectDTO) => {
         is_repository_public: projectDTO.isRepositoryPublic,
         repository_url: projectDTO.repositoryUrl,
         metadata: JSON.stringify(projectDTO.metadata),
-        old_versions: projectDTO.oldVersions ? projectDTO.oldVersions.map((oldVersion) => {
-            return JSON.stringify(oldVersion);
-        }) : [],
+        old_versions: projectDTO.oldVersions ? JSON.stringify(projectDTO.oldVersions) : '[]',
     };
     return projectEntity;
-};
+    };
 
 // errors
 interface CreateProjectError {
