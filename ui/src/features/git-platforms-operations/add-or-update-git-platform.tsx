@@ -36,20 +36,24 @@ export const AddOrUpdateGitPlatform = (addOrUpdateGitPlatformProps: AddOrUpdateG
     interface SupportedGitPlatform {
         name: string;
         url: string;
+        isEnabled: boolean;
     }
 
     const supportedGitPlatforms = [
         {
             name: "github",
-            url: "https://github.com"
+            url: "https://github.com",
+            isEnabled: true
         },
         {
-            name: "gitlab",
-            url: "https://gitlab.com"
+            name: "gitlab [upcoming]",
+            url: "https://gitlab.com",
+            isEnabled: false
         },
         {
-            name: "bitbucket",
-            url: "https://bitbucket.org"
+            name: "bitbucket[upcoming]",
+            url: "https://bitbucket.org",
+            isEnabled: false
         }
     ];
 
@@ -130,7 +134,8 @@ export const AddOrUpdateGitPlatform = (addOrUpdateGitPlatformProps: AddOrUpdateG
             {
                 supportedGitPlatforms.map((supportedGitPlatform: SupportedGitPlatform) =>
                     (
-                        <MenuItem key={supportedGitPlatform.name} value={supportedGitPlatform.name}>
+                        <MenuItem key={supportedGitPlatform.name} value={supportedGitPlatform.name}
+                                  disabled={!supportedGitPlatform.isEnabled}>
                             {supportedGitPlatform.name}
                         </MenuItem>
                     )
