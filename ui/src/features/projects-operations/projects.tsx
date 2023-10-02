@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {selectListProjectsData} from "./slice";
-import {DeleteProjectRequest, ListProjectsRequest, ProjectDTO} from "./model";
+import {DeleteProjectRequest, GetProjectRequest, ListProjectsRequest, ProjectDTO} from "./model";
 import {getCurrentUser} from "../../utils/sessionstorageClient";
 import {listProjectsAsync} from "./async-apis/listProjects";
 import {Container, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
@@ -10,10 +10,15 @@ import Button from "@mui/material/Button";
 import {deleteProjectAsync} from "./async-apis/deleteProject";
 import Typography from "@mui/material/Typography";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
+
 import {DeleteProject} from "./delete-project";
+import {getProjectAsync} from "./async-apis/getProject";
+import {useNavigate} from "react-router-dom";
 
 export const Projects = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const listProjectsData = useAppSelector(selectListProjectsData);
     const [payload, setPayload] = useState({
         isDeleteProjectDialogOpen: false,
@@ -56,6 +61,15 @@ export const Projects = () => {
         });
     };
 
+    const handleSwitchProjectClick = (projectDTO: ProjectDTO) => {
+        const getProjectRequest: GetProjectRequest = {
+            id: projectDTO.id,
+            email: getCurrentUser()
+        };
+        dispatch(getProjectAsync(getProjectRequest));
+        navigate('/home');
+    };
+
     const getActionButtons = (projectDTO: ProjectDTO): React.ReactNode => {
         return <Stack direction="row" spacing="3">
             <Button variant="contained"
@@ -64,6 +78,14 @@ export const Projects = () => {
                         handleDeleteClick(projectDTO);
                     }}>
                 <DeleteOutlineIcon/>
+            </Button>
+            &nbsp;
+            <Button variant="contained"
+                    color="primary"
+                    onClick={() => {
+                        handleSwitchProjectClick(projectDTO);
+                    }}>
+                <ChangeCircleIcon/>
             </Button>
         </Stack>;
     };
