@@ -5,4 +5,4 @@ metadata:
   labels:
     {{- include "compage.core.labels" . | nindent 4 }}
 data:
-  OTEL_EXPORTER_OTLP_ENDPOINT: {{.Values.core.open-telemetry.otelExporterOtlpEndpoint}}
+  OTEL_EXPORTER_OTLP_ENDPOINT: {{.Values.core.openTelemetry.otelExporterOtlpEndpoint}}
