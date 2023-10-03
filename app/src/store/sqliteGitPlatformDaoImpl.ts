@@ -65,14 +65,13 @@ export class SqliteGitPlatformDaoImpl implements GitPlatformDao {
     }
 
     async updateGitPlatform(ownerEmail: string, name: string, gitPlatformEntity: GitPlatformEntity): Promise<boolean> {
+        console.log('updateGitPlatform', ownerEmail, name, gitPlatformEntity);
         const query = `UPDATE git_platforms
-                       SET url                   = ?,
-                           user_name             = ?,
-                           personal_access_token = ?,
+                       SET personal_access_token = ?,
                            updated_at            = ?
                        WHERE owner_email = ?
-                         and name = ? IF EXISTS`;
-        const params = [gitPlatformEntity.url, gitPlatformEntity.user_name, gitPlatformEntity.personal_access_token, gitPlatformEntity.updated_at, ownerEmail, name];
+                         and name = ?`;
+        const params = [gitPlatformEntity.personal_access_token, gitPlatformEntity.updated_at, ownerEmail, name];
         return new Promise<boolean>((resolve, reject) => {
             const stmt = db.prepare(query);
             stmt.run(params, (err: any) => {
