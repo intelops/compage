@@ -1,5 +1,5 @@
 # build environment
-FROM node:18.15-alpine as builder
+FROM node:18.18.0-alpine3.18 as builder
 WORKDIR /app
 COPY . .
 RUN npm install -g npm@latest && npm install --production=false && \
@@ -10,7 +10,7 @@ RUN npm install -g npm@latest && npm install --production=false && \
     npm install
 
 # production environment
-FROM node:18.15-alpine
+FROM node:18.18.0-alpine3.18
 WORKDIR /server
 RUN apk update && apk add git
 COPY --from=builder /app/dist /server/dist
