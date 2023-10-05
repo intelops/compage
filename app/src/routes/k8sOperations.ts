@@ -13,8 +13,9 @@ k8sOperationsRouter.get('/current-context', requireEmailMiddleware, async (_requ
     const contextName = await getCurrentContext();
     try {
         return response.status(200).json(getGetCurrentContextResponse(contextName));
-    } catch (e: any) {
-        const message = `current context couldn't be fetched[${e.message}].`;
+    } catch (err: any) {
+        const message = `current context couldn't be fetched[${err.message}].`;
+        Logger.debug(err);
         Logger.error(message);
         return response.status(500).json(getGetCurrentContextError(message));
     }

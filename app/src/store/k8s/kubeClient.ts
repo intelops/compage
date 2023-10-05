@@ -46,8 +46,8 @@ export const deleteObject = async ({
             plural,
             name
         );
-    } catch (e: any) {
-        Logger.debug(`error while deleting custom object: ${JSON.stringify(e?.body)}`);
+    } catch (err: any) {
+        Logger.debug(`error while deleting custom object: ${JSON.stringify(err?.body)}`);
         // Logger.info('error while getting custom object: ', e?.body?.reason)
     }
 };
@@ -68,8 +68,8 @@ export const getObject = async ({
         );
         const resource: Resource = JSON.parse(JSON.stringify(object.body));
         return resource;
-    } catch (e: any) {
-        Logger.debug(`error while getting custom object: ${JSON.stringify(e?.body)}`);
+    } catch (err: any) {
+        Logger.debug(`error while getting custom object: ${JSON.stringify(err?.body)}`);
         // Logger.info('error while getting custom object: ', e?.body?.reason)
         const resource: Resource = {apiVersion: '', kind: '', metadata: undefined, spec: undefined};
         return resource;
@@ -94,9 +94,9 @@ export const patchObject = async ({
         );
         const resource: Resource = JSON.parse(JSON.stringify(object.body));
         return resource;
-    } catch (e: any) {
-        Logger.debug(`error while patching custom object: ${JSON.stringify(e?.body)}`);
-        // Logger.info(`error while patching custom object: ${e?.body?.reason}`);
+    } catch (err: any) {
+        Logger.debug(`error while patching custom object: ${JSON.stringify(err?.body)}`);
+        // Logger.info(`error while patching a custom object: ${e?.body?.reason}`);
         const resource: Resource = {apiVersion: '', kind: '', metadata: undefined, spec: undefined};
         return resource;
     }
@@ -118,9 +118,9 @@ export const createObject = async ({
         );
         const resource: Resource = JSON.parse(JSON.stringify(object.body));
         return resource;
-    } catch (e: any) {
-        Logger.debug(`error while creating custom object: ${e}`);
-        // Logger.info(`error while creating custom object: ${e?.body?.reason}`);
+    } catch (err: any) {
+        Logger.debug(`error while creating custom object: ${err}`);
+        // Logger.info(`error while creating a custom object: ${e?.body?.reason}`);
         const resource: Resource = {apiVersion: '', kind: '', metadata: undefined, spec: undefined};
         return resource;
     }
@@ -148,9 +148,9 @@ export const listObjects = async ({
 
             const resources: ResourceList = JSON.parse(JSON.stringify(object.body));
             return resources;
-        } catch (e: any) {
-            Logger.debug(`error while listing custom object: ${JSON.stringify(e?.body)}`);
-            // Logger.info(`error while listing custom object: ${e?.body?.reason}`)
+        } catch (err: any) {
+            Logger.debug(`error while listing custom object: ${JSON.stringify(err?.body)}`);
+            // Logger.info(`error while listing a custom object: ${e?.body?.reason}`)
             const resources: ResourceList = {apiVersion: '', items: [], kind: '', metadata: undefined};
             return resources;
         }
@@ -164,9 +164,9 @@ export const listObjects = async ({
             );
             const resources: ResourceList = JSON.parse(JSON.stringify(object.body));
             return resources;
-        } catch (e: any) {
-            Logger.debug(`error while listing custom object: ${JSON.stringify(e?.body)}`);
-            // Logger.info(`error while listing custom object: ${e?.body?.reason}`);
+        } catch (err: any) {
+            Logger.debug(`error while listing custom object: ${JSON.stringify(err?.body)}`);
+            // Logger.info(`error while listing a custom object: ${e?.body?.reason}`);
             const resources: ResourceList = {apiVersion: '', items: [], kind: '', metadata: undefined};
             return resources;
         }
@@ -176,8 +176,8 @@ export const listObjects = async ({
 export const getCurrentContext = async () => {
     try {
         return currentContext;
-    } catch (e: any) {
-        Logger.debug(`error while retrieving context[${JSON.stringify(e?.body)}]`);
-        throw e;
+    } catch (err: any) {
+        Logger.debug(`error while retrieving context[${JSON.stringify(err?.body)}]`);
+        throw err;
     }
 };

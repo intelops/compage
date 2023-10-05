@@ -113,7 +113,7 @@ export const getListProjectsResponse = (projectEntities: ProjectEntity[]) => {
             id: projectEntity.id,
             displayName: projectEntity.display_name,
             version: projectEntity.version,
-            json: JSON.parse(JSON.stringify(projectEntity.json)),
+            json: JSON.parse(projectEntity.json),
             ownerEmail: projectEntity.owner_email,
             createdAt: projectEntity.created_at,
             updatedAt: projectEntity.updated_at,

@@ -41,8 +41,9 @@ usersOperationsRouter.post('/', requireEmailMiddleware, async (request: Request,
         const message = `${userDTO.email} user couldn't be created.`;
         Logger.error(message);
         return response.status(500).json(getCreateUserError(message));
-    } catch (e: any) {
-        const message = `${userDTO.email} user couldn't be created[${JSON.stringify(e)}].`;
+    } catch (err: any) {
+        const message = `${userDTO.email} user couldn't be created[${JSON.stringify(err)}].`;
+        Logger.debug(err);
         Logger.error(message);
         return response.status(500).json(getCreateUserError(message));
     }
@@ -53,8 +54,9 @@ usersOperationsRouter.get('/', requireEmailMiddleware, async (_request: Request,
     try {
         const userEntities = await userService.listUsers();
         return response.status(200).json(getListUsersResponse(userEntities));
-    } catch (e: any) {
-        const message = `users couldn't be listed[${e.message}].`;
+    } catch (err: any) {
+        const message = `users couldn't be listed[${err.message}].`;
+        Logger.debug(err);
         Logger.error(message);
         return response.status(500).json(getListUsersError(message));
     }
@@ -70,8 +72,9 @@ usersOperationsRouter.get('/:email', requireEmailMiddleware, async (request: Req
             return response.status(200).json(getGetUserResponse(userEntity));
         }
         return response.status(404).json();
-    } catch (e: any) {
-        const message = `user couldn't be retrieved[${e.message}].`;
+    } catch (err: any) {
+        const message = `user couldn't be retrieved[${err.message}].`;
+        Logger.debug(err);
         Logger.error(message);
         return response.status(500).json(getGetUserError(message));
     }
@@ -105,8 +108,9 @@ usersOperationsRouter.put('/:email', requireEmailMiddleware, async (request: Req
         const message: string = `[${userDTO.email}] user couldn't be updated.`;
         Logger.error(message);
         return response.status(500).json(getUpdateUserError(message));
-    } catch (e: any) {
-        const message = `[${userDTO.email}] user couldn't be updated[${e.message}].`;
+    } catch (err: any) {
+        const message = `[${userDTO.email}] user couldn't be updated[${err.message}].`;
+        Logger.debug(err);
         Logger.error(message);
         return response.status(500).json(getUpdateUserError(message));
     }
@@ -125,8 +129,9 @@ usersOperationsRouter.delete('/:email', requireEmailMiddleware, async (request: 
         const errorMessage = `'${email}' user couldn't be deleted.`;
         Logger.error(errorMessage);
         return response.status(500).json(getDeleteUserError(errorMessage));
-    } catch (e: any) {
-        const message = `[${email}] user couldn't be deleted[${e.message}].`;
+    } catch (err: any) {
+        const message = `[${email}] user couldn't be deleted[${err.message}].`;
+        Logger.debug(err);
         Logger.error(message);
         return response.status(500).json(getDeleteUserError(message));
     }

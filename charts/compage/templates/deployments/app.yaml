@@ -43,8 +43,6 @@ spec:
             initialDelaySeconds: 45
             periodSeconds: 30
           env:
-            - name: SYSTEM_NAMESPACE
-              value: {{ .Values.systemNamespace }}
             - name: LOG_LEVEL
               value: {{ .Values.app.logLevel }}
             - name: COMPAGE_CORE_URL
@@ -52,11 +50,6 @@ spec:
                 configMapKeyRef:
                   name: app-data
                   key: COMPAGE_CORE_URL
-            - name: GITHUB_APP_REDIRECT_URI
-              valueFrom:
-                configMapKeyRef:
-                  name: app-github
-                  key: GITHUB_APP_REDIRECT_URI
           volumeMounts:
             - name: db-cassandra-credentials
               mountPath: "/etc/db-cassandra-credentials"
@@ -87,10 +80,10 @@ spec:
             items:
               - key: CASSANDRA_CONTACT_POINTS
                 path: compage/CASSANDRA_CONTACT_POINTS
-              - key: CASANDRA_LOCAL_DATA_CENTER
-                path: compage/CASANDRA_LOCAL_DATA_CENTER
-              - key: CASANDRA_KEYSPACE
-                path: compage/CASANDRA_KEYSPACE
+              - key: CASSANDRA_LOCAL_DATA_CENTER
+                path: compage/CASSANDRA_LOCAL_DATA_CENTER
+              - key: CASSANDRA_KEYSPACE
+                path: compage/CASSANDRA_KEYSPACE
               - key: CASSANDRA_USERNAME
                 path: compage/CASSANDRA_USERNAME
               - key: CASSANDRA_PASSWORD

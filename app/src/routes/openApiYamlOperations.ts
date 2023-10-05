@@ -28,8 +28,9 @@ openApiYamlOperationsRouter.post('/upload', requireEmailMiddleware, async (reque
             // TODO the upload happens so quickly that artificial delay is required and it will help for better experience.
             await new Promise(r => setTimeout(r, 1000));
             return response.status(200).json(getUploadYamlResponse(uploadYamlRequest.projectId, uploadYamlRequest.nodeId, content, successMessage));
-        } catch (e: any) {
-            const errorMessage = `File couldn't be uploaded[${e.message}].`;
+        } catch (err: any) {
+            const errorMessage = `File couldn't be uploaded[${err.message}].`;
+            Logger.debug(err);
             Logger.error(errorMessage);
             return response.status(500).json(getUploadYamlError(errorMessage));
         }

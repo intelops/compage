@@ -7,10 +7,10 @@ export const gitOperations = async (git: SimpleGit, repositoryBranch?: string, p
     await git.add('.')
         .then(
             (success: any) => {
-                Logger.debug(`git add succeeded: ${success}`);
+                Logger.debug(`git add succeeded: ${JSON.stringify(success)}`);
             }, (failure: any) => {
-                Logger.debug(`git add failed: ${failure}`);
-                error = `git add failed: ${failure}`;
+                Logger.debug(`git add failed: ${JSON.stringify(failure)}`);
+                error = `git add failed: ${JSON.stringify(failure)}`;
             });
     if (error.length > 0) {
         return error;
@@ -26,10 +26,10 @@ export const gitOperations = async (git: SimpleGit, repositoryBranch?: string, p
     await git.commit(message)
         .then(
             (success: any) => {
-                Logger.debug(`git commit succeeded: ${success}`);
+                Logger.debug(`git commit succeeded: ${JSON.stringify(success)}`);
             }, (failure: any) => {
-                Logger.debug(`git commit failed: ${failure}`);
-                error = `git commit failed: ${failure}`;
+                Logger.debug(`git commit failed: ${JSON.stringify(failure)}`);
+                error = `git commit failed: ${JSON.stringify(failure)}`;
             });
     if (error.length > 0) {
         return error;
@@ -47,23 +47,23 @@ export const gitOperations = async (git: SimpleGit, repositoryBranch?: string, p
         await git.checkoutLocalBranch(branchName)
             .then(
                 (success: any) => {
-                    Logger.debug(`git checkoutLocalBranch succeeded: ${success}`);
+                    Logger.debug(`git checkoutLocalBranch succeeded: ${JSON.stringify(success)}`);
                 }, (failure: any) => {
-                    Logger.debug(`git checkoutLocalBranch failed: ${failure}`);
-                    error = `git checkoutLocalBranch failed: ${failure}`;
+                    Logger.debug(`git checkoutLocalBranch failed: ${JSON.stringify(failure)}`);
+                    error = `git checkoutLocalBranch failed: ${JSON.stringify(failure)}`;
                 });
         if (error.length > 0) {
             return error;
         }
     }
 
-    // Finally push to online repository
+    // Finally, push to online repository
     await git.push('origin', branchName, {'--force': null})
         .then((success: any) => {
-            Logger.debug(`git push succeeded: ${success}`);
+            Logger.debug(`git push succeeded: ${JSON.stringify(success)}`);
         }, (failure: any) => {
-            Logger.debug(`git push failed: ${failure}`);
-            error = `git push failed: ${failure}`;
+            Logger.debug(`git push failed: ${JSON.stringify(failure)}`);
+            error = `git push failed: ${JSON.stringify(failure)}`;
         });
     return error;
 };

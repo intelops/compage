@@ -117,8 +117,8 @@ jobs:
           context: ./core
           # Note: tags has to be all lower-case
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/core:${{ github.run_id }}
-          # ${{ steps.metadata.outputs.tags }}
-          labels: ${{ steps.metadata.outputs.labels }}
+          # ${{ steps.md.metadata.outputs.tags }}
+          labels: ${{ steps.md.metadata.outputs.labels }}
           # build on feature branches, push only on main branch
           push: true
 #      - uses: goodwithtech/dockle-action@main

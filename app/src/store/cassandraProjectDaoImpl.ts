@@ -14,7 +14,7 @@ export class CassandraProjectDaoImpl implements ProjectDao {
                                              old_versions,
                                              created_at, updated_at)
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) IF NOT EXISTS`;
-        const params = [projectEntity.id, projectEntity.display_name, projectEntity.version, projectEntity.json, projectEntity.git_platform_name, projectEntity.git_platform_user_name, projectEntity.is_repository_public, projectEntity.repository_branch, projectEntity.repository_name, projectEntity.owner_email, projectEntity.repository_url, projectEntity.metadata,projectEntity.old_versions, projectEntity.created_at, projectEntity.updated_at];
+        const params = [projectEntity.id, projectEntity.display_name, projectEntity.version, projectEntity.json, projectEntity.git_platform_name, projectEntity.git_platform_user_name, projectEntity.is_repository_public, projectEntity.repository_branch, projectEntity.repository_name, projectEntity.owner_email, projectEntity.repository_url, projectEntity.metadata, projectEntity.old_versions, projectEntity.created_at, projectEntity.updated_at];
         const resultSet = await cassandraClient.execute(query, params, {prepare: true});
         if (resultSet.wasApplied()) {
             return projectEntity;
@@ -59,16 +59,13 @@ export class CassandraProjectDaoImpl implements ProjectDao {
                 json: row.json,
                 owner_email: row.owner_email,
                 repository_url: row.repository_url,
-                metadata: row.metadata,
-                old_versions: row.old_versions ? row.old_versions.map((oldVersion: OldVersion) => {
-                    return oldVersion;
-                }) : [],
-                created_at: row.created_at,
-                updated_at: row.updated_at,
+                metadata: row.metadata ? row.metadata : '{}',
+                old_versions: row.old_versions ? row.old_versions : '[]',
+                created_at: row.created_at.toString(),
+                updated_at: row.updated_at.toString(),
             };
             projectEntities.push(projectEntity);
         });
-
         return projectEntities;
     }
 
@@ -111,10 +108,8 @@ export class CassandraProjectDaoImpl implements ProjectDao {
             json: row.json,
             repository_url: row.repository_url,
             owner_email: row.owner_email,
-            metadata: row.metadata,
-            old_versions: row.old_versions ? row.old_versions.map((oldVersion: OldVersion) => {
-                return oldVersion;
-            }) : [],
+            metadata: row.metadata ? row.metadata : '{}',
+            old_versions: row.old_versions ? row.old_versions : '[]',
             created_at: row.created_at,
             updated_at: row.updated_at,
         };

@@ -66,16 +66,18 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
         return resource.status(500).json(getGenerateCodeError(message));
     }
 
-    // check to decide whether to call core or not. This means that user has done no changes in this version since last code generation. Re-generating code for same diagram is not a good idea.
+    // Check to decide whether to call core or not.
+    // This means that user has done no changes in this version since the last code generation.
+    // Re-generating code for the same diagram is not a good idea.
     if (projectEntity.version !== 'v1') {
         const currentVersion = projectEntity.version;
         const lastVersion = previousVersion(currentVersion);
         const oldVersions = projectEntity.old_versions;
         // iterate over all oldVersions to find the last version in it.
         for (const oldVersionJson of JSON.parse(oldVersions) as OldVersion[]) {
-            // check if the lastVersion matches with current version
+            // check if the lastVersion matches with the current version
             if (oldVersionJson.version === lastVersion) {
-                // remove unwanted keys and then do the equality check. This is needed to avoid keys used to render ui.
+                // Remove unwanted keys and then do the equality check. This is needed to avoid keys used to render ui.
                 if (JSON.stringify(removeUnwantedKeys(oldVersionJson.json)) === JSON.stringify(removeUnwantedKeys(projectEntity.json))) {
                     const message = `unable to generate code, No new changes found since last generation: ${projectEntity.display_name}[${projectId}].`;
                     return resource.status(500).json(getGenerateCodeError(message));
@@ -86,13 +88,13 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
 
     // create directory hierarchy here itself as creating it after receiving data will not be proper.
     const originalProjectPath = `${os.tmpdir()}/${projectEntity.display_name}`;
-    // this is path where project will be downloaded
+    // this is a path where the project will be downloaded
     const downloadedProjectPath = `${originalProjectPath}_downloaded`;
-    // this is path where project will be cloned
+    // this is a path where the project will be cloned
     const clonedProjectPath = `${originalProjectPath}_cloned`;
-    // this is path in tar file
+    // this is a path in tar file
     const generatedProjectPath = `${downloadedProjectPath}` + `${originalProjectPath}`;
-    // this is path where tar file will be saved
+    // this is a path where tar file will be saved
     const downloadedProjectTarFilePath = `${originalProjectPath}_downloaded.tar.gz`;
     try {
         // create downloadedProjectPath
@@ -106,6 +108,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
         }
         fs.mkdirSync(clonedProjectPath, {recursive: true});
     } catch (err: any) {
+        Logger.debug(err);
         if (err.code !== 'EEXIST') {
             const message = `unable to generate code for ${projectEntity.display_name}[${projectEntity.id}] => ${err}`;
             return resource.status(500).json(getGenerateCodeError(message));
@@ -123,7 +126,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
     const gitPlatformEntity: GitPlatformEntity = await gitPlatformService.getGitPlatform(projectEntity.owner_email as string, projectEntity.git_platform_name as string);
 
     // save project metadata (in compage db or somewhere)
-    // need to save project-name, compage-json version, github repo and latest commit to the db
+    // need to save project-name, compage-json version, github repo and the latest commit to the db
     const payload: Project = {
         projectName: projectEntity.display_name,
         projectJSON: projectEntity.json,
@@ -147,14 +150,14 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
         }
     });
 
-    // error while receiving the file from core component
+    // error while receiving the file from a core component
     call.on('error', async (response: any) => {
         cleanup(downloadedProjectPath);
         const message = `unable to generate code for ${projectEntity.display_name}[${projectEntity.id}] => ${response.details}`;
         return resource.status(500).json(getGenerateCodeError(message));
     });
 
-    // file has been transferred, lets save it to github.
+    // file has been transferred, let's save it to github.
     call.on('end', () => {
         // extract tar file
         const extract = tar.extract({
@@ -255,6 +258,7 @@ codeOperationsRouter.post('/regenerate', requireEmailMiddleware, async (req, res
             return res.status(200).json({fileChunk: response.fileChunk.toString()});
         });
     } catch (err: any) {
+        Logger.debug(err);
         return res.status(500).json(err);
     }
 });
