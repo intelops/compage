@@ -19,29 +19,30 @@ export const pushNewProjectToGitServer = async (newProjectGitServerRequest: NewP
     // initialize git
     await git.init().then(
         (success: any) => {
-            Logger.debug(`git init succeeded: ${success}`);
+            Logger.debug(`git init succeeded: ${JSON.stringify(success)}`);
         }, (failure: any) => {
-            Logger.debug(`git init failed: ${failure}`);
-            error = `git init failed: ${failure}`;
+            Logger.debug(`git init failed: ${JSON.stringify(failure)}`);
+            error = `git init failed: ${JSON.stringify(failure)}`;
         });
     if (error.length > 0) {
         return error;
     }
+    Logger.debug('git init done');
+
     // add local git config like username and email
     await git.addConfig('user.email', newProjectGitServerRequest.gitProviderDetails.platformEmail);
     await git.addConfig('user.name', newProjectGitServerRequest.gitProviderDetails.platformUserName);
 
-    // TODO when the support for other git providers will be added, need to change below hardcoded string.
     // Set up GitHub url like this so no manual entry of user pass needed
     const gitServerUrl = `https://${newProjectGitServerRequest.gitProviderDetails.platformUserName}:${newProjectGitServerRequest.gitProviderDetails.platformPersonalAccessToken}@${newProjectGitServerRequest.gitProviderDetails.platformUrl.replace('https://', '')}/${newProjectGitServerRequest.gitProviderDetails.platformUserName}/${newProjectGitServerRequest.gitProviderDetails.repositoryName}.git`;
 
     // Add remote repository url as origin to repository
     await git.addRemote('origin', gitServerUrl).then(
         (success: any) => {
-            Logger.debug(`git remote add origin succeeded: ${success}`);
+            Logger.debug(`git remote add origin succeeded: ${JSON.stringify(success)}`);
         }, (failure: any) => {
-            Logger.debug(`git remote add origin failed: ${failure}`);
-            error = `git remote add origin failed: ${failure}`;
+            Logger.debug(`git remote add origin failed: ${JSON.stringify(failure)}`);
+            error = `git remote add origin failed: ${JSON.stringify(failure)}`;
         });
     if (error.length > 0) {
         return error;

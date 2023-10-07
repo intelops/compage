@@ -118,7 +118,7 @@ ui:
     # Overrides the image tag whose default is the chart appVersion.
     tag: v1.0.0
   nameOverride: "ui"
-  fullnameOverride: """"
+  fullnameOverride: ""
   ingress:
     enabled: false
     className: ""

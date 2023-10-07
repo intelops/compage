@@ -46,6 +46,8 @@ deployments:
                 value: development
               - name: COMPAGE_CORE_URL
                 value: ${COMPAGE_CORE_URL}
+              - name: LOG_LEVEL
+                value: debug
         service:
           ports:
             - port: 5000

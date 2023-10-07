@@ -31,9 +31,9 @@ kubens compage
 ./build-docker-images.sh
 
 ### Load docker images into kind cluster
-kind load docker-image --name compage ghcr.io/intelops/compage/app:nextv2
-kind load docker-image --name compage ghcr.io/intelops/compage/core:nextv2
-kind load docker-image --name compage ghcr.io/intelops/compage/ui:nextv2
+kind load docker-image --name compage ghcr.io/intelops/compage/app:v1Next
+kind load docker-image --name compage ghcr.io/intelops/compage/core:v1Next
+kind load docker-image --name compage ghcr.io/intelops/compage/ui:v1Next
 
 ### Update image tags and cassandra password in values.yaml
 ### Install compage helm chart from compage root directory
