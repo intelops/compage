@@ -87,7 +87,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
     }
 
     // create directory hierarchy here itself as creating it after receiving data will not be proper.
-    const originalProjectPath = `${os.tmpdir()}/${projectEntity.display_name}`;
+    const originalProjectPath = `/compage/workdir/${projectEntity.display_name}`;
     // this is a path where the project will be downloaded
     const downloadedProjectPath = `${originalProjectPath}_downloaded`;
     // this is a path where the project will be cloned
@@ -176,6 +176,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
             const existingProjectGitServerRequest: ExistingProjectGitServerRequest = {
                 projectName: projectEntity.display_name,
                 projectVersion: projectEntity.version,
+                repositoryName: projectEntity.repository_name as string,
                 gitProviderDetails: {
                     repositoryBranch: projectEntity.repository_branch as string,
                     repositoryName: projectEntity.repository_name as string,
@@ -192,16 +193,16 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
 
             let error: string = await cloneExistingProjectFromGitServer(existingProjectGitServerRequest);
             if (error.length > 0) {
-                cleanup(downloadedProjectPath);
+                // cleanup(downloadedProjectPath);
                 // send status back to ui
                 const clonedErrorMessage = `unable to generate code for ${projectEntity.display_name}[${projectEntity.id}] => ${error}.`;
                 Logger.error(clonedErrorMessage);
                 return resource.status(500).json(getGenerateCodeError(clonedErrorMessage));
             }
-
+            Logger.debug(`cloned ${clonedProjectPath} from github.`);
             error = await pushToExistingProjectOnGitServer(existingProjectGitServerRequest);
             if (error.length > 0) {
-                cleanup(downloadedProjectPath);
+                // cleanup(downloadedProjectPath);
                 // send status back to ui
                 const pushErrorMessage = `unable to generate code for ${projectEntity.display_name}[${projectEntity.id}] => ${error}.`;
                 Logger.error(pushErrorMessage);

@@ -23,7 +23,7 @@ export const createRepository = async (projectEntity: ProjectEntity) => {
 };
 
 export const makeInitialCommit = async (projectEntity: ProjectEntity) => {
-    const createdProjectPath = `/server/workdir/${projectEntity.id}`;
+    const createdProjectPath = `/compage/workdir/workdir/${projectEntity.id}`;
     fs.mkdirSync(createdProjectPath, {recursive: true});
     fs.writeFileSync(`${createdProjectPath}/README.md`, `# ${projectEntity.repository_name}`);
     const gitPlatform: GitPlatformEntity = await gitPlatformService.getGitPlatform(projectEntity.owner_email, projectEntity.git_platform_name);

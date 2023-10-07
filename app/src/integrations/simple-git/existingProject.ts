@@ -30,7 +30,7 @@ export const cloneExistingProjectFromGitServer = async (existingProjectGitServer
 };
 
 export const pushToExistingProjectOnGitServer = async (existingProjectGitServerRequest: ExistingProjectGitServerRequest): Promise<string> => {
-    const baseDir = existingProjectGitServerRequest.clonedProjectPath + '/' + existingProjectGitServerRequest.projectName;
+    const baseDir = existingProjectGitServerRequest.clonedProjectPath + '/' + existingProjectGitServerRequest.repositoryName;
     const options: Partial<SimpleGitOptions> = {
         baseDir,
         binary: 'git',

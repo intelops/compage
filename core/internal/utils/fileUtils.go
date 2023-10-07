@@ -10,7 +10,7 @@ import (
 
 // GetProjectDirectoryName returns tarFile parent path
 func GetProjectDirectoryName(name string) string {
-	return TmpPath + "/" + name
+	return CodeGeneratorPath + "/" + name
 }
 
 // CreateDirectories creates the directory specified and all other directories in the path.
@@ -18,7 +18,7 @@ func CreateDirectories(dirName string) error {
 	return os.MkdirAll(dirName, os.ModePerm)
 }
 
-// CopyFiles copies only files in the srcDirectory to destDirectory, doesn't do it recursively.
+// CopyFiles copies only file in the srcDirectory to destDirectory, doesn't do it recursively.
 func CopyFiles(destDirectory string, srcDirectory string) error {
 	return CopyAllInSrcDirToDestDir(destDirectory, srcDirectory, false)
 }

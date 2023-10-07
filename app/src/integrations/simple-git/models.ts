@@ -18,6 +18,7 @@ export interface NewProjectGitServerRequest {
 export interface ExistingProjectGitServerRequest {
     projectName: string;
     projectVersion: string;
+    repositoryName: string;
     gitProviderDetails: GitProviderDetails;
     clonedProjectPath: string;
     generatedProjectPath: string;

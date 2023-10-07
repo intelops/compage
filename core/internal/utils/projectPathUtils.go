@@ -12,7 +12,7 @@ var (
 	root = filepath.Join(filepath.Dir(b), "../..")
 )
 
-// GetProjectRootPath returns root path of the language template passed.
+// GetProjectRootPath returns a root path of the language template passed.
 func GetProjectRootPath(templatesPath string) string {
 	return root + "/" + templatesPath
 }

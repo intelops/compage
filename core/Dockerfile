@@ -55,6 +55,8 @@ RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 COPY --from=builder /app/core /
 COPY templates /app/templates
+RUN mkdir -p /compage/workdir
+RUN chmod -R 777 /compage/workdir
 # Application port (optional)
 EXPOSE 8080
 EXPOSE 50051
