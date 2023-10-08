@@ -5,6 +5,7 @@ import {GitPlatformEntity} from '../../models/gitPlatform';
 import {NewProjectGitServerRequest} from '../simple-git/models';
 import {pushNewProjectToGitServer} from '../simple-git/newProject';
 import {GitPlatformService} from '../../services/gitPlatformService';
+import {WORKDIR_PATH} from '../../utils/constants';
 
 const gitPlatformService = new GitPlatformService();
 
@@ -23,7 +24,7 @@ export const createRepository = async (projectEntity: ProjectEntity) => {
 };
 
 export const makeInitialCommit = async (projectEntity: ProjectEntity) => {
-    const createdProjectPath = `/compage/workdir/workdir/${projectEntity.id}`;
+    const createdProjectPath = `${WORKDIR_PATH}/${projectEntity.id}`;
     fs.mkdirSync(createdProjectPath, {recursive: true});
     fs.writeFileSync(`${createdProjectPath}/README.md`, `# ${projectEntity.repository_name}`);
     const gitPlatform: GitPlatformEntity = await gitPlatformService.getGitPlatform(projectEntity.owner_email, projectEntity.git_platform_name);
@@ -45,6 +46,7 @@ export const makeInitialCommit = async (projectEntity: ProjectEntity) => {
     if (error.length !== 0) {
         throw new Error(error);
     }
+    // TODO: uncomment this line
     // delete the project from temp folder once it's pushed to git server.
     // fs.rmSync(createdProjectPath, {recursive: true});
 };

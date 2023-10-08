@@ -37,7 +37,7 @@ export const gitOperations = async (git: SimpleGit, repositoryBranch?: string, p
 
     let branchName: string = '';
     if (!repositoryBranch && !projectVersion) {
-        branchName = 'master';
+        branchName = 'main';
     } else {
         branchName = repositoryBranch + '-' + projectVersion;
     }

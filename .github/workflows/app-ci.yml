@@ -116,8 +116,8 @@ jobs:
           context: ./app
           # Note: tags has to be all lower-case
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/app:${{ github.run_id }}
-          # ${{ steps.md.metadata.outputs.tags }}
-          labels: ${{ steps.md.metadata.outputs.labels }}
+          # ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
           # build on feature branches, push only on main branch
           push: true
 #      - uses: goodwithtech/dockle-action@main

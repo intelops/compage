@@ -10,7 +10,7 @@ import {requireEmailMiddleware} from '../middlewares/auth';
 import Logger from '../utils/logger';
 import {rimraf} from 'rimraf';
 import tar from 'tar';
-import {X_EMAIL_HEADER} from '../utils/constants';
+import {WORKDIR_PATH, X_EMAIL_HEADER} from '../utils/constants';
 import {GenerateCodeRequest, getGenerateCodeError, getGenerateCodeResponse, Project} from '../models/code';
 import {GitPlatformEntity} from '../models/gitPlatform';
 import {Metadata, OldVersion, ProjectEntity} from '../models/project';
@@ -87,7 +87,7 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
     }
 
     // create directory hierarchy here itself as creating it after receiving data will not be proper.
-    const originalProjectPath = `/compage/workdir/${projectEntity.display_name}`;
+    const originalProjectPath = `${WORKDIR_PATH}/${projectEntity.display_name}`;
     // this is a path where the project will be downloaded
     const downloadedProjectPath = `${originalProjectPath}_downloaded`;
     // this is a path where the project will be cloned

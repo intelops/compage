@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io"
 	"os"
 	"path/filepath"
@@ -10,7 +11,12 @@ import (
 
 // GetProjectDirectoryName returns tarFile parent path
 func GetProjectDirectoryName(name string) string {
-	return CodeGeneratorPath + "/" + name
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Debugf("Error getting user home directory: %s", err)
+		panic(err)
+	}
+	return userHomeDir + CodeGeneratorPath + "/" + name
 }
 
 // CreateDirectories creates the directory specified and all other directories in the path.
@@ -24,7 +30,7 @@ func CopyFiles(destDirectory string, srcDirectory string) error {
 }
 
 // CopyFilesAndDirs copies files and dirs in the srcDirectory to destDirectory, does it recursively.
-func CopyFilesAndDirs(destDirectory string, srcDirectory string) error {
+func _(destDirectory string, srcDirectory string) error {
 	return CopyAllInSrcDirToDestDir(destDirectory, srcDirectory, true)
 }
 
@@ -100,12 +106,12 @@ func IgnorablePaths(path string) bool {
 	return strings.HasSuffix(path, ".git") || strings.HasSuffix(path, ".idea")
 }
 
-// GetDirectoriesAndFilePaths returns files and directories in given path or error.
+// GetDirectoriesAndFilePaths returns files and directories in given a path or error.
 func GetDirectoriesAndFilePaths(templatesPath string) ([]string, []string, error) {
 	var directories []string
 	var filePaths []string
 
-	// Get all directories on /templates and check if there's repeated files
+	// Get all directories on /templates and check if there are repeated files
 	err := filepath.Walk(templatesPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err

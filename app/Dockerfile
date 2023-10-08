@@ -16,8 +16,11 @@ RUN apk update && apk add git
 COPY --from=builder /app/dist /server/dist
 COPY --from=builder /app/node_modules /server/node_modules
 COPY --from=builder /app/protobufs /server/protobufs
-RUN mkdir -p /compage/workdir
-RUN chmod -R 777 /compage/workdir
+### Add new user
+RUN adduser -D -g '' compageuser
+RUN mkdir -p $HOME/.compage/workdir
+RUN chmod -R 777 $HOME/.compage/workdir
+USER compageuser
 ENV NODE_ENV=production
 EXPOSE 5000
 CMD [ "node", "dist/src/app.js" ]
