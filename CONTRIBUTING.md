@@ -8,29 +8,33 @@ If you find a bug while working with the Compage, please [open an issue on GitHu
 You are more than welcome to open issues in this project to [suggest new features](https://github.com/intelops/compage/issues/new?labels=kind%2Ffeature&template=feature-request.md&title=Feature%20Request:).
 
 ## Contributing Code
-This project is written in Golang, NodeJs(TypeScript) and ReactJs(TypeScript). 
+This project is written in Golang, Node.js(TypeScript) and ReactJs(TypeScript). 
 
 ![block-diagram.png](images/architecture-high.png)
 
-To contribute code,
+To contribute code.
 1. Ensure you are running golang version 1.11.4 or greater for go module support
 2. Set the following environment variables:
     ```
     GO111MODULE=on
     GOFLAGS=-mod=vendor
     ```
-3. Ensure you have NodeJs(LTS >= 18.12.0) installed for Core and UI part of the compage.
-4. Ensure you have access to any Kubernetes(tested on KinD) cluster to store the compage projects and users related data on it.
+3. Ensure you have Node.js(LTS >= 18.12.0) installed for Core and UI part of the compage.
+4. Ensure you have access to any Kubernetes (tested on KinD) cluster to store the compage projects and users related data on it.
    #### KinD
    - Install KinD from https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries
-   - Create KinD cluster https://kind.sigs.k8s.io/docs/user/quick-start/#creating-a-cluster
+   - Create KinD cluster using below command
+     ```shell
+     cd deploy
+     ./create-kind-cluster.sh
+     ```
    - Check if you can access the cluster created in previous step, and you are able to list down the pods.
 5. Fork the project.
 6. Clone the project: `git clone https://github.com/[YOUR_USERNAME]/compage && cd compage`
 7. kindly refer compage.md file to know the structure of the project.
-8. The Compage has 3 servers (subprojects) which need to be started to run the compage on local
+8. The Compage has three servers (subprojects) which need to be started to run the compage on local
    - core (Golang), navigate to core directory and follow its [core README](./core/README.md)
-   - app (NodeJs), navigate to app directory and follow its [app README](./app/README.md)
+   - app (Node.js), navigate to app directory and follow its [app README](./app/README.md)
    - ui (ReactJs), navigate to ui directory and follow its [ui README](./ui/README.md)
 9. Commit changes *([Please refer the commit message conventions](https://www.conventionalcommits.org/en/v1.0.0/))*
 10. Push commits.
@@ -49,9 +53,9 @@ The documentation is contained within `./docs` and made with Docusaurus. See the
    ```shell
   export PATH="$PATH:$(go env GOPATH)/bin"
    ```
-- Download buf binary from this link - https://github.com/bufbuild/buf/releases and fire the command from core directory of compage.
+- Download buf binary from this link—https://github.com/bufbuild/buf/releases and fire the command from core directory of compage.
    ```shell
    buf generate
    ```
-## How K8s and GitHub are interacted with above 3 components?
+## How are K8s and GitHub interacted with above three components?
 ![architecture-med.png](images/architecture-med.png)

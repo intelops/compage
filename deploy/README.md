@@ -43,13 +43,13 @@
 
 ## Different shell scripts in deploy directory.
 ### create-kind-cluster.sh
-- creates KinD cluster, creates `compage` namespace on it and sets `compage` namespace as default. It later extracts KinD cluster's node ip as well and sets it to KIND_NODE_IP environment variable.
+- This script creates KinD cluster, creates `compage` namespace on it and sets `compage` namespace as default. It later extracts KinD cluster's node ip as well and sets it to KIND_NODE_IP environment variable.
  
 ### delete-kind-cluster.sh
-- deletes the KinD cluster.
+- This script deletes the KinD cluster.
 
 ### load-on-kind.sh
 - creates KinD cluster, builds docker images for core, app and ui components of compage. The images are then loaded on to KinD cluster. 
 
 ### push-docker-images-to-github.sh
-- builds docker images for core, app and ui components of compage. The images are then pushed to configured docker registry.
+- This script builds docker images for core, app and ui components of compage. The images are then pushed to configured docker registry.
