@@ -2,8 +2,19 @@ apiVersion: v1
 entries:
   compage:
   - apiVersion: v2
+    appVersion: v1.0.0
+    created: "2023-10-08T13:16:21.561226865+05:30"
+    description: A Helm chart for Kubernetes
+    digest: 3aa5df9f99dd0de5aac198ebdef47fb9d6b7b2a1f76e1ffe7259eb229372bf3a
+    icon: https://raw.githubusercontent.com/intelops/compage/main/images/compage-logo.svg
+    name: compage
+    type: application
+    urls:
+    - compage-v1.0.0.tgz
+    version: v1.0.0
+  - apiVersion: v2
     appVersion: v0.0.7
-    created: "2023-08-29T00:25:54.356509874+05:30"
+    created: "2023-10-08T13:16:21.560680472+05:30"
     description: A Helm chart for Kubernetes
     digest: 31b0c827542089052f06f6a1bb100de54ba2b8d36b5c87c2ea60fe6a5cc5be7e
     icon: https://raw.githubusercontent.com/intelops/compage/main/images/compage-logo.svg
@@ -14,7 +25,7 @@ entries:
     version: v0.0.7
   - apiVersion: v2
     appVersion: v0.0.6
-    created: "2023-08-29T00:25:54.355827463+05:30"
+    created: "2023-10-08T13:16:21.560107067+05:30"
     description: A Helm chart for Kubernetes
     digest: 5af1965fa1960c7959b04a04488e660c4e68bf882abce57ff910640365f26603
     icon: https://raw.githubusercontent.com/intelops/compage/main/images/compage-logo.svg
@@ -25,7 +36,7 @@ entries:
     version: v0.0.6
   - apiVersion: v2
     appVersion: v0.0.5
-    created: "2023-08-29T00:25:54.355029005+05:30"
+    created: "2023-10-08T13:16:21.559531194+05:30"
     description: A Helm chart for Kubernetes
     digest: 33b29e519ac3d2a10c19950cb9862e23fc803eecb04aca74d62f8453dd9a959e
     icon: https://raw.githubusercontent.com/intelops/compage/main/images/compage-logo.svg
@@ -36,7 +47,7 @@ entries:
     version: v0.0.5
   - apiVersion: v2
     appVersion: v0.0.4
-    created: "2023-08-29T00:25:54.354133806+05:30"
+    created: "2023-10-08T13:16:21.55892845+05:30"
     description: A Helm chart for Kubernetes
     digest: 902a0295a4667be0b6351ca3ef648e82fa7465980529e43580f55cb2e9e1d664
     icon: https://raw.githubusercontent.com/intelops/compage/main/images/compage-logo.svg
@@ -47,7 +58,7 @@ entries:
     version: v0.0.4
   - apiVersion: v2
     appVersion: v0.0.3
-    created: "2023-08-29T00:25:54.353557606+05:30"
+    created: "2023-10-08T13:16:21.558109732+05:30"
     description: A Helm chart for Kubernetes
     digest: d09f086c430e37c57ef8b18931c099deb745a198f36956a6b4bf0094b83107da
     icon: https://raw.githubusercontent.com/intelops/compage/main/images/compage-logo.svg
@@ -58,7 +69,7 @@ entries:
     version: v0.0.3
   - apiVersion: v2
     appVersion: v0.0.2
-    created: "2023-08-29T00:25:54.352977934+05:30"
+    created: "2023-10-08T13:16:21.557173498+05:30"
     description: A Helm chart for Kubernetes
     digest: 3ffa211dcf4b40b2689bab03c9e888b2a0155eaacb9f0d9f4facb64caab4e192
     icon: https://raw.githubusercontent.com/intelops/compage/main/images/compage-logo.svg
@@ -69,7 +80,7 @@ entries:
     version: v0.0.2
   - apiVersion: v2
     appVersion: v0.0.1
-    created: "2023-08-29T00:25:54.352391011+05:30"
+    created: "2023-10-08T13:16:21.55652577+05:30"
     description: A Helm chart for Kubernetes
     digest: 465881368ade986559ce811b754b75f49626848fa8d9063c06d7121565f1ac52
     icon: https://raw.githubusercontent.com/intelops/compage/main/images/compage-logo.svg
@@ -78,4 +89,4 @@ entries:
     urls:
     - compage-v0.0.1.tgz
     version: v0.0.1
-generated: "2023-08-29T00:25:54.351661723+05:30"
+generated: "2023-10-08T13:16:21.555719076+05:30"
