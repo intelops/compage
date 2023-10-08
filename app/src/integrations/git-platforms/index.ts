@@ -46,7 +46,7 @@ export const makeInitialCommit = async (projectEntity: ProjectEntity) => {
     if (error.length !== 0) {
         throw new Error(error);
     }
-    // TODO: uncomment this line
+
     // delete the project from temp folder once it's pushed to git server.
-    // fs.rmSync(createdProjectPath, {recursive: true});
+    fs.rmSync(createdProjectPath, {recursive: true});
 };

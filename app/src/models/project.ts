@@ -39,7 +39,6 @@ export interface ProjectDTO {
     repositoryBranch: string;
     isRepositoryPublic: boolean;
     repositoryUrl: string;
-    // TODO temporary made optional.
     metadata?: Metadata;
     ownerEmail: string;
     oldVersions?: OldVersion[];
