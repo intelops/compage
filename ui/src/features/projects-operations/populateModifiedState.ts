@@ -1,4 +1,4 @@
-import {getModifiedState, setModifiedState} from "../../utils/localstorage-client";
+import {getModifiedState, setModifiedState} from "../../utils/localstorageClient";
 import {CompageJson, EdgeConsumerData, NodeConsumerData} from "../../components/diagram-maker/models";
 
 export const getNodeConsumerData = (node: any) => {

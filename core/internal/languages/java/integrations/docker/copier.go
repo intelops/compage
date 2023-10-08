@@ -17,13 +17,13 @@ type Copier struct {
 	RestServerPort    string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath, generatedJarName string, isRestServer bool, restServerPort string) *Copier {
+func NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, templatesRootPath, generatedJarName string, isRestServer bool, restServerPort string) *Copier {
 	// populate map to replace templates
 	data := map[string]interface{}{
-		"RepositoryName":   repositoryName,
-		"NodeName":         strings.ToLower(nodeName),
-		"UserName":         userName,
-		"GeneratedJarName": generatedJarName,
+		"GitRepositoryName":   gitRepositoryName,
+		"NodeName":            strings.ToLower(nodeName),
+		"GitPlatformUserName": gitPlatformUserName,
+		"GeneratedJarName":    generatedJarName,
 	}
 
 	if isRestServer {

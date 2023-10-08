@@ -164,7 +164,6 @@ Active communication channels
 
 ## Quick start
 
-- Register an app - Refer [GitHub App setup](./github-app-setup.md).
 - Follow step-by-step instructions given here [Run Compage on local](./deploy/README.md).
 
 ## License

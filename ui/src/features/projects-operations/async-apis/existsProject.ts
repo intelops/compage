@@ -1,5 +1,5 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {ExistsProjectError, ExistsProjectRequest, ExistsProjectResponse} from "../model";
+import {ExistsProjectError, ExistsProjectRequest, ProjectDTO} from "../model";
 import {getProject} from "../api";
 import {toastr} from 'react-redux-toastr';
 import {
@@ -7,16 +7,16 @@ import {
     removeCurrentProjectDetails,
     removeCurrentState,
     removeModifiedState
-} from "../../../utils/localstorage-client";
+} from "../../../utils/localstorageClient";
 
 // this is separately added even though this resembles to getProjectAsync. getProjectAsync updates the localstorage but existsProjectAsync doesn't.
-export const existsProjectAsync = createAsyncThunk<ExistsProjectResponse, ExistsProjectRequest, { rejectValue: ExistsProjectError }>(
+export const existsProjectAsync = createAsyncThunk<ProjectDTO, ExistsProjectRequest, { rejectValue: ExistsProjectError }>(
     'projects/existsProject',
     async (existsProjectRequest: ExistsProjectRequest, thunkApi) => {
         return getProject(existsProjectRequest).then(response => {
             if (response.status !== 200) {
-                const msg = `Failed to retrieve project.`;
-                const errorMessage = `Status: ${response.status}, Message: ${msg}`;
+                const details = `Failed to retrieve project.`;
+                const errorMessage = `Status: ${response.status}, Message: ${details}`;
                 console.log(errorMessage);
                 toastr.error(`existsProject [Failure]`, errorMessage);
                 removeCurrentConfig();
@@ -27,11 +27,11 @@ export const existsProjectAsync = createAsyncThunk<ExistsProjectResponse, Exists
                     message: errorMessage
                 });
             }
-            const message = `Successfully retrieved project.`;
-            console.log(message);
-            toastr.success(`existsProject [Success]`, message);
+            const successMessage = `Successfully retrieved project.`;
+            console.log(successMessage);
+            toastr.success(`existsProject [Success]`, successMessage);
             return response.data;
-        }).catch(e => {
+        }).catch((e: any) => {
             const statusCode = e.response.status;
             const message = e.response.data.message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;

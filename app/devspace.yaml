@@ -44,14 +44,10 @@ deployments:
             env:
               - name: NODE_ENV
                 value: development
-              - name: GITHUB_APP_CLIENT_ID
-                value: ${GITHUB_APP_CLIENT_ID}
-              - name: GITHUB_APP_CLIENT_SECRET
-                value: ${GITHUB_APP_CLIENT_SECRET}
-              - name: GITHUB_APP_REDIRECT_URI
-                value: ${GITHUB_APP_REDIRECT_URI}
               - name: COMPAGE_CORE_URL
                 value: ${COMPAGE_CORE_URL}
+              - name: LOG_LEVEL
+                value: debug
         service:
           ports:
             - port: 5000

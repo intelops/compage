@@ -51,8 +51,8 @@ func Generate(ctx context.Context) error {
 }
 
 func getIntegrationsCopier(typescriptValues Values) map[string]interface{} {
-	userName := typescriptValues.Values.Get(languages.UserName)
-	repositoryName := typescriptValues.Values.Get(languages.RepositoryName)
+	gitPlatformUserName := typescriptValues.Values.Get(languages.GitPlatformUserName)
+	gitRepositoryName := typescriptValues.Values.Get(languages.GitRepositoryName)
 	nodeName := typescriptValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := typescriptValues.Values.NodeDirectoryName
 	isRestServer := typescriptValues.TypeScriptNode.RestConfig.Server != nil
@@ -60,7 +60,7 @@ func getIntegrationsCopier(typescriptValues Values) map[string]interface{} {
 	path := GetTypeScriptTemplatesRootPath()
 
 	// create typescript specific copier
-	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	return map[string]interface{}{
 		"k8s": k8sCopier,

@@ -2,145 +2,162 @@ import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
-import Avatar from '@mui/material/Avatar';
-import Tooltip from '@mui/material/Tooltip';
-import MenuItem from '@mui/material/MenuItem';
 import Logo from "../../compage-logo.svg";
 import {useAppSelector} from "../../redux/hooks";
 import {Link, useNavigate} from "react-router-dom";
-import {selectAuthData} from "../../features/auth-operations/slice";
-import {getCurrentProjectDetails} from "../../utils/localstorage-client";
+import {getCurrentProjectDetails} from "../../utils/localstorageClient";
 import {selectGetCurrentContextData} from "../../features/k8s-operations/slice";
-
-const settings = ['Account', 'Logout'];
+import {getCurrentUser} from "../../utils/sessionstorageClient";
+import Button from "@mui/material/Button";
+import {ClickAwayListener, Grow, MenuList, Paper, Popper} from "@mui/material";
+import MenuItem from "@mui/material/MenuItem";
 
 const Header = () => {
-    const authData = useAppSelector(selectAuthData);
     const getCurrentContextData = useAppSelector(selectGetCurrentContextData);
 
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        sessionStorage.clear();
-        localStorage.clear();
-        // TODO Call backend service to invalidate the token
-        handleCloseUserMenu();
-        window.location.reload();
+    const [open, setOpen] = React.useState(false);
+    const anchorRef = React.useRef<HTMLButtonElement>(null);
+
+    const handleToggle = () => {
+        setOpen((prevOpenToggle) => !prevOpenToggle);
     };
 
-    const handleAccount = () => {
+    const handleClose = (event: Event | React.SyntheticEvent) => {
+        if (
+            anchorRef.current &&
+            anchorRef.current.contains(event.target as HTMLElement)
+        ) {
+            return;
+        }
+        setOpen(false);
+    };
+
+    const handleListKeyDown = (event: React.KeyboardEvent) => {
+        if (event.key === 'Tab') {
+            event.preventDefault();
+            setOpen(false);
+        } else if (event.key === 'Escape') {
+            setOpen(false);
+        }
+    };
+
+    // return focus to the button when we transitioned from !open -> open
+    const prevOpen = React.useRef(open);
+    React.useEffect(() => {
+        if (prevOpen.current === true && open === false) {
+            anchorRef.current!.focus();
+        }
+        prevOpen.current = open;
+    }, [open]);
+
+    const handleMyAccountClick = () => {
+        handleClose(new Event("click"));
         navigate("/account");
-        handleCloseUserMenu();
     };
 
-    const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-
-    const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElUser(event.currentTarget);
+    const handleProjectsClick = () => {
+        handleClose(new Event("click"));
+        navigate("/projects");
     };
 
-    const handleCloseUserMenu = () => {
-        setAnchorElUser(null);
+    const handleGitPlatformsClick = () => {
+        handleClose(new Event("click"));
+        navigate("/git-platforms");
     };
 
-    const getMenuItem = (setting: string) => {
-        if (setting === "Logout") {
-            if (authData.login) {
-                return <MenuItem key={setting} onClick={handleLogout}>
-                    <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>;
-            }
-            return "";
-        }
-        if (setting === "Account") {
-            return <MenuItem key={setting} onClick={handleAccount}>
-                <Typography textAlign="center">{setting}</Typography>
-            </MenuItem>;
-        }
-    };
-
-    const getMenu = () => {
-        if (authData.login) {
-            return <Toolbar>
-                <Box sx={{flexGrow: 0}}>
-                    <Tooltip title="Account Details">
-                        <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                            <Avatar alt={authData.name} src={authData.avatar_url}/>
-                        </IconButton>
-                    </Tooltip>
-                    <Menu
-                        sx={{mt: '45px'}}
-                        id="menu-appbar"
-                        anchorEl={anchorElUser}
-                        anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        keepMounted
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        open={Boolean(anchorElUser)}
-                        onClose={handleCloseUserMenu}
-                    >
-                        <MenuItem key="username">
-                            <Typography textAlign="center">Welcome {authData.login}!!!</Typography>
-                        </MenuItem>
-                        {settings.map((setting) => getMenuItem(setting))}
-                    </Menu>
-                </Box>
-            </Toolbar>;
-        }
-        return "";
+    const handleLogoutClick = () => {
+        handleClose(new Event("click"));
+        sessionStorage.clear();
+        navigate("/login");
     };
 
     const getCurrentProjectSelected = () => {
-        if (authData.login) {
-            const currentProjectDetails = getCurrentProjectDetails();
-            if (currentProjectDetails) {
-                const userNameAndProjectAndVersion = currentProjectDetails.split("###");
-                return <Toolbar>
-                    <Box sx={{flexGrow: 0}}>
-                        <Typography variant={"h6"}>
-                            You have selected <u>{userNameAndProjectAndVersion[1]}</u> [<span style={{
-                            color: "yellow"
-                        }}>{getCurrentContextData?.contextName}</span>]
-                        </Typography>
-                    </Box>
-                </Toolbar>;
-            }
+        const currentProjectDetails = getCurrentProjectDetails();
+        if (currentProjectDetails) {
+            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
+            return <Toolbar>
+                <Box sx={{flexGrow: 0}}>
+                    <Typography variant={"h6"}>
+                        You have selected <u>{userNameAndProjectAndVersion[1]}</u> [<span style={{
+                        color: "yellow"
+                    }}>{getCurrentContextData?.contextName}</span>]
+                    </Typography>
+                </Box>
+            </Toolbar>;
         }
-        return "";
     };
 
     const getLogo = () => {
-        if (authData.login) {
-            return <Toolbar component="div" sx={{flexGrow: 1}}>
-                <Link to={"/home"}>
-                    <Box
-                        component="img"
-                        sx={{
-                            height: 64,
-                            width: "320px"
-                        }}
-                        alt="Compage by IntelOps"
-                        src={Logo}
-                    />
-                </Link>
-            </Toolbar>;
-        }
-        return "";
+        return <Toolbar component="div" sx={{flexGrow: 1}}>
+            <Link to={"/home"}>
+                <Box
+                    component="img"
+                    sx={{
+                        height: 64,
+                        width: "320px"
+                    }}
+                    alt="Compage by IntelOps"
+                    src={Logo}
+                />
+            </Link>
+        </Toolbar>;
     };
 
     return <AppBar position="absolute" style={{backgroundColor: "#174985"}}>
         <Toolbar disableGutters>
             {getLogo()}
             {getCurrentProjectSelected()}
-            {getMenu()}
+            <Toolbar>
+                <Button
+                    ref={anchorRef}
+                    id="composition-button"
+                    aria-controls={open ? 'composition-menu' : undefined}
+                    aria-expanded={open ? 'true' : undefined}
+                    aria-haspopup="true"
+                    variant={"contained"}
+                    onClick={handleToggle}>
+                    Settings
+                </Button>
+                <Popper
+                    open={open}
+                    anchorEl={anchorRef.current}
+                    role={undefined}
+                    placement="bottom-start"
+                    transition
+                    disablePortal
+                >
+                    {({TransitionProps, placement}) => (
+                        <Grow
+                            {...TransitionProps}
+                            style={{
+                                transformOrigin:
+                                    placement === 'bottom-start' ? 'left top' : 'left bottom',
+                            }}
+                        >
+                            <Paper>
+                                <ClickAwayListener onClickAway={handleClose}>
+                                    <MenuList
+                                        autoFocusItem={open}
+                                        id="composition-menu"
+                                        aria-labelledby="composition-button"
+                                        onKeyDown={handleListKeyDown}
+                                    >
+                                        <MenuItem onClick={handleMyAccountClick}>
+                                            {getCurrentUser()}
+                                        </MenuItem>
+                                        <MenuItem onClick={handleProjectsClick}>Projects</MenuItem>
+                                        <MenuItem onClick={handleGitPlatformsClick}>Git Platforms</MenuItem>
+                                        <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
+                                    </MenuList>
+                                </ClickAwayListener>
+                            </Paper>
+                        </Grow>
+                    )}
+                </Popper>
+            </Toolbar>
         </Toolbar>
     </AppBar>;
 };

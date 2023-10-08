@@ -1,12 +1,3 @@
-# GitHub app configuration.
-githubApp:
-  # update below value cluster's node ip and with port specified here (.Values.ui.service.nodePort)
-  redirectURI: "http://localhost:32222/login"
-  clientId: "XXXXX"
-  clientSecret: "XXXXX"
-
-systemNamespace: compage
-
 app:
   enabled: true
   name: app
@@ -19,12 +10,11 @@ app:
     repository: ghcr.io/intelops/compage/app
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.0.1"
+    tag: v1.0.0
   nameOverride: "app"
   logLevel: "debug"
   fullnameOverride: ""
   podAnnotations: {}
-
   podSecurityContext: {}
 
 #  securityContext:
@@ -53,10 +43,14 @@ app:
     targetMemoryUtilizationPercentage: 80
 
   nodeSelector: {}
-
   tolerations: []
-
   affinity: {}
+  cassandra:
+    contactPoints: "test-dc1-service.k8ssandra-operator.svc.cluster.local"
+    localDataCenter: "dc1"
+    username: "test-superuser"
+    password: "Vr58zqslXCgQniIfHdYe"
+    keyspace: "compage"
 core:
   telemetry: false
   enabled: true
@@ -70,7 +64,7 @@ core:
     repository: ghcr.io/intelops/compage/core
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.0.1"
+    tag: v1.0.0
   nameOverride: "core"
   fullnameOverride: ""
 
@@ -87,7 +81,7 @@ core:
     type: ClusterIP
     port: 50051
 
-  open-telemetry:
+  openTelemetry:
     otelExporterOtlpEndpoint: "http://localhost:4317"
 
   resources:
@@ -122,7 +116,7 @@ ui:
     repository: ghcr.io/intelops/compage/ui
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.0.1"
+    tag: v1.0.0
   nameOverride: "ui"
   fullnameOverride: ""
   ingress:

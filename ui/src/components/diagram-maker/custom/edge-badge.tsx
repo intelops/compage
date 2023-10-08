@@ -1,5 +1,5 @@
 import React from 'react';
-import {getModifiedState} from "../../../utils/localstorage-client";
+import {getModifiedState} from "../../../utils/localstorageClient";
 
 interface EdgeBadgeProps {
     id: string;

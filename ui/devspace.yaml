@@ -44,10 +44,6 @@ deployments:
         containers:
           - image: ghcr.io/intelops/compage/ui
             env:
-            - name: REACT_APP_GITHUB_APP_CLIENT_ID
-              value: ${REACT_APP_GITHUB_APP_CLIENT_ID}
-            - name: REACT_APP_GITHUB_APP_REDIRECT_URI
-              value: ${REACT_APP_GITHUB_APP_REDIRECT_URI}
             - name: REACT_APP_COMPAGE_APP_SERVER_URL
               value: ${REACT_APP_COMPAGE_APP_SERVER_URL}
         service:

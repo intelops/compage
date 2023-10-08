@@ -11,25 +11,25 @@ const File = "README.md.tmpl"
 // Copier integrations specific copier
 type Copier struct {
 	ProjectDirectoryName string
-	RepositoryName       string
+	GitRepositoryName    string
 	TemplatesRootPath    string
 	Data                 map[string]interface{}
 }
 
 func NewCopier(project *core.Project) *Copier {
 	// retrieve project named directory
-	//userName, repositoryName, projectDirectoryName, templatesRootPath string
+	//gitPlatformUserName, gitRepositoryName, projectDirectoryName, templatesRootPath string
 	// populate map to replace templates
 	data := map[string]interface{}{
-		"RepositoryName": project.RepositoryName,
-		"UserName":       project.UserName,
+		"GitRepositoryName":   project.GitRepositoryName,
+		"GitPlatformUserName": project.GitPlatformUserName,
 	}
 
 	return &Copier{
 		// TODO change this path to constant. Add language specific analysers in a generic way later.
 		TemplatesRootPath:    utils.GetProjectRootPath("templates/common-templates"),
 		ProjectDirectoryName: utils.GetProjectDirectoryName(project.Name),
-		RepositoryName:       project.RepositoryName,
+		GitRepositoryName:    project.GitRepositoryName,
 		Data:                 data,
 	}
 }

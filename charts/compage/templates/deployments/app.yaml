@@ -43,8 +43,6 @@ spec:
             initialDelaySeconds: 45
             periodSeconds: 30
           env:
-            - name: SYSTEM_NAMESPACE
-              value: {{ .Values.systemNamespace }}
             - name: LOG_LEVEL
               value: {{ .Values.app.logLevel }}
             - name: COMPAGE_CORE_URL
@@ -52,14 +50,9 @@ spec:
                 configMapKeyRef:
                   name: app-data
                   key: COMPAGE_CORE_URL
-            - name: GITHUB_APP_REDIRECT_URI
-              valueFrom:
-                configMapKeyRef:
-                  name: app-github
-                  key: GITHUB_APP_REDIRECT_URI
           volumeMounts:
-            - name: github-credentials
-              mountPath: "/etc/github-credentials"
+            - name: db-cassandra-credentials
+              mountPath: "/etc/db-cassandra-credentials"
               readOnly: true
             - name: tmp-volume
               mountPath: /tmp
@@ -80,12 +73,18 @@ spec:
       volumes:
         - name: tmp-volume
           emptyDir: {}
-        - name: github-credentials
+        - name: db-cassandra-credentials
           secret:
-            secretName: app-github-credentials
+            secretName: db-cassandra-credentials
             defaultMode: 0400
             items:
-              - key: GITHUB_APP_CLIENT_ID
-                path: compage/GITHUB_APP_CLIENT_ID
-              - key: GITHUB_APP_CLIENT_SECRET
-                path: compage/GITHUB_APP_CLIENT_SECRET
+              - key: CASSANDRA_CONTACT_POINTS
+                path: compage/CASSANDRA_CONTACT_POINTS
+              - key: CASSANDRA_LOCAL_DATA_CENTER
+                path: compage/CASSANDRA_LOCAL_DATA_CENTER
+              - key: CASSANDRA_KEYSPACE
+                path: compage/CASSANDRA_KEYSPACE
+              - key: CASSANDRA_USERNAME
+                path: compage/CASSANDRA_USERNAME
+              - key: CASSANDRA_PASSWORD
+                path: compage/CASSANDRA_PASSWORD

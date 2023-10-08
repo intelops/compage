@@ -1,20 +1,24 @@
-// ProjectEntity is for transferring info about projects from client to server
+// ProjectDTO is for transferring info about projects from client to server
 import {CompageJson} from "../../components/diagram-maker/models";
 
-export interface ProjectEntity {
+export interface ProjectDTO {
     id: string;
     displayName?: string;
     version: string;
-    user?: User;
-    json?: CompageJson;
-    repository?: Repository;
+    json: CompageJson;
+    gitPlatformUserName?: string;
+    gitPlatformName?: string;
+    repositoryName?: string;
+    repositoryBranch?: string;
+    isRepositoryPublic?: boolean;
+    repositoryUrl?: string;
     // TODO temporary made optional.
     metadata?: Map<string, string>;
+    ownerEmail: string;
 }
 
-export interface CreateProjectResponse {
-    project: ProjectEntity;
-    message: string;
+// create project models
+export interface CreateProjectRequest extends ProjectDTO {
 }
 
 // This type describes the error object structure:
@@ -22,27 +26,10 @@ export type CreateProjectError = {
     message: string;
 };
 
-// create project models
-export interface CreateProjectRequest extends ProjectEntity {
-}
-
-export interface Repository {
-    name: string;
-    branch: string;
-    isPublic: boolean;
-}
-
-export interface User {
-    name: string;
-    email: string;
-}
-
 // listProjects models (the structure matches as of now with CreateProjectRequest but have kept it
 // separate for future customizations)
-export interface ListProjectsResponse extends ProjectEntity {
-}
-
 export interface ListProjectsRequest {
+    email: string;
 }
 
 // This type describes the error object structure:
@@ -52,43 +39,47 @@ export type ListProjectsError = {
 
 // existsProject models (the structure matches as of now with CreateProjectRequest but have kept it
 // separate for future customizations)
-export interface ExistsProjectResponse extends ProjectEntity {
-}
-
 export interface ExistsProjectRequest {
     id: string;
+    email: string;
 }
 
 // This type describes the error object structure:
-export type ExistsProjectError = {
+export interface ExistsProjectError {
     message: string;
-};
+}
 
 // getProject models (the structure matches as of now with CreateProjectRequest but have kept it
 // separate for future customizations)
-export interface GetProjectResponse extends ProjectEntity {
-}
-
 export interface GetProjectRequest {
     id: string;
+    email: string;
 }
 
 // This type describes the error object structure:
-export type GetProjectError = {
-    message: string;
-};
-
-// updateProject models (the structure matches as of now with UpdateProjectRequest but have kept it
-// separate for future customizations)
-export interface UpdateProjectResponse {
-    project: ProjectEntity;
+export interface GetProjectError {
     message: string;
 }
 
-export interface UpdateProjectRequest extends ProjectEntity {
+// updateProject models (the structure matches as of now with UpdateProjectRequest but have kept it
+// separate for future customizations)
+export interface UpdateProjectRequest extends ProjectDTO {
 }
 
 // This type describes the error object structure:
 export type UpdateProjectError = {
+    message: string;
+};
+
+
+// deleteProject models (the structure matches as of now with DeleteProjectRequest but have kept it
+// separate for future customizations)
+export interface DeleteProjectRequest {
+    id: string;
+    email: string;
+}
+
+// This type describes the error object structure:
+export type DeleteProjectError = {
     message: string;
 };

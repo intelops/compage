@@ -2,19 +2,19 @@ import express, {Application, Request, Response, Router} from 'express';
 import 'dotenv/config';
 import bodyParser from 'body-parser';
 import helmet from 'helmet';
-import codeOperationsRouter from './routes/code-operations';
-import authOperationsRouter from './routes/auth-operations';
-import config from './util/constants';
-import projectsOperationsRouter from './routes/projects-operations';
-import {checkIfCrdsInstalled, checkIfSystemNamespaceExists, initializeKubeClient} from './store/kube-client';
+import codeOperationsRouter from './routes/codeOperations';
+import config from './utils/constants';
+import projectsOperationsRouter from './routes/projectsOperations';
+import {initializeKubeClient} from './store/k8s/kubeClient';
 import '@kubernetes/client-node';
-import openApiYamlOperationsRouter from './routes/open-api-yaml-operations';
-import Logger from './util/logger';
-import morganMiddleware from './util/morganMiddleware';
-import k8sOperationsRouter from './routes/k8s-operations';
+import openApiYamlOperationsRouter from './routes/openApiYamlOperations';
+import Logger from './utils/logger';
+import morganMiddleware from './utils/morganMiddleware';
+import k8sOperationsRouter from './routes/k8sOperations';
+import gitPlatformsOperationsRouter from './routes/gitPlatformOperations';
+import usersOperationsRouter from './routes/usersOperations';
 
 export const {customObjectsApiClient, coreV1ApiClient, currentContext} = initializeKubeClient();
-
 const app: Application = express();
 
 app.use(bodyParser.json());
@@ -26,7 +26,7 @@ app.use(morganMiddleware);
 app.use((req: Request, res: Response, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     // Needed for PUT requests
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, X-User-Name');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, X-Email-ID');
     res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
     next();
 });
@@ -46,58 +46,21 @@ app.get('/', (req: Request, res: Response) => {
 
 const routes = Router();
 routes.use('/k8s', k8sOperationsRouter);
-routes.use('/projects', projectsOperationsRouter);
 routes.use('/code', codeOperationsRouter);
-routes.use('/auth', authOperationsRouter);
 routes.use('/openapi', openApiYamlOperationsRouter);
+
+routes.use('/users', usersOperationsRouter);
+routes.use('/', projectsOperationsRouter);
+routes.use('/', gitPlatformsOperationsRouter);
+
 app.use(routes);
 
 app.get('*', (req, res) => {
     return res.status(200).json('you have reached default route');
 });
 
-const isTest = (process.env.NODE_ENV === 'test');
-if (!isTest) {
-    // check if there is a valid kubernetes cluster and crds installed on it.
-    checkIfCrdsInstalled().then(resources => {
-        Logger.debug(resources);
-        Logger.info('connection to K8s cluster is successful and it seems that crds are installed too.');
-    }).catch(e => {
-        Logger.error('It seems that crds are not yet installed, please check if you have applied crds');
-        Logger.debug(JSON.stringify(e));
-        process.exit(0);
-    });
-
-    // check if there is a system namespace exists.
-    checkIfSystemNamespaceExists().then(namespaces => {
-        Logger.debug(`Namespace list:`);
-        namespaces.items.forEach((namespace: { metadata: { name: string } }) => {
-            Logger.debug(`${JSON.stringify(namespace.metadata.name)}`);
-        });
-
-        let hasFound = false;
-        // tslint:disable-next-line: prefer-for-of
-        for (let i = 0; i < namespaces.items.length; i++) {
-            if (namespaces.items[i].metadata.name === config.system_namespace) {
-                hasFound = true;
-                break;
-            }
-        }
-        if (!hasFound) {
-            Logger.error(`It seems that system namespace doesn't exist, please check if you have created namespace with name ${config.system_namespace}`);
-            process.exit(0);
-        } else {
-            Logger.info(`The namespace '${config.system_namespace}' exists on the cluster, good to go.`);
-        }
-    }).catch(e => {
-        Logger.error(`It seems that system namespace doesn't exist, please check if you have created namespace with name ${config.system_namespace}`);
-        Logger.debug(e);
-        process.exit(0);
-    });
-}
-
-app.listen(parseInt(config.server_port as string, 10), '0.0.0.0', () => {
-    Logger.info(`Server is up and running @ http://0.0.0.0:${config.server_port}`);
+app.listen(parseInt(config.serverPort as string, 10), '0.0.0.0', () => {
+    Logger.info(`Server is up and running @ http://0.0.0.0:${config.serverPort}`);
 });
 
 export default app;

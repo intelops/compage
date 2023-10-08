@@ -3,6 +3,15 @@
   "extends": [
     "tslint:recommended"
   ],
+  "compilerOptions": {
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "node_modules/helmet",
+    "./node_modules",
+    "./node_modules/*",
+    "./node_modules/helmet"
+  ],
   "jsRules": {},
   "rules": {
     "no-console": [

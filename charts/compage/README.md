@@ -23,10 +23,6 @@ kubectl create ns compage
 kubectl config set-context --current --namespace=compage
 ```
 
-### Register an app on GitHub
-To run `Compage` (on your local or on the server), you have to first set up GitHub app. 
-Refer [GitHub App setup](../../github-app-setup.md)
-
 ### Create namespace
 ```yaml
 kubectl create ns compage

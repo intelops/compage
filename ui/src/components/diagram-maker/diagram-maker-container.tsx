@@ -46,7 +46,7 @@ import {
     setModifiedState,
     setReset,
     shouldReset
-} from "../../utils/localstorage-client";
+} from "../../utils/localstorageClient";
 import {ToolPanel} from "./custom/tool-panel";
 import {LibraryPanel} from "./custom/library-panel";
 import {ContextNode} from "./custom/context-node";
@@ -55,7 +55,7 @@ import {ContextPanel} from "./custom/context-panel";
 import {ContextWorkspace} from "./custom/context-workspace";
 import {EdgeBadge} from "./custom/edge-badge";
 import {PotentialNode} from "./custom/potential-node";
-import {getNodeTypeConfig} from "./helper/node-type-ui";
+import {getNodeTypeConfig} from "./helper/nodeTypeUi";
 import {NewEdgeProperties} from "./edge-properties/new-edge-properties";
 import {NewNodeProperties} from "./node-properties/new-node-properties";
 import JSONPretty from "react-json-pretty";
@@ -69,7 +69,7 @@ import {cleanse, getParsedCurrentConfig, getParsedModifiedState, removeUnwantedK
 import * as _ from "lodash";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import {getCurrentUserName} from "../../utils/sessionstorage-client";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
 import {useNavigate} from "react-router-dom";
 import {CompageEdge, CompageJson, CompageNode} from "./models";
 import {DEVELOPMENT} from "../../utils/constants";
@@ -97,11 +97,11 @@ export const DiagramMakerContainer = ({
                                           plugin,
                                           onAction,
                                       }: ArgTypes) => {
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const updateProjectStatus = useAppSelector(selectUpdateProjectStatus);
     const containerRef = useRef() as any;
     const diagramMakerRef = useRef() as any;
-    const dispatch = useAppDispatch();
-    const updateProjectStatus = useAppSelector(selectUpdateProjectStatus);
-    const navigate = useNavigate();
 
     // handle ctrl+s in window
     const handleKeyDown = (event) => {
@@ -320,6 +320,7 @@ export const DiagramMakerContainer = ({
                         }
                     }
                 };
+                // eslint-disable-next-line
                 const removeWsClient = (srcNode: CompageNode, destNode: CompageNode) => {
                     if (destNode.consumerData.wsConfig && destNode.consumerData.wsConfig.clients) {
                         for (let i = 0; i < destNode.consumerData.wsConfig.clients.length; i++) {
@@ -510,22 +511,23 @@ export const DiagramMakerContainer = ({
             const state = diagramMakerRef.current.store.getState();
             setData(JSON.stringify(state));
         });
-
+        // eslint-disable-next-line
     }, [plugin, initialData]);
 
     // When clicked, save the state of project to backend.
     const handleSaveProjectClick = () => {
         const currentProjectDetails: string = getCurrentProjectDetails();
         if (currentProjectDetails) {
-            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
+            const currentUserAndProjectAndVersion = currentProjectDetails.split("###");
             // save in localstorage
             setCurrentConfig(JSON.parse(diagramMaker.config));
             setCurrentState(JSON.parse(diagramMaker.state));
             const prepareUpdateProjectRequest = () => {
                 const uPR: UpdateProjectRequest = {
-                    version: userNameAndProjectAndVersion[2],
-                    id: userNameAndProjectAndVersion[1],
-                    json: JSON.parse(getCurrentState())
+                    version: currentUserAndProjectAndVersion[2],
+                    id: currentUserAndProjectAndVersion[1],
+                    json: JSON.parse(getCurrentState()),
+                    ownerEmail: getCurrentUser()
                 };
                 return uPR;
             };
@@ -540,12 +542,12 @@ export const DiagramMakerContainer = ({
     function getProjectAndVersion(): React.ReactNode {
         const currentProjectDetails = getCurrentProjectDetails();
         if (currentProjectDetails) {
-            const userNameAndProjectAndVersion = currentProjectDetails.split("###");
+            const currentUserAndProjectAndVersion = currentProjectDetails.split("###");
             return <a target="_blank" rel="noreferrer"
-                      href={"https://github1s.com/" + getCurrentUserName() + "/" + userNameAndProjectAndVersion[3]}>
+                      href={"https://github1s.com/" + getCurrentUser() + "/" + currentUserAndProjectAndVersion[3]}>
                 <Box sx={{flexGrow: 0}}>
                     <Typography variant={"subtitle1"}>
-                        {userNameAndProjectAndVersion[1]}[{userNameAndProjectAndVersion[2]}]
+                        {currentUserAndProjectAndVersion[1]}[{currentUserAndProjectAndVersion[2]}]
                     </Typography>
                 </Box>
             </a>;

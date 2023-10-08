@@ -3,67 +3,66 @@ import React, {ChangeEvent, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectGetProjectStatus, selectListProjectsData, selectListProjectsStatus} from './slice';
 import Button from "@mui/material/Button";
-import {GetProjectRequest, ListProjectsRequest, ListProjectsResponse} from "./model";
-import {selectAuthData} from "../auth-operations/slice";
-import {Navigate} from "react-router-dom";
+import {GetProjectRequest, ListProjectsRequest, ProjectDTO} from "./model";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import {Stack} from "@mui/material";
 import {getProjectAsync} from "./async-apis/getProject";
 import {listProjectsAsync} from "./async-apis/listProjects";
 import CircularProgress from '@mui/material/CircularProgress';
+import {getCurrentUser, isUserNotLoggedIn} from "../../utils/sessionstorageClient";
+import {useNavigate} from "react-router-dom";
 
-interface ArgTypes {
-    handleClose: (...args: any) => void;
+interface SwitchToExistingProjectProps {
 }
 
-export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
-    const listProjectsStatus = useAppSelector(selectListProjectsStatus);
-    const authData = useAppSelector(selectAuthData);
-    const listProjectsData = useAppSelector(selectListProjectsData);
-    const getProjectStatus = useAppSelector(selectGetProjectStatus);
+export const SwitchToExistingProject = (_switchToExistingProjectProps: SwitchToExistingProjectProps) => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const listProjectsData = useAppSelector(selectListProjectsData);
+    const listProjectsStatus = useAppSelector(selectListProjectsStatus);
+    const getProjectStatus = useAppSelector(selectGetProjectStatus);
 
-    useEffect(() => {
-        // dispatch listProjects
-        const listProjectsRequest: ListProjectsRequest = {};
-        dispatch(listProjectsAsync(listProjectsRequest));
-    }, [dispatch]);
-
-    const [data, setData] = useState({
+    const [payload, setPayload] = useState({
         projectName: "",
     });
 
-    if (!authData.login) {
-        return <Navigate to="/login"/>;
-    }
+    useEffect(() => {
+        if (isUserNotLoggedIn()) {
+            navigate('/login');
+        }
+        // dispatch listProjects
+        const listProjectsRequest: ListProjectsRequest = {
+            email: getCurrentUser()
+        };
+        dispatch(listProjectsAsync(listProjectsRequest));
+    }, [dispatch, navigate]);
+
+    const handleChooseProjectClick = () => {
+        // allow to choose project only when the project is chosen from drop-down
+        if (payload.projectName) {
+            const getProjectRequest: GetProjectRequest = {
+                id: payload.projectName,
+                email: getCurrentUser()
+            };
+            dispatch(getProjectAsync(getProjectRequest));
+        }
+        console.log("handleChooseProjectClick called");
+        navigate('/home');
+    };
 
     const handleExistingProjectsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setData({
-            ...data,
+        setPayload({
+            ...payload,
             projectName: event.target.value
         });
     };
 
-    const handleChooseProjectClick = () => {
-        // allow to choose project only when the project is chosen from drop-down
-        if (data.projectName) {
-            const getProjectRequest: GetProjectRequest = {
-                id: data.projectName
-            };
-            dispatch(getProjectAsync(getProjectRequest));
-            if (handleClose) {
-                handleClose();
-            }
+    const getLoadingIcon = (): React.ReactNode => {
+        if (listProjectsStatus === 'loading') {
+            return <CircularProgress/>;
         }
-    };
-
-    const getActionButtons = (): React.ReactNode => {
-        return <Button variant="contained"
-                       disabled={listProjectsStatus === 'loading' || getProjectStatus === 'loading' || data.projectName === ''}
-                       onClick={handleChooseProjectClick}>
-            Choose Project
-        </Button>;
+        return "";
     };
 
     const getExistingProjects = (): React.ReactNode => {
@@ -76,14 +75,14 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
             id="projectName"
             label="Existing Projects"
             type="text"
-            value={data.projectName}
+            value={payload.projectName}
             onChange={handleExistingProjectsChange}
             variant="outlined">
             {
-                listProjectsData && listProjectsData.map((listProjectsResponse: ListProjectsResponse) =>
+                listProjectsData && listProjectsData.map((projectDTO: ProjectDTO) =>
                     (
-                        <MenuItem key={listProjectsResponse.id} value={listProjectsResponse.id}>
-                            {listProjectsResponse.displayName} [{listProjectsResponse.id}]
+                        <MenuItem key={projectDTO.id} value={projectDTO.id}>
+                            {projectDTO.displayName} [{projectDTO.id}]
                         </MenuItem>
                     )
                 )
@@ -91,11 +90,12 @@ export const SwitchToExistingProject = ({handleClose}: ArgTypes) => {
         </TextField>;
     };
 
-    const getLoadingIcon = () => {
-        if (listProjectsStatus === 'loading') {
-            return <CircularProgress/>;
-        }
-        return;
+    const getActionButtons = (): React.ReactNode => {
+        return <Button variant="contained"
+                       disabled={listProjectsStatus === 'loading' || getProjectStatus === 'loading' || payload.projectName === ''}
+                       onClick={handleChooseProjectClick}>
+            Choose Project
+        </Button>;
     };
 
     return <React.Fragment>

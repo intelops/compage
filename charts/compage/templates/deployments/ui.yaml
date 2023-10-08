@@ -43,16 +43,6 @@ spec:
             initialDelaySeconds: 120
             periodSeconds: 30
           env:
-            - name: REACT_APP_GITHUB_APP_REDIRECT_URI
-              valueFrom:
-                configMapKeyRef:
-                  name: ui-data
-                  key: REACT_APP_GITHUB_APP_REDIRECT_URI
-            - name: REACT_APP_GITHUB_APP_CLIENT_ID
-              valueFrom:
-                configMapKeyRef:
-                  name: ui-data
-                  key: REACT_APP_GITHUB_APP_CLIENT_ID
             - name: REACT_APP_COMPAGE_APP_SERVER_URL
               valueFrom:
                 configMapKeyRef:

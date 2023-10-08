@@ -23,13 +23,13 @@ import Button from "@mui/material/Button";
 import React, {ChangeEvent} from "react";
 import {Resource} from "../models";
 import TextField from "@mui/material/TextField";
-import {sanitizeString} from "../../../utils/backend-api";
+import {sanitizeString} from "../../../utils/backendApi";
 import {BOOL, COMPLEX, FLOAT, goDataTypes, INT, STRING, STRUCT} from "./go-resource";
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import EditIcon from "@mui/icons-material/Edit";
 
-interface AddOrUpdateRestServerResourceProperties {
+interface AddOrUpdateRestServerResourceProps {
     isOpen: boolean;
     onAddOrUpdateRestServerResourceClose: () => void;
     handleAddOrUpdateRestServerResource: (resource: Resource) => void;
@@ -87,15 +87,15 @@ const getFieldsCollection = (resource: Resource) => {
     return fieldsCollection;
 };
 
-export const AddOrUpdateRestServerResource = (props: AddOrUpdateRestServerResourceProperties) => {
+export const AddOrUpdateRestServerResource = (addOrUpdateRestServerResourceProps: AddOrUpdateRestServerResourceProps) => {
     const [payload, setPayload] = React.useState({
         name: {
-            value: props.resource.name,
+            value: addOrUpdateRestServerResourceProps.resource.name,
             error: false,
             errorMessage: ''
         },
-        fields: JSON.stringify(props.resource?.fields) || '',
-        fieldsCollection: getFieldsCollection(props.resource),
+        fields: JSON.stringify(addOrUpdateRestServerResourceProps.resource?.fields) || '',
+        fieldsCollection: getFieldsCollection(addOrUpdateRestServerResourceProps.resource),
     });
 
     // individual states for Attribute Name and Data Type
@@ -152,7 +152,7 @@ export const AddOrUpdateRestServerResource = (props: AddOrUpdateRestServerResour
     };
 
     const isStruct = (value: string) => {
-        return props.resourceNames.includes(value);
+        return addOrUpdateRestServerResourceProps.resourceNames.includes(value);
     };
 
     const handleDatatypeChange = (event: SelectChangeEvent) => {
@@ -303,8 +303,8 @@ export const AddOrUpdateRestServerResource = (props: AddOrUpdateRestServerResour
         } else {
             // check for duplicate resource name only when name has any value in it.
             // tslint:disable-next-line: prefer-for-of
-            for (let i = 0; i < props.resourceNames.length; i++) {
-                if (!props.resource.name && props.resourceNames[i] === payload.name.value) {
+            for (let i = 0; i < addOrUpdateRestServerResourceProps.resourceNames.length; i++) {
+                if (!addOrUpdateRestServerResourceProps.resource.name && addOrUpdateRestServerResourceProps.resourceNames[i] === payload.name.value) {
                     newPayload = {
                         ...newPayload,
                         name: {
@@ -348,7 +348,7 @@ export const AddOrUpdateRestServerResource = (props: AddOrUpdateRestServerResour
         }
         const resource: Resource = {fields: JSON.parse(JSON.stringify(fields)), name: payload.name.value};
         if (isNameValid()) {
-            props.handleAddOrUpdateRestServerResource(resource);
+            addOrUpdateRestServerResourceProps.handleAddOrUpdateRestServerResource(resource);
             setPayload({
                 ...payload,
                 fields: '',
@@ -377,12 +377,12 @@ export const AddOrUpdateRestServerResource = (props: AddOrUpdateRestServerResour
         if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
         }
-        props.onAddOrUpdateRestServerResourceClose();
+        addOrUpdateRestServerResourceProps.onAddOrUpdateRestServerResourceClose();
     };
 
     return <React.Fragment>
-        <Dialog open={props.isOpen} onClose={onAddOrUpdateRestResourceClose}>
-            <DialogTitle>Add or update [REST Server] resource : {props.nodeId}</DialogTitle>
+        <Dialog open={addOrUpdateRestServerResourceProps.isOpen} onClose={onAddOrUpdateRestResourceClose}>
+            <DialogTitle>Add or update [REST Server] resource : {addOrUpdateRestServerResourceProps.nodeId}</DialogTitle>
             <Divider/>
             <DialogContent style={{
                 height: "500px",
@@ -458,7 +458,7 @@ export const AddOrUpdateRestServerResource = (props: AddOrUpdateRestServerResour
                                 }
                                 <Divider/>
                                 <ListSubheader color="primary">STRUCT</ListSubheader>
-                                {getCustomStructs(props.resourceNames)}
+                                {getCustomStructs(addOrUpdateRestServerResourceProps.resourceNames)}
                             </Select>
                         </FormControl>
                         <Stack direction="row">
@@ -519,12 +519,12 @@ export const AddOrUpdateRestServerResource = (props: AddOrUpdateRestServerResour
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary"
-                        onClick={props.onAddOrUpdateRestServerResourceClose}>Cancel</Button>
+                        onClick={addOrUpdateRestServerResourceProps.onAddOrUpdateRestServerResourceClose}>Cancel</Button>
                 <Button variant="contained"
                         disabled={isEmpty(payload.name.value) || isEmptyField()}
                         onClick={addOrUpdateRestResource}>
                     {
-                        props.resource.name ? <>Update Resource</> : <>Add Resource</>
+                        addOrUpdateRestServerResourceProps.resource.name ? <>Update Resource</> : <>Add Resource</>
                     }
                 </Button>
             </DialogActions>

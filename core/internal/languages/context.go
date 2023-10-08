@@ -19,9 +19,11 @@ var (
 type TemplateVarKey string
 
 const (
-	RepositoryName TemplateVarKey = "RepositoryName"
-	NodeName       TemplateVarKey = "NodeName"
-	UserName       TemplateVarKey = "UserName"
+	GitRepositoryName   TemplateVarKey = "GitRepositoryName"
+	GitPlatformName     TemplateVarKey = "GitPlatformName"
+	GitPlatformURL      TemplateVarKey = "GitPlatformURL"
+	GitPlatformUserName TemplateVarKey = "GitPlatformUserName"
+	NodeName            TemplateVarKey = "NodeName"
 )
 
 type Values struct {
@@ -45,9 +47,11 @@ func AddValuesToContext(ctx context.Context, project *core.Project, languageNode
 
 	v := Values{
 		TemplateVars: map[TemplateVarKey]string{
-			RepositoryName: project.RepositoryName,
-			NodeName:       languageNode.Name,
-			UserName:       project.UserName,
+			GitRepositoryName:   project.GitRepositoryName,
+			NodeName:            languageNode.Name,
+			GitPlatformName:     project.GitPlatformName,
+			GitPlatformURL:      project.GitPlatformURL,
+			GitPlatformUserName: project.GitPlatformUserName,
 		},
 		NodeDirectoryName: nodeDirectoryName,
 		ProjectName:       project.Name,

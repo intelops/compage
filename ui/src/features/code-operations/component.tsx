@@ -4,27 +4,28 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectGenerateCodeStatus} from './slice';
 import Button from "@mui/material/Button";
 import {generateCodeAsync} from "./async-apis/generateCode";
-import {getCurrentProjectDetails, getCurrentState} from "../../utils/localstorage-client";
-import {selectGetProjectData, selectUpdateProjectData} from "../projects-operations/slice";
+import {getCurrentProjectDetails, getCurrentState} from "../../utils/localstorageClient";
+import {selectGetProjectData} from "../projects-operations/slice";
 import {removeUnwantedKeys} from "../../components/diagram-maker/helper/helper";
 import * as _ from "lodash";
 import {CompageNode, GrpcConfig, RestClient, RestConfig} from "../../components/diagram-maker/models";
 import {isCompageTemplate} from "../../components/diagram-maker/node-properties/utils";
+import {GenerateCodeRequest} from "./model";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
 
 export const GenerateCode = () => {
-    const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
-    const getProjectData = useAppSelector(selectGetProjectData);
-    const updateProjectData = useAppSelector(selectUpdateProjectData);
-
     const dispatch = useAppDispatch();
+    const getProjectData = useAppSelector(selectGetProjectData);
+    const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
 
     // When clicked, dispatch `generateCode`
     const handleGenerateCodeClick = () => {
         const currentProjectDetails: string = getCurrentProjectDetails();
         if (currentProjectDetails) {
             const userNameAndProjectAndVersion = currentProjectDetails.split("###");
-            const generateCodeRequest = {
-                projectId: userNameAndProjectAndVersion[1]
+            const generateCodeRequest: GenerateCodeRequest = {
+                projectId: userNameAndProjectAndVersion[1],
+                email: getCurrentUser(),
             };
             if (generateCodeStatus !== 'loading') {
                 dispatch(generateCodeAsync(generateCodeRequest));
@@ -102,16 +103,10 @@ export const GenerateCode = () => {
             return true;
         }
 
-        if (updateProjectData?.project?.json) {
-            const removeUnwantedKeyUpdateProject = removeUnwantedKeys(JSON.stringify(updateProjectData.project.json));
-            if (_.isEqual(removeUnwantedKeyUpdateProject, removeUnwantedKeysGetCurrentState) && Object.keys(updateProjectData.project.json?.nodes).length !== 0) {
-                return false;
-            }
-        }
         // check if the get project data is different.
         if (getProjectData?.json) {
             const removeUnwantedKeyGetProject = removeUnwantedKeys(JSON.stringify(getProjectData?.json));
-            if (_.isEqual(removeUnwantedKeyGetProject, removeUnwantedKeysGetCurrentState)) {
+            if (_.isEqual(removeUnwantedKeyGetProject?.consumerData, removeUnwantedKeysGetCurrentState?.consumerData)) {
                 return false;
             }
         }

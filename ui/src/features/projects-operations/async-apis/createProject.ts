@@ -1,16 +1,17 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {CreateProjectError, CreateProjectRequest, CreateProjectResponse} from "../model";
+import {CreateProjectError, CreateProjectRequest, ProjectDTO} from "../model";
 import {createProject} from "../api";
 import {toastr} from 'react-redux-toastr';
-import {setCurrentConfig, setCurrentProjectDetails, setCurrentState} from "../../../utils/localstorage-client";
+import {setCurrentConfig, setCurrentProjectDetails, setCurrentState} from "../../../utils/localstorageClient";
+import {refreshProjectsList} from "./refresh";
 
-export const createProjectAsync = createAsyncThunk<CreateProjectResponse, CreateProjectRequest, { rejectValue: CreateProjectError }>(
+export const createProjectAsync = createAsyncThunk<ProjectDTO, CreateProjectRequest, { rejectValue: CreateProjectError }>(
     'projects/createProject',
     async (createProjectRequest: CreateProjectRequest, thunkApi) => {
         return createProject(createProjectRequest).then(response => {
-            if (response.status !== 200) {
-                const msg = `Failed to create project.`;
-                const errorMessage = `Status: ${response.status}, Message: ${msg}`;
+            if (response.status !== 201) {
+                const details = `Failed to create project.`;
+                const errorMessage = `Status: ${response.status}, Message: ${details}`;
                 console.log(errorMessage);
                 toastr.error(`createProject [Failure]`, errorMessage);
                 // Return the error message:
@@ -18,16 +19,18 @@ export const createProjectAsync = createAsyncThunk<CreateProjectResponse, Create
                     message: errorMessage
                 });
             }
-            const createProjectResponse: CreateProjectResponse = response.data;
+            const projectDTO: ProjectDTO = response.data;
             // update details to localstorage client
-            setCurrentProjectDetails(createProjectResponse.project.id, createProjectResponse.project.version, createProjectResponse.project.repository.name);
-            setCurrentConfig(createProjectResponse.project.json);
-            setCurrentState(createProjectResponse.project.json);
-            const message = `Successfully created project: ${createProjectRequest.displayName}[${createProjectResponse.project.id}]`;
-            console.log(message);
-            toastr.success(`createProject [Success]`, message);
+            setCurrentProjectDetails(projectDTO.id, projectDTO.version, projectDTO.repositoryName);
+            setCurrentConfig(projectDTO.json);
+            setCurrentState(projectDTO.json);
+            const successMessage = `Successfully created project: ${createProjectRequest.displayName}[${projectDTO.id}]`;
+            console.log(successMessage);
+            toastr.success(`createProject [Success]`, successMessage);
+            // refresh the list of Projects
+            thunkApi.dispatch(refreshProjectsList());
             return response.data;
-        }).catch(e => {
+        }).catch((e:any) => {
             const statusCode = e.response.status;
             const message = e.response.data.message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;

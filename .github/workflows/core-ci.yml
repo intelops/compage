@@ -115,11 +115,11 @@ jobs:
         with:
           # relative path to the place where source code with Dockerfile is located
           context: ./core
-          # Note: tags has to be all lower-case
+          # Note: tags have to be all lower-case
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/core:${{ github.run_id }}
           # ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
-          # build on feature branches, push only on main branch
+          # build on feature branches, push only on the main branch
           push: true
 #      - uses: goodwithtech/dockle-action@main
 #        with:

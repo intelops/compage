@@ -11,7 +11,7 @@ import {
     RestClient,
     WsClient
 } from "../models";
-import {getCurrentConfig} from "../../../utils/localstorage-client";
+import {getCurrentConfig} from "../../../utils/localstorageClient";
 
 interface ContextEdgeProps {
     id: string | undefined;

@@ -61,8 +61,8 @@ func Generate(ctx context.Context) error {
 }
 
 func getIntegrationsCopier(pythonValues Values) map[string]interface{} {
-	userName := pythonValues.Values.Get(languages.UserName)
-	repositoryName := pythonValues.Values.Get(languages.RepositoryName)
+	gitPlatformUserName := pythonValues.Values.Get(languages.GitPlatformUserName)
+	gitRepositoryName := pythonValues.Values.Get(languages.GitRepositoryName)
 	nodeName := pythonValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := pythonValues.Values.NodeDirectoryName
 	isRestServer := pythonValues.PythonNode.RestConfig.Server != nil
@@ -70,10 +70,10 @@ func getIntegrationsCopier(pythonValues Values) map[string]interface{} {
 	path := GetPythonTemplatesRootPath()
 
 	// create python specific k8sCopier
-	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	// create python specific devspaceCopier
-	devspaceCopier := devspace.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	devspaceCopier := devspace.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	return map[string]interface{}{
 		"k8s":      k8sCopier,

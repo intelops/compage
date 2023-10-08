@@ -1,100 +1,49 @@
 import * as React from 'react';
 import {useEffect} from 'react';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardMedia from '@mui/material/CardMedia';
-import CardContent from '@mui/material/CardContent';
-import Avatar from '@mui/material/Avatar';
-import Typography from '@mui/material/Typography';
-import {red} from '@mui/material/colors';
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
-import {Navigate} from "react-router-dom";
-import {selectAuthData} from "../../features/auth-operations/slice";
-import {selectListProjectsData} from "../../features/projects-operations/slice";
-import {ListProjectsRequest} from "../../features/projects-operations/model";
-import {listProjectsAsync} from "../../features/projects-operations/async-apis/listProjects";
-import Box from '@mui/material/Box';
 import {Stack} from "@mui/material";
 import {GetCurrentContextRequest} from "../../features/k8s-operations/model";
 import {getCurrentContextAsync} from "../../features/k8s-operations/async-apis/getCurrentContext";
+import {getCurrentUser, isUserNotLoggedIn} from "../../utils/sessionstorageClient";
+import {useNavigate} from "react-router-dom";
+import {selectGetUserData, selectGetUserStatus} from "../../features/users-operations/slice";
+import {GetUserRequest} from "../../features/users-operations/model";
+import {getUserAsync} from "../../features/users-operations/async-apis/getUser";
+import {selectGetCurrentContextData, selectGetCurrentContextStatus} from "../../features/k8s-operations/slice";
 
 export const Account = () => {
-    const authData = useAppSelector(selectAuthData);
-    const listProjectsData = useAppSelector(selectListProjectsData);
     const dispatch = useAppDispatch();
-
-    const {
-        avatar_url,
-        bio,
-        name,
-        public_repos,
-        owned_private_repos,
-        followers,
-        following,
-        login,
-        email
-    } = authData;
+    const navigate = useNavigate();
+    const getUserData = useAppSelector(selectGetUserData);
+    const getUserStatus = useAppSelector(selectGetUserStatus);
+    const getCurrentContextData = useAppSelector(selectGetCurrentContextData);
+    const getCurrentContextStatus = useAppSelector(selectGetCurrentContextStatus);
 
     useEffect(() => {
-        // dispatch listProjects
-        const listProjectsRequest: ListProjectsRequest = {};
-        dispatch(listProjectsAsync(listProjectsRequest));
-        const getCurrentProjectContext: GetCurrentContextRequest = {};
-        dispatch(getCurrentContextAsync(getCurrentProjectContext));
-    }, [dispatch]);
+        if (isUserNotLoggedIn()) {
+            navigate('/login');
+        }
+        if (getUserStatus !== 'loading') {
+            const getUserRequest: GetUserRequest = {
+                email: getCurrentUser()
+            };
+            dispatch(getUserAsync(getUserRequest));
+        }
+        if (getCurrentContextStatus !== 'loading') {
+            const getCurrentProjectContext: GetCurrentContextRequest = {
+                email: getCurrentUser()
+            };
+            dispatch(getCurrentContextAsync(getCurrentProjectContext));
+        }
+        // eslint-disable-next-line
+    }, [dispatch, navigate]);
 
-    if (!authData.login) {
-        return <Navigate to="/login"/>;
-    }
-
-    let title = name;
-    if (email) {
-        title += "[" + email + "]";
-    }
-    console.log("listProjectsData : ", listProjectsData);
-    const listItems = listProjectsData && listProjectsData.map((d) =>
-        <li key={d.id}>
-            {d.id}
-        </li>
-    );
 
     return <>
         <Stack direction="column" spacing={2}>
-            <Card sx={{width: 700}}>
-                <CardHeader
-                    avatar={
-                        <Avatar sx={{bgcolor: red[500]}} aria-label="recipe">
-                        </Avatar>
-                    }
-                    title={title}
-                    subheader={login}
-                />
-                <CardMedia
-                    component="img"
-                    height="350"
-                    image={avatar_url}
-                    alt={name}
-                />
-                <CardContent>
-                    <Typography variant="body2" color="text.secondary">
-                        {bio}
-                    </Typography>
-                    <hr/>
-                    <Typography variant="body2">
-                        {followers} followers <br/>
-                        {following} following <br/>
-                        {public_repos} public_repos <br/>
-                        {owned_private_repos} owned_private_repos
-                    </Typography>
-                </CardContent>
-            </Card>
-            <Box sx={{flexGrow: 0}}>
-                <Typography variant={"h6"}> You have created below projects so far.
-                </Typography>
-                <ul>
-                    {listItems}
-                </ul>
-            </Box>
+            {getUserData && JSON.stringify(getUserData)}
+            <br/>
+            {getCurrentContextData && JSON.stringify(getCurrentContextData)}
         </Stack>
     </>;
 };

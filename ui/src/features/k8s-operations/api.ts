@@ -1,4 +1,4 @@
-import {K8sOperationsBackendApi} from "../../utils/backend-api";
+import {K8sOperationsBackendApi} from "../../utils/backendApi";
 
 // Sync apis (async apis are in thunk)
 export const getCurrentContext = () => {

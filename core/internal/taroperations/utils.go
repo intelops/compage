@@ -112,7 +112,7 @@ func listProjectFiles(projectDirectoryPath string) []string {
 			return err
 		}
 		if !utils.IgnorablePaths(path) && !info.IsDir() {
-			//TODO Needs to fix problem with below impl as it searches in current dir
+			//TODO Needs to fix a problem with below impl as it searches in current dir
 			//files = append(files, strings.Replace(path, projectDirectoryPath, "", -1))
 			files = append(files, path)
 		}

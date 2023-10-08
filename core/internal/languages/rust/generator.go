@@ -53,8 +53,8 @@ func Generate(ctx context.Context) error {
 }
 
 func getIntegrationsCopier(rustValues Values) map[string]interface{} {
-	userName := rustValues.Values.Get(languages.UserName)
-	repositoryName := rustValues.Values.Get(languages.RepositoryName)
+	gitPlatformUserName := rustValues.Values.Get(languages.GitPlatformUserName)
+	gitRepositoryName := rustValues.Values.Get(languages.GitRepositoryName)
 	nodeName := rustValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := rustValues.Values.NodeDirectoryName
 	isRestServer := rustValues.RustNode.RestConfig.Server != nil
@@ -62,7 +62,7 @@ func getIntegrationsCopier(rustValues Values) map[string]interface{} {
 	path := GetRustTemplatesRootPath()
 
 	// create rust specific copier
-	k8sCopier := kubernetes.NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
 
 	return map[string]interface{}{
 		"k8s": k8sCopier,

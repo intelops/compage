@@ -6,7 +6,7 @@ import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import {getCurrentConfig, setModifiedState} from "../../../utils/localstorage-client";
+import {getCurrentConfig, setModifiedState} from "../../../utils/localstorageClient";
 import {getParsedModifiedState} from "../helper/helper";
 import Divider from "@mui/material/Divider";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";

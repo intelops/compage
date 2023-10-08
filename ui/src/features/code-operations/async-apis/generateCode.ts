@@ -2,22 +2,25 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {GenerateCodeError, GenerateCodeRequest, GenerateCodeResponse} from "../model";
 import {generateCode} from "../api";
 import {toastr} from 'react-redux-toastr';
-import {GetProjectRequest, GetProjectResponse} from "../../projects-operations/model";
+import {GetProjectRequest, ProjectDTO} from "../../projects-operations/model";
 import {getProject} from "../../projects-operations/api";
-import {setCurrentConfig, setCurrentProjectDetails, setCurrentState} from "../../../utils/localstorage-client";
+import {setCurrentConfig, setCurrentProjectDetails, setCurrentState} from "../../../utils/localstorageClient";
 import {updateModifiedState} from "../../projects-operations/populateModifiedState";
 
-export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, GenerateCodeRequest, { rejectValue: GenerateCodeError }>(
+export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, GenerateCodeRequest, {
+    rejectValue: GenerateCodeError
+}>(
     'code/generateCode',
     async (generateCodeRequest: GenerateCodeRequest, thunkApi) => {
         const retrieveProjectToUpdateState = (request: GenerateCodeRequest) => {
             const getProjectRequest: GetProjectRequest = {
-                id: request.projectId
+                id: request.projectId,
+                email: generateCodeRequest.email
             };
             getProject(getProjectRequest).then(getProjectResp => {
                 if (getProjectResp.status !== 200) {
-                    const msg = `Failed to retrieve project.`;
-                    const errorMessage = `Status: ${getProjectResp.status}, Message: ${msg}`;
+                    const detailedMessage = `Failed to retrieve project.`;
+                    const errorMessage = `Status: ${getProjectResp.status}, Message: ${detailedMessage}`;
                     console.log(errorMessage);
                     toastr.error(`getProject [Failure]`, errorMessage);
                     return thunkApi.rejectWithValue({
@@ -27,16 +30,16 @@ export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, Generate
                 const message = `Successfully retrieved project.`;
                 console.log(message);
                 toastr.success(`getProject [Success]`, message);
-                const getProjectResponse: GetProjectResponse = getProjectResp.data;
+                const projectDTO: ProjectDTO = getProjectResp.data;
                 // update details to localstorage client
-                setCurrentConfig(getProjectResponse.json);
-                setCurrentState(getProjectResponse.json);
-                setCurrentProjectDetails(getProjectResponse.id, getProjectResponse.version, getProjectResponse.repository.name);
+                setCurrentConfig(projectDTO.json);
+                setCurrentState(projectDTO.json);
+                setCurrentProjectDetails(projectDTO.id, projectDTO.version, projectDTO.repositoryName);
                 // set the modified state when the project is fetched. This is required when user logged out after adding
                 // properties to nodes and edges. After re-login, the modified state is lost and user can't see props
                 // added to nodes and edges.
-                updateModifiedState(getProjectResponse.json);
-            }).catch(e => {
+                updateModifiedState(projectDTO.json);
+            }).catch((e: any) => {
                 const statusCode = e.response.status;
                 const message = e.response.data.message;
                 const errorMessage = `Status: ${statusCode}, Message: ${message}`;
@@ -64,7 +67,7 @@ export const generateCodeAsync = createAsyncThunk<GenerateCodeResponse, Generate
             // the below function retrieves project and updates the store.
             retrieveProjectToUpdateState(generateCodeRequest);
             return response.data;
-        }).catch(e => {
+        }).catch((e: any) => {
             const statusCode = e.response.status;
             const message = e.response.data.message;
             const errorMessage = `Status: ${statusCode}, Message: ${message}`;

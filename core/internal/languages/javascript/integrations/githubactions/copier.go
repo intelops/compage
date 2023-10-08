@@ -19,12 +19,12 @@ type Copier struct {
 	Data                 map[string]interface{}
 }
 
-func NewCopier(userName, repositoryName, projectDirectoryName, nodeName, nodeDirectoryName, templatesRootPath string) *Copier {
+func NewCopier(gitPlatformUserName, gitRepositoryName, projectDirectoryName, nodeName, nodeDirectoryName, templatesRootPath string) *Copier {
 	// populate map to replace templates
 	data := map[string]interface{}{
-		"RepositoryName": repositoryName,
-		"NodeName":       strings.ToLower(nodeName),
-		"UserName":       userName,
+		"GitRepositoryName":   gitRepositoryName,
+		"NodeName":            strings.ToLower(nodeName),
+		"GitPlatformUserName": gitPlatformUserName,
 	}
 
 	return &Copier{

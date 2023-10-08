@@ -7,21 +7,21 @@ import Button from "@mui/material/Button";
 import React from "react";
 import {Resource} from "../models";
 
-interface DeleteRestServerResourceProperties {
+interface DeleteRestServerResourceProps {
     isOpen: boolean;
     resource: Resource;
     onDeleteRestServerResourceClose: () => void;
     handleDeleteRestServerResource: () => void;
 }
 
-export const DeleteRestServerResource = (props: DeleteRestServerResourceProperties) => {
+export const DeleteRestServerResource = (deleteRestServerResourceProperties: DeleteRestServerResourceProps) => {
     return <Dialog
-        open={props.isOpen}
+        open={deleteRestServerResourceProperties.isOpen}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
     >
         <DialogTitle id="alert-dialog-title">
-            Delete Resource: {props.resource.name}?
+            Delete Resource: {deleteRestServerResourceProperties.resource.name}?
         </DialogTitle>
         <DialogContent>
             <DialogContentText id="alert-dialog-description">
@@ -30,10 +30,10 @@ export const DeleteRestServerResource = (props: DeleteRestServerResourceProperti
         </DialogContent>
         <DialogActions>
             <Button variant="outlined" color="secondary"
-                    onClick={props.onDeleteRestServerResourceClose}>Cancel</Button>
+                    onClick={deleteRestServerResourceProperties.onDeleteRestServerResourceClose}>Cancel</Button>
             <Button color="error"
                     variant="contained"
-                    onClick={props.handleDeleteRestServerResource} autoFocus>
+                    onClick={deleteRestServerResourceProperties.handleDeleteRestServerResource} autoFocus>
                 Delete
             </Button>
         </DialogActions>

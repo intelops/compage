@@ -1,15 +1,14 @@
 import React from 'react';
 import './App.scss';
 import {BrowserRouter, Link, Route, Routes} from "react-router-dom";
-import {Login} from "../../features/auth-operations/component";
 import {Home} from "../home/home";
 import Header from "../navbar/header";
 import {Account} from "../account/account";
 import {Grid} from "@mui/material";
-import LoadingOverlay from "react-loading-overlay";
+import LoadingOverlay from "react-loading-overlay-ts";
 import {useAppSelector} from "../../redux/hooks";
 import {
-    selectCreateProjectStatus,
+    selectCreateProjectStatus, selectDeleteProjectStatus,
     selectExistsProjectStatus,
     selectGetProjectStatus,
     selectListProjectsStatus,
@@ -18,25 +17,46 @@ import {
 import {selectGenerateCodeStatus} from "../../features/code-operations/slice";
 import {selectUploadYamlStatus} from "../../features/open-api-yaml-operations/slice";
 import {selectGetCurrentContextStatus} from "../../features/k8s-operations/slice";
+import {AddOrUpdateGitPlatform} from "../../features/git-platforms-operations/add-or-update-git-platform";
+import {
+    selectCreateGitPlatformStatus,
+    selectDeleteGitPlatformStatus,
+    selectListGitPlatformsStatus,
+    selectUpdateGitPlatformStatus
+} from "../../features/git-platforms-operations/slice";
+import {SwitchProject} from "../../features/projects-operations/switch-project";
+import {Login} from "../auth/login";
+import {Projects} from "../../features/projects-operations/projects";
+import {GitPlatforms} from "../../features/git-platforms-operations/git-platforms";
 
 export const App = () => {
     const createProjectStatus = useAppSelector(selectCreateProjectStatus);
+    const listProjectsStatus = useAppSelector(selectListProjectsStatus);
     const getProjectStatus = useAppSelector(selectGetProjectStatus);
     const existsProjectStatus = useAppSelector(selectExistsProjectStatus);
-    const listProjectsStatus = useAppSelector(selectListProjectsStatus);
     const updateProjectStatus = useAppSelector(selectUpdateProjectStatus);
+    const deleteProjectStatus = useAppSelector(selectDeleteProjectStatus);
+    const createGitPlatformStatus = useAppSelector(selectCreateGitPlatformStatus);
+    const listGitPlatformsStatus = useAppSelector(selectListGitPlatformsStatus);
+    const updateGitPlatformStatus = useAppSelector(selectUpdateGitPlatformStatus);
+    const deleteGitPlatformStatus = useAppSelector(selectDeleteGitPlatformStatus);
     const generateCodeStatus = useAppSelector(selectGenerateCodeStatus);
     const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
     const getCurrentContextStatus = useAppSelector(selectGetCurrentContextStatus);
 
     const isActive = () => {
         return createProjectStatus === 'loading'
-            || getProjectStatus === 'loading'
             || listProjectsStatus === 'loading'
+            || getProjectStatus === 'loading'
+            || existsProjectStatus === 'loading'
             || updateProjectStatus === 'loading'
+            || deleteProjectStatus === 'loading'
+            || createGitPlatformStatus === 'loading'
+            || listGitPlatformsStatus === 'loading'
+            || updateGitPlatformStatus === 'loading'
+            || deleteGitPlatformStatus === 'loading'
             || uploadYamlStatus === 'loading'
             || generateCodeStatus === 'loading'
-            || existsProjectStatus === 'loading'
             || getCurrentContextStatus === 'loading';
     };
 
@@ -66,6 +86,10 @@ export const App = () => {
                 <br/>
                 <Routes>
                     <Route path="/login" element={<Login/>}/>
+                    <Route path="/switch-project" element={<SwitchProject/>}/>
+                    <Route path="/projects" element={<Projects/>}/>
+                    <Route path="/git-platforms" element={<GitPlatforms/>}/>
+                    <Route path="/git-platforms/new" element={<AddOrUpdateGitPlatform/>}/>
                     <Route path="/home" element={<Home/>}/>
                     <Route path="/account" element={<Account/>}/>
                     <Route path="/" element={<Home/>}/>

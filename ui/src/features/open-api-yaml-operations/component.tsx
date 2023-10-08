@@ -1,21 +1,20 @@
 import React from 'react';
 
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
-import {selectUploadYamlData, selectUploadYamlStatus} from './slice';
+import {selectUploadYamlStatus} from './slice';
 import Button from "@mui/material/Button";
 import {uploadYamlAsync} from "./async-apis/uploadYaml";
-import {getCurrentProjectDetails} from "../../utils/localstorage-client";
+import {getCurrentProjectDetails} from "../../utils/localstorageClient";
 import {UploadYamlRequest} from "./model";
 
-interface ArgTypes {
+interface UploadYamlProps {
     nodeId: string;
 }
 
-export const UploadYaml = ({nodeId}: ArgTypes) => {
-    const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
-    const uploadYamlData = useAppSelector(selectUploadYamlData);
-    const [openApiYamlFile, setOpenApiYamlFile] = React.useState("");
+export const UploadYaml = ({nodeId}: UploadYamlProps) => {
     const dispatch = useAppDispatch();
+    const uploadYamlStatus = useAppSelector(selectUploadYamlStatus);
+    const [openApiYamlFile, setOpenApiYamlFile] = React.useState("");
 
     // When clicked, dispatch `uploadYaml`
     const handleUploadYamlClick = () => {

@@ -1,4 +1,4 @@
-import {getCurrentConfig, getModifiedState, setModifiedState} from "../../../utils/localstorage-client";
+import {getCurrentConfig, getModifiedState, setModifiedState} from "../../../utils/localstorageClient";
 import {CompageEdge, CompageJson, CompageNode} from "../models";
 
 export const cleanse = (state: string) => {

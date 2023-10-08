@@ -94,15 +94,16 @@ type serverResourceData struct {
 	CapsResourceNamePlural             string
 }
 
-func NewCopier(userName, repositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isSQLDB bool, sqlDB string, isNoSQLDB bool, noSQLDB string, resources []*corenode.Resource, restClients []*corenode.RestClient) *Copier {
+func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isSQLDB bool, sqlDB string, isNoSQLDB bool, noSQLDB string, resources []*corenode.Resource, restClients []*corenode.RestClient) *Copier {
 
 	pluralizeClient := pluralize.NewClient()
 
 	// populate map to replace templates
 	data := map[string]interface{}{
-		"RepositoryName": repositoryName,
-		"NodeName":       strings.ToLower(nodeName),
-		"UserName":       userName,
+		"GitRepositoryName":   gitRepositoryName,
+		"NodeName":            strings.ToLower(nodeName),
+		"GitPlatformUserName": gitPlatformUserName,
+		"GitPlatformURL":      strings.Replace(gitPlatformURL, "https://", "", -1),
 	}
 	data["SQLDB"] = sqlDB
 	data["IsSQLDB"] = isSQLDB

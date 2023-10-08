@@ -3,93 +3,189 @@ import React, {ChangeEvent, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {selectCreateProjectStatus, selectListProjectsData} from './slice';
 import Button from "@mui/material/Button";
-import {CreateProjectRequest, Repository, User} from "./model";
-import {selectAuthData} from "../auth-operations/slice";
-import {Navigate} from "react-router-dom";
+import {CreateProjectRequest} from "./model";
 import TextField from "@mui/material/TextField";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import {createProjectAsync} from "./async-apis/createProject";
 import {getData} from "../../components/diagram-maker/data/BoundaryCircular/data";
-import {sanitizeString} from "../../utils/backend-api";
+import {sanitizeString} from "../../utils/backendApi";
+import {getCurrentUser} from "../../utils/sessionstorageClient";
+import MenuItem from "@mui/material/MenuItem";
+import {selectListGitPlatformsData, selectListGitPlatformsStatus} from "../git-platforms-operations/slice";
+import {GitPlatformDTO} from "../git-platforms-operations/model";
+import {Link, useNavigate} from "react-router-dom";
 
-interface ArgTypes {
-    handleClose: (...args: any) => void;
+interface SwitchToNewProjectProps {
 }
 
-export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
-    const createProjectStatus = useAppSelector(selectCreateProjectStatus);
-    const authData = useAppSelector(selectAuthData);
-    const listProjectsData = useAppSelector(selectListProjectsData);
-
+export const SwitchToNewProject = (_switchToNewProjectProps: SwitchToNewProjectProps) => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const listProjectsData = useAppSelector(selectListProjectsData);
+    const listGitPlatformsData = useAppSelector(selectListGitPlatformsData);
+    const createProjectStatus = useAppSelector(selectCreateProjectStatus);
+    const listGitPlatformsStatus = useAppSelector(selectListGitPlatformsStatus);
 
-    const [data, setData] = useState({
+    const [payload, setPayload] = useState({
         projectName: "",
         repositoryName: "",
         isPublicRepository: true,
         repositoryBranch: "",
+        gitPlatform: {
+            userName: "",
+            name: "",
+            url: ""
+        },
         // TODO ui for this yet to be added.
         metadata: new Map<string, string>()
     });
 
-    if (!authData.login) {
-        return <Navigate to="/login"/>;
-    }
+    const prepareCreateProjectRequest = () => {
+        const json = getData(0, 0, "");
+        const displayName = payload.projectName;
+        const metadata = payload.metadata;
+        const cPR: CreateProjectRequest = {
+            id: "",
+            metadata,
+            version: "v1",
+            gitPlatformName: payload.gitPlatform.name,
+            gitPlatformUserName: payload.gitPlatform.userName,
+            repositoryName: payload.repositoryName,
+            repositoryBranch: payload.repositoryBranch || 'compage',
+            isRepositoryPublic: payload.isPublicRepository,
+            repositoryUrl: payload.gitPlatform.url + '/' + payload.gitPlatform.userName + '/' + payload.repositoryName,
+            displayName,
+            ownerEmail: getCurrentUser(),
+            json: JSON.parse(JSON.stringify(json))
+        };
+        return cPR;
+    };
 
     const handleCreateProjectClick = () => {
         const createProjectRequest: CreateProjectRequest = prepareCreateProjectRequest();
         dispatch(createProjectAsync(createProjectRequest));
-        if (handleClose) {
-            handleClose();
+        setTimeout(() => {
+            navigate('/home');
+        }, 2000);
+    };
+
+    const handleGitPlatformsChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const gitPlatformName = event.target.value;
+        const gitPlatform = listGitPlatformsData.find((gitPlatformDTO: GitPlatformDTO) => gitPlatformDTO.name === gitPlatformName);
+        if (gitPlatform) {
+            setPayload({
+                ...payload,
+                gitPlatform: {
+                    name: gitPlatform.name,
+                    userName: gitPlatform.userName,
+                    url: gitPlatform.url
+                }
+            });
         }
     };
 
     const handleProjectNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setData({
-            ...data,
+        setPayload({
+            ...payload,
             projectName: sanitizeString(event.target.value)
         });
     };
 
     const handleRepositoryBranchChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setData({
-            ...data,
+        setPayload({
+            ...payload,
             repositoryBranch: sanitizeString(event.target.value)
         });
     };
 
     const handleRepositoryNameChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        setData({
-            ...data,
+        setPayload({
+            ...payload,
             repositoryName: sanitizeString(event.target.value)
         });
     };
 
     const handleIsPublicRepositoryChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setData({
-            ...data,
+        setPayload({
+            ...payload,
             isPublicRepository: event.target.checked
         });
     };
 
     const isValid = () => {
         for (const project of listProjectsData) {
-            if (data.projectName === project.id) {
+            if (payload.projectName === project.id) {
                 return false;
             }
         }
         return true;
     };
 
-    const getIsRepositoryPublic = (): React.ReactNode => {
-        return <FormControlLabel
-            label="Is Public Repository?"
-            control={<Checkbox
-                id="isPublicRepository"
-                size="medium" checked={data.isPublicRepository}
-                onChange={handleIsPublicRepositoryChange}
-            />}
+    const getProjectName = (): React.ReactNode => {
+        return <TextField
+            required
+            fullWidth
+            margin="dense"
+            id="projectName"
+            label="Name"
+            type="text"
+            value={payload.projectName}
+            onChange={handleProjectNameChange}
+            variant="outlined"
         />;
+    };
+
+    const getGitPlatforms = (): React.ReactNode => {
+        if (listGitPlatformsData && listGitPlatformsData.length === 0) {
+            return <>
+                <Link to="/git-platforms">
+                    Add Git Platform
+                </Link>
+                <TextField
+                    required
+                    fullWidth
+                    select
+                    disabled={listGitPlatformsStatus === 'loading' || (listGitPlatformsData && listGitPlatformsData.length === 0)}
+                    margin="dense"
+                    id="gitPlatform"
+                    label="Git Platforms"
+                    type="text"
+                    value={payload.gitPlatform.name}
+                    onChange={handleGitPlatformsChange}
+                    variant="outlined">
+                    {
+                        listGitPlatformsData && listGitPlatformsData.map((gitPlatformDTO: GitPlatformDTO) =>
+                            (
+                                <MenuItem key={gitPlatformDTO.name} value={gitPlatformDTO.name}>
+                                    {gitPlatformDTO.name} [{gitPlatformDTO.userName}]
+                                </MenuItem>
+                            )
+                        )
+                    }
+                </TextField>
+            </>;
+        }
+        return <TextField
+            required
+            fullWidth
+            select
+            disabled={listGitPlatformsStatus === 'loading' || (listGitPlatformsData && listGitPlatformsData.length === 0)}
+            margin="dense"
+            id="gitPlatform"
+            label="Git Platforms"
+            type="text"
+            onChange={handleGitPlatformsChange}
+            variant="outlined">
+            {
+                listGitPlatformsData && listGitPlatformsData.map((gitPlatformDTO: GitPlatformDTO) =>
+                    (
+                        <MenuItem key={gitPlatformDTO.name} value={gitPlatformDTO.name}>
+                            {gitPlatformDTO.name} [{gitPlatformDTO.userName}]
+                        </MenuItem>
+                    )
+                )
+            }
+        </TextField>;
     };
 
     const getRepositoryName = (): React.ReactNode => {
@@ -99,7 +195,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             id="repositoryName"
             label="Repository Name"
             type="text"
-            value={data.repositoryName}
+            value={payload.repositoryName}
             onChange={handleRepositoryNameChange}
             variant="outlined"
         />;
@@ -112,55 +208,27 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
             id="repositoryBranch"
             label="Repository Branch"
             type="text"
-            value={data.repositoryBranch}
+            value={payload.repositoryBranch}
             onChange={handleRepositoryBranchChange}
             variant="outlined"
         />;
     };
 
-    const getProjectName = (): React.ReactNode => {
-        return <TextField
-            required
-            fullWidth
-            margin="dense"
-            id="projectName"
-            label="Name"
-            type="text"
-            value={data.projectName}
-            onChange={handleProjectNameChange}
-            variant="outlined"
+    const getIsRepositoryPublic = (): React.ReactNode => {
+        return <FormControlLabel
+            label="Is Public Repository?"
+            control={<Checkbox
+                id="isPublicRepository"
+                size="medium" checked={payload.isPublicRepository}
+                onChange={handleIsPublicRepositoryChange}
+            />}
         />;
-    };
-
-    const prepareCreateProjectRequest = () => {
-        const user: User = {
-            email: authData.email || authData.login,
-            name: authData.login
-        };
-        const repository: Repository = {
-            branch: data.repositoryBranch || 'compage',
-            name: data.repositoryName,
-            isPublic: data.isPublicRepository,
-        };
-        const json = getData(0, 0, "");
-        const displayName = data.projectName;
-        const metadata = data.metadata;
-        const cPR: CreateProjectRequest = {
-            id: "",
-            metadata,
-            version: "v1",
-            repository,
-            displayName,
-            user,
-            json: JSON.parse(JSON.stringify(json))
-        };
-        return cPR;
     };
 
     const getActionButtons = (): React.ReactNode => {
         return <Button variant="contained"
                        onClick={handleCreateProjectClick}
-                       disabled={createProjectStatus === 'loading' || data.projectName === "" || !isValid()}>
+                       disabled={createProjectStatus === 'loading' || payload.projectName === "" || payload.gitPlatform.name === "" || !isValid()}>
             Create Project
         </Button>;
     };
@@ -168,6 +236,7 @@ export const SwitchToNewProject = ({handleClose}: ArgTypes) => {
     return <React.Fragment>
         <Stack direction="column" spacing={2}>
             {getProjectName()}
+            {getGitPlatforms()}
             {getRepositoryName()}
             {getRepositoryBranch()}
             {getIsRepositoryPublic()}

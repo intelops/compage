@@ -13,6 +13,7 @@ import ReduxToastr from 'react-redux-toastr';
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
+
 root.render(
     <React.StrictMode>
         <Provider store={store}>
@@ -24,7 +25,6 @@ root.render(
                 newestOnTop={false}
                 preventDuplicates
                 position="bottom-left"
-                getState={(state) => state.toastr} // This is the default
                 transitionIn="fadeIn"
                 transitionOut="fadeOut"
                 progressBar
@@ -34,10 +34,10 @@ root.render(
 );
 
 const backup = console.error;
-console.error = function filterWarnings(msg) {
+console.error = function filterWarnings(message: string[]) {
     const suppressedWarnings = ['Use createRoot instead', "Legacy context API has been detected within a strict-mode tree"];
 
-    if (!suppressedWarnings.some(entry => msg.includes(entry))) {
+    if (!suppressedWarnings.some(entry => message.includes(entry))) {
         backup.apply(console, arguments);
     }
 };

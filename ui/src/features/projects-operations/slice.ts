@@ -5,29 +5,36 @@ import {listProjectsAsync} from "./async-apis/listProjects";
 import {getProjectAsync} from "./async-apis/getProject";
 import {updateProjectAsync} from './async-apis/updateProject';
 import {existsProjectAsync} from "./async-apis/existsProject";
+import {ProjectDTO} from "./model";
+import {deleteProjectAsync} from "./async-apis/deleteProject";
 
 export interface ProjectState {
     createProject: {
-        data: any,
+        data: ProjectDTO,
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
     };
     listProjects: {
-        data: any,
+        data: ProjectDTO[],
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
     };
     getProject: {
-        data: any,
+        data: ProjectDTO,
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
     };
     existsProject: {
-        data: any,
+        data: ProjectDTO,
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
     };
     updateProject: {
+        data: any,
+        status: 'idle' | 'loading' | 'failed';
+        error: string | null;
+    };
+    deleteProject: {
         data: any,
         status: 'idle' | 'loading' | 'failed';
         error: string | null;
@@ -35,18 +42,8 @@ export interface ProjectState {
 }
 
 const initialState: ProjectState = {
-    updateProject: {
-        data: {},
-        status: 'idle',
-        error: null
-    },
-    getProject: {
-        data: {},
-        status: 'idle',
-        error: null
-    },
-    existsProject: {
-        data: {},
+    createProject: {
+        data: {} as ProjectDTO,
         status: 'idle',
         error: null
     },
@@ -55,11 +52,26 @@ const initialState: ProjectState = {
         status: 'idle',
         error: null
     },
-    createProject: {
+    getProject: {
+        data: {} as ProjectDTO,
+        status: 'idle',
+        error: null
+    },
+    existsProject: {
+        data: {} as ProjectDTO,
+        status: 'idle',
+        error: null
+    },
+    updateProject: {
         data: {},
         status: 'idle',
         error: null
     },
+    deleteProject: {
+        data: {},
+        status: 'idle',
+        error: null
+    }
 };
 
 export const projectsSlice = createSlice({
@@ -83,7 +95,7 @@ export const projectsSlice = createSlice({
         }).addCase(listProjectsAsync.fulfilled, (state, action) => {
             state.listProjects.status = 'idle';
             state.listProjects.error = null;
-            state.listProjects.data = action.payload;
+            state.listProjects.data = action.payload as ProjectDTO[];
         }).addCase(listProjectsAsync.rejected, (state, action) => {
             state.listProjects.status = 'failed';
             if (action.payload) state.listProjects.error = JSON.stringify(action.payload);
@@ -106,7 +118,7 @@ export const projectsSlice = createSlice({
         }).addCase(getProjectAsync.fulfilled, (state, action) => {
             state.getProject.status = 'idle';
             state.getProject.error = null;
-            state.getProject.data = action.payload;
+            state.getProject.data = action.payload as ProjectDTO;
         }).addCase(getProjectAsync.rejected, (state, action) => {
             state.getProject.status = 'failed';
             if (action.payload) state.getProject.error = JSON.stringify(action.payload);
@@ -120,6 +132,16 @@ export const projectsSlice = createSlice({
         }).addCase(updateProjectAsync.rejected, (state, action) => {
             state.updateProject.status = 'failed';
             if (action.payload) state.updateProject.error = JSON.stringify(action.payload);
+        }).addCase(deleteProjectAsync.pending, (state) => {
+            state.deleteProject.status = 'loading';
+            state.deleteProject.error = null;
+        }).addCase(deleteProjectAsync.fulfilled, (state, action) => {
+            state.deleteProject.status = 'idle';
+            state.deleteProject.error = null;
+            state.deleteProject.data = action.payload;
+        }).addCase(deleteProjectAsync.rejected, (state, action) => {
+            state.deleteProject.status = 'failed';
+            if (action.payload) state.deleteProject.error = JSON.stringify(action.payload);
         });
     },
 });
@@ -143,5 +165,9 @@ export const selectExistsProjectStatus = (state: RootState) => state.projectsOpe
 export const selectUpdateProjectData = (state: RootState) => state.projectsOperations.updateProject.data;
 export const selectUpdateProjectError = (state: RootState) => state.projectsOperations.updateProject.error;
 export const selectUpdateProjectStatus = (state: RootState) => state.projectsOperations.updateProject.status;
+
+export const selectDeleteProjectData = (state: RootState) => state.projectsOperations.deleteProject.data;
+export const selectDeleteProjectError = (state: RootState) => state.projectsOperations.deleteProject.error;
+export const selectDeleteProjectStatus = (state: RootState) => state.projectsOperations.deleteProject.status;
 
 export default projectsSlice.reducer;
