@@ -14,3 +14,5 @@ openapitools.json
 /ui/.env.kind.cluster
 /app/compage-app.sqlite3
 /deploy/build/
+/charts/compage/secure-connect-compage.zip
+/app/secure-connect-compage.zip
