@@ -1,6 +1,6 @@
 import {UserEntity} from '../models/user';
 import {UserDao} from './userDao';
-import {cassandraClient} from './cassandra/cassandraClient';
+import cassandraClient from './cassandra/cassandraClient';
 
 export class CassandraUserDaoImpl implements UserDao {
 

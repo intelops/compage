@@ -4,7 +4,6 @@ import Logger from '../../utils/logger';
 import {NewProjectGitServerRequest} from './models';
 
 export const pushNewProjectToGitServer = async (newProjectGitServerRequest: NewProjectGitServerRequest): Promise<string> => {
-    console.log('pushNewProjectToGitServer' + newProjectGitServerRequest.generatedProjectPath);
     const options: Partial<SimpleGitOptions> = {
         baseDir: newProjectGitServerRequest.generatedProjectPath,
         binary: 'git',

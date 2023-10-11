@@ -2,15 +2,20 @@ import {GitPlatformEntity} from '../models/gitPlatform';
 import {GitPlatformDao} from '../store/gitPlatformDao';
 import {SqliteGitPlatformDaoImpl} from '../store/sqliteGitPlatformDaoImpl';
 import {CassandraGitPlatformDaoImpl} from '../store/cassandraGitPlatformDaoImpl';
+import config from '../utils/constants';
 
 export class GitPlatformService {
     private gitPlatformDao: GitPlatformDao;
 
     constructor() {
-        // create the appropriate gitPlatformDao based on the environment
-        this.gitPlatformDao = process.env.NODE_ENV === 'production'
-            ? new CassandraGitPlatformDaoImpl()
-            : new SqliteGitPlatformDaoImpl();
+        // create the appropriate gitPlatformDao based on the DB_TYPE
+        if (config.db?.type === 'cassandra') {
+            this.gitPlatformDao = new CassandraGitPlatformDaoImpl();
+        } else if (config.db?.type === 'sqlite') {
+            this.gitPlatformDao = new SqliteGitPlatformDaoImpl();
+        } else {
+            throw new Error('Invalid process.env.DB_TYPE');
+        }
     }
 
     async createGitPlatform(gitPlatform: GitPlatformEntity): Promise<GitPlatformEntity> {

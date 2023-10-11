@@ -42,19 +42,17 @@ export const gitOperations = async (git: SimpleGit, repositoryBranch?: string, p
         branchName = repositoryBranch + '-' + projectVersion;
     }
 
-    if (repositoryBranch && projectVersion) {
-        //  checkoutLocalBranch checks out local branch with name supplied
-        await git.checkoutLocalBranch(branchName)
-            .then(
-                (success: any) => {
-                    Logger.debug(`git checkoutLocalBranch succeeded: ${JSON.stringify(success)}`);
-                }, (failure: any) => {
-                    Logger.debug(`git checkoutLocalBranch failed: ${JSON.stringify(failure)}`);
-                    error = `git checkoutLocalBranch failed: ${JSON.stringify(failure)}`;
-                });
-        if (error.length > 0) {
-            return error;
-        }
+    //  checkoutLocalBranch checks out local branch with name supplied
+    await git.checkoutLocalBranch(branchName)
+        .then(
+            (success: any) => {
+                Logger.debug(`git checkoutLocalBranch succeeded: ${JSON.stringify(success)}`);
+            }, (failure: any) => {
+                Logger.debug(`git checkoutLocalBranch failed: ${JSON.stringify(failure)}`);
+                error = `git checkoutLocalBranch failed: ${JSON.stringify(failure)}`;
+            });
+    if (error.length > 0) {
+        return error;
     }
 
     // Finally, push to online repository

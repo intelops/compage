@@ -1,6 +1,6 @@
 import {generateProjectId} from '../utils/utils';
-import {OldVersion, ProjectEntity} from '../models/project';
-import {cassandraClient} from './cassandra/cassandraClient';
+import {ProjectEntity} from '../models/project';
+import cassandraClient from './cassandra/cassandraClient';
 
 import {ProjectDao} from './projectDao';
 

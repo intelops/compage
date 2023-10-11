@@ -1,7 +1,7 @@
 import {GitPlatformEntity} from '../models/gitPlatform';
 
 import {GitPlatformDao} from './gitPlatformDao';
-import {cassandraClient} from './cassandra/cassandraClient';
+import cassandraClient from './cassandra/cassandraClient';
 
 export class CassandraGitPlatformDaoImpl implements GitPlatformDao {
     async createGitPlatform(gitPlatformEntity: GitPlatformEntity): Promise<GitPlatformEntity> {

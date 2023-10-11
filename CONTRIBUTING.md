@@ -19,8 +19,7 @@ To contribute code.
     GO111MODULE=on
     GOFLAGS=-mod=vendor
     ```
-3. Ensure you have Node.js(LTS >= 18.12.0) installed for Core and UI part of the compage.
-4. Ensure you have access to any Kubernetes (tested on KinD) cluster to store the compage projects and users related data on it.
+3. Ensure you have Node.js(LTS >= v18.18.0) installed for app and ui part of the compage.
    #### KinD
    - Install KinD from https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries
    - Create KinD cluster using below command
@@ -29,19 +28,16 @@ To contribute code.
      ./create-kind-cluster.sh
      ```
    - Check if you can access the cluster created in previous step, and you are able to list down the pods.
-5. Fork the project.
-6. Clone the project: `git clone https://github.com/[YOUR_USERNAME]/compage && cd compage`
-7. kindly refer compage.md file to know the structure of the project.
-8. The Compage has three servers (subprojects) which need to be started to run the compage on local
+4. Fork the project.
+5. Clone the project: `git clone https://github.com/[YOUR_USERNAME]/compage && cd compage`
+6. kindly refer compage.md file to know the structure of the project.
+7. The Compage has three servers (subprojects) which need to be started to run the compage on local
    - core (Golang), navigate to core directory and follow its [core README](./core/README.md)
    - app (Node.js), navigate to app directory and follow its [app README](./app/README.md)
    - ui (ReactJs), navigate to ui directory and follow its [ui README](./ui/README.md)
-9. Commit changes *([Please refer the commit message conventions](https://www.conventionalcommits.org/en/v1.0.0/))*
-10. Push commits.
-11. Open pull request.
-
-## Improving the Documentation
-The documentation is contained within `./docs` and made with Docusaurus. See the [Docs README](./docs/README.md) for infos about developing the docs.
+8. Commit changes *([Please refer the commit message conventions](https://www.conventionalcommits.org/en/v1.0.0/))*
+9. Push commits.
+10. Open pull request.
 
 ## Regenerate the gRPC code from .proto files
 - Install below packages in order to regenerate the gRPC code.
@@ -57,5 +53,5 @@ The documentation is contained within `./docs` and made with Docusaurus. See the
    ```shell
    buf generate
    ```
-## How are K8s and GitHub interacted with above three components?
-![architecture-med.png](images/architecture-med.png)
+## How are DB(sqlite/cassandra) and GitHub interacted with above three components?
+![architecture.png](images/architecture-med.png)

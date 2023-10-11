@@ -29,7 +29,6 @@ RUN apk update && apk add protoc && apk add dos2unix && apk add openjdk11 && apk
 
 # Downloading and installing Maven
 ARG MAVEN_VERSION=3.9.4
-ARG USER_HOME_DIR="/root"
 ARG BASE_URL=https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries
 RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
   && echo "Downloading maven" \
@@ -40,25 +39,32 @@ RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
   && rm -f /tmp/apache-maven.tar.gz \
   && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
 
-ENV MAVEN_HOME /usr/share/maven
-ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
-
-ENV PATH="/usr/local/go/bin:$PATH:/app/"
-ENV GOPATH /go
-ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
-RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
-
 # test if the below command avoids loading the files later.
 RUN /app/openapi-generator-cli version
 RUN go version
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-COPY --from=builder /app/core /
-COPY templates /app/templates
-RUN adduser -D -g '' compageuser
+
+ARG USER_NAME=compageuser
+ARG GROUP_NAME=compagegroup
+RUN addgroup -g 1001 $GROUP_NAME && adduser -D -u 1001 -G $GROUP_NAME $USER_NAME
+ENV HOME "/home/"$USER_NAME
+RUN chown $USER_NAME:$GROUP_NAME /app
+USER $USER_NAME
+
 RUN mkdir -p $HOME/.compage/workdir
 RUN chmod -R 777 $HOME/.compage/workdir
-USER compageuser
+ENV MAVEN_HOME /usr/share/maven
+ENV MAVEN_CONFIG "$HOME/.m2"
+
+ENV PATH="/usr/local/go/bin:$PATH:/app/"
+ENV GOPATH $HOME/go
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
+
+COPY --from=builder /app/core /
+COPY templates /app/templates
+
 # Application port (optional)
 EXPOSE 8080
 EXPOSE 50051
