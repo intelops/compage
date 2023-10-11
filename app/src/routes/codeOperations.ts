@@ -1,7 +1,6 @@
 import {getProjectGrpcClient} from '../grpc/project';
 import {Router} from 'express';
 import * as fs from 'fs';
-import * as os from 'os';
 import {
     cloneExistingProjectFromGitServer,
     pushToExistingProjectOnGitServer,
@@ -40,9 +39,12 @@ codeOperationsRouter.post('/generate', requireEmailMiddleware, async (request, r
 
     const cleanup = (downloadedPrjPath: string) => {
         // remove directory created, delete directory recursively
-        rimraf(downloadedPrjPath).then((result: any) => {
-            Logger.debug(`Result: ${result}`);
-            Logger.debug(`${downloadedPrjPath} is cleaned up`);
+        rimraf(downloadedPrjPath).then((result: boolean) => {
+            if (result) {
+                Logger.debug(`${downloadedPrjPath} is cleaned up`);
+            } else {
+                Logger.debug(`${downloadedPrjPath} is not cleaned up`);
+            }
         });
     };
 

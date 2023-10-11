@@ -1,5 +1,6 @@
 import winston from 'winston';
 import {DEVELOPMENT} from './constants';
+import os from 'os';
 
 const levels = {
     error: 0,
@@ -39,10 +40,10 @@ const transports = [
         level: process.env.LOG_LEVEL || level(),
     }),
     new winston.transports.File({
-        filename: 'logs/error.log',
+        filename: os.homedir() + '/.compage/logs/error.log',
         level: 'error',
     }),
-    new winston.transports.File({filename: 'logs/all.log'}),
+    new winston.transports.File({filename: os.homedir() + '/.compage/logs/all.log'}),
 ];
 
 const Logger = winston.createLogger({

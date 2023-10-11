@@ -2,15 +2,20 @@ import {ProjectEntity} from '../models/project';
 import {ProjectDao} from '../store/projectDao';
 import {SqliteProjectDaoImpl} from '../store/sqliteProjectDaoImpl';
 import {CassandraProjectDaoImpl} from '../store/cassandraProjectDaoImpl';
+import config from '../utils/constants';
 
 export class ProjectService {
     private projectDao: ProjectDao;
 
     constructor() {
-        // create the appropriate projectDao based on the environment
-        this.projectDao = process.env.NODE_ENV === 'production'
-            ? new CassandraProjectDaoImpl()
-            : new SqliteProjectDaoImpl();
+        // create the appropriate projectDao based on the DB_TYPE
+        if (config.db?.type === 'cassandra') {
+            this.projectDao = new CassandraProjectDaoImpl();
+        } else if (config.db?.type === 'sqlite') {
+            this.projectDao = new SqliteProjectDaoImpl();
+        } else {
+            throw new Error('Invalid process.env.DB_TYPE');
+        }
     }
 
     async createProject(project: ProjectEntity): Promise<ProjectEntity> {

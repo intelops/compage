@@ -45,17 +45,21 @@ spec:
           env:
             - name: LOG_LEVEL
               value: {{ .Values.app.logLevel }}
+            - name: DB_TYPE
+              value: {{ .Values.app.db.type }}
             - name: COMPAGE_CORE_URL
               valueFrom:
                 configMapKeyRef:
                   name: app-data
                   key: COMPAGE_CORE_URL
+          {{- if eq .Values.app.db.type "cassandra" }}
           volumeMounts:
             - name: db-cassandra-credentials
               mountPath: "/etc/db-cassandra-credentials"
               readOnly: true
             - name: tmp-volume
               mountPath: /tmp
+          {{- end }}
           resources:
             {{- toYaml .Values.app.resources | nindent 12 }}
       {{- with .Values.app.nodeSelector }}
@@ -70,13 +74,14 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+  {{- if eq .Values.app.db.type "cassandra" }}
       volumes:
         - name: tmp-volume
           emptyDir: {}
         - name: db-cassandra-credentials
           secret:
             secretName: db-cassandra-credentials
-            defaultMode: 0400
+            defaultMode: 0444
             items:
               - key: CASSANDRA_CONTACT_POINTS
                 path: compage/CASSANDRA_CONTACT_POINTS
@@ -88,3 +93,4 @@ spec:
                 path: compage/CASSANDRA_USERNAME
               - key: CASSANDRA_PASSWORD
                 path: compage/CASSANDRA_PASSWORD
+  {{- end }}

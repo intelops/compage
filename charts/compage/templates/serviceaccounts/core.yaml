@@ -1,4 +1,4 @@
-{{- if .Values.core.serviceAccount.create -}}
+{{- if .Values.core.serviceAccount.create }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:

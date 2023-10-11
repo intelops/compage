@@ -45,12 +45,14 @@ app:
   nodeSelector: {}
   tolerations: []
   affinity: {}
-  cassandra:
-    contactPoints: "test-dc1-service.k8ssandra-operator.svc.cluster.local"
-    localDataCenter: "dc1"
-    username: "test-superuser"
-    password: "Vr58zqslXCgQniIfHdYe"
-    keyspace: "compage"
+  db:
+    cassandra:
+      contactPoints: "test-dc1-service.k8ssandra-operator.svc.cluster.local"
+      localDataCenter: "dc1"
+      username: "test-superuser"
+      password: "0CZRAseBHp0armH97n23"
+      keyspace: "compage"
+    type: "cassandra"
 core:
   telemetry: false
   enabled: true
