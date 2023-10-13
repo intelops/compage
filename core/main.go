@@ -26,10 +26,10 @@ var (
 
 func main() {
 	// grpc server configuration
-	// Initialize the exporter
+	// Initializes the exporter
 	var grpcTraceProvider *sdktrace.TracerProvider
 	if len(serviceName) > 0 && len(collectorURL) > 0 {
-		// add opentel
+		// add open telemetry tracing
 		grpcTraceProvider = config.InitGrpcTracer(serviceName, collectorURL, insecure)
 	}
 	defer func() {
