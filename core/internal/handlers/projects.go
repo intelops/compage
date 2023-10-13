@@ -7,6 +7,7 @@ import (
 	"github.com/intelops/compage/core/internal/integrations/deepsource"
 	"github.com/intelops/compage/core/internal/integrations/readme"
 	"github.com/intelops/compage/core/internal/languages"
+	"github.com/intelops/compage/core/internal/languages/dotnet"
 	"github.com/intelops/compage/core/internal/languages/golang"
 	"github.com/intelops/compage/core/internal/languages/java"
 	"github.com/intelops/compage/core/internal/languages/javascript"
@@ -132,6 +133,13 @@ func runLanguageProcess(languageNode *languages.LanguageNode, languageCtx contex
 		// add values(LanguageNode and configs from coreProject) to context.
 		rubyCtx := ruby.AddValuesToContext(languageCtx)
 		if err1 := ruby.Process(rubyCtx); err1 != nil {
+			log.Debugf("err : %s", err1)
+			return err1
+		}
+	} else if languageNode.Language == languages.DotNet {
+		// add values(LanguageNode and configs from coreProject) to context.
+		dotnetCtx := dotnet.AddValuesToContext(languageCtx)
+		if err1 := dotnet.Process(dotnetCtx); err1 != nil {
 			log.Debugf("err : %s", err1)
 			return err1
 		}
