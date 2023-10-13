@@ -5,7 +5,7 @@
   related details.
 - It's an Express.js based REST server and gRPC client to a core component.
 - The sqlite is used as a database for development. To use cassandra, you need to set the following environment
-  variables in your terminal along with a `environment DB_TYPE='cassandra'`.
+  variables in your terminal along with a `export DB_TYPE='cassandra'`.
 
 #### Use cassandra as a database
 
