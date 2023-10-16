@@ -28,6 +28,7 @@ import {BOOL, COMPLEX, FLOAT, goDataTypes, INT, STRING, STRUCT} from "./go-resou
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import EditIcon from "@mui/icons-material/Edit";
+import AllowedMethodCheckBoxGroup from "./allowed-methods";
 
 interface AddOrUpdateGrpcServerResourceProperties {
     isOpen: boolean;
@@ -76,22 +77,27 @@ const getFieldsCollection = (resource: Resource) => {
         // tslint:disable-next-line: forin
         for (const key in resource.fields) {
             if (resource.fields.hasOwnProperty(key)) {
-                fieldsCollection.push({attribute: key, datatype: resource.fields[key]});
+                fieldsCollection.push({
+                    attribute: key,
+                    datatype: resource.fields[key].datatype,
+                    isComposite: resource.fields[key].isComposite || false
+                });
             }
         }
     }
     return fieldsCollection;
 };
 
-export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResourceProperties) => {
+export const AddOrUpdateGrpcServerResource = (addOrUpdateGrpcServerResourceProperties: AddOrUpdateGrpcServerResourceProperties) => {
     const [payload, setPayload] = React.useState({
         name: {
-            value: props.resource.name,
+            value: addOrUpdateGrpcServerResourceProperties.resource.name,
             error: false,
             errorMessage: ''
         },
-        fields: JSON.stringify(props.resource?.fields) || '',
-        fieldsCollection: getFieldsCollection(props.resource),
+        allowedMethods: addOrUpdateGrpcServerResourceProperties.resource?.allowedMethods || [],
+        fields: JSON.stringify(addOrUpdateGrpcServerResourceProperties.resource?.fields) || '',
+        fieldsCollection: getFieldsCollection(addOrUpdateGrpcServerResourceProperties.resource),
     });
 
     // individual states for Attribute Name and Data Type
@@ -125,7 +131,7 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
         if (payload.fieldsCollection.length <= 0) {
             return true;
         }
-        // this below means there are more than 1 fields and that means field is not empty.
+        // this below means there is more than one field and that means the field is not empty.
         if (payload.fieldsCollection.length > 1) {
             return false;
         }
@@ -147,10 +153,16 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
         });
     };
 
+    const isStruct = (value: string) => {
+        return addOrUpdateGrpcServerResourceProperties.resourceNames.includes(value);
+    };
+
     const handleDatatypeChange = (event: SelectChangeEvent) => {
         setField({
             ...field,
-            datatype: event.target.value as string
+            datatype: event.target.value as string,
+            // TODO fix
+            isComposite: isStruct(event.target.value as string)
         });
     };
 
@@ -221,7 +233,7 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
         return isEmpty(field.attribute.value) || isEmpty(field.datatype);
     };
 
-    // first letter of the Resource should always be capital.
+    // the first letter of the Resource should always be capital.
     const capitalizeFirstLetter = (input: string) => {
         return input.charAt(0).toUpperCase() + input.slice(1);
     };
@@ -293,8 +305,8 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
         } else {
             // check for duplicate resource name only when name has any value in it.
             // tslint:disable-next-line: prefer-for-of
-            for (let i = 0; i < props.resourceNames.length; i++) {
-                if (!props.resource.name && props.resourceNames[i] === payload.name.value) {
+            for (let i = 0; i < addOrUpdateGrpcServerResourceProperties.resourceNames.length; i++) {
+                if (!addOrUpdateGrpcServerResourceProperties.resource.name && addOrUpdateGrpcServerResourceProperties.resourceNames[i] === payload.name.value) {
                     newPayload = {
                         ...newPayload,
                         name: {
@@ -309,7 +321,7 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
             }
 
             // check for invalid names for fields.
-            // removed _ from regex as we dont want users to have names starting with _.
+            // removed _ from regex as we don't want users to have names starting with _.
             const regex = new RegExp("^[a-zA-Z$][a-zA-Z$0-9]*$");
             if (!regex.test(payload.name.value)) {
                 newPayload = {
@@ -336,9 +348,15 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
                 fields[fld.attribute] = {datatype: fld.datatype};
             }
         }
-        const resource: Resource = {fields: JSON.parse(JSON.stringify(fields)), name: payload.name.value};
+
+        const resource: Resource = {
+            name: payload.name.value,
+            allowedMethods: payload.allowedMethods,
+            fields: JSON.parse(JSON.stringify(fields))
+        };
+
         if (isNameValid()) {
-            props.handleAddOrUpdateGrpcServerResource(resource);
+            addOrUpdateGrpcServerResourceProperties.handleAddOrUpdateGrpcServerResource(resource);
             setPayload({
                 ...payload,
                 fields: '',
@@ -362,17 +380,22 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
         }
     };
 
-    const onAddOrUpdateGrpcResourceClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
-        // this prevents dialog box from closing.
+    const updateAllowedMethods = (allowedMethods: string[]) => {
+        setPayload({...payload, allowedMethods});
+    };
+
+    const onAddOrUpdateGrpcResourceClose = (_: any, reason: "backdropClick" | "escapeKeyDown") => {
+        // this prevents the dialog box from closing.
         if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
         }
-        props.onAddOrUpdateGrpcServerResourceClose();
+        addOrUpdateGrpcServerResourceProperties.onAddOrUpdateGrpcServerResourceClose();
     };
 
     return <React.Fragment>
-        <Dialog open={props.isOpen} onClose={onAddOrUpdateGrpcResourceClose}>
-            <DialogTitle>Add or update [GRPC Server] resource : {props.nodeId}</DialogTitle>
+        <Dialog open={addOrUpdateGrpcServerResourceProperties.isOpen} onClose={onAddOrUpdateGrpcResourceClose}>
+            <DialogTitle>Add or update [GRPC Server] resource
+                : {addOrUpdateGrpcServerResourceProperties.nodeId}</DialogTitle>
             <Divider/>
             <DialogContent style={{
                 height: "500px",
@@ -393,6 +416,8 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
                         onChange={handleNameChange}
                         variant="outlined"
                     />
+                    <AllowedMethodCheckBoxGroup allowedMethods={payload.allowedMethods} updateAllowedMethods={updateAllowedMethods}/>
+                    {/*<strong>Selected Methods: </strong> {payload.allowedMethods.join(',')}*/}
                     <Stack direction="row" alignItems="center" spacing={1}>
                         <TextField
                             required
@@ -448,7 +473,7 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
                                 }
                                 <Divider/>
                                 <ListSubheader color="primary">STRUCT</ListSubheader>
-                                {getCustomStructs(props.resourceNames)}
+                                {getCustomStructs(addOrUpdateGrpcServerResourceProperties.resourceNames)}
                             </Select>
                         </FormControl>
                         <Stack direction="row">
@@ -509,12 +534,12 @@ export const AddOrUpdateGrpcServerResource = (props: AddOrUpdateGrpcServerResour
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary"
-                        onClick={props.onAddOrUpdateGrpcServerResourceClose}>Cancel</Button>
+                        onClick={addOrUpdateGrpcServerResourceProperties.onAddOrUpdateGrpcServerResourceClose}>Cancel</Button>
                 <Button variant="contained"
                         disabled={isEmpty(payload.name.value) || isEmptyField()}
                         onClick={addOrUpdateGrpcResource}>
                     {
-                        props.resource.name ? <>Update Resource</> : <>Add Resource</>
+                        addOrUpdateGrpcServerResourceProperties.resource.name ? <>Update Resource</> : <>Add Resource</>
                     }
                 </Button>
             </DialogActions>

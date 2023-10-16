@@ -11,7 +11,7 @@ type Node struct {
 type ConsumerData struct {
 	// Language node's(component) language.
 	Language string `json:"language"`
-	// Name of component (required, this will be service and deployment name).
+	// Name of a component (required, this will be service and deployment name).
 	Name string `json:"name"`
 	// RestConfig holds all config related to REST. If nil, it means that the node is not REST server or has REST clients.
 	RestConfig *RestConfig `json:"restConfig,omitempty"`
@@ -21,7 +21,7 @@ type ConsumerData struct {
 	WsConfig *WsConfig `json:"wsConfig,omitempty"`
 	// Metadata holds misc information about the node.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
-	// Annotations holds annotations for the node.
+	// Annotations hold annotations for the node.
 	Annotations map[string]string `json:"annotations,omitempty"`
 }
 
@@ -38,7 +38,7 @@ type RestClient struct {
 	SourceNodeName string `json:"sourceNodeName"`
 	SourceNodeID   string `json:"sourceNodeId"`
 	Port           string `json:"port"`
-	// below two keys are populated in language node and are used to create server's clients.
+	// The below given, two keys are populated in language node and are used to create server's clients.
 	Resources              []*Resource `json:"resources"`
 	OpenAPIFileYamlContent string      `json:"openAPIFileYamlContent,omitempty"`
 }
@@ -63,7 +63,7 @@ type GrpcClient struct {
 	SourceNodeName string `json:"sourceNodeName"`
 	SourceNodeID   string `json:"sourceNodeId"`
 	Port           string `json:"port"`
-	// below two keys are populated in language node and are used to create server's clients.
+	// the below given, two keys are populated in language node and are used to create server's clients.
 	Resources        []*Resource `json:"resources"`
 	ProtoFileContent string      `json:"protoFileContent,omitempty"`
 }
@@ -84,7 +84,7 @@ type WsClient struct {
 	SourceNodeName string `json:"sourceNodeName"`
 	SourceNodeID   string `json:"sourceNodeId"`
 	Port           string `json:"port"`
-	// below two keys are populated in language node and are used to create server's clients.
+	// the below given, two keys are populated in language node and are used to create server's clients.
 	Resources []Resource `json:"resources"`
 }
 
@@ -102,7 +102,8 @@ type FieldMetadata struct {
 
 // Resource depicts the endpoints(e.g. /users, /accounts)
 type Resource struct {
-	Name string `json:"name"`
-	// resources fields (e.g. name, age in user)
+	Name           string    `json:"name"`
+	AllowedMethods []*string `json:"allowedMethods"`
+	// resource fields (e.g., name, age in user)
 	Fields map[string]FieldMetadata `json:"fields"`
 }

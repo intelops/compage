@@ -5,6 +5,7 @@ import (
 	"github.com/gertd/go-pluralize"
 	corenode "github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages/executor"
+	"github.com/intelops/compage/core/internal/languages/golang/frameworks"
 	commonUtils "github.com/intelops/compage/core/internal/languages/utils"
 	"github.com/intelops/compage/core/internal/utils"
 	"golang.org/x/text/cases"
@@ -37,22 +38,6 @@ type Copier struct {
 	PluralizeClient   *pluralize.Client
 }
 
-type restResourceData struct {
-	SmallResourceNameSingular string
-	SmallResourceNamePlural   string
-	CapsResourceNameSingular  string
-	CapsResourceNamePlural    string
-	ResourcePostBody          string
-	ResourcePutBody           string
-}
-
-type grpcResourceData struct {
-	SmallResourceNameSingular string
-	SmallResourceNamePlural   string
-	CapsResourceNameSingular  string
-	CapsResourceNamePlural    string
-}
-
 type clientData struct {
 	SourceNodeID string
 }
@@ -69,15 +54,18 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 		"GitPlatformURL":      strings.Replace(gitPlatformURL, "https://", "", -1),
 	}
 	// set all grpcResources for main.go.tmpl
-	var grpcResourcesData []grpcResourceData
+	var grpcResourcesData []frameworks.GrpcResourceData
 	for _, r := range grpcResources {
-		grpcResourcesData = append(grpcResourcesData, grpcResourceData{
+		grpcResourceData := frameworks.GrpcResourceData{
 			SmallResourceNameSingular: strings.ToLower(r.Name),
 			SmallResourceNamePlural:   pluralizeClient.Plural(strings.ToLower(r.Name)),
 			CapsResourceNameSingular:  r.Name,
 			CapsResourceNamePlural:    pluralizeClient.Plural(r.Name),
-		})
+		}
+		frameworks.AddGRPCAllowedMethods(&grpcResourceData, r.AllowedMethods)
+		grpcResourcesData = append(grpcResourcesData, grpcResourceData)
 	}
+
 	data["GrpcResources"] = grpcResourcesData
 	data["GrpcServerPort"] = grpcServerPort
 	data["IsGrpcServer"] = isGrpcServer
@@ -85,17 +73,19 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 	HasGrpcClients := len(grpcClients) > 0
 	data["HasGrpcClients"] = HasGrpcClients
 
-	// set all grpcResources for main.go.tmpl
-	var restResourcesData []restResourceData
+	// set all restResources for main.go.tmpl
+	var restResourcesData []frameworks.RestResourceData
 	for _, r := range restResources {
-		restResourcesData = append(restResourcesData, restResourceData{
+		resourceData := frameworks.RestResourceData{
 			SmallResourceNameSingular: strings.ToLower(r.Name),
 			SmallResourceNamePlural:   pluralizeClient.Plural(strings.ToLower(r.Name)),
 			CapsResourceNameSingular:  r.Name,
 			CapsResourceNamePlural:    pluralizeClient.Plural(r.Name),
 			ResourcePostBody:          getResourcePostBody(r),
 			ResourcePutBody:           getResourcePutBody(r),
-		})
+		}
+		frameworks.AddRESTAllowedMethods(&resourceData, r.AllowedMethods)
+		restResourcesData = append(restResourcesData, resourceData)
 	}
 	data["RestResources"] = restResourcesData
 	data["RestServerPort"] = restServerPort
@@ -189,7 +179,7 @@ func getResourcePutBody(r *corenode.Resource) string {
 	return putBody
 }
 
-// CreateCommonFiles creates/copies relevant files to generated project
+// CreateCommonFiles creates/copies relevant files to a generated project
 func (c Copier) CreateCommonFiles() error {
 	var filePaths []string
 	targetMainGoFileName := c.NodeDirectoryName + "/" + MainGoFile

@@ -4,6 +4,7 @@ import (
 	"github.com/intelops/compage/core/gen/api/v1"
 	"github.com/intelops/compage/core/internal/converter/grpc"
 	"github.com/intelops/compage/core/internal/handlers"
+	"github.com/intelops/compage/core/internal/utils"
 	"os"
 	"strings"
 	"testing"
@@ -74,7 +75,7 @@ func TestRestServerGeneratorNoSql(t *testing.T) {
 		ProjectJSON:         restServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-server-project-nosql")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-rest-server-project-nosql"))
 	}()
 
 	// retrieve project struct
@@ -153,7 +154,7 @@ func TestRestServerGeneratorSqlMap(t *testing.T) {
 		ProjectJSON:         restServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-server-project-map")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-rest-server-project-map"))
 	}()
 
 	// retrieve project struct
@@ -184,6 +185,7 @@ func TestRestServerGeneratorSqlSQLite(t *testing.T) {
                         "port": "1337",
                         "resources": [
                             {
+								"allowedMethods":["GET", "POST"],
                                 "fields": {
                                     "Name": {
                                         "datatype": "string"
@@ -232,7 +234,7 @@ func TestRestServerGeneratorSqlSQLite(t *testing.T) {
 		ProjectJSON:         restServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-server-project-sqlite")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-rest-server-project-sqlite"))
 	}()
 
 	// retrieve project struct
@@ -311,7 +313,7 @@ func TestRestServerGeneratorSqlMySQL(t *testing.T) {
 		ProjectJSON:         restServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-server-project-mysql")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-rest-server-project-mysql"))
 	}()
 
 	// retrieve project struct
@@ -390,7 +392,7 @@ func TestRestServerGeneratorSqlSQLiteGORM(t *testing.T) {
 		ProjectJSON:         restServerConfigJSON,
 	}
 	defer func() {
-		//_ = os.RemoveAll("/tmp/first-rest-server-project-sqlite-gorm")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-rest-server-project-sqlite-gorm"))
 	}()
 
 	// retrieve project struct
@@ -469,7 +471,7 @@ func TestRestServerGeneratorSqlMySQLGORM(t *testing.T) {
 		ProjectJSON:         restServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-server-project-mysql-gorm")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-rest-server-project-mysql-gorm"))
 	}()
 
 	// retrieve project struct
@@ -538,7 +540,7 @@ func TestRestServerWithOpenApiGenerator(t *testing.T) {
 				ProjectJSON:         replacedConfig,
 			}
 			defer func() {
-				_ = os.RemoveAll("/tmp/first-openapi-based-project-" + tt.language)
+				_ = os.RemoveAll(utils.GetProjectDirectoryName("first-openapi-based-project-" + tt.language))
 			}()
 
 			// retrieve project struct
@@ -615,7 +617,7 @@ func TestGrpcServerGeneratorNoSql(t *testing.T) {
 		ProjectJSON:         grpcServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-grpc-server-project-nosql")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-grpc-server-project-nosql"))
 	}()
 
 	// retrieve project struct
@@ -688,7 +690,7 @@ func TestGrpcServerGeneratorSqlMap(t *testing.T) {
 		ProjectJSON:         grpcServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-grpc-server-project-map")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-grpc-server-project-map"))
 	}()
 
 	// retrieve project struct
@@ -719,6 +721,7 @@ func TestGrpcServerGeneratorSqlSQLite(t *testing.T) {
                         "port": "50052",
                         "resources": [
                             {
+								"allowedMethods":["GET", "POST"],	
                                 "fields": {
                                     "Name": {
                                         "datatype": "string"
@@ -761,7 +764,7 @@ func TestGrpcServerGeneratorSqlSQLite(t *testing.T) {
 		ProjectJSON:         grpcServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-grpc-server-project-sqlite")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-grpc-server-project-sqlite"))
 	}()
 
 	// retrieve project struct
@@ -834,7 +837,7 @@ func TestGrpcServerGeneratorSqlMySQL(t *testing.T) {
 		ProjectJSON:         grpcServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-grpc-server-project-mysql")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-grpc-server-project-mysql"))
 	}()
 
 	// retrieve project struct
@@ -907,7 +910,7 @@ func TestGrpcServerGeneratorSqlSQLiteGORM(t *testing.T) {
 		ProjectJSON:         grpcServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-grpc-server-project-sqlite-gorm")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-grpc-server-project-sqlite-gorm"))
 	}()
 
 	// retrieve project struct
@@ -980,7 +983,7 @@ func TestGrpcServerGeneratorSqlMySQLGORM(t *testing.T) {
 		ProjectJSON:         grpcServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-grpc-server-project-mysql-gorm")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-grpc-server-project-mysql-gorm"))
 	}()
 
 	// retrieve project struct
@@ -1172,7 +1175,7 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
 		ProjectJSON:         restGrpcServerClientsCrossConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-server-clients-and-grpc-server-clients-cross-config-project")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-rest-server-clients-and-grpc-server-clients-cross-config-project"))
 	}()
 
 	// retrieve project struct
@@ -1293,7 +1296,7 @@ func TestRestClientAndGrpcClientCrossConfigGenerator(t *testing.T) {
 		ProjectJSON:         restGrpcClientCrossConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-client-and-grpc-client-cross-config-project")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-rest-client-and-grpc-client-cross-config-project"))
 	}()
 
 	// retrieve project struct
@@ -1372,7 +1375,7 @@ func TestRestAndGrpcServerGenerator(t *testing.T) {
 		ProjectJSON:         restAndGrpcServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-and-grpc-server-project")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-rest-and-grpc-server-project"))
 	}()
 
 	// retrieve project struct
@@ -1433,7 +1436,7 @@ func TestWsServerGenerator(t *testing.T) {
 		ProjectJSON:         wsServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-ws-server-project")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-ws-server-project"))
 	}()
 
 	// retrieve project struct

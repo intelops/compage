@@ -40,7 +40,7 @@ func Generate(ctx context.Context) error {
 	if n.WsConfig != nil {
 		return fmt.Errorf("unsupported protocol %s for language %s", "ws", n.Language)
 	}
-	// common files needs to be generated for the project(custom template for rest and grpc) so, it should be here.
+	// common files need to be generated for the project (custom template for rest and grpc) so, it should be here.
 	if (n.RestConfig != nil && n.RestConfig.Server != nil && n.RestConfig.Template == templates.Compage) || (n.GrpcConfig != nil && n.GrpcConfig.Server != nil && n.GrpcConfig.Template == templates.Compage) {
 		commonFilesCopier := getCommonFilesCopier(goValues)
 		if err := commonFilesCopier.CreateCommonFiles(); err != nil {
@@ -60,14 +60,14 @@ func Generate(ctx context.Context) error {
 
 func generateIntegrationConfig(goValues *GoValues) error {
 	m := getIntegrationsCopier(goValues)
-	// dockerfile needs to be generated for the whole project so, it should be here.
+	// dockerfile needs to be generated for the whole project, so it should be here.
 	dockerCopier := m["docker"].(*docker.Copier)
 	if err := dockerCopier.CreateDockerFile(); err != nil {
 		log.Debugf("err : %s", err)
 		return err
 	}
 
-	// k8s files need to be generated for the whole project so, it should be here.
+	// k8s files need to be generated for the whole project, so it should be here.
 	k8sCopier := m["k8s"].(*kubernetes.Copier)
 	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
 		log.Debugf("err : %s", err)
@@ -81,14 +81,14 @@ func generateIntegrationConfig(goValues *GoValues) error {
 		return err
 	}
 
-	// devspace.yaml and devspace_start.sh need to be generated for the whole project so, it should be here.
+	// devspace.yaml and devspace_start.sh need to be generated for the whole project, so it should be here.
 	devspaceCopier := m["devspace"].(*devspace.Copier)
 	if err := devspaceCopier.CreateDevspaceConfigs(); err != nil {
 		log.Debugf("err : %s", err)
 		return err
 	}
 
-	// devcontainer.json and Dockerfile need to be generated for the whole project so, it should be here.
+	// devcontainer.json and Dockerfile need to be generated for the whole project, so it should be here.
 	devContainerCopier := m["devcontainer"].(*devcontainer.Copier)
 	if err := devContainerCopier.CreateDevContainerConfigs(); err != nil {
 		log.Debugf("err : %s", err)
@@ -122,7 +122,7 @@ func generateGRPCConfig(goValues *GoValues) error {
 					}
 				}
 				if n.GrpcConfig.Clients != nil {
-					//  grpcConfig.clients -  present when client config is provided
+					//  grpcConfig.clients - present when client config is provided
 					if err := goGrpcServerCopier.CreateGrpcClients(); err != nil {
 						log.Debugf("err : %s", err)
 						return err
@@ -154,7 +154,7 @@ func generateRESTConfig(ctx context.Context, goValues *GoValues) error {
 					}
 				}
 				if n.RestConfig.Clients != nil {
-					//  restConfig.clients -  present when client config is provided
+					//  restConfig.clients - present when client config is provided
 					if err := goGinServerCopier.CreateRestClients(); err != nil {
 						log.Debugf("err : %s", err)
 						return err
@@ -266,7 +266,6 @@ func getGoGrpcServerCopier(goValues *GoValues) *gogrpcserver.Copier {
 	var grpcSQLDB string
 	var isGrpcNoSQLDB bool
 	var grpcNoSQLDB string
-
 	if isGrpcServer {
 		grpcServerPort = goValues.LGoLangNode.GrpcConfig.Server.Port
 		isGrpcSQLDB = goValues.LGoLangNode.GrpcConfig.Server.SQLDB != ""

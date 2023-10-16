@@ -3,6 +3,7 @@ package goginserver
 import (
 	"errors"
 	"fmt"
+	"github.com/intelops/compage/core/internal/languages/golang/frameworks"
 	"text/template"
 
 	"github.com/gertd/go-pluralize"
@@ -81,21 +82,13 @@ type Copier struct {
 	IsNoSQLDB         bool
 	RestServerPort    string
 	Resources         []*corenode.Resource
+	ResourceConfig    map[string]*frameworks.RestResourceData
 	RestClients       []*corenode.RestClient
 	PluralizeClient   *pluralize.Client
 }
 
-type serverResourceData struct {
-	SmallKebabCaseResourceNameSingular string
-	SmallSnakeCaseResourceNameSingular string
-	SmallResourceNameSingular          string
-	SmallResourceNamePlural            string
-	CapsResourceNameSingular           string
-	CapsResourceNamePlural             string
-}
-
 func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isSQLDB bool, sqlDB string, isNoSQLDB bool, noSQLDB string, resources []*corenode.Resource, restClients []*corenode.RestClient) *Copier {
-
+	var restResourceConfig = make(map[string]*frameworks.RestResourceData)
 	pluralizeClient := pluralize.NewClient()
 
 	// populate map to replace templates
@@ -109,21 +102,23 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 	data["IsSQLDB"] = isSQLDB
 	data["NoSQLDB"] = noSQLDB
 	data["IsNoSQLDB"] = isNoSQLDB
-	// set all resources for main.go.tmpl
 	if isRestServer {
-		var serverResourcesData []serverResourceData
+		var restResourceData []*frameworks.RestResourceData
 		for _, r := range resources {
 			lowerCamelResourceName := strcase.ToLowerCamel(r.Name)
-			serverResourcesData = append(serverResourcesData, serverResourceData{
+			resourceData := frameworks.RestResourceData{
 				SmallKebabCaseResourceNameSingular: strcase.ToKebab(r.Name),
 				SmallSnakeCaseResourceNameSingular: strcase.ToSnake(r.Name),
 				SmallResourceNameSingular:          lowerCamelResourceName,
 				SmallResourceNamePlural:            pluralizeClient.Plural(lowerCamelResourceName),
 				CapsResourceNameSingular:           r.Name,
 				CapsResourceNamePlural:             pluralizeClient.Plural(r.Name),
-			})
+			}
+			frameworks.AddRESTAllowedMethods(&resourceData, r.AllowedMethods)
+			restResourceConfig[r.Name] = &resourceData
+			restResourceData = append(restResourceData, &resourceData)
 		}
-		data["RestResources"] = serverResourcesData
+		data["RestResources"] = restResourceData
 		data["RestServerPort"] = restServerPort
 		data["IsRestServer"] = isRestServer
 	}
@@ -135,12 +130,14 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 		NodeDirectoryName: nodeDirectoryName,
 		Data:              data,
 		IsRestServer:      isRestServer,
+		RestServerPort:    restServerPort,
 		HasRestClients:    hasRestClients,
 		SQLDB:             sqlDB,
 		IsSQLDB:           isSQLDB,
 		NoSQLDB:           noSQLDB,
 		IsNoSQLDB:         isNoSQLDB,
 		Resources:         resources,
+		ResourceConfig:    restResourceConfig,
 		RestClients:       restClients,
 		PluralizeClient:   pluralizeClient,
 	}
@@ -226,7 +223,7 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 		}
 	}
 
-	// add resource specific data to map in c needed for templates.
+	// add resource-specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
 	if err != nil {
 		log.Debugf("error adding resource specific template data: %v", err)
@@ -272,12 +269,12 @@ func (c *Copier) getFuncMap(resource *corenode.Resource) template.FuncMap {
 
 // copyRestClientResourceFiles copies rest client files from template and renames them as per client config.
 func (c *Copier) copyRestClientResourceFiles(restClient *corenode.RestClient) error {
-	/// add resource specific data to map in c needed for templates.
+	/// add resource-specific data to map in c needed for templates.
 	c.Data["RestClientPort"] = restClient.Port
 	c.Data["RestClientServiceName"] = restClient.SourceNodeName
 	c.Data["RestClientSourceNodeID"] = strings.Replace(cases.Title(language.Und, cases.NoLower).String(restClient.SourceNodeID), "-", "", -1)
 
-	// copy restClient files to generated project.
+	// copy restClient files to a generated project.
 	targetResourceClientFileName := c.NodeDirectoryName + RestClientPath + "/" + restClient.SourceNodeName + "-" + ClientFile
 	_, err := utils.CopyFile(targetResourceClientFileName, c.TemplatesRootPath+RestClientPath+"/"+ClientFile)
 	if err != nil {
@@ -445,19 +442,28 @@ func (c *Copier) addResourceSpecificTemplateData(resource *corenode.Resource) er
 		}
 	}
 
-	// Add another map with below keys at root level (this is for specific resource for this iteration)
-	lowerCamelResourceName := strcase.ToLowerCamel(resource.Name)
-	c.Data["SmallKebabCaseResourceNameSingular"] = strcase.ToKebab(resource.Name)
-	c.Data["SmallSnakeCaseResourceNameSingular"] = strcase.ToSnake(resource.Name)
-	c.Data["SmallResourceNameSingular"] = lowerCamelResourceName
-	c.Data["SmallResourceNamePlural"] = c.PluralizeClient.Plural(lowerCamelResourceName)
-	c.Data["CapsResourceNameSingular"] = resource.Name
-	c.Data["CapsResourceNamePlural"] = c.PluralizeClient.Plural(resource.Name)
+	// Add another map with the below keys at root level (this is for specific resource for this iteration)
+	restResourceData := c.ResourceConfig[resource.Name]
+	c.Data["SmallKebabCaseResourceNameSingular"] = restResourceData.SmallKebabCaseResourceNameSingular
+	c.Data["SmallSnakeCaseResourceNameSingular"] = restResourceData.SmallSnakeCaseResourceNameSingular
+	c.Data["SmallResourceNameSingular"] = restResourceData.SmallResourceNameSingular
+	c.Data["SmallResourceNamePlural"] = restResourceData.SmallResourceNamePlural
+	c.Data["CapsResourceNameSingular"] = restResourceData.CapsResourceNameSingular
+	c.Data["CapsResourceNamePlural"] = restResourceData.CapsResourceNamePlural
+	c.Data["IsRESTCreateAllowed"] = restResourceData.IsRESTCreateAllowed
+	c.Data["IsRESTListAllowed"] = restResourceData.IsRESTListAllowed
+	c.Data["IsRESTGetAllowed"] = restResourceData.IsRESTGetAllowed
+	c.Data["IsRESTPutAllowed"] = restResourceData.IsRESTPutAllowed
+	c.Data["IsRESTDeleteAllowed"] = restResourceData.IsRESTDeleteAllowed
+	c.Data["IsRESTPatchAllowed"] = restResourceData.IsRESTPatchAllowed
+	c.Data["IsRESTOptionsAllowed"] = restResourceData.IsRESTPatchAllowed
+	c.Data["IsRESTHeadAllowed"] = restResourceData.IsRESTHeadAllowed
+
 	return nil
 }
 
 func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*string) ([]*string, error) {
-	// copy controller files to generated project
+	// copy controller files to a generated project
 	targetResourceControllerFileName := c.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + strings.Replace(NoSQLControllerFile, "nosqls-", "", 1)
 	_, err := utils.CopyFile(targetResourceControllerFileName, c.TemplatesRootPath+ControllersPath+"/"+NoSQLControllerFile)
 	if err != nil {
@@ -466,7 +472,7 @@ func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*stri
 	}
 	filePaths = append(filePaths, &targetResourceControllerFileName)
 
-	// copy model files to generated project
+	// copy model files to a generated project
 	targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + strings.Replace(NoSQLModelFile, "nosqls-", "", 1)
 	_, err = utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+NoSQLModelFile)
 	if err != nil {
@@ -475,7 +481,7 @@ func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*stri
 	}
 	filePaths = append(filePaths, &targetResourceModelFileName)
 
-	// copy service files to generated project
+	// copy service files to a generated project
 	targetResourceServiceFileName := c.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + strings.Replace(NoSQLServiceFile, "nosqls-", "", 1)
 	_, err = utils.CopyFile(targetResourceServiceFileName, c.TemplatesRootPath+ServicesPath+"/"+NoSQLServiceFile)
 	if err != nil {
@@ -500,7 +506,7 @@ func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*stri
 }
 
 func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string) ([]*string, error) {
-	// copy controller files to generated project
+	// copy controller files to a generated project
 	targetResourceControllerFileName := c.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + strings.Replace(SQLControllerFile, "sqls-", "", 1)
 	_, err := utils.CopyFile(targetResourceControllerFileName, c.TemplatesRootPath+ControllersPath+"/"+SQLControllerFile)
 	if err != nil {
@@ -509,7 +515,7 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string
 	}
 	filePaths = append(filePaths, &targetResourceControllerFileName)
 
-	// copy service files to generated project
+	// copy service files to a generated project
 	targetResourceServiceFileName := c.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + strings.Replace(SQLServiceFile, "sqls-", "", 1)
 	_, err = utils.CopyFile(targetResourceServiceFileName, c.TemplatesRootPath+ServicesPath+"/"+SQLServiceFile)
 	if err != nil {
@@ -521,7 +527,7 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string
 	var targetResourceDaoFileName string
 	if c.SQLDB == SQLite {
 		// model files
-		// copy model files to generated project
+		// copy model files to a generated project
 		targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + strings.Replace(SQLModelFile, "sqls-", "", 1)
 		_, err = utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+SQLModelFile)
 		if err != nil {
@@ -558,7 +564,7 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string
 		filePaths = append(filePaths, &targetResourceDaoFileName)
 	} else if c.SQLDB == Map {
 		// model files
-		// copy model files to generated project
+		// copy model files to a generated project
 		targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + strings.Replace(SQLModelFile, "sqls-", "", 1)
 		_, err = utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+SQLModelFile)
 		if err != nil {
@@ -613,7 +619,7 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string
 	return filePaths, nil
 }
 
-// CreateRestConfigs creates/copies relevant files to generated project
+// CreateRestConfigs creates/copies relevant files to a generated project
 func (c *Copier) CreateRestConfigs() error {
 	if err := c.CreateRestServer(); err != nil {
 		log.Debugf("error creating rest server: %v", err)
@@ -626,7 +632,7 @@ func (c *Copier) CreateRestConfigs() error {
 	return nil
 }
 
-// CreateRestServer creates/copies relevant files to generated project
+// CreateRestServer creates/copies relevant files to a generated project
 func (c *Copier) CreateRestServer() error {
 	// if the node is server, add server code
 	if c.IsRestServer {
@@ -642,7 +648,7 @@ func (c *Copier) CreateRestServer() error {
 				return err
 			}
 		}
-		// copy opentel config file
+		// copy open telemetry config file
 		var filePaths []string
 		// client files
 		targetOpenTelConfigFileName := c.NodeDirectoryName + ConfigPath + "/" + ConfigFile
@@ -660,7 +666,7 @@ func (c *Copier) CreateRestServer() error {
 
 		if c.IsSQLDB {
 			// create sql db config file (common to all resources for specific database)
-			// No vars in config file as of now but in future they may be there.
+			// No vars in config file as of now, but in future they may be there.
 			if c.SQLDB == SQLite {
 				var filePaths []string
 				// client files
@@ -719,7 +725,7 @@ func (c *Copier) CreateRestServer() error {
 			}
 		} else if c.IsNoSQLDB {
 			// create nosql db config file (common to all resources for specific database)
-			// No vars in config file as of now but in future they may be there.
+			// No vars in config file as of now, but in future they may be there.
 			if c.NoSQLDB == MongoDB {
 				var filePaths []string
 				// client files
@@ -737,11 +743,11 @@ func (c *Copier) CreateRestServer() error {
 	return nil
 }
 
-// CreateRestClients creates/copies relevant files to generated project
+// CreateRestClients creates/copies relevant files to a generated project
 func (c *Copier) CreateRestClients() error {
 	// if the node is client, add client code
 	if c.HasRestClients {
-		// create directories for client
+		// create directories for a client
 		if err := c.createRestClientDirectories(); err != nil {
 			return err
 		}
