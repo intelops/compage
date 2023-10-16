@@ -6,9 +6,9 @@ import Typography from '@mui/material/Typography';
 import Logo from "../../compage-logo.svg";
 import {useAppSelector} from "../../redux/hooks";
 import {Link, useNavigate} from "react-router-dom";
-import {getCurrentProjectDetails} from "../../utils/localstorageClient";
+import {getCurrentProjectDetails, removeCurrentProjectDetails} from "../../utils/localstorageClient";
 import {selectGetCurrentContextData} from "../../features/k8s-operations/slice";
-import {getCurrentUser} from "../../utils/sessionstorageClient";
+import {getCurrentUser, isUserNotLoggedIn} from "../../utils/sessionstorageClient";
 import Button from "@mui/material/Button";
 import {ClickAwayListener, Grow, MenuList, Paper, Popper} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
@@ -48,7 +48,7 @@ const Header = () => {
     const prevOpen = React.useRef(open);
     React.useEffect(() => {
         if (prevOpen.current === true && open === false) {
-            anchorRef.current!.focus();
+            anchorRef.current!?.focus();
         }
         prevOpen.current = open;
     }, [open]);
@@ -71,6 +71,7 @@ const Header = () => {
     const handleLogoutClick = () => {
         handleClose(new Event("click"));
         sessionStorage.clear();
+        removeCurrentProjectDetails();
         navigate("/login");
     };
 
@@ -110,7 +111,7 @@ const Header = () => {
         <Toolbar disableGutters>
             {getLogo()}
             {getCurrentProjectSelected()}
-            <Toolbar>
+            {!isUserNotLoggedIn() && <Toolbar>
                 <Button
                     ref={anchorRef}
                     id="composition-button"
@@ -158,6 +159,7 @@ const Header = () => {
                     )}
                 </Popper>
             </Toolbar>
+            }
         </Toolbar>
     </AppBar>;
 };

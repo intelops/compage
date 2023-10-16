@@ -7,6 +7,7 @@ import (
 	"github.com/iancoleman/strcase"
 	corenode "github.com/intelops/compage/core/internal/core/node"
 	"github.com/intelops/compage/core/internal/languages/executor"
+	"github.com/intelops/compage/core/internal/languages/golang/frameworks"
 	commonUtils "github.com/intelops/compage/core/internal/languages/utils"
 	"github.com/intelops/compage/core/internal/utils"
 	log "github.com/sirupsen/logrus"
@@ -71,32 +72,25 @@ const MySQLGORM = "MySQL-GORM"
 
 // Copier Language specific *Copier
 type Copier struct {
-	NodeDirectoryName string
-	TemplatesRootPath string
-	Data              map[string]interface{}
-	IsGrpcServer      bool
-	HasGrpcClients    bool
-	SQLDB             string
-	NoSQLDB           string
-	IsNoSQLDB         bool
-	IsSQLDB           bool
-	GrpcServerPort    string
-	Resources         []*corenode.Resource
-	GrpcClients       []*corenode.GrpcClient
-	PluralizeClient   *pluralize.Client
-}
-
-type resourceData struct {
-	SmallKebabCaseResourceNameSingular string
-	SmallSnakeCaseResourceNameSingular string
-	SmallResourceNameSingular          string
-	SmallResourceNamePlural            string
-	CapsResourceNameSingular           string
-	CapsResourceNamePlural             string
+	NodeDirectoryName  string
+	TemplatesRootPath  string
+	Data               map[string]interface{}
+	IsGrpcServer       bool
+	HasGrpcClients     bool
+	SQLDB              string
+	NoSQLDB            string
+	IsNoSQLDB          bool
+	IsSQLDB            bool
+	GrpcServerPort     string
+	GRPCAllowedMethods []*string
+	Resources          []*corenode.Resource
+	ResourceConfig     map[string]frameworks.GrpcResourceData
+	GrpcClients        []*corenode.GrpcClient
+	PluralizeClient    *pluralize.Client
 }
 
 func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isGrpcServer bool, grpcServerPort string, isSQLDB bool, sqlDB string, isNoSQLDB bool, noSQLDB string, resources []*corenode.Resource, grpcClients []*corenode.GrpcClient) *Copier {
-
+	var grpcResourceConfig = make(map[string]frameworks.GrpcResourceData)
 	pluralizeClient := pluralize.NewClient()
 
 	// populate map to replace templates
@@ -110,21 +104,25 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 	data["IsSQLDB"] = isSQLDB
 	data["NoSQLDB"] = noSQLDB
 	data["IsNoSQLDB"] = isNoSQLDB
+
 	// set all resources for main.go.tmpl
 	if isGrpcServer {
-		var resourcesData []resourceData
+		var grpcResourceData []frameworks.GrpcResourceData
 		for _, r := range resources {
 			lowerCamelResourceName := strcase.ToLowerCamel(r.Name)
-			resourcesData = append(resourcesData, resourceData{
+			resourceData := frameworks.GrpcResourceData{
 				SmallKebabCaseResourceNameSingular: strcase.ToKebab(r.Name),
 				SmallSnakeCaseResourceNameSingular: strcase.ToSnake(r.Name),
 				SmallResourceNameSingular:          lowerCamelResourceName,
 				SmallResourceNamePlural:            pluralizeClient.Plural(lowerCamelResourceName),
 				CapsResourceNameSingular:           r.Name,
 				CapsResourceNamePlural:             pluralizeClient.Plural(r.Name),
-			})
+			}
+			frameworks.AddGRPCAllowedMethods(&resourceData, r.AllowedMethods)
+			grpcResourceConfig[r.Name] = resourceData
+			grpcResourceData = append(grpcResourceData, resourceData)
 		}
-		data["GrpcResources"] = resourcesData
+		data["GrpcResources"] = grpcResourceData
 		data["GrpcServerPort"] = grpcServerPort
 		data["IsGrpcServer"] = isGrpcServer
 	}
@@ -137,12 +135,14 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 		NodeDirectoryName: nodeDirectoryName,
 		Data:              data,
 		IsGrpcServer:      isGrpcServer,
+		GrpcServerPort:    grpcServerPort,
 		HasGrpcClients:    hasGrpcClients,
 		SQLDB:             sqlDB,
 		IsSQLDB:           isSQLDB,
 		NoSQLDB:           noSQLDB,
 		IsNoSQLDB:         isNoSQLDB,
 		Resources:         resources,
+		ResourceConfig:    grpcResourceConfig,
 		GrpcClients:       grpcClients,
 		PluralizeClient:   pluralizeClient,
 	}
@@ -231,7 +231,7 @@ func (c *Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error 
 		}
 	}
 
-	// add resource specific data to map in c needed for templates.
+	// add resource-specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
 	if err != nil {
 		log.Debugf("error adding resource specific template data: %v", err)
@@ -246,7 +246,7 @@ func (c *Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error 
 }
 
 func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*string) ([]*string, error) {
-	// copy controller files to generated project
+	// copy controller files to a generated project
 	targetResourceControllerFileName := c.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + strings.Replace(NoSQLControllerFile, "nosqls-", "", 1)
 	_, err := utils.CopyFile(targetResourceControllerFileName, c.TemplatesRootPath+ControllersPath+"/"+NoSQLControllerFile)
 	if err != nil {
@@ -255,7 +255,7 @@ func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*stri
 	}
 	filePaths = append(filePaths, &targetResourceControllerFileName)
 
-	// copy model files to generated project
+	// copy model files to a generated project
 	targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + strings.Replace(NoSQLModelFile, "nosqls-", "", 1)
 	_, err = utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+NoSQLModelFile)
 	if err != nil {
@@ -264,7 +264,7 @@ func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*stri
 	}
 	filePaths = append(filePaths, &targetResourceModelFileName)
 
-	// copy service files to generated project
+	// copy service files to a generated project
 	targetResourceServiceFileName := c.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + strings.Replace(NoSQLServiceFile, "nosqls-", "", 1)
 	_, err = utils.CopyFile(targetResourceServiceFileName, c.TemplatesRootPath+ServicesPath+"/"+NoSQLServiceFile)
 	if err != nil {
@@ -298,7 +298,7 @@ func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*stri
 }
 
 func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string) ([]*string, error) {
-	// copy controller files to generated project
+	// copy controller files to a generated project
 	targetResourceControllerFileName := c.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + strings.Replace(SQLControllerFile, "sqls-", "", 1)
 
 	_, err := utils.CopyFile(targetResourceControllerFileName, c.TemplatesRootPath+ControllersPath+"/"+SQLControllerFile)
@@ -308,7 +308,7 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string
 	}
 	filePaths = append(filePaths, &targetResourceControllerFileName)
 
-	// copy service files to generated project
+	// copy service files to a generated project
 	targetResourceServiceFileName := c.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + strings.Replace(SQLServiceFile, "sqls-", "", 1)
 	_, err = utils.CopyFile(targetResourceServiceFileName, c.TemplatesRootPath+ServicesPath+"/"+SQLServiceFile)
 	if err != nil {
@@ -367,7 +367,7 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string
 		filePaths = append(filePaths, &targetResourceDaoFileName)
 	} else if c.SQLDB == Map {
 		// model files
-		// copy model files to generated project
+		// copy model files to a generated project
 		targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + strings.Replace(SQLModelFile, "sqls-", "", 1)
 		_, err = utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+SQLModelFile)
 		if err != nil {
@@ -432,7 +432,7 @@ func (c *Copier) getFuncMap(resource *corenode.Resource) template.FuncMap {
 		"ToLowerCamelCase": func(key string) string {
 			return strcase.ToLowerCamel(key)
 		},
-		// this function adds pointer to the type if the field is composite
+		// this function adds a pointer to the type if the field is composite
 		"AddPointerIfCompositeField": func(key string) string {
 			fieldMetaData, ok := resource.Fields[key]
 			if ok && fieldMetaData.IsComposite {
@@ -466,7 +466,7 @@ func (c *Copier) CopyGrpcClientResourceFiles(grpcClient *corenode.GrpcClient) er
 	c.Data["GrpcClientPort"] = grpcClient.Port
 	c.Data["GrpcClientServiceName"] = grpcClient.SourceNodeName
 	c.Data["GrpcClientSourceNodeID"] = strings.Replace(cases.Title(language.Und, cases.NoLower).String(grpcClient.SourceNodeID), "-", "_", -1)
-	// copy grpcClient files to generated project.
+	// copy grpcClient files to a generated project.
 	targetResourceClientFileName := c.NodeDirectoryName + GrpcClientPath + "/" + grpcClient.SourceNodeName + "-" + ClientFile
 	_, err := utils.CopyFile(targetResourceClientFileName, c.TemplatesRootPath+GrpcClientPath+"/"+ClientFile)
 	if err != nil {
@@ -506,14 +506,23 @@ func (c *Copier) addResourceSpecificTemplateData(resource *corenode.Resource) er
 		}
 	}
 
-	// Add another map with below keys at root level (this is for specific resource for this iteration)
-	lowerCamelResourceName := strcase.ToLowerCamel(resource.Name)
-	c.Data["SmallKebabCaseResourceNameSingular"] = strcase.ToKebab(resource.Name)
-	c.Data["SmallSnakeCaseResourceNameSingular"] = strcase.ToSnake(resource.Name)
-	c.Data["SmallResourceNameSingular"] = lowerCamelResourceName
-	c.Data["SmallResourceNamePlural"] = c.PluralizeClient.Plural(lowerCamelResourceName)
-	c.Data["CapsResourceNameSingular"] = resource.Name
-	c.Data["CapsResourceNamePlural"] = c.PluralizeClient.Plural(resource.Name)
+	// Add another map with the below keys at root level (this is for specific resource for this iteration)
+	grpcResourceData := c.ResourceConfig[resource.Name]
+	c.Data["SmallKebabCaseResourceNameSingular"] = grpcResourceData.SmallKebabCaseResourceNameSingular
+	c.Data["SmallSnakeCaseResourceNameSingular"] = grpcResourceData.SmallSnakeCaseResourceNameSingular
+	c.Data["SmallResourceNameSingular"] = grpcResourceData.SmallResourceNameSingular
+	c.Data["SmallResourceNamePlural"] = grpcResourceData.SmallResourceNamePlural
+	c.Data["CapsResourceNameSingular"] = grpcResourceData.CapsResourceNameSingular
+	c.Data["CapsResourceNamePlural"] = grpcResourceData.CapsResourceNamePlural
+	c.Data["IsGRPCCreateAllowed"] = grpcResourceData.IsGRPCCreateAllowed
+	c.Data["IsGRPCListAllowed"] = grpcResourceData.IsGRPCListAllowed
+	c.Data["IsGRPCGetAllowed"] = grpcResourceData.IsGRPCGetAllowed
+	c.Data["IsGRPCPutAllowed"] = grpcResourceData.IsGRPCPutAllowed
+	c.Data["IsGRPCDeleteAllowed"] = grpcResourceData.IsGRPCDeleteAllowed
+	c.Data["IsGRPCPatchAllowed"] = grpcResourceData.IsGRPCPatchAllowed
+	c.Data["IsGRPCOptionsAllowed"] = grpcResourceData.IsGRPCOptionsAllowed
+	c.Data["IsGRPCHeadAllowed"] = grpcResourceData.IsGRPCHeadAllowed
+
 	return nil
 }
 
@@ -653,7 +662,7 @@ func (c *Copier) getCreateQueryColumns(createQueryColumns *string, key string, v
 	return createQueryColumns
 }
 
-// CreateGrpcConfigs creates/copies relevant files to generated project
+// CreateGrpcConfigs creates/copies relevant files to a generated project
 func (c *Copier) CreateGrpcConfigs() error {
 	if err := c.CreateGrpcServer(); err != nil {
 		return err
@@ -664,7 +673,7 @@ func (c *Copier) CreateGrpcConfigs() error {
 	return nil
 }
 
-// CreateGrpcServer creates/copies relevant files to generated project
+// CreateGrpcServer creates/copies relevant files to a generated project
 func (c *Copier) CreateGrpcServer() error {
 	// if the node is server, add server code
 	if c.IsGrpcServer {
@@ -697,7 +706,7 @@ func (c *Copier) CreateGrpcServer() error {
 
 		if c.IsSQLDB {
 			// create sql db config file (common to all resources for specific database)
-			// No vars in config file as of now but in future they may be there.
+			// No vars in config file as of now, but in future they may be there.
 			if c.SQLDB == SQLite {
 				var filePaths []string
 				// client files
@@ -754,7 +763,7 @@ func (c *Copier) CreateGrpcServer() error {
 			}
 		} else if c.IsNoSQLDB {
 			// create nosql db config file (common to all resources for specific database)
-			// No vars in config file as of now but in future they may be there.
+			// No vars in config file as of now, but in future they may be there.
 			if c.NoSQLDB == MongoDB {
 				var filePaths []string
 				// client files
@@ -772,9 +781,9 @@ func (c *Copier) CreateGrpcServer() error {
 	return nil
 }
 
-// CreateGrpcClients creates/copies relevant files to generated project
+// CreateGrpcClients creates/copies relevant files to a generated project
 func (c *Copier) CreateGrpcClients() error {
-	// create directories for client
+	// create directories for a client
 	if err := c.createGrpcClientDirectories(); err != nil {
 		return err
 	}
@@ -789,7 +798,7 @@ func (c *Copier) CreateGrpcClients() error {
 	//}
 	//}
 	if c.IsGrpcServer {
-		// create self client
+		// create self-client
 		if err := c.copySelfGrpcClientResourceFiles(); err != nil {
 			return err
 		}

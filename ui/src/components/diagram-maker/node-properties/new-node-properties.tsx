@@ -130,6 +130,12 @@ const getNodeTypesConfig = (currentNodeState: CompageNode): NodeTypesConfig => {
             nodeTypesConfig.grpcConfig.template = grpcConfig.template || getEmptyGrpcConfig().template;
             nodeTypesConfig.grpcConfig.framework = grpcConfig.framework || getEmptyGrpcConfig().framework;
         }
+        if (grpcConfig?.server?.noSQLDB) {
+            nodeTypesConfig.isGrpcServerNoSQLDB = true;
+        }
+        if (grpcConfig?.server?.sqlDB) {
+            nodeTypesConfig.isGrpcServerSQLDB = true;
+        }
     }
     if (wsConfig && Object.keys(wsConfig).length > 0) {
         nodeTypesConfig.wsConfig = {template: wsConfig.template || getEmptyWsConfig().template};
@@ -915,67 +921,71 @@ export const NewNodeProperties = (newNodePropertiesProps: NewNodePropertiesProps
     };
 
     const getGrpcServerSQLDBContent = () => {
-        // create language:sqlDBs map based on template chosen
-        let map;
-        if (isCompageTemplate(payload.grpcConfig.template)) {
-            map = new Map(Object.entries(COMPAGE_LANGUAGE_SQL_DBS));
-        } else {
-            map = new Map();
-        }
-        const sqlDBs = map.get(payload.language) || [];
+        if (payload.isGrpcServerSQLDB) {
+            // create language:sqlDBs map based on template chosen
+            let map;
+            if (isCompageTemplate(payload.grpcConfig.template)) {
+                map = new Map(Object.entries(COMPAGE_LANGUAGE_SQL_DBS));
+            } else {
+                map = new Map();
+            }
+            const sqlDBs = map.get(payload.language) || [];
 
-        if (sqlDBs.length > 0) {
-            return <TextField
-                required
-                size="medium"
-                select
-                margin="dense"
-                id="grpcServerSQLDB"
-                label="SQL Database"
-                defaultValue=''
-                type="text"
-                value={payload.grpcConfig.server.sqlDB}
-                onChange={handleGrpcServerSQLDBChange}
-                variant="outlined">
-                {sqlDBs.map((sqlDB: string) => (
-                    <MenuItem key={sqlDB} value={sqlDB}>
-                        {sqlDB}
-                    </MenuItem>
-                ))}
-            </TextField>;
+            if (sqlDBs.length > 0) {
+                return <TextField
+                    required
+                    size="medium"
+                    select
+                    margin="dense"
+                    id="grpcServerSQLDB"
+                    label="SQL Database"
+                    defaultValue=''
+                    type="text"
+                    value={payload.grpcConfig.server.sqlDB}
+                    onChange={handleGrpcServerSQLDBChange}
+                    variant="outlined">
+                    {sqlDBs.map((sqlDB: string) => (
+                        <MenuItem key={sqlDB} value={sqlDB}>
+                            {sqlDB}
+                        </MenuItem>
+                    ))}
+                </TextField>;
+            }
         }
         return '';
     };
 
     const getGrpcServerNoSQLDBContent = () => {
-        // create language:noSQLDBs map based on template chosen
-        let map;
-        if (isCompageTemplate(payload.grpcConfig.template)) {
-            map = new Map(Object.entries(COMPAGE_LANGUAGE_NOSQL_DBS));
-        } else {
-            map = new Map();
-        }
-        const noSQLDBs = map.get(payload.language) || [];
+        if (payload.isGrpcServerNoSQLDB) {
+            // create language:noSQLDBs map based on template chosen
+            let map;
+            if (isCompageTemplate(payload.grpcConfig.template)) {
+                map = new Map(Object.entries(COMPAGE_LANGUAGE_NOSQL_DBS));
+            } else {
+                map = new Map();
+            }
+            const noSQLDBs = map.get(payload.language) || [];
 
-        if (noSQLDBs.length > 0) {
-            return <TextField
-                required
-                size="medium"
-                select
-                margin="dense"
-                id="grpcServerNoSQLDB"
-                label="NoSQL Database"
-                defaultValue=''
-                type="text"
-                value={payload.grpcConfig.server.noSQLDB}
-                onChange={handleGrpcServerNoSQLDBChange}
-                variant="outlined">
-                {noSQLDBs.map((noSQLDB: string) => (
-                    <MenuItem key={noSQLDB} value={noSQLDB}>
-                        {noSQLDB}
-                    </MenuItem>
-                ))}
-            </TextField>;
+            if (noSQLDBs.length > 0) {
+                return <TextField
+                    required
+                    size="medium"
+                    select
+                    margin="dense"
+                    id="grpcServerNoSQLDB"
+                    label="NoSQL Database"
+                    defaultValue=''
+                    type="text"
+                    value={payload.grpcConfig.server.noSQLDB}
+                    onChange={handleGrpcServerNoSQLDBChange}
+                    variant="outlined">
+                    {noSQLDBs.map((noSQLDB: string) => (
+                        <MenuItem key={noSQLDB} value={noSQLDB}>
+                            {noSQLDB}
+                        </MenuItem>
+                    ))}
+                </TextField>;
+            }
         }
         return '';
     };
@@ -1567,7 +1577,8 @@ export const NewNodeProperties = (newNodePropertiesProps: NewNodePropertiesProps
                     </Stack>
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="outlined" color="secondary" onClick={newNodePropertiesProps.onNodePropertiesClose}>Cancel</Button>
+                    <Button variant="outlined" color="secondary"
+                            onClick={newNodePropertiesProps.onNodePropertiesClose}>Cancel</Button>
                     <Button variant="contained"
                             onClick={handleNodeUpdate}
                             disabled={payload.name.value === '' || payload.language === '' || uploadYamlStatus === 'loading'}>Update

@@ -28,8 +28,9 @@ import {BOOL, COMPLEX, FLOAT, goDataTypes, INT, STRING, STRUCT} from "./go-resou
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import EditIcon from "@mui/icons-material/Edit";
+import AllowedMethodCheckBoxGroup from "./allowed-methods";
 
-interface AddOrUpdateRestServerResourceProps {
+interface AddOrUpdateRestServerResourceProperties {
     isOpen: boolean;
     onAddOrUpdateRestServerResourceClose: () => void;
     handleAddOrUpdateRestServerResource: (resource: Resource) => void;
@@ -87,15 +88,16 @@ const getFieldsCollection = (resource: Resource) => {
     return fieldsCollection;
 };
 
-export const AddOrUpdateRestServerResource = (addOrUpdateRestServerResourceProps: AddOrUpdateRestServerResourceProps) => {
+export const AddOrUpdateRestServerResource = (addOrUpdateRestServerResourceProperties: AddOrUpdateRestServerResourceProperties) => {
     const [payload, setPayload] = React.useState({
         name: {
-            value: addOrUpdateRestServerResourceProps.resource.name,
+            value: addOrUpdateRestServerResourceProperties.resource.name,
             error: false,
             errorMessage: ''
         },
-        fields: JSON.stringify(addOrUpdateRestServerResourceProps.resource?.fields) || '',
-        fieldsCollection: getFieldsCollection(addOrUpdateRestServerResourceProps.resource),
+        allowedMethods: addOrUpdateRestServerResourceProperties.resource?.allowedMethods || [],
+        fields: JSON.stringify(addOrUpdateRestServerResourceProperties.resource?.fields) || '',
+        fieldsCollection: getFieldsCollection(addOrUpdateRestServerResourceProperties.resource),
     });
 
     // individual states for Attribute Name and Data Type
@@ -129,7 +131,7 @@ export const AddOrUpdateRestServerResource = (addOrUpdateRestServerResourceProps
         if (payload.fieldsCollection.length <= 0) {
             return true;
         }
-        // this below means there are more than 1 fields and that means field is not empty.
+        // this below means there is more than one field and that means the field is not empty.
         if (payload.fieldsCollection.length > 1) {
             return false;
         }
@@ -152,7 +154,7 @@ export const AddOrUpdateRestServerResource = (addOrUpdateRestServerResourceProps
     };
 
     const isStruct = (value: string) => {
-        return addOrUpdateRestServerResourceProps.resourceNames.includes(value);
+        return addOrUpdateRestServerResourceProperties.resourceNames.includes(value);
     };
 
     const handleDatatypeChange = (event: SelectChangeEvent) => {
@@ -207,8 +209,8 @@ export const AddOrUpdateRestServerResource = (addOrUpdateRestServerResourceProps
                 errorMessage: '',
                 error: false
             },
-            datatype: payload.fieldsCollection[index].datatype,
             isComposite: payload.fieldsCollection[index].isComposite,
+            datatype: payload.fieldsCollection[index].datatype,
             // set the index and mode as true
             mode: {edit: true, index}
         });
@@ -231,7 +233,7 @@ export const AddOrUpdateRestServerResource = (addOrUpdateRestServerResourceProps
         return isEmpty(field.attribute.value) || isEmpty(field.datatype);
     };
 
-    // first letter of the Resource should always be capital.
+    // the first letter of the Resource should always be capital.
     const capitalizeFirstLetter = (input: string) => {
         return input.charAt(0).toUpperCase() + input.slice(1);
     };
@@ -303,8 +305,8 @@ export const AddOrUpdateRestServerResource = (addOrUpdateRestServerResourceProps
         } else {
             // check for duplicate resource name only when name has any value in it.
             // tslint:disable-next-line: prefer-for-of
-            for (let i = 0; i < addOrUpdateRestServerResourceProps.resourceNames.length; i++) {
-                if (!addOrUpdateRestServerResourceProps.resource.name && addOrUpdateRestServerResourceProps.resourceNames[i] === payload.name.value) {
+            for (let i = 0; i < addOrUpdateRestServerResourceProperties.resourceNames.length; i++) {
+                if (!addOrUpdateRestServerResourceProperties.resource.name && addOrUpdateRestServerResourceProperties.resourceNames[i] === payload.name.value) {
                     newPayload = {
                         ...newPayload,
                         name: {
@@ -346,9 +348,15 @@ export const AddOrUpdateRestServerResource = (addOrUpdateRestServerResourceProps
                 fields[fld.attribute] = {datatype: fld.datatype};
             }
         }
-        const resource: Resource = {fields: JSON.parse(JSON.stringify(fields)), name: payload.name.value};
+
+        const resource: Resource = {
+            name: payload.name.value,
+            allowedMethods: payload.allowedMethods,
+            fields: JSON.parse(JSON.stringify(fields))
+        };
+
         if (isNameValid()) {
-            addOrUpdateRestServerResourceProps.handleAddOrUpdateRestServerResource(resource);
+            addOrUpdateRestServerResourceProperties.handleAddOrUpdateRestServerResource(resource);
             setPayload({
                 ...payload,
                 fields: '',
@@ -372,17 +380,22 @@ export const AddOrUpdateRestServerResource = (addOrUpdateRestServerResourceProps
         }
     };
 
-    const onAddOrUpdateRestResourceClose = (e: any, reason: "backdropClick" | "escapeKeyDown") => {
-        // this prevents dialog box from closing.
+    const updateAllowedMethods = (allowedMethods: string[]) => {
+        setPayload({...payload, allowedMethods});
+    };
+
+    const onAddOrUpdateRestResourceClose = (_: any, reason: "backdropClick" | "escapeKeyDown") => {
+        // this prevents the dialog box from closing.
         if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
         }
-        addOrUpdateRestServerResourceProps.onAddOrUpdateRestServerResourceClose();
+        addOrUpdateRestServerResourceProperties.onAddOrUpdateRestServerResourceClose();
     };
 
     return <React.Fragment>
-        <Dialog open={addOrUpdateRestServerResourceProps.isOpen} onClose={onAddOrUpdateRestResourceClose}>
-            <DialogTitle>Add or update [REST Server] resource : {addOrUpdateRestServerResourceProps.nodeId}</DialogTitle>
+        <Dialog open={addOrUpdateRestServerResourceProperties.isOpen} onClose={onAddOrUpdateRestResourceClose}>
+            <DialogTitle>Add or update [REST Server] resource
+                : {addOrUpdateRestServerResourceProperties.nodeId}</DialogTitle>
             <Divider/>
             <DialogContent style={{
                 height: "500px",
@@ -403,6 +416,8 @@ export const AddOrUpdateRestServerResource = (addOrUpdateRestServerResourceProps
                         onChange={handleNameChange}
                         variant="outlined"
                     />
+                    <AllowedMethodCheckBoxGroup allowedMethods={payload.allowedMethods} updateAllowedMethods={updateAllowedMethods}/>
+                    {/*<strong>Selected Methods: </strong> {payload.allowedMethods.join(',')}*/}
                     <Stack direction="row" alignItems="center" spacing={1}>
                         <TextField
                             required
@@ -458,7 +473,7 @@ export const AddOrUpdateRestServerResource = (addOrUpdateRestServerResourceProps
                                 }
                                 <Divider/>
                                 <ListSubheader color="primary">STRUCT</ListSubheader>
-                                {getCustomStructs(addOrUpdateRestServerResourceProps.resourceNames)}
+                                {getCustomStructs(addOrUpdateRestServerResourceProperties.resourceNames)}
                             </Select>
                         </FormControl>
                         <Stack direction="row">
@@ -519,12 +534,12 @@ export const AddOrUpdateRestServerResource = (addOrUpdateRestServerResourceProps
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="secondary"
-                        onClick={addOrUpdateRestServerResourceProps.onAddOrUpdateRestServerResourceClose}>Cancel</Button>
+                        onClick={addOrUpdateRestServerResourceProperties.onAddOrUpdateRestServerResourceClose}>Cancel</Button>
                 <Button variant="contained"
                         disabled={isEmpty(payload.name.value) || isEmptyField()}
                         onClick={addOrUpdateRestResource}>
                     {
-                        addOrUpdateRestServerResourceProps.resource.name ? <>Update Resource</> : <>Add Resource</>
+                        addOrUpdateRestServerResourceProperties.resource.name ? <>Update Resource</> : <>Add Resource</>
                     }
                 </Button>
             </DialogActions>
