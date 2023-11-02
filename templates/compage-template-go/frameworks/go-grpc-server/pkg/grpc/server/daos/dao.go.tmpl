@@ -1,0 +1,74 @@
+package daos
+
+import (
+	"errors"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"{{.GitPlatformURL}}/{{.GitPlatformUserName}}/{{.GitRepositoryName}}/{{.NodeName}}/pkg/grpc/server/models"
+)
+
+var {{.SmallResourceNamePlural}} = make(map[int64]*models.{{.CapsResourceNameSingular}})
+
+type {{.CapsResourceNameSingular}}Dao struct {
+}
+
+func New{{.CapsResourceNameSingular}}Dao() (*{{.CapsResourceNameSingular}}Dao, error) {
+	return &{{.CapsResourceNameSingular}}Dao{
+	}, nil
+}
+
+{{ if .IsGRPCCreateAllowed }}
+func ({{.SmallResourceNameSingular}}Dao *{{.CapsResourceNameSingular}}Dao) Create{{.CapsResourceNameSingular}}({{.SmallResourceNameSingular}} *models.{{.CapsResourceNameSingular}})  (*models.{{.CapsResourceNameSingular}}, error) {
+	{{.SmallResourceNamePlural}}[{{.SmallResourceNameSingular}}.Id] = {{.SmallResourceNameSingular}}
+
+	return {{.SmallResourceNameSingular}}, nil
+}
+{{ end }}
+
+{{ if .IsGRPCListAllowed }}
+func ({{.SmallResourceNameSingular}}Dao *{{.CapsResourceNameSingular}}Dao) List{{.CapsResourceNamePlural}}() ([]*models.{{.CapsResourceNameSingular}}, error) {
+	v := make([]*models.{{.CapsResourceNameSingular}}, len({{.SmallResourceNamePlural}}))
+	for _, value := range {{.SmallResourceNamePlural}} {
+		v = append(v, value)
+	}
+
+	return v, nil
+}
+{{ end }}
+
+{{ if .IsGRPCGetAllowed }}
+func ({{.SmallResourceNameSingular}}Dao *{{.CapsResourceNameSingular}}Dao) Get{{.CapsResourceNameSingular}}(id int64) (*models.{{.CapsResourceNameSingular}}, error) {
+	if id == 0 {
+		return nil, status.Error(codes.InvalidArgument, "id can't be empty")
+	}
+
+	if {{.SmallResourceNameSingular}}, ok := {{.SmallResourceNamePlural}}[id]; ok {
+		return {{.SmallResourceNameSingular}}, nil
+	}
+
+	return &models.{{.CapsResourceNameSingular}}{}, errors.New("{{.SmallResourceNameSingular}} not found")
+}
+{{ end }}
+
+{{ if .IsGRPCPutAllowed }}
+func ({{.SmallResourceNameSingular}}Dao *{{.CapsResourceNameSingular}}Dao) Update{{.CapsResourceNameSingular}}(id int64, {{.SmallResourceNameSingular}} *models.{{.CapsResourceNameSingular}}) (*models.{{.CapsResourceNameSingular}}, error) {
+	if id != {{.SmallResourceNameSingular}}.Id {
+		return nil, status.Error(codes.InvalidArgument, "id and payload don't match")
+	}
+	{{.SmallResourceNamePlural}}[{{.SmallResourceNameSingular}}.Id] = {{.SmallResourceNameSingular}}
+
+	return {{.SmallResourceNameSingular}}, nil
+}
+{{ end }}
+
+{{ if .IsGRPCDeleteAllowed }}
+func ({{.SmallResourceNameSingular}}Dao *{{.CapsResourceNameSingular}}Dao) Delete{{.CapsResourceNameSingular}}(id int64) error {
+	if _, ok := {{.SmallResourceNamePlural}}[id]; ok {
+		delete({{.SmallResourceNamePlural}}, id)
+		return nil
+	}
+
+	return errors.New("{{.SmallResourceNameSingular}} not found")
+}
+{{ end }}

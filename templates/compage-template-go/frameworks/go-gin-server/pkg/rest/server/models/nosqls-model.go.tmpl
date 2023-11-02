@@ -1,0 +1,11 @@
+package models
+
+type {{.CapsResourceNameSingular}} struct {
+    ID string `json:"id,omitempty" bson:"_id,omitempty"`
+{{range $k, $v := .Fields}}
+    {{if eq $k "ID"}}
+    {{else}}
+    {{$k}} {{AddPointerIfCompositeField $k}} `json:"{{ToLowerCamelCase $k}},omitempty" bson:"{{ToLowerCamelCase $k}},omitempty"`
+    {{end}}
+{{end}}
+}

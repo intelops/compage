@@ -1,0 +1,16 @@
+package client
+
+import (
+	"io"
+	"net/http"
+)
+
+func Execute{{.RestClientSourceNodeID}}() ([]byte, error) {
+	response, err := http.Get("{{.RestClientServiceName}}:{{.RestClientPort}}/ping")
+
+	if err != nil {
+		return nil, err
+	}
+
+	return io.ReadAll(response.Body)
+}

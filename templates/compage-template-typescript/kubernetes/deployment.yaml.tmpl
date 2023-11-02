@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{.NodeName}}
+  name: {{.NodeName}}
+  labels:
+    app: {{.NodeName}}
+spec:
+  selector:
+    matchLabels:
+      app: {{.NodeName}}
+  template:
+    metadata:
+      labels:
+        app: {{.NodeName}}
+        name: {{.NodeName}}
+    spec:
+      containers:
+        - name: {{.NodeName}}
+          image: {{.UserName}}/{{.RepositoryName}}/{{.NodeName}}
+          imagePullPolicy: Always
+       {{if .IsRestServer }}
+          ports:
+            - containerPort: {{.RestServerPort}}
+              name: http
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 30
+        {{end}}

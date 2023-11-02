@@ -1,0 +1,50 @@
+package services
+
+import (
+	"{{.GitPlatformURL}}/{{.GitPlatformUserName}}/{{.GitRepositoryName}}/{{.NodeName}}/pkg/grpc/server/daos"
+	"{{.GitPlatformURL}}/{{.GitPlatformUserName}}/{{.GitRepositoryName}}/{{.NodeName}}/pkg/grpc/server/models"
+)
+
+type {{.CapsResourceNameSingular}}Service struct {
+	{{.SmallResourceNameSingular}}Dao *daos.{{.CapsResourceNameSingular}}Dao
+}
+
+func New{{.CapsResourceNameSingular}}Service() (*{{.CapsResourceNameSingular}}Service, error) {
+	{{.SmallResourceNameSingular}}Dao, err := daos.New{{.CapsResourceNameSingular}}Dao()
+	if err != nil {
+		return nil, err
+	}
+	return &{{.CapsResourceNameSingular}}Service{
+		{{.SmallResourceNameSingular}}Dao: {{.SmallResourceNameSingular}}Dao,
+	}, nil
+}
+
+{{ if .IsGRPCCreateAllowed }}
+func ({{.SmallResourceNameSingular}}Service *{{.CapsResourceNameSingular}}Service) Create{{.CapsResourceNameSingular}}({{.SmallResourceNameSingular}} *models.{{.CapsResourceNameSingular}}) (*models.{{.CapsResourceNameSingular}}, error)  {
+	return {{.SmallResourceNameSingular}}Service.{{.SmallResourceNameSingular}}Dao.Create{{.CapsResourceNameSingular}}({{.SmallResourceNameSingular}})
+}
+{{ end }}
+
+{{ if .IsGRPCListAllowed }}
+func ({{.SmallResourceNameSingular}}Service *{{.CapsResourceNameSingular}}Service) List{{.CapsResourceNamePlural}}() ([]*models.{{.CapsResourceNameSingular}}, error) {
+	return {{.SmallResourceNameSingular}}Service.{{.SmallResourceNameSingular}}Dao.List{{.CapsResourceNamePlural}}()
+}
+{{ end }}
+
+{{ if .IsGRPCGetAllowed }}
+func ({{.SmallResourceNameSingular}}Service *{{.CapsResourceNameSingular}}Service) Get{{.CapsResourceNameSingular}}(id string) (*models.{{.CapsResourceNameSingular}}, error) {
+	return {{.SmallResourceNameSingular}}Service.{{.SmallResourceNameSingular}}Dao.Get{{.CapsResourceNameSingular}}(id)
+}
+{{ end }}
+
+{{ if .IsGRPCPutAllowed }}
+func ({{.SmallResourceNameSingular}}Service *{{.CapsResourceNameSingular}}Service) Update{{.CapsResourceNameSingular}}(id string, {{.SmallResourceNameSingular}} *models.{{.CapsResourceNameSingular}}) (*models.{{.CapsResourceNameSingular}}, error)  {
+	return {{.SmallResourceNameSingular}}Service.{{.SmallResourceNameSingular}}Dao.Update{{.CapsResourceNameSingular}}(id, {{.SmallResourceNameSingular}})
+}
+{{ end }}
+
+{{ if .IsGRPCDeleteAllowed }}
+func ({{.SmallResourceNameSingular}}Service *{{.CapsResourceNameSingular}}Service) Delete{{.CapsResourceNameSingular}}(id string) error {
+	return {{.SmallResourceNameSingular}}Service.{{.SmallResourceNameSingular}}Dao.Delete{{.CapsResourceNameSingular}}(id)
+}
+{{ end }}

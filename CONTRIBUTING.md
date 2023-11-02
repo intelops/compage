@@ -32,9 +32,7 @@ To contribute code.
 5. Clone the project: `git clone https://github.com/[YOUR_USERNAME]/compage && cd compage`
 6. kindly refer compage.md file to know the structure of the project.
 7. The Compage has three servers (subprojects) which need to be started to run the compage on local
-   - core (Golang), navigate to core directory and follow its [core README](./core/README.md)
-   - app (Node.js), navigate to app directory and follow its [app README](./app/README.md)
-   - ui (ReactJs), navigate to ui directory and follow its [ui README](./ui/README.md)
+   - (Golang), navigate to core directory and follow its [core README](./core/README.md)
 8. Commit changes *([Please refer the commit message conventions](https://www.conventionalcommits.org/en/v1.0.0/))*
 9. Push commits.
 10. Open pull request.
@@ -49,7 +47,7 @@ To contribute code.
    ```shell
   export PATH="$PATH:$(go env GOPATH)/bin"
    ```
-- Download buf binary from this link—https://github.com/bufbuild/buf/releases and fire the command from core directory of compage.
+- Download buf binary from this link—https://github.com/bufbuild/buf/releases and fire the command from root directory of compage.
    ```shell
    buf generate
    ```
