@@ -39,12 +39,6 @@ RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
   && rm -f /tmp/apache-maven.tar.gz \
   && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
 
-# test if the below command avoids loading the files later.
-RUN /app/openapi-generator-cli version
-RUN go version
-RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-
 ARG USER_NAME=compageuser
 ARG GROUP_NAME=compagegroup
 RUN addgroup -g 1001 $GROUP_NAME && adduser -D -u 1001 -G $GROUP_NAME $USER_NAME
@@ -64,6 +58,12 @@ RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 
 COPY --from=builder /app/core /
 COPY templates /app/templates
+
+# test if the below command avoids loading the files later.
+RUN /app/openapi-generator-cli version
+RUN go version
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
 # Application port (optional)
 EXPOSE 8080
