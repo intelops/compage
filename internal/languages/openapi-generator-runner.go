@@ -11,24 +11,27 @@ import (
 
 // runs openapi-generator-cli with args passed.
 func runOpenAPIGenerator(args ...string) error {
-	path, err := exec.LookPath("openapi-generator-cli")
+	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		log.Debugf("err : %s", err)
+		log.Debugf("Error getting user home directory: %s", err)
 		return errors.New("'openapi-generator-cli' command doesn't exist")
 	}
-	log.Debugf("'openapi-generator-cli' is available at %s", path)
-	err = os.Setenv("OPENAPI_GENERATOR_VERSION", "6.6.0")
+	binPath := userHomeDir + "/.openapi-generator/openapi-generator-cli.jar"
+	_, err = os.Stat(binPath)
 	if err != nil {
 		log.Debugf("err : %s", err)
-		return err
+		return errors.New("'openapi-generator-cli.jar' file doesn't exist")
 	}
-	output, err := exec.Command(path, args...).Output()
+	log.Debugf("openapi-generator-cli.jar is available at %s", binPath)
+	args = append([]string{"-jar", binPath}, args...)
+	output, err := exec.Command("java", args...).Output()
 	if err != nil {
 		log.Debugf("Output : %s", string(output))
 		log.Debugf("err : %s", err)
 		return err
 	}
 	log.Debugf("Output : %s", string(output))
+	log.Infof("openapi-generator-cli ran successfully")
 	return nil
 }
 
@@ -70,10 +73,10 @@ func ProcessOpenAPITemplate(ctx context.Context) error {
 	}
 
 	// generate documentation for the code
-	if err1 := runOpenAPIGenerator("generate", "-i", fileName, "-g", "dynamic-html", "-o", values.NodeDirectoryName+"/gen/docs", "--git-user-id", values.TemplateVars[GitPlatformUserName], "--git-repo-id", values.TemplateVars[GitRepositoryName]+"/"+values.LanguageNode.Name); err1 != nil {
-		log.Debugf("err : %s", err1)
-		return errors.New("something happened while running openAPI generator for documentation")
-	}
+	//if err1 := runOpenAPIGenerator("generate", "-i", fileName, "-g", "dynamic-html", "-o", values.NodeDirectoryName+"/gen/docs", "--git-user-id", values.TemplateVars[GitPlatformUserName], "--git-repo-id", values.TemplateVars[GitRepositoryName]+"/"+values.LanguageNode.Name); err1 != nil {
+	//	log.Debugf("err : %s", err1)
+	//	return errors.New("something happened while running openAPI generator for documentation")
+	//}
 	return nil
 }
 
