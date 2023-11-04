@@ -53,14 +53,15 @@ func checkIfGitSubmodulesExist() bool {
 	templatesPath := "templates"
 	// currently available templates
 	templates := []string{"compage-templates", "compage-template-go", "compage-template-java", "compage-template-python", "compage-template-javascript", "compage-template-ruby", "compage-template-rust", "compage-template-typescript"}
-	// read templates directory and list down files in it.
+	// read the templates directory and list down files in it.
 	files, err := os.ReadDir(templatesPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	// iterate over files in templates directory
 	for _, file := range files {
-		// check if the item in templates directory is directory and it's a valid template(by looking into available templates)
+		// check if the item in templates directory is directory,
+		// and it's a valid template (by looking into available templates)
 		if file.IsDir() && slices.Contains(templates, file.Name()) {
 			// check in specific template folder.
 			filesInDir, err0 := os.ReadDir(templatesPath + "/" + file.Name())
@@ -103,8 +104,8 @@ func startGrpcServer() {
 }
 
 func init() {
-	// Log as JSON instead of the default ASCII formatter.
-	//log.SetFormatter(&log.JSONFormatter{})
+	// log as JSON instead of the default ASCII formatter.
+	// log.SetFormatter(&log.JSONFormatter{})
 	log.SetFormatter(&log.TextFormatter{
 		DisableColors: false,
 		FullTimestamp: true,
