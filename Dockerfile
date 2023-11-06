@@ -11,7 +11,7 @@ WORKDIR /app
 COPY . .
 
 # Build application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o core .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o compage .
 # Container start command for development
 # Allows DevSpace to restart the dev container
 # It is also possible to override this in devspace.yaml via images.*.cmd
@@ -71,4 +71,4 @@ RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 EXPOSE 8080
 EXPOSE 50051
 # Container start command for production
-CMD ["/core"]
+CMD ["/compage"]
