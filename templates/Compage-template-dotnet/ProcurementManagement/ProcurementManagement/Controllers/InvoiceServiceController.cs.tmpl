@@ -1,0 +1,73 @@
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Procurement.Application.Commands.{{.CapsResourceNameSingular}}Service;
+using Procurement.Application.Queries.{{.CapsResourceNameSingular}}Service;
+using Procurement.Application.Responses;
+using System.Net;
+
+
+namespace ProcurementManagement.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class {{.CapsResourceNameSingular}}ServiceController : ControllerBase
+    {
+        private readonly IMediator _mediator;
+        private readonly ILogger<{{.CapsResourceNameSingular}}ServiceController> _logger;
+        public {{.CapsResourceNameSingular}}ServiceController(IMediator mediator, ILogger<{{.CapsResourceNameSingular}}ServiceController> logger)
+        {
+            _mediator = mediator;
+            _logger = logger;
+        }
+
+        [HttpGet(Name = "GetAll{{.CapsResourceNameSingular}}")]
+        [ProducesResponseType(typeof(IEnumerable<List<{{.CapsResourceNameSingular}}Response>>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<List<{{.CapsResourceNameSingular}}Response>>> GetAll{{.CapsResourceNameSingular}}(CancellationToken cancellationToken)
+        {
+
+            var response = await _mediator.Send(new GetAll{{.CapsResourceNameSingular}}Query(), cancellationToken);
+            return Ok(response);
+        }
+
+
+        [HttpGet("{id}", Name = "Get{{.CapsResourceNameSingular}}ById")]
+        [ProducesResponseType(typeof({{.CapsResourceNameSingular}}Response), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<{{.CapsResourceNameSingular}}Response>> Get{{.CapsResourceNameSingular}}ById(int id, CancellationToken cancellationToken)
+        {
+            var response = await _mediator.Send(new Get{{.CapsResourceNameSingular}}ByIdQuery(id), cancellationToken);
+            return Ok(response);
+        }
+
+
+        [HttpPost(Name = "Create{{.CapsResourceNameSingular}}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<ActionResult<int>> Create{{.CapsResourceNameSingular}}([FromBody] Create{{.CapsResourceNameSingular}}Command command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpPut(Name = "Update{{.CapsResourceNameSingular}}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<ActionResult> Update{{.CapsResourceNameSingular}}([FromBody] Update{{.CapsResourceNameSingular}}Command command)
+        {
+            await _mediator.Send(command);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}", Name = "Delete{{.CapsResourceNameSingular}}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<ActionResult> Delete{{.CapsResourceNameSingular}}(int id)
+        {
+            var cmd = new Delete{{.CapsResourceNameSingular}}Command() { Id = id };
+            await _mediator.Send(cmd);
+            return NoContent();
+        }
+
+    }
+}

@@ -1,0 +1,34 @@
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
+using Procurement.Application.Commands.{{.CapsResourceNameSingular}}Service;
+using Procurement.Application.Exceptions;
+using Procurement.Core.Entities;
+using Procurement.Core.Repositories;
+
+
+namespace Procurement.Application.Handlers.{{.CapsResourceNameSingular}}Service
+{
+
+    public class Delete{{.CapsResourceNameSingular}}CommandHandler : IRequestHandler<Delete{{.CapsResourceNameSingular}}Command>
+    {
+        private readonly I{{.CapsResourceNameSingular}}Repository _{{.SmallResourceNameSingular}}Repository;
+        private readonly ILogger<Delete{{.CapsResourceNameSingular}}CommandHandler> _logger;
+
+        public Delete{{.CapsResourceNameSingular}}CommandHandler(I{{.CapsResourceNameSingular}}Repository {{.SmallResourceNameSingular}}Repository, ILogger<Delete{{.CapsResourceNameSingular}}CommandHandler> logger)
+        {
+            _{{.SmallResourceNameSingular}}Repository = {{.SmallResourceNameSingular}}Repository;
+            _logger = logger;
+        }
+        public async Task Handle(Delete{{.CapsResourceNameSingular}}Command request, CancellationToken cancellationToken)
+        {
+            var orderToDelete = await _{{.SmallResourceNameSingular}}Repository.GetByIdAsync(request.Id);
+            if (orderToDelete == null)
+            {
+                throw new OrderNotFoundException(nameof({{.CapsResourceNameSingular}}), request.Id);
+            }
+
+            await _{{.SmallResourceNameSingular}}Repository.DeleteAsync(orderToDelete);
+            _logger.LogInformation($" Id {request.Id} is deleted successfully.");
+        }
+    }
+}

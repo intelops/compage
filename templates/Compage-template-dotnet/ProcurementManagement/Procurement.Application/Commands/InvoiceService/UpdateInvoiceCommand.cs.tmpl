@@ -1,0 +1,13 @@
+﻿using MediatR;
+
+namespace Procurement.Application.Commands.{{.CapsResourceNameSingular}}Service
+{
+
+    public class Update{{.CapsResourceNameSingular}}Command : IRequest
+    {
+        public int Id { get; set; }
+        /********************************************************/
+        public string Name { get; set; }
+
+    }
+}

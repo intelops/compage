@@ -1,0 +1,52 @@
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
+using Moq;
+using Procurement.Application.Commands.{{.CapsResourceNameSingular}}Service;
+using Procurement.Application.Handlers.{{.CapsResourceNameSingular}}Service;
+using Procurement.Core.Entities;
+using Procurement.Core.Repositories;
+
+namespace Procurement.Application.Tests.Handlers.{{.CapsResourceNameSingular}}Service
+{
+    public class Create{{.CapsResourceNameSingular}}CommandHandlerTests
+    {
+        private readonly Mock<I{{.CapsResourceNameSingular}}Repository> _{{.SmallResourceNameSingular}}Repository;
+        private readonly Mock<IMapper> _mapper;
+        private readonly Mock<ILogger<Create{{.CapsResourceNameSingular}}CommandHandler>> _logger;
+
+        public Create{{.CapsResourceNameSingular}}CommandHandlerTests()
+        {
+            _{{.SmallResourceNameSingular}}Repository = new();
+            _mapper = new();
+            _logger = new();
+        }
+
+
+
+        [Fact]
+        public async Task Handle_Returns{{.CapsResourceNameSingular}}Id()
+        {
+            // Arrange
+            var request = new Create{{.CapsResourceNameSingular}}Command(); 
+
+
+            _mapper
+                .Setup(m => m.Map<{{.CapsResourceNameSingular}}>(request))
+                .Returns(new {{.CapsResourceNameSingular}}()); 
+
+
+            _{{.SmallResourceNameSingular}}Repository
+                .Setup(r => r.AddAsync(It.IsAny<{{.CapsResourceNameSingular}}>()))
+                .ReturnsAsync(new {{.CapsResourceNameSingular}} { Id = 123 }); 
+
+            var loggerMock = new Mock<ILogger<Create{{.CapsResourceNameSingular}}CommandHandler>>();
+            var handler = new Create{{.CapsResourceNameSingular}}CommandHandler(_{{.SmallResourceNameSingular}}Repository.Object, _mapper.Object, loggerMock.Object);
+
+            // Act
+            var result = await handler.Handle(request, CancellationToken.None);
+
+            // Assert
+            Assert.Equal(123, result); 
+        }
+    }
+}

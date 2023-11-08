@@ -1,0 +1,16 @@
+﻿using MediatR;
+using Procurement.Application.Responses;
+
+namespace Procurement.Application.Queries.{{.CapsResourceNameSingular}}Service
+{
+
+    public class Get{{.CapsResourceNameSingular}}ByIdQuery : IRequest<{{.CapsResourceNameSingular}}Response>
+    {
+        public int id { get; set; }
+
+        public Get{{.CapsResourceNameSingular}}ByIdQuery(int _id)
+        {
+            id = _id;
+        }
+    }
+}

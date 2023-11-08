@@ -1,0 +1,34 @@
+﻿using AutoMapper;
+using MediatR;
+using Microsoft.Extensions.Logging;
+using Procurement.Application.Commands.{{.CapsResourceNameSingular}}Service;
+using Procurement.Core.Entities;
+using Procurement.Core.Repositories;
+
+namespace Procurement.Application.Handlers.{{.CapsResourceNameSingular}}Service
+{
+
+    public class Create{{.CapsResourceNameSingular}}CommandHandler : IRequestHandler<Create{{.CapsResourceNameSingular}}Command, int>
+    {
+        private readonly I{{.CapsResourceNameSingular}}Repository _{{.SmallResourceNameSingular}}Repository;
+        private readonly IMapper _mapper;
+        private readonly ILogger<Create{{.CapsResourceNameSingular}}CommandHandler> _logger;
+
+        public Create{{.CapsResourceNameSingular}}CommandHandler(I{{.CapsResourceNameSingular}}Repository {{.SmallResourceNameSingular}}Repository, IMapper mapper, ILogger<Create{{.CapsResourceNameSingular}}CommandHandler> logger)
+        {
+            _{{.SmallResourceNameSingular}}Repository = {{.SmallResourceNameSingular}}Repository;
+            _mapper = mapper;
+            _logger = logger;
+        }
+        public async Task<int> Handle(Create{{.CapsResourceNameSingular}}Command request, CancellationToken cancellationToken)
+        {
+            var orderEntity = _mapper.Map<{{.CapsResourceNameSingular}}>(request);
+
+            /*****************************************************************************/
+            var generatedOrder = await _{{.SmallResourceNameSingular}}Repository.AddAsync(orderEntity);
+            /*****************************************************************************/
+            _logger.LogInformation($"{{.CapsResourceNameSingular}} {generatedOrder} successfully created.");
+            return generatedOrder.Id;
+        }
+    }
+}

@@ -1,0 +1,47 @@
+﻿using AutoMapper;
+using Moq;
+using Procurement.Application.Handlers.{{.CapsResourceNameSingular}}Service;
+using Procurement.Application.Queries.{{.CapsResourceNameSingular}}Service;
+using Procurement.Application.Responses;
+using Procurement.Core.Entities;
+using Procurement.Core.Repositories;
+
+namespace Procurement.Application.Tests.Handlers.{{.CapsResourceNameSingular}}Service
+{
+    public class GetAll{{.CapsResourceNameSingular}}QueryHandlerTests
+    {
+        [Fact]
+        public async Task Handle_ReturnsListOf{{.CapsResourceNameSingular}}Responses()
+        {
+            // Arrange
+            var mapperConfig = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<{{.CapsResourceNameSingular}}, {{.CapsResourceNameSingular}}Response>();
+            });
+
+            var mapper = new Mapper(mapperConfig);
+
+            var lists = new List<{{.CapsResourceNameSingular}}> 
+        {
+            new {{.CapsResourceNameSingular}} { {{Id = 1, Name="Test 1" },
+            new {{.CapsResourceNameSingular}} { {{Id = 2, Name="Test 2" }
+
+        };
+
+            var RepositoryMock = new Mock<I{{.CapsResourceNameSingular}}Repository>();
+            RepositoryMock.Setup(repo => repo.GetAllAsync()).ReturnsAsync(lists);
+
+            var query = new GetAll{{.CapsResourceNameSingular}}Query();
+            var handler = new GetAll{{.CapsResourceNameSingular}}QueryHandler(RepositoryMock.Object, mapper);
+
+            // Act
+            var result = await handler.Handle(query, CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsType<List<{{.CapsResourceNameSingular}}Response>>(result);
+            Assert.Equal(lists.Count, result.Count);
+            // You can add more assertions to check the mapping and properties of {{.CapsResourceNameSingular}}Response objects
+        }
+    }
+}

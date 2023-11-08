@@ -1,0 +1,20 @@
+﻿using Procurement.Core.Entities;
+using Procurement.Core.Repositories;
+using Procurement.Infrastructure.Data;
+
+namespace Procurement.Infrastructure.Repositories
+{
+
+    public class {{.CapsResourceNameSingular}}Repository : RepositoryBase<{{.CapsResourceNameSingular}}>, I{{.CapsResourceNameSingular}}Repository
+    {
+        public {{.CapsResourceNameSingular}}Repository(ApplicationDbContext dbContext) : base(dbContext)
+        {
+        }
+        //public async Task<{{.CapsResourceNameSingular}}> GetByIdAsync(Guid id)
+        //{
+        //    return await _dbContext.Set<{{.CapsResourceNameSingular}}>().FindAsync(id);
+        //}
+    }
+
+
+}

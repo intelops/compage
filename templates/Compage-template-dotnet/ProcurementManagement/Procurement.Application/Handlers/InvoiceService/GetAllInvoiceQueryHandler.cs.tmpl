@@ -1,0 +1,27 @@
+﻿using AutoMapper;
+using MediatR;
+using Procurement.Application.Queries.{{.CapsResourceNameSingular}}Service;
+using Procurement.Application.Responses;
+using Procurement.Core.Repositories;
+
+namespace Procurement.Application.Handlers.{{.CapsResourceNameSingular}}Service
+{
+
+    public class GetAll{{.CapsResourceNameSingular}}QueryHandler : IRequestHandler<GetAll{{.CapsResourceNameSingular}}Query, List<{{.CapsResourceNameSingular}}Response>>
+    {
+        private readonly I{{.CapsResourceNameSingular}}Repository _{{.SmallResourceNameSingular}}Repository;
+        private readonly IMapper _mapper;
+        public GetAll{{.CapsResourceNameSingular}}QueryHandler(I{{.CapsResourceNameSingular}}Repository {{.SmallResourceNameSingular}}Repository, IMapper mapper)
+        {
+            _{{.SmallResourceNameSingular}}Repository = {{.SmallResourceNameSingular}}Repository;
+            _mapper = mapper;
+        }
+        public async Task<List<{{.CapsResourceNameSingular}}Response>> Handle(GetAll{{.CapsResourceNameSingular}}Query request, CancellationToken cancellationToken)
+        {
+            var generatedOrder = await _{{.SmallResourceNameSingular}}Repository.GetAllAsync();
+            var orderEntity = _mapper.Map<List<{{.CapsResourceNameSingular}}Response>>(generatedOrder);
+            return orderEntity;
+        }
+
+    }
+}

@@ -1,0 +1,22 @@
+﻿using AutoMapper;
+using Procurement.Application.Commands.{{.CapsResourceNameSingular}}Service;
+using Procurement.Application.Responses;
+using Procurement.Core.Entities;
+
+namespace Procurement.Application.Mappers
+{
+
+    public class ProcurementMappingProfile : Profile
+    {
+        public ProcurementMappingProfile()
+        {
+            //{{.CapsResourceNameSingular}}
+            CreateMap<{{.CapsResourceNameSingular}}, {{.CapsResourceNameSingular}}Response>().ReverseMap();
+            CreateMap<{{.CapsResourceNameSingular}}, Create{{.CapsResourceNameSingular}}Command>().ReverseMap();
+            CreateMap<{{.CapsResourceNameSingular}}, Update{{.CapsResourceNameSingular}}Command>().ReverseMap();
+
+
+        }
+    }
+
+}

@@ -1,0 +1,41 @@
+﻿using AutoMapper;
+using MediatR;
+using Microsoft.Extensions.Logging;
+using Procurement.Application.Commands.{{.CapsResourceNameSingular}}Service;
+using Procurement.Application.Exceptions;
+using Procurement.Core.Entities;
+using Procurement.Core.Repositories;
+
+
+namespace Procurement.Application.Handlers.{{.CapsResourceNameSingular}}Service
+{
+
+    public class Update{{.CapsResourceNameSingular}}CommandHandler : IRequestHandler<Update{{.CapsResourceNameSingular}}Command>
+    {
+        private readonly I{{.CapsResourceNameSingular}}Repository _{{.SmallResourceNameSingular}}Repository;
+        private readonly IMapper _mapper;
+        private readonly ILogger<Update{{.CapsResourceNameSingular}}CommandHandler> _logger;
+
+        public Update{{.CapsResourceNameSingular}}CommandHandler(I{{.CapsResourceNameSingular}}Repository {{.SmallResourceNameSingular}}Repository, IMapper mapper, ILogger<Update{{.CapsResourceNameSingular}}CommandHandler> logger)
+        {
+            _{{.SmallResourceNameSingular}}Repository = {{.SmallResourceNameSingular}}Repository;
+            _mapper = mapper;
+            _logger = logger;
+        }
+
+        public async Task Handle(Update{{.CapsResourceNameSingular}}Command request, CancellationToken cancellationToken)
+        {
+            var orderToUpdate = await _{{.SmallResourceNameSingular}}Repository.GetByIdAsync(request.Id);
+            if (orderToUpdate == null)
+            {
+                throw new OrderNotFoundException(nameof({{.CapsResourceNameSingular}}), request.Id);
+            }
+
+            _mapper.Map(request, orderToUpdate, typeof(Update{{.CapsResourceNameSingular}}Command), typeof({{.CapsResourceNameSingular}}));
+            await _{{.SmallResourceNameSingular}}Repository.UpdateAsync(orderToUpdate);
+            _logger.LogInformation($"Order is successfully updated");
+        }
+
+    }
+
+}

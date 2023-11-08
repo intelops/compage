@@ -1,0 +1,43 @@
+﻿using Microsoft.Extensions.Logging;
+using Moq;
+using Procurement.Application.Commands.{{.CapsResourceNameSingular}}Service;
+using Procurement.Application.Exceptions;
+using Procurement.Application.Handlers.{{.CapsResourceNameSingular}}Service;
+using Procurement.Core.Entities;
+using Procurement.Core.Repositories;
+
+namespace Procurement.Application.Tests.Handlers.{{.CapsResourceNameSingular}}Service
+{
+
+    public class Delete{{.CapsResourceNameSingular}}CommandHandlerTests
+    {
+        private readonly Mock<I{{.CapsResourceNameSingular}}Repository> _{{.SmallResourceNameSingular}}Repository;
+        private readonly Mock<ILogger<Delete{{.CapsResourceNameSingular}}CommandHandler>> _logger;
+
+        public Delete{{.CapsResourceNameSingular}}CommandHandlerTests()
+        {
+            _{{.SmallResourceNameSingular}}Repository = new();
+            _logger = new();
+        }
+
+
+        [Fact]
+        public async Task Handle_ThrowsOrderNotFoundExceptionWhen{{.CapsResourceNameSingular}}NotFound()
+        {
+            // Arrange
+            var Id = 123; // Replace with the ID you want to test
+            var request = new Delete{{.CapsResourceNameSingular}}Command { Id = Id }; // Create a request object
+
+            _{{.SmallResourceNameSingular}}Repository
+                .Setup(r => r.GetByIdAsync(Id))
+                .ReturnsAsync(({{.CapsResourceNameSingular}})null); // Mock the repository to return null
+
+            var handler = new Delete{{.CapsResourceNameSingular}}CommandHandler(_{{.SmallResourceNameSingular}}Repository.Object, _logger.Object);
+
+            // Act and Assert
+            await Assert.ThrowsAsync<OrderNotFoundException>(
+                async () => await handler.Handle(request, CancellationToken.None)
+            );
+        }
+    }
+}

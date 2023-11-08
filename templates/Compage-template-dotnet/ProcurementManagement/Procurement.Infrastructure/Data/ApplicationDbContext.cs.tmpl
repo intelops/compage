@@ -1,0 +1,36 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Procurement.Core.Common;
+using Procurement.Core.Entities;
+
+
+namespace Procurement.Infrastructure.Data
+{
+
+    public class ApplicationDbContext : DbContext
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+        }
+        public DbSet<{{.CapsResourceNameSingular}}> {{.CapsResourceNameSingular}} { get; set; }
+
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+        {
+            foreach (var entry in ChangeTracker.Entries<EntityBase>())
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entry.Entity.CreatedDate = DateTime.Now;
+                        entry.Entity.CreatedBy = "Administrator";
+                        break;
+                    case EntityState.Modified:
+                        entry.Entity.LastModifiedDate = DateTime.Now;
+                        entry.Entity.LastModifiedBy = "Administrator"; //TODO: This will be replaced Identity Server
+                        break;
+                }
+            }
+            return base.SaveChangesAsync(cancellationToken);
+        }
+    }
+}

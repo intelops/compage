@@ -1,0 +1,24 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Procurement.Core.Repositories;
+using Procurement.Infrastructure.Data;
+using Procurement.Infrastructure.Repositories;
+
+
+namespace Procurement.Infrastructure.Extensions
+{
+
+    public static class ServicesCollectionExtensions
+    {
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection serviceCollection,
+            IConfiguration configuration)
+        {
+            serviceCollection.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
+                configuration.GetConnectionString("ProcurementConnectionString")));
+            serviceCollection.AddScoped(typeof(IAsyncRepository<>), typeof(RepositoryBase<>));
+            serviceCollection.AddScoped<I{{.CapsResourceNameSingular}}Repository, {{.CapsResourceNameSingular}}Repository>();
+            return serviceCollection;
+        }
+    }
+}

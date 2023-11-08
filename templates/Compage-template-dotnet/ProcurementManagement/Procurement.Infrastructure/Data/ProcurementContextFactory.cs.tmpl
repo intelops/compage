@@ -1,0 +1,16 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+
+namespace Procurement.Infrastructure.Data
+{
+
+    public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
+    {
+        public ApplicationDbContext CreateDbContext(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            optionsBuilder.UseSqlServer("Data Source=sourcename;Initial Catalog = DBName;User Id=username;Password=passport;TrustServerCertificate=True;");
+            return new ApplicationDbContext(optionsBuilder.Options);
+        }
+    }
+}
