@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/intelops/compage/cmd/prompts"
 
 	"github.com/spf13/cobra"
 )
@@ -15,7 +16,15 @@ var initCmd = &cobra.Command{
 You can change the file as per your needs and then run the compage generate command to generate the code.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("init called")
+		prompts.GetProjectDetails()
+		prompts.GetGitPlatformDetails()
+		createDefaultConfigFile()
 	},
+}
+
+func createDefaultConfigFile() {
+	// create default config file
+
 }
 
 func init() {
