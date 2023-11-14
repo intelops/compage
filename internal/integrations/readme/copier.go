@@ -41,13 +41,13 @@ func (c Copier) CreateReadMeFile() error {
 		return err
 	}
 
-	var filePaths []string
+	var filePaths []*string
 	// copy deployment files to generated deepsource config files
 	targetReadMeFileName := c.ProjectDirectoryName + "/" + File
 	_, err := utils.CopyFile(targetReadMeFileName, c.TemplatesRootPath+"/"+File)
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetReadMeFileName)
+	filePaths = append(filePaths, &targetReadMeFileName)
 	return executor.Execute(filePaths, c.Data)
 }

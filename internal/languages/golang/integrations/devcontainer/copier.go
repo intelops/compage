@@ -57,7 +57,7 @@ func (c Copier) CreateDevContainerConfigs() error {
 		return err
 	}
 
-	var filePaths []string
+	var filePaths []*string
 
 	// copy devcontainer.json
 	targetDevContainerJSONName := c.NodeDirectoryName + Path + "/" + JSONFile
@@ -66,7 +66,7 @@ func (c Copier) CreateDevContainerConfigs() error {
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetDevContainerJSONName)
+	filePaths = append(filePaths, &targetDevContainerJSONName)
 
 	// copy Dockerfile
 	targetDockerFileName := c.NodeDirectoryName + Path + "/" + DockerfileFile
@@ -74,7 +74,7 @@ func (c Copier) CreateDevContainerConfigs() error {
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetDockerFileName)
+	filePaths = append(filePaths, &targetDockerFileName)
 
 	return executor.Execute(filePaths, c.Data)
 }

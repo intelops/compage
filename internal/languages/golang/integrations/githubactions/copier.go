@@ -56,26 +56,26 @@ func (c Copier) CreateYamls() error {
 
 // createCIYaml creates required file from language template.
 func (c Copier) createCIYaml() error {
-	var filePaths []string
+	var filePaths []*string
 	// copy ci.yaml
 	targetCIYamlName := c.ProjectDirectoryName + Path + "/" + c.NodeName + "-" + CIFile
 	_, err := utils.CopyFile(targetCIYamlName, c.TemplatesRootPath+Path+"/"+CIFile)
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetCIYamlName)
+	filePaths = append(filePaths, &targetCIYamlName)
 	return executor.ExecuteGhActions(filePaths, c.Data)
 }
 
 // createReleaseYaml creates required file from language template.
 func (c Copier) createReleaseYaml() error {
-	var filePaths []string
+	var filePaths []*string
 	// copy release.yaml
 	targetReleaseFileName := c.ProjectDirectoryName + Path + "/" + c.NodeName + "-" + ReleaseFile
 	_, err := utils.CopyFile(targetReleaseFileName, c.TemplatesRootPath+Path+"/"+ReleaseFile)
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetReleaseFileName)
+	filePaths = append(filePaths, &targetReleaseFileName)
 	return executor.ExecuteGhActions(filePaths, c.Data)
 }

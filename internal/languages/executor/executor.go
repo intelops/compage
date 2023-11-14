@@ -36,13 +36,13 @@ func ExecuteWithFuncs(filePaths []*string, data map[string]interface{}, funcMap 
 	return nil
 }
 
-func Execute(filePaths []string, data map[string]interface{}) error {
+func Execute(filePaths []*string, data map[string]interface{}) error {
 	for _, filePathName := range filePaths {
 		// template code
-		parsedTemplates := template.Must(tmpl.ParseFiles(filePathName))
+		parsedTemplates := template.Must(tmpl.ParseFiles(*filePathName))
 		// generate go code now
-		fileName := filePathName[strings.LastIndex(filePathName, utils.SubstrString)+1:]
-		createdFile, err := os.Create(strings.TrimSuffix(filePathName, utils.TemplateExtension))
+		fileName := (*filePathName)[strings.LastIndex(*filePathName, utils.SubstrString)+1:]
+		createdFile, err := os.Create(strings.TrimSuffix(*filePathName, utils.TemplateExtension))
 		if err != nil {
 			return err
 		}
@@ -53,8 +53,8 @@ func Execute(filePaths []string, data map[string]interface{}) error {
 
 	// delete the template files
 	for _, filePathName := range filePaths {
-		if strings.HasSuffix(filePathName, ".tmpl") {
-			if err := os.Remove(filePathName); err != nil {
+		if strings.HasSuffix(*filePathName, ".tmpl") {
+			if err := os.Remove(*filePathName); err != nil {
 				return err
 			}
 		}
@@ -62,13 +62,13 @@ func Execute(filePaths []string, data map[string]interface{}) error {
 	return nil
 }
 
-func ExecuteGhActions(filePaths []string, data map[string]interface{}) error {
+func ExecuteGhActions(filePaths []*string, data map[string]interface{}) error {
 	for _, filePathName := range filePaths {
 		// template code
-		parsedTemplates := template.Must(ghActionsTmpl.ParseFiles(filePathName))
+		parsedTemplates := template.Must(ghActionsTmpl.ParseFiles(*filePathName))
 		// generate go code now
-		fileName := filePathName[strings.LastIndex(filePathName, utils.SubstrString)+1:]
-		createdFile, err := os.Create(strings.TrimSuffix(filePathName, utils.TemplateExtension))
+		fileName := (*filePathName)[strings.LastIndex(*filePathName, utils.SubstrString)+1:]
+		createdFile, err := os.Create(strings.TrimSuffix(*filePathName, utils.TemplateExtension))
 		if err != nil {
 			return err
 		}
@@ -79,8 +79,8 @@ func ExecuteGhActions(filePaths []string, data map[string]interface{}) error {
 
 	// delete the template files
 	for _, filePathName := range filePaths {
-		if strings.HasSuffix(filePathName, ".tmpl") {
-			if err := os.Remove(filePathName); err != nil {
+		if strings.HasSuffix(*filePathName, ".tmpl") {
+			if err := os.Remove(*filePathName); err != nil {
 				return err
 			}
 		}
