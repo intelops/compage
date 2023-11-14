@@ -1,10 +1,12 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/intelops/compage/cmd/prompts"
-
+	"github.com/intelops/compage/internal/languages/executor"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"io/ioutil"
+	"os"
 )
 
 // initCmd represents the init command
@@ -15,16 +17,48 @@ var initCmd = &cobra.Command{
 
 You can change the file as per your needs and then run the compage generate command to generate the code.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("init called")
-		prompts.GetProjectDetails()
-		prompts.GetGitPlatformDetails()
-		createDefaultConfigFile()
+		projectDetails, err := prompts.GetProjectDetails()
+		cobra.CheckErr(err)
+		gitPlatformDetails, err := prompts.GetGitPlatformDetails()
+		cobra.CheckErr(err)
+		createOrUpdateDefaultConfigFile(projectDetails, gitPlatformDetails)
 	},
 }
 
-func createDefaultConfigFile() {
+func createOrUpdateDefaultConfigFile(pd *prompts.ProjectDetails, gpd *prompts.GitPlatformDetails) {
 	// create default config file
+	configFilePath := "config.yaml"
+	_, err := os.Stat(configFilePath)
+	if os.IsExist(err) {
+		log.Warnf("config file already exists at %s", configFilePath)
+		overwriteConfirmation, err := prompts.GetInputBoolean("Do you want to overwrite the existing config file? (y/n)", false)
+		cobra.CheckErr(err)
+		if overwriteConfirmation == "n" {
+			log.Infof("skipping config file creation")
+			return
+		}
+	}
 
+	os.Remove(configFilePath)
+	_, err = os.Create(configFilePath)
+	contentData, err := Content.ReadFile("config.yaml.tmpl")
+	cobra.CheckErr(err)
+	// copy the default config file and use go template to replace the values
+	err = ioutil.WriteFile(configFilePath, contentData, 0644)
+	cobra.CheckErr(err)
+
+	var filePaths []*string
+	filePaths = append(filePaths, &configFilePath)
+	data := make(map[string]interface{})
+	data["ProjectName"] = pd.ProjectName
+	data["GitRepositoryName"] = gpd.RepositoryName
+	data["GitRepositoryURL"] = gpd.PlatformURL + "/" + gpd.PlatformUserName + "/" + gpd.RepositoryName
+	data["GitPlatformName"] = gpd.PlatformName
+	data["GitPlatformURL"] = gpd.PlatformURL
+	data["GitPlatformUserName"] = gpd.PlatformUserName
+
+	err = executor.Execute(filePaths, data)
+	cobra.CheckErr(err)
 }
 
 func init() {

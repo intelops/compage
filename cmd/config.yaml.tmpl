@@ -1,0 +1,31 @@
+project:
+  name: {{.ProjectName}}
+git:
+  repository:
+    name: {{.GitRepositoryName}}
+    url: {{.GitRepositoryURL}}
+  platform:
+    name: {{.GitPlatformName}}
+    url: {{.GitPlatformURL}}
+    userName: {{.GitPlatformUserName}}
+compageJSON:
+  edges: {}
+  nodes:
+    node-ef:
+      id: node-ef
+      consumerData:
+        name: user-service
+        language: go
+        restConfig:
+          server:
+            sqlDB: Map
+            port: '1337'
+            resources:
+              - fields:
+                  Name:
+                    datatype: string
+                  Age:
+                    datatype: int
+                name: User
+          framework: go-gin-server
+          template: compage
