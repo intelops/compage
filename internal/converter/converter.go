@@ -35,7 +35,7 @@ func GetEdges(edges interface{}) interface{} {
 
 // ConvertMap converts compageJSON structure to {edges: [], nodes:[]}
 func ConvertMap(x map[string]interface{}) map[string]interface{} {
-	// convert key-value based edges to edges Slice
+	// convert key-value-based edges to edges Slice
 	if x["edges"] != nil {
 		x["edges"] = maps.Values(x["edges"].(map[string]interface{}))
 	}
@@ -46,14 +46,33 @@ func ConvertMap(x map[string]interface{}) map[string]interface{} {
 	return x
 }
 
-// GetCompageJSON converts json string to CompageJSON struct
-func GetCompageJSON(jsonString string) (*core.CompageJSON, error) {
+// GetCompageJSONForGRPC converts json string to CompageJSON struct
+func GetCompageJSONForGRPC(jsonString string) (*core.CompageJSON, error) {
 	x := map[string]interface{}{}
 	if err := json.Unmarshal([]byte(jsonString), &x); err != nil {
 		return nil, err
 	}
 	convertedX := ConvertMap(x)
 	convertedXBytes, err1 := json.Marshal(convertedX)
+	if err1 != nil {
+		return nil, err1
+	}
+	compageJSON := &core.CompageJSON{}
+	if err2 := json.Unmarshal(convertedXBytes, compageJSON); err2 != nil {
+		return nil, err2
+	}
+
+	// Validate compageJSON
+	if err3 := validate(compageJSON); err3 != nil {
+		return nil, err3
+	}
+
+	return compageJSON, nil
+}
+
+// GetCompageJSONForCMD converts compageJSON map to CompageJSON struct
+func GetCompageJSONForCMD(jsonMap map[string]interface{}) (*core.CompageJSON, error) {
+	convertedXBytes, err1 := json.Marshal(jsonMap)
 	if err1 != nil {
 		return nil, err1
 	}

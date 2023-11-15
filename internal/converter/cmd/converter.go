@@ -1,15 +1,16 @@
 package cmd
 
 import (
+	"time"
+
 	"github.com/intelops/compage/cmd/models"
 	"github.com/intelops/compage/internal/converter"
 	"github.com/intelops/compage/internal/core"
-	"time"
 )
 
 // GetProject converts *cmd.GenerateCodeCommand to *core.Project
 func GetProject(input *models.Project) (*core.Project, error) {
-	compageJSON, err := converter.GetCompageJSON("")
+	compageJSON, err := converter.GetCompageJSONForCMD(input.CompageJSON)
 	if err != nil {
 		return nil, err
 	}
@@ -17,9 +18,11 @@ func GetProject(input *models.Project) (*core.Project, error) {
 	return &core.Project{
 		CompageJSON:         compageJSON,
 		Name:                input.Name,
-		GitRepositoryName:   input.GitDetails.Repository.Name,
-		GitPlatformUserName: input.GitDetails.Platform.UserName,
+		GitPlatformName:     input.GitDetails.Platform.Name,
 		GitPlatformURL:      input.GitDetails.Platform.Url,
+		GitPlatformUserName: input.GitDetails.Platform.UserName,
+		GitRepositoryName:   input.GitDetails.Repository.Name,
+		GitRepositoryURL:    input.GitDetails.Repository.Url,
 		Metadata:            converter.GetMetadata(input.ProjectMetadata),
 		ModificationDetails: core.ModificationDetails{
 			CreatedBy: input.GitDetails.Platform.UserName,

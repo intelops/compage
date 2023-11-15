@@ -25,10 +25,10 @@ type CompageJSON struct {
 }
 
 type Project struct {
-	Name            string      `yaml:"name"`
-	GitDetails      GitDetails  `yaml:"git"`
-	CompageJSON     interface{} `yaml:"compageJSON"`
-	ProjectMetadata string      `yaml:"projectMetadata"`
+	Name            string                 `yaml:"name"`
+	GitDetails      GitDetails             `yaml:"git"`
+	CompageJSON     map[string]interface{} `yaml:"compageJSON"`
+	ProjectMetadata string                 `yaml:"projectMetadata"`
 }
 
 func ReadConfigYAMLFile(configFile string) (*Project, error) {

@@ -50,4 +50,5 @@ func GenerateCode() {
 	if err0 := handlers.Handle(coreProject); err0 != nil {
 		log.Debugf("error while generating the project [" + err0.Error() + "]")
 	}
+	log.Info("project generated successfully")
 }

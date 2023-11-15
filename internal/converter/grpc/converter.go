@@ -9,7 +9,7 @@ import (
 
 // GetProject converts *project.GenerateCodeRequest to *core.Project
 func GetProject(input *project.GenerateCodeRequest) (*core.Project, error) {
-	compageJSON, err := converter.GetCompageJSON(input.ProjectJSON)
+	compageJSON, err := converter.GetCompageJSONForGRPC(input.ProjectJSON)
 	if err != nil {
 		return nil, err
 	}
