@@ -7,12 +7,12 @@ import (
 
 type Repository struct {
 	Name string `yaml:"name,omitempty"`
-	Url  string `yaml:"url,omitempty"`
+	URL  string `yaml:"url,omitempty"`
 }
 
 type Platform struct {
 	Name     string `yaml:"name,omitempty"`
-	Url      string `yaml:"url,omitempty"`
+	URL      string `yaml:"url,omitempty"`
 	UserName string `yaml:"userName,omitempty"`
 }
 

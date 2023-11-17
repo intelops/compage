@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"github.com/intelops/compage/config"
 	project "github.com/intelops/compage/gen/api/v1"
 	server "github.com/intelops/compage/grpc"
@@ -34,8 +33,6 @@ var startCmd = &cobra.Command{
 
 This command will start thr gRPC server and allow the gRPC clients to get connected with it. The gRPC server will be listening on port 50051. Make sure that the git submodules are pulled.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("start called")
-
 		// grpc server configuration
 		// Initializes the exporter
 		var grpcTraceProvider *sdktrace.TracerProvider
@@ -53,7 +50,6 @@ This command will start thr gRPC server and allow the gRPC clients to get connec
 
 		// check if the git submodules have been pulled (mainly need to check this on developer's machine)
 		if checkIfGitSubmodulesExist() {
-			log.Println("starting gRPC server...")
 			startGrpcServer()
 		} else {
 			log.Error("starting gRPC server failed as git submodules don't exist")
@@ -109,9 +105,11 @@ func startGrpcServer() {
 	if err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
-
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
-		grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()))
+	log.Println("started gRPC server on '0.0.0.0:50051'")
+	grpcServer := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()))
+	// uncomment below lines if the above line doesn't work
+	//grpcServer := grpc.NewServer(grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
+	//	grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()))
 	impl := server.New()
 	project.RegisterProjectServiceServer(grpcServer, impl)
 	reflection.Register(grpcServer)

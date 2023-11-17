@@ -5,7 +5,6 @@ import (
 	"github.com/intelops/compage/internal/languages/executor"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"io/ioutil"
 	"os"
 )
 
@@ -39,12 +38,17 @@ func createOrUpdateDefaultConfigFile(pd *prompts.ProjectDetails, gpd *prompts.Gi
 		}
 	}
 
-	os.Remove(configFilePath)
+	err = os.Remove(configFilePath)
+	if err != nil && !os.IsNotExist(err) {
+		log.Warnf("error while removing the config file %s", err)
+		cobra.CheckErr(err)
+	}
 	_, err = os.Create(configFilePath)
+	cobra.CheckErr(err)
 	contentData, err := Content.ReadFile("config.yaml.tmpl")
 	cobra.CheckErr(err)
 	// copy the default config file and use go template to replace the values
-	err = ioutil.WriteFile(configFilePath, contentData, 0644)
+	err = os.WriteFile(configFilePath, contentData, 0644)
 	cobra.CheckErr(err)
 
 	var filePaths []*string

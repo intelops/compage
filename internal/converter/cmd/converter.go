@@ -19,10 +19,10 @@ func GetProject(input *models.Project) (*core.Project, error) {
 		CompageJSON:         compageJSON,
 		Name:                input.Name,
 		GitPlatformName:     input.GitDetails.Platform.Name,
-		GitPlatformURL:      input.GitDetails.Platform.Url,
+		GitPlatformURL:      input.GitDetails.Platform.URL,
 		GitPlatformUserName: input.GitDetails.Platform.UserName,
 		GitRepositoryName:   input.GitDetails.Repository.Name,
-		GitRepositoryURL:    input.GitDetails.Repository.Url,
+		GitRepositoryURL:    input.GitDetails.Repository.URL,
 		Metadata:            converter.GetMetadata(input.ProjectMetadata),
 		ModificationDetails: core.ModificationDetails{
 			CreatedBy: input.GitDetails.Platform.UserName,

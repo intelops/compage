@@ -40,9 +40,9 @@ jobs:
       - name: Test
         run: |
           sudo apt install dos2unix -y
-          # install openapi-generator-cli
-          mkdir -p $HOME/ogc
-          curl https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/bin/utils/openapi-generator-cli.sh > $HOME/ogc/openapi-generator-cli && chmod a+x $HOME/ogc/openapi-generator-cli
+          mkdir -p $HOME/.openapi-generator
+          chmod -R 777 $HOME/.openapi-generator
+          wget https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar -O $HOME/.openapi-generator/openapi-generator-cli.jar
           go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
           export GOPATH=$HOME/go
