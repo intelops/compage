@@ -21,7 +21,7 @@ func GetNodes(nodes interface{}) interface{} {
 	return ""
 }
 
-// GetEdges converts edges map to string.
+// GetEdges converts an edge map to string.
 func GetEdges(edges interface{}) interface{} {
 	if edges != nil {
 		edgesBytes, err := json.Marshal(maps.Values(edges.(map[string]interface{})))
@@ -39,7 +39,7 @@ func ConvertMap(x map[string]interface{}) map[string]interface{} {
 	if x["edges"] != nil {
 		x["edges"] = maps.Values(x["edges"].(map[string]interface{}))
 	}
-	// convert key-value based nodes to nodes Slice
+	// convert key-value-based nodes to nodes Slice
 	if x["nodes"] != nil {
 		x["nodes"] = maps.Values(x["nodes"].(map[string]interface{}))
 	}
@@ -94,16 +94,16 @@ func validate(compageJSON *core.CompageJSON) error {
 	// validations on node fields and setting default values.
 	for _, n := range compageJSON.Nodes {
 		// name can't be empty for node
-		if n.ConsumerData.Name == "" {
+		if n.Name == "" {
 			return fmt.Errorf("name should not be empty")
 		}
-		// set default language as go
-		if n.ConsumerData.Language == "" {
-			n.ConsumerData.Language = languages.Go
+		// set the default language as go
+		if n.Language == "" {
+			n.Language = languages.Go
 		}
 		// set default template as compage
-		if n.ConsumerData.RestConfig != nil && n.ConsumerData.RestConfig.Template == "" {
-			n.ConsumerData.RestConfig.Template = templates.Compage
+		if n.RestConfig != nil && n.RestConfig.Template == "" {
+			n.RestConfig.Template = templates.Compage
 		}
 	}
 

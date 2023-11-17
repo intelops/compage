@@ -9,22 +9,21 @@ git:
     url: {{.GitPlatformURL}}
     userName: {{.GitPlatformUserName}}
 compageJSON:
-  edges: {}
+  edges: []
   nodes:
   - id: node-ef
-    consumerData:
-      name: user-service
-      language: go
-      restConfig:
-        server:
-          sqlDB: Map
-          port: '1337'
-          resources:
-            - fields:
-                Name:
-                  datatype: string
-                Age:
-                  datatype: int
-              name: User
-        framework: go-gin-server
-        template: compage
+    name: user-service
+    language: go
+    restConfig:
+      server:
+        sqlDB: Map
+        port: '1337'
+        resources:
+          - fields:
+              Name:
+                datatype: string
+              Age:
+                datatype: int
+            name: User
+      framework: go-gin-server
+      template: compage

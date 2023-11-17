@@ -21,9 +21,6 @@ type GitDetails struct {
 	Platform   Platform   `yaml:"platform,omitempty"`
 }
 
-type CompageJSON struct {
-}
-
 type Project struct {
 	Name            string                 `yaml:"name"`
 	GitDetails      GitDetails             `yaml:"git"`
