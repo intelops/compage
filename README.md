@@ -77,7 +77,7 @@ Solution: **Compage**
 - Automatically take care of all git processes like tagging, versioning, commits, PRs, etc.
 - Automatically enforce software supply chain security process like signing the source code for integrity and generating
   immutable ledger logs, generating SBOM, generating vulnerability report, and also generate configurations to auto
-  verify, validateStringInput & control the source code integrity and container image integrity for deployments, etc. in K8s env.
+  verify, validate & control the source code integrity and container image integrity for deployments, etc. in K8s env.
 - Automatically convert backend application related environment variables' content to configmaps, secrets, etc. to make
   the generated backend compatible to K8s of any flavor (K8s, K3s, TalOS, etc.) and also auto configs to support
   integration with Vault, cert-manager, external secrets, sealed secrets & Venafi tools for TLS/SSL and secrets

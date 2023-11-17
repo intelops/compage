@@ -29,7 +29,7 @@ func New{{.CapsResourceNameSingular}}Controller() (*{{.CapsResourceNameSingular}
 
 {{ if .IsRESTCreateAllowed }}
 func ({{.SmallResourceNameSingular}}Controller *{{.CapsResourceNameSingular}}Controller) Create{{.CapsResourceNameSingular}}(context *gin.Context) {
-	// validateStringInput input
+	// validate input
 	var input models.{{.CapsResourceNameSingular}}
 	if err := context.ShouldBindJSON(&input); err != nil {
 		log.Error(err)
@@ -94,7 +94,7 @@ func ({{.SmallResourceNameSingular}}Controller *{{.CapsResourceNameSingular}}Con
 
 {{ if .IsRESTPutAllowed }}
 func ({{.SmallResourceNameSingular}}Controller *{{.CapsResourceNameSingular}}Controller) Update{{.CapsResourceNameSingular}}(context *gin.Context) {
-	// validateStringInput input
+	// validate input
 	var input models.{{.CapsResourceNameSingular}}
 	if err := context.ShouldBindJSON(&input); err != nil {
 		log.Error(err)
