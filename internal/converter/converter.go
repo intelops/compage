@@ -21,7 +21,7 @@ func GetNodes(nodes interface{}) interface{} {
 	return ""
 }
 
-// GetEdges converts edges map to string.
+// GetEdges converts an edge map to string.
 func GetEdges(edges interface{}) interface{} {
 	if edges != nil {
 		edgesBytes, err := json.Marshal(maps.Values(edges.(map[string]interface{})))
@@ -35,19 +35,19 @@ func GetEdges(edges interface{}) interface{} {
 
 // ConvertMap converts compageJSON structure to {edges: [], nodes:[]}
 func ConvertMap(x map[string]interface{}) map[string]interface{} {
-	// convert key-value based edges to edges Slice
+	// convert key-value-based edges to edges Slice
 	if x["edges"] != nil {
 		x["edges"] = maps.Values(x["edges"].(map[string]interface{}))
 	}
-	// convert key-value based nodes to nodes Slice
+	// convert key-value-based nodes to nodes Slice
 	if x["nodes"] != nil {
 		x["nodes"] = maps.Values(x["nodes"].(map[string]interface{}))
 	}
 	return x
 }
 
-// GetCompageJSON converts json string to CompageJSON struct
-func GetCompageJSON(jsonString string) (*core.CompageJSON, error) {
+// GetCompageJSONForGRPC converts json string to CompageJSON struct
+func GetCompageJSONForGRPC(jsonString string) (*core.CompageJSON, error) {
 	x := map[string]interface{}{}
 	if err := json.Unmarshal([]byte(jsonString), &x); err != nil {
 		return nil, err
@@ -70,21 +70,40 @@ func GetCompageJSON(jsonString string) (*core.CompageJSON, error) {
 	return compageJSON, nil
 }
 
+// GetCompageJSONForCMD converts compageJSON map to CompageJSON struct
+func GetCompageJSONForCMD(jsonMap map[string]interface{}) (*core.CompageJSON, error) {
+	convertedXBytes, err1 := json.Marshal(jsonMap)
+	if err1 != nil {
+		return nil, err1
+	}
+	compageJSON := &core.CompageJSON{}
+	if err2 := json.Unmarshal(convertedXBytes, compageJSON); err2 != nil {
+		return nil, err2
+	}
+
+	// Validate compageJSON
+	if err3 := validate(compageJSON); err3 != nil {
+		return nil, err3
+	}
+
+	return compageJSON, nil
+}
+
 // validate validates edges and nodes in compage json.
 func validate(compageJSON *core.CompageJSON) error {
 	// validations on node fields and setting default values.
 	for _, n := range compageJSON.Nodes {
 		// name can't be empty for node
-		if n.ConsumerData.Name == "" {
+		if n.Name == "" {
 			return fmt.Errorf("name should not be empty")
 		}
-		// set default language as go
-		if n.ConsumerData.Language == "" {
-			n.ConsumerData.Language = languages.Go
+		// set the default language as go
+		if n.Language == "" {
+			n.Language = languages.Go
 		}
 		// set default template as compage
-		if n.ConsumerData.RestConfig != nil && n.ConsumerData.RestConfig.Template == "" {
-			n.ConsumerData.RestConfig.Template = templates.Compage
+		if n.RestConfig != nil && n.RestConfig.Template == "" {
+			n.RestConfig.Template = templates.Compage
 		}
 	}
 

@@ -51,7 +51,7 @@ func NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryNa
 
 // CreateDevspaceConfigs creates required file from language template.
 func (c Copier) CreateDevspaceConfigs() error {
-	var filePaths []string
+	var filePaths []*string
 	// copy devspace.yml
 	targetDevspaceYamlName := c.NodeDirectoryName + "/" + YamlFile
 	const DevspaceSrcPath = "/devspace/"
@@ -59,7 +59,7 @@ func (c Copier) CreateDevspaceConfigs() error {
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetDevspaceYamlName)
+	filePaths = append(filePaths, &targetDevspaceYamlName)
 
 	// copy devspace_start.sh
 	targetDevspaceStartShFileName := c.NodeDirectoryName + "/" + StartShFile
@@ -67,7 +67,7 @@ func (c Copier) CreateDevspaceConfigs() error {
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetDevspaceStartShFileName)
+	filePaths = append(filePaths, &targetDevspaceStartShFileName)
 
 	return executor.Execute(filePaths, c.Data)
 }

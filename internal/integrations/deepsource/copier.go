@@ -41,13 +41,13 @@ func (c Copier) CreateDeepSourceFiles() error {
 		return err
 	}
 
-	var filePaths []string
+	var filePaths []*string
 	// copy deployment files to generated deepsource config files
 	targetDeepSourceTomlFileName := c.ProjectDirectoryName + "/" + TomlFile
 	_, err := utils.CopyFile(targetDeepSourceTomlFileName, c.TemplatesRootPath+"/"+TomlFile)
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetDeepSourceTomlFileName)
+	filePaths = append(filePaths, &targetDeepSourceTomlFileName)
 	return executor.Execute(filePaths, c.Data)
 }

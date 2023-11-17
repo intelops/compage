@@ -50,13 +50,13 @@ func NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryNa
 
 // CreateDockerFile creates required file from language template.
 func (c Copier) CreateDockerFile() error {
-	var filePaths []string
+	var filePaths []*string
 	// copy dockerfile
 	targetDockerFileName := c.NodeDirectoryName + "/" + File
 	_, err := utils.CopyFile(targetDockerFileName, c.TemplatesRootPath+"/"+File)
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetDockerFileName)
+	filePaths = append(filePaths, &targetDockerFileName)
 	return executor.Execute(filePaths, c.Data)
 }

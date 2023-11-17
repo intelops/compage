@@ -34,10 +34,10 @@ type LanguageNode struct {
 func NewLanguageNode(compageJSON *core.CompageJSON, node *corenode.Node) (*LanguageNode, error) {
 	languageNode := &LanguageNode{
 		ID:          node.ID,
-		Name:        node.ConsumerData.Name,
-		Metadata:    node.ConsumerData.Metadata,
-		Annotations: node.ConsumerData.Annotations,
-		Language:    node.ConsumerData.Language,
+		Name:        node.Name,
+		Metadata:    node.Metadata,
+		Annotations: node.Annotations,
+		Language:    node.Language,
 	}
 
 	addRestConfig(node, languageNode)
@@ -53,20 +53,20 @@ func NewLanguageNode(compageJSON *core.CompageJSON, node *corenode.Node) (*Langu
 }
 
 func addWSConfig(node *corenode.Node, languageNode *LanguageNode) {
-	if node.ConsumerData.WsConfig != nil {
+	if node.WsConfig != nil {
 		languageNode.WsConfig = &corenode.WsConfig{}
-		languageNode.WsConfig.Template = node.ConsumerData.WsConfig.Template
-		languageNode.WsConfig.Framework = node.ConsumerData.WsConfig.Framework
+		languageNode.WsConfig.Template = node.WsConfig.Template
+		languageNode.WsConfig.Framework = node.WsConfig.Framework
 
 		// Ws clients should have client's array not nil.
-		if node.ConsumerData.WsConfig.Clients != nil {
-			languageNode.WsConfig.Clients = node.ConsumerData.WsConfig.Clients
+		if node.WsConfig.Clients != nil {
+			languageNode.WsConfig.Clients = node.WsConfig.Clients
 		}
 
 		// WS server should have port and if port is nil, that means the node is not server, but it's a client.
-		if node.ConsumerData.WsConfig.Server != nil && node.ConsumerData.WsConfig.Server.Port != "" {
+		if node.WsConfig.Server != nil && node.WsConfig.Server.Port != "" {
 			// one node, one ws server
-			for _, resource := range node.ConsumerData.WsConfig.Server.Resources {
+			for _, resource := range node.WsConfig.Server.Resources {
 				resource.Name = cases.Title(language.Und, cases.NoLower).String(resource.Name)
 				fields := make(map[string]corenode.FieldMetadata)
 				for key, value := range resource.Fields {
@@ -76,26 +76,26 @@ func addWSConfig(node *corenode.Node, languageNode *LanguageNode) {
 				}
 				resource.Fields = fields
 			}
-			languageNode.WsConfig.Server = node.ConsumerData.WsConfig.Server
+			languageNode.WsConfig.Server = node.WsConfig.Server
 		}
 	}
 }
 
 func addGRPCConfig(node *corenode.Node, languageNode *LanguageNode) {
-	if node.ConsumerData.GrpcConfig != nil {
+	if node.GrpcConfig != nil {
 		languageNode.GrpcConfig = &corenode.GrpcConfig{}
-		languageNode.GrpcConfig.Template = node.ConsumerData.GrpcConfig.Template
-		languageNode.GrpcConfig.Framework = node.ConsumerData.GrpcConfig.Framework
+		languageNode.GrpcConfig.Template = node.GrpcConfig.Template
+		languageNode.GrpcConfig.Framework = node.GrpcConfig.Framework
 
 		// gRPC clients should have client's array not nil.
-		if node.ConsumerData.GrpcConfig.Clients != nil {
-			languageNode.GrpcConfig.Clients = node.ConsumerData.GrpcConfig.Clients
+		if node.GrpcConfig.Clients != nil {
+			languageNode.GrpcConfig.Clients = node.GrpcConfig.Clients
 		}
 
 		// gRPC server should have port and if port is nil, that means the node is not server, but it's a client.
-		if node.ConsumerData.GrpcConfig.Server != nil && node.ConsumerData.GrpcConfig.Server.Port != "" {
+		if node.GrpcConfig.Server != nil && node.GrpcConfig.Server.Port != "" {
 			// one node, one grpc server
-			for _, resource := range node.ConsumerData.GrpcConfig.Server.Resources {
+			for _, resource := range node.GrpcConfig.Server.Resources {
 				resource.Name = cases.Title(language.Und, cases.NoLower).String(resource.Name)
 				fields := make(map[string]corenode.FieldMetadata)
 				for key, value := range resource.Fields {
@@ -105,24 +105,24 @@ func addGRPCConfig(node *corenode.Node, languageNode *LanguageNode) {
 				}
 				resource.Fields = fields
 			}
-			languageNode.GrpcConfig.Server = node.ConsumerData.GrpcConfig.Server
+			languageNode.GrpcConfig.Server = node.GrpcConfig.Server
 		}
 	}
 }
 
 func addRestConfig(node *corenode.Node, languageNode *LanguageNode) {
-	if node.ConsumerData.RestConfig != nil {
+	if node.RestConfig != nil {
 		languageNode.RestConfig = &corenode.RestConfig{}
-		languageNode.RestConfig.Template = node.ConsumerData.RestConfig.Template
-		languageNode.RestConfig.Framework = node.ConsumerData.RestConfig.Framework
+		languageNode.RestConfig.Template = node.RestConfig.Template
+		languageNode.RestConfig.Framework = node.RestConfig.Framework
 		// REST clients should have client's array not nil.
-		if node.ConsumerData.RestConfig.Clients != nil {
-			languageNode.RestConfig.Clients = node.ConsumerData.RestConfig.Clients
+		if node.RestConfig.Clients != nil {
+			languageNode.RestConfig.Clients = node.RestConfig.Clients
 		}
 		// REST server should have port and if port is nil, that means the node is not server, but it's a client.
-		if node.ConsumerData.RestConfig.Server != nil && node.ConsumerData.RestConfig.Server.Port != "" {
+		if node.RestConfig.Server != nil && node.RestConfig.Server.Port != "" {
 			// one node, one rest server
-			for _, resource := range node.ConsumerData.RestConfig.Server.Resources {
+			for _, resource := range node.RestConfig.Server.Resources {
 				resource.Name = cases.Title(language.Und, cases.NoLower).String(resource.Name)
 				fields := make(map[string]corenode.FieldMetadata)
 				for key, value := range resource.Fields {
@@ -132,7 +132,7 @@ func addRestConfig(node *corenode.Node, languageNode *LanguageNode) {
 				}
 				resource.Fields = fields
 			}
-			languageNode.RestConfig.Server = node.ConsumerData.RestConfig.Server
+			languageNode.RestConfig.Server = node.RestConfig.Server
 		}
 	}
 }
@@ -153,32 +153,32 @@ func PopulateClientsForNode(compageJSON *core.CompageJSON, nodeP *corenode.Node)
 }
 
 func populateWSConfig(compageJSON *core.CompageJSON, nodeP *corenode.Node) error {
-	if nodeP.ConsumerData.WsConfig != nil && nodeP.ConsumerData.WsConfig.Clients != nil {
+	if nodeP.WsConfig != nil && nodeP.WsConfig.Clients != nil {
 		// iterate over the ws clients
-		for _, client := range nodeP.ConsumerData.WsConfig.Clients {
+		for _, client := range nodeP.WsConfig.Clients {
 			// process client, iterate over the nodes and retrieve other details from source node.
 			for _, currentNode := range compageJSON.Nodes {
 				if client.SourceNodeID == currentNode.ID {
-					client.Resources = currentNode.ConsumerData.WsConfig.Server.Resources
+					client.Resources = currentNode.WsConfig.Server.Resources
 					break
 				}
 			}
 		}
 		return fmt.Errorf("unsupported clientProtocol %s for language : %s",
-			"ws", nodeP.ConsumerData.Language)
+			"ws", nodeP.Language)
 	}
 	return nil
 }
 
 func populateGRPCClients(compageJSON *core.CompageJSON, nodeP *corenode.Node) {
-	if nodeP.ConsumerData.GrpcConfig != nil && nodeP.ConsumerData.GrpcConfig.Clients != nil {
+	if nodeP.GrpcConfig != nil && nodeP.GrpcConfig.Clients != nil {
 		// iterate over the grpc clients
-		for _, client := range nodeP.ConsumerData.GrpcConfig.Clients {
+		for _, client := range nodeP.GrpcConfig.Clients {
 			// process client, iterate over the nodes and retrieve other details from source node.
 			for _, currentNode := range compageJSON.Nodes {
 				if client.SourceNodeID == currentNode.ID {
-					client.ProtoFileContent = currentNode.ConsumerData.GrpcConfig.Server.ProtoFileContent
-					client.Resources = currentNode.ConsumerData.GrpcConfig.Server.Resources
+					client.ProtoFileContent = currentNode.GrpcConfig.Server.ProtoFileContent
+					client.Resources = currentNode.GrpcConfig.Server.Resources
 					break
 				}
 			}
@@ -187,14 +187,14 @@ func populateGRPCClients(compageJSON *core.CompageJSON, nodeP *corenode.Node) {
 }
 
 func populateRESTClients(compageJSON *core.CompageJSON, nodeP *corenode.Node) {
-	if nodeP.ConsumerData.RestConfig != nil && nodeP.ConsumerData.RestConfig.Clients != nil {
+	if nodeP.RestConfig != nil && nodeP.RestConfig.Clients != nil {
 		// iterate over the rest clients
-		for _, client := range nodeP.ConsumerData.RestConfig.Clients {
+		for _, client := range nodeP.RestConfig.Clients {
 			// process client, iterate over the nodes and retrieve other details from source node.
 			for _, currentNode := range compageJSON.Nodes {
 				if client.SourceNodeID == currentNode.ID {
-					client.OpenAPIFileYamlContent = currentNode.ConsumerData.RestConfig.Server.OpenAPIFileYamlContent
-					client.Resources = currentNode.ConsumerData.RestConfig.Server.Resources
+					client.OpenAPIFileYamlContent = currentNode.RestConfig.Server.OpenAPIFileYamlContent
+					client.Resources = currentNode.RestConfig.Server.Resources
 					break
 				}
 			}
@@ -206,7 +206,7 @@ func populateRESTClients(compageJSON *core.CompageJSON, nodeP *corenode.Node) {
 func getProtoFileContentAndFrameworkFromNodeForEdge(src string, nodes []*corenode.Node) (string, string) {
 	for _, n := range nodes {
 		if src == n.ID {
-			return n.ConsumerData.GrpcConfig.Server.ProtoFileContent, n.ConsumerData.GrpcConfig.Framework
+			return n.GrpcConfig.Server.ProtoFileContent, n.GrpcConfig.Framework
 		}
 	}
 	return "", ""
@@ -215,7 +215,7 @@ func getProtoFileContentAndFrameworkFromNodeForEdge(src string, nodes []*corenod
 func GetOpenAPIFileYamlContentAndFrameworkAndTemplateFromNodeForEdge(src string, nodes []*corenode.Node) (string, string, string) {
 	for _, n := range nodes {
 		if src == n.ID {
-			return n.ConsumerData.RestConfig.Server.OpenAPIFileYamlContent, n.ConsumerData.RestConfig.Framework, n.ConsumerData.RestConfig.Template
+			return n.RestConfig.Server.OpenAPIFileYamlContent, n.RestConfig.Framework, n.RestConfig.Template
 		}
 	}
 	return "", "", ""

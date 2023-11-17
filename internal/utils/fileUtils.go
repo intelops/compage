@@ -107,9 +107,9 @@ func IgnorablePaths(path string) bool {
 }
 
 // GetDirectoriesAndFilePaths returns files and directories in given a path or error.
-func GetDirectoriesAndFilePaths(templatesPath string) ([]string, []string, error) {
-	var directories []string
-	var filePaths []string
+func GetDirectoriesAndFilePaths(templatesPath string) ([]*string, []*string, error) {
+	var directories []*string
+	var filePaths []*string
 
 	// Get all directories on /templates and check if there are repeated files
 	err := filepath.Walk(templatesPath, func(path string, info os.FileInfo, err error) error {
@@ -123,10 +123,10 @@ func GetDirectoriesAndFilePaths(templatesPath string) ([]string, []string, error
 			if hasRepeatedFilePaths {
 				return fmt.Errorf("you can't have repeated template files: %s", filename)
 			}
-			filePaths = append(filePaths, path)
+			filePaths = append(filePaths, &path)
 		} else {
 			// Is directory
-			directories = append(directories, path)
+			directories = append(directories, &path)
 		}
 
 		return nil
@@ -134,9 +134,9 @@ func GetDirectoriesAndFilePaths(templatesPath string) ([]string, []string, error
 	return directories, filePaths, err
 }
 
-func contains(filePaths []string, filePathName string) bool {
+func contains(filePaths []*string, filePathName string) bool {
 	for _, f := range filePaths {
-		if f == filePathName {
+		if *f == filePathName {
 			return true
 		}
 	}

@@ -1,0 +1,113 @@
+project:
+  name: {{.ProjectName}}
+git:
+  repository:
+    name: {{.GitRepositoryName}}
+    url: {{.GitRepositoryURL}}
+  platform:
+    name: {{.GitPlatformName}}
+    url: {{.GitPlatformURL}}
+    userName: {{.GitPlatformUserName}}
+{{if .IsRestServer}}
+compageJSON:
+  edges: []
+  nodes:
+  - id: node-ef
+    name: user-service
+    language: go
+    restConfig:
+      server:
+        sqlDB: Map
+        port: '1337'
+        resources:
+          - fields:
+              Name:
+                datatype: string
+              Age:
+                datatype: int
+            name: User
+      framework: go-gin-server
+      template: compage
+{{end}}
+{{if .IsGrpcServer}}
+compageJSON:
+  edges: []
+  nodes:
+  - id: node-c5
+    name: user-service
+    language: go
+    grpcConfig:
+      server:
+        sqlDB: SQLite
+        port: '50033'
+        resources:
+        - name: User
+          allowedMethods:
+          - POST
+          - LIST
+          - GET
+          - PUT
+          - DELETE
+          fields:
+            Name:
+              datatype: string
+            City:
+              datatype: string
+      template: compage
+      framework: go-grpc-server
+{{end}}
+{{if .IsRestAndGrpcServer}}
+compageJSON:
+  edges:
+  - dest: node-90
+    id: edge-12
+    src: node-ee
+    name: user-service-to-account-service
+  nodes:
+    - id: node-ee
+      name: user-service
+      language: go
+      restConfig:
+        server:
+          sqlDB: MySQL
+          port: '3000'
+          resources:
+          - name: User
+            allowedMethods:
+            - POST
+            - LIST
+            - GET
+            - PUT
+            - DELETE
+            fields:
+              Name:
+                datatype: string
+              City:
+                datatype: string
+        template: compage
+        framework: go-gin-server
+    - id: node-90
+      name: account-service
+      language: go
+      grpcConfig:
+          server:
+            sqlDB: MongoDB
+            port: '50033'
+            resources:
+            - name: Account
+              allowedMethods:
+              - POST
+              - LIST
+              - GET
+              - PUT
+              - DELETE
+              fields:
+                Name:
+                  datatype: string
+                AccountNumber:
+                  datatype: string
+                City:
+                  datatype: string
+          template: compage
+          framework: go-grpc-server
+{{end}}

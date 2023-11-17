@@ -77,7 +77,7 @@ Solution: **Compage**
 - Automatically take care of all git processes like tagging, versioning, commits, PRs, etc.
 - Automatically enforce software supply chain security process like signing the source code for integrity and generating
   immutable ledger logs, generating SBOM, generating vulnerability report, and also generate configurations to auto
-  verify, validate & control the source code integrity and container image integrity for deployments, etc. in K8s env.
+  verify, validateStringInput & control the source code integrity and container image integrity for deployments, etc. in K8s env.
 - Automatically convert backend application related environment variables' content to configmaps, secrets, etc. to make
   the generated backend compatible to K8s of any flavor (K8s, K3s, TalOS, etc.) and also auto configs to support
   integration with Vault, cert-manager, external secrets, sealed secrets & Venafi tools for TLS/SSL and secrets
@@ -125,7 +125,20 @@ contribution.
 
 - A user can download the compage executable binary from releases page suitable for the user's machine architecture. The user can even build the binary from source code.
 - Once the binary is downloaded, user can create a yaml file as configuration to be supplied to compage binary. The yaml file can be created by running the command `compage init` and then user can edit the yaml file to add the required configuration.
-## Architecture
+
+#### Build from source code
+```shell
+## clone the repo
+git clone https://github.com/intelops/compage.git
+## change directory to compage
+cd compage
+go build -o compage .
+## initialize the config.yaml file
+./compage init
+## edit the config.yaml file as per your requirement
+## generate the code. Below command accepts serverType [rest, grpc and rest-grpc] 
+./compage generate grpc
+```
 
 ## Contributing
 

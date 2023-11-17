@@ -281,8 +281,8 @@ func (c *Copier) copyRestClientResourceFiles(restClient *corenode.RestClient) er
 		log.Debugf("error while copying rest client file %s", targetResourceClientFileName)
 		return err
 	}
-	var filePaths []string
-	filePaths = append(filePaths, targetResourceClientFileName)
+	var filePaths []*string
+	filePaths = append(filePaths, &targetResourceClientFileName)
 
 	// apply template
 	return executor.Execute(filePaths, c.Data)
@@ -649,7 +649,7 @@ func (c *Copier) CreateRestServer() error {
 			}
 		}
 		// copy open telemetry config file
-		var filePaths []string
+		var filePaths []*string
 		// client files
 		targetOpenTelConfigFileName := c.NodeDirectoryName + ConfigPath + "/" + ConfigFile
 		_, err := utils.CopyFile(targetOpenTelConfigFileName, c.TemplatesRootPath+ConfigPath+"/"+ConfigFile)
@@ -657,7 +657,7 @@ func (c *Copier) CreateRestServer() error {
 			log.Debugf("error copying opentel config file: %v", err)
 			return err
 		}
-		filePaths = append(filePaths, targetOpenTelConfigFileName)
+		filePaths = append(filePaths, &targetOpenTelConfigFileName)
 		err = executor.Execute(filePaths, c.Data)
 		if err != nil {
 			log.Debugf("error executing opentel config file: %v", err)
@@ -668,7 +668,7 @@ func (c *Copier) CreateRestServer() error {
 			// create sql db config file (common to all resources for specific database)
 			// No vars in config file as of now, but in future they may be there.
 			if c.SQLDB == SQLite {
-				var filePaths []string
+				var filePaths []*string
 				// client files
 				targetSQLiteConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + SQLiteDBConfigFile
 				_, err := utils.CopyFile(targetSQLiteConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SQLiteDBConfigFile)
@@ -676,10 +676,10 @@ func (c *Copier) CreateRestServer() error {
 					log.Debugf("error copying sqlite config file: %v", err)
 					return err
 				}
-				filePaths = append(filePaths, targetSQLiteConfigFileName)
+				filePaths = append(filePaths, &targetSQLiteConfigFileName)
 				return executor.Execute(filePaths, c.Data)
 			} else if c.SQLDB == MySQL {
-				var filePaths []string
+				var filePaths []*string
 				// client files
 				targetMySQLConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + MySQLDBConfigFile
 				_, err := utils.CopyFile(targetMySQLConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBConfigFile)
@@ -687,10 +687,10 @@ func (c *Copier) CreateRestServer() error {
 					log.Debugf("error copying mysql config file: %v", err)
 					return err
 				}
-				filePaths = append(filePaths, targetMySQLConfigFileName)
+				filePaths = append(filePaths, &targetMySQLConfigFileName)
 				return executor.Execute(filePaths, c.Data)
 			} else if c.SQLDB == SQLiteGORM {
-				var filePaths []string
+				var filePaths []*string
 				// client files
 				targetSQLiteConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + SQLiteGORMDBConfigFile
 				_, err := utils.CopyFile(targetSQLiteConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SQLiteGORMDBConfigFile)
@@ -698,10 +698,10 @@ func (c *Copier) CreateRestServer() error {
 					log.Debugf("error copying sqlite gorm config file: %v", err)
 					return err
 				}
-				filePaths = append(filePaths, targetSQLiteConfigFileName)
+				filePaths = append(filePaths, &targetSQLiteConfigFileName)
 				return executor.Execute(filePaths, c.Data)
 			} else if c.SQLDB == MySQLGORM {
-				var filePaths []string
+				var filePaths []*string
 				// client files
 				targetMySQLConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + MySQLGORMDBConfigFile
 				_, err := utils.CopyFile(targetMySQLConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLGORMDBConfigFile)
@@ -709,10 +709,10 @@ func (c *Copier) CreateRestServer() error {
 					log.Debugf("error copying mysql gorm config file: %v", err)
 					return err
 				}
-				filePaths = append(filePaths, targetMySQLConfigFileName)
+				filePaths = append(filePaths, &targetMySQLConfigFileName)
 				return executor.Execute(filePaths, c.Data)
 			} else if c.SQLDB == Map {
-				var filePaths []string
+				var filePaths []*string
 				// client files
 				targetMapConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + MapDBConfigFile
 				_, err := utils.CopyFile(targetMapConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MapDBConfigFile)
@@ -720,14 +720,14 @@ func (c *Copier) CreateRestServer() error {
 					log.Debugf("error copying map config file: %v", err)
 					return err
 				}
-				filePaths = append(filePaths, targetMapConfigFileName)
+				filePaths = append(filePaths, &targetMapConfigFileName)
 				return executor.Execute(filePaths, c.Data)
 			}
 		} else if c.IsNoSQLDB {
 			// create nosql db config file (common to all resources for specific database)
 			// No vars in config file as of now, but in future they may be there.
 			if c.NoSQLDB == MongoDB {
-				var filePaths []string
+				var filePaths []*string
 				// client files
 				targetMongoDBConfigFileName := c.NodeDirectoryName + NoSQLDBClientsPath + "/" + MongoDBConfigFile
 				_, err := utils.CopyFile(targetMongoDBConfigFileName, c.TemplatesRootPath+NoSQLDBClientsPath+"/"+MongoDBConfigFile)
@@ -735,7 +735,7 @@ func (c *Copier) CreateRestServer() error {
 					log.Debugf("error copying mongodb config file: %v", err)
 					return err
 				}
-				filePaths = append(filePaths, targetMongoDBConfigFileName)
+				filePaths = append(filePaths, &targetMongoDBConfigFileName)
 				return executor.Execute(filePaths, c.Data)
 			}
 		}

@@ -14,6 +14,8 @@ func RunGoFmt(directoryName string) error {
 		log.Debugf("err : %s", err)
 		return err
 	}
-	log.Debugf("Output : %s", string(output))
+	if string(output) != "" {
+		log.Debugf("Output : %s", string(output))
+	}
 	return nil
 }

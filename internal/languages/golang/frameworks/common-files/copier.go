@@ -181,48 +181,48 @@ func getResourcePutBody(r *corenode.Resource) string {
 
 // CreateCommonFiles creates/copies relevant files to a generated project
 func (c Copier) CreateCommonFiles() error {
-	var filePaths []string
+	var filePaths []*string
 	targetMainGoFileName := c.NodeDirectoryName + "/" + MainGoFile
 	_, err := utils.CopyFile(targetMainGoFileName, c.TemplatesRootPath+"/"+MainGoFile)
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetMainGoFileName)
+	filePaths = append(filePaths, &targetMainGoFileName)
 
 	targetReadMeMdFileName := c.NodeDirectoryName + "/" + ReadMeMdFile
 	_, err = utils.CopyFile(targetReadMeMdFileName, c.TemplatesRootPath+"/"+ReadMeMdFile)
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetReadMeMdFileName)
+	filePaths = append(filePaths, &targetReadMeMdFileName)
 
 	targetGoModFileName := c.NodeDirectoryName + "/" + GoModFile
 	_, err = utils.CopyFile(targetGoModFileName, c.TemplatesRootPath+"/"+GoModFile)
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetGoModFileName)
+	filePaths = append(filePaths, &targetGoModFileName)
 
 	targetGoSumFileName := c.NodeDirectoryName + "/" + GoSumFile
 	_, err = utils.CopyFile(targetGoSumFileName, c.TemplatesRootPath+"/"+GoSumFile)
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetGoSumFileName)
+	filePaths = append(filePaths, &targetGoSumFileName)
 
 	targetGitIgnoreFileName := c.NodeDirectoryName + "/" + GitIgnoreFile
 	_, err = utils.CopyFile(targetGitIgnoreFileName, c.TemplatesRootPath+"/"+GitIgnoreFile)
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetGitIgnoreFileName)
+	filePaths = append(filePaths, &targetGitIgnoreFileName)
 
 	targetUsefulCommandsFileName := c.NodeDirectoryName + "/" + UsefulCommandsFile
 	_, err = utils.CopyFile(targetUsefulCommandsFileName, c.TemplatesRootPath+"/"+UsefulCommandsFile)
 	if err != nil {
 		return err
 	}
-	filePaths = append(filePaths, targetUsefulCommandsFileName)
+	filePaths = append(filePaths, &targetUsefulCommandsFileName)
 
 	return executor.Execute(filePaths, c.Data)
 }

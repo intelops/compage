@@ -30,7 +30,9 @@ func runOpenAPIGenerator(args ...string) error {
 		log.Debugf("err : %s", err)
 		return err
 	}
-	log.Debugf("Output : %s", string(output))
+	if string(output) != "" {
+		log.Debugf("Output : %s", string(output))
+	}
 	log.Infof("openapi-generator-cli ran successfully")
 	return nil
 }
@@ -89,10 +91,12 @@ func runDos2Unix(fileName string) error {
 	log.Debugf("dos2unix is available at %s", path)
 	args := []string{fileName}
 	output, err := exec.Command(path, args...).Output()
-	log.Debugf("Output : %s", string(output))
 	if err != nil {
 		log.Debugf("err : %s", err)
 		return err
+	}
+	if string(output) != "" {
+		log.Debugf("Output : %s", string(output))
 	}
 	return nil
 }

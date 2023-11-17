@@ -2,13 +2,7 @@ package corenode
 
 // Node depicts a separate repository
 type Node struct {
-	ConsumerData ConsumerData `json:"consumerData,omitempty"`
-	ID           string       `json:"id"`
-	TypeID       string       `json:"typeId"`
-}
-
-// ConsumerData has detailed attributes of a Node
-type ConsumerData struct {
+	ID string `json:"id"`
 	// Language node's(component) language.
 	Language string `json:"language"`
 	// Name of a component (required, this will be service and deployment name).
