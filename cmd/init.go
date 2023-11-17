@@ -20,11 +20,17 @@ You can change the file as per your needs and then run the compage generate comm
 		cobra.CheckErr(err)
 		gitPlatformDetails, err := prompts.GetGitPlatformDetails()
 		cobra.CheckErr(err)
-		createOrUpdateDefaultConfigFile(projectDetails, gitPlatformDetails)
+		var serverType string
+		if args != nil && len(args) == 1 {
+			serverType = args[0]
+		} else {
+			serverType = "rest"
+		}
+		createOrUpdateDefaultConfigFile(projectDetails, gitPlatformDetails, serverType)
 	},
 }
 
-func createOrUpdateDefaultConfigFile(pd *prompts.ProjectDetails, gpd *prompts.GitPlatformDetails) {
+func createOrUpdateDefaultConfigFile(pd *prompts.ProjectDetails, gpd *prompts.GitPlatformDetails, serverType string) {
 	// create default config file
 	configFilePath := "config.yaml"
 	_, err := os.Stat(configFilePath)
@@ -60,7 +66,20 @@ func createOrUpdateDefaultConfigFile(pd *prompts.ProjectDetails, gpd *prompts.Gi
 	data["GitPlatformName"] = gpd.PlatformName
 	data["GitPlatformURL"] = gpd.PlatformURL
 	data["GitPlatformUserName"] = gpd.PlatformUserName
-
+	if serverType == "grpc" {
+		data["IsRestAndGrpcServer"] = false
+		data["IsGrpcServer"] = true
+		data["IsRestServer"] = false
+	} else if serverType == "rest-grpc" {
+		data["IsRestAndGrpcServer"] = true
+		data["IsGrpcServer"] = false
+		data["IsRestServer"] = false
+	} else {
+		log.Info("defaulting to serverType config `rest`")
+		data["IsRestAndGrpcServer"] = false
+		data["IsGrpcServer"] = false
+		data["IsRestServer"] = true
+	}
 	err = executor.Execute(filePaths, data)
 	cobra.CheckErr(err)
 }
