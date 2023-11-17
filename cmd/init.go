@@ -21,7 +21,7 @@ You can change the file as per your needs and then run the compage generate comm
 		gitPlatformDetails, err := prompts.GetGitPlatformDetails()
 		cobra.CheckErr(err)
 		var serverType string
-		if args != nil && len(args) == 1 {
+		if len(args) == 1 {
 			serverType = args[0]
 		} else {
 			serverType = "rest"
