@@ -22,13 +22,17 @@ func RunMakeProto(directoryName string) error {
 			var stdOut bytes.Buffer
 			command.Stdout = &stdOut
 			if err := command.Run(); err != nil {
-				log.Debugf("err : %s", err)
-				log.Debugf("stdOut: %s\n", stdOut.String())
-				log.Debugf("stdErr: %s\n", stdErr.String())
+				log.Debugf("%s\n", err)
+				log.Debugf("%s\n", stdOut.String())
+				log.Debugf("%s\n", stdErr.String())
 				return err
 			}
-			log.Debugf("stdOut: %s\n", stdOut.String())
-			log.Debugf("stdErr: %s\n", stdErr.String())
+			if len(stdErr.String()) > 0 {
+				log.Debugf("%s\n", stdErr.String())
+			}
+			if len(stdOut.String()) > 0 {
+				log.Debugf("%s\n", stdOut.String())
+			}
 			return nil
 		} else {
 			return fmt.Errorf("%s command doesn't exist", makeCommand)

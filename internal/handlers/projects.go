@@ -28,12 +28,16 @@ func Handle(coreProject *core.Project) error {
 
 	// Iterate over all nodes and generate code for all nodes.
 	compageJSON := coreProject.CompageJSON
+	log.Debug("----------------------------------------------------")
 	for _, compageNode := range compageJSON.Nodes {
+		log.Debugf("processing node ID : %s[%s]", compageNode.ID, compageNode.Name)
 		err := processNode(coreProject, compageNode)
 		if err != nil {
 			log.Debugf("err : %s", err)
 			return err
 		}
+		log.Debugf("processed node ID : %s[%s]", compageNode.ID, compageNode.Name)
+		log.Debug("----------------------------------------------------")
 	}
 
 	// add deepsource at project level
@@ -53,7 +57,6 @@ func Handle(coreProject *core.Project) error {
 
 func processNode(coreProject *core.Project, compageNode *corenode.Node) error {
 	compageJSON := coreProject.CompageJSON
-	log.Debugf("processing node ID : %s ", compageNode.ID)
 
 	// convert node to languageNode
 	languageNode, err := languages.NewLanguageNode(compageJSON, compageNode)
