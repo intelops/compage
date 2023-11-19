@@ -5,8 +5,6 @@ go 1.21
 require (
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/iancoleman/strcase v0.3.0
-	github.com/manifoldco/promptui v0.9.0
-	github.com/santhosh-tekuri/jsonschema v1.2.4
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.17.0
@@ -25,7 +23,6 @@ require (
 require (
 	cloud.google.com/go/compute v1.23.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
-	github.com/chzyer/readline v1.5.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-logr/logr v1.3.0 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect

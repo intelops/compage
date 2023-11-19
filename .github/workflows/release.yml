@@ -1,8 +1,10 @@
 name: compage-release
 on:
   push:
-    tags:
-      - "v*.*.*"
+    branches:
+      - test
+        #    tags:
+#      - "v*.*.*"
 permissions:
   contents: write
 jobs:
@@ -73,14 +75,18 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          submodules: 'recursive'
+          token: ${{ secrets.GH_TOKEN }}
       - run: git fetch --force --tags
+      - name: Initialize and update submodules
+        run: git submodule update --init --recursive
       - uses: actions/setup-go@v4
         with:
-          go-version: stable
+          go-version: 1.21
       - uses: goreleaser/goreleaser-action@v5
         with:
           distribution: goreleaser
           version: latest
-          args: release --clean
+          args: release --clean --debug
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
