@@ -1,11 +1,20 @@
 package cmd
 
 import (
-	"github.com/intelops/compage/cmd/prompts"
 	"github.com/intelops/compage/internal/languages/executor"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
+)
+
+var (
+	projectName         string
+	platformName        string
+	platformURL         string
+	platformUserName    string
+	repositoryName      string
+	serverType          string
+	overwriteConfigFile bool
 )
 
 // initCmd represents the init command
@@ -16,39 +25,27 @@ var initCmd = &cobra.Command{
 
 You can change the file as per your needs and then run the compage generate command to generate the code.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		projectDetails, err := prompts.GetProjectDetails()
-		cobra.CheckErr(err)
-		gitPlatformDetails, err := prompts.GetGitPlatformDetails()
-		cobra.CheckErr(err)
-		var serverType string
-		if len(args) == 1 {
-			serverType = args[0]
-		} else {
-			serverType = "rest"
-		}
-		createOrUpdateDefaultConfigFile(projectDetails, gitPlatformDetails, serverType)
+		createOrUpdateDefaultConfigFile()
 	},
 }
 
-func createOrUpdateDefaultConfigFile(pd *prompts.ProjectDetails, gpd *prompts.GitPlatformDetails, serverType string) {
+func createOrUpdateDefaultConfigFile() {
 	// create default config file
 	configFilePath := "config.yaml"
 	_, err := os.Stat(configFilePath)
-	if os.IsExist(err) {
+	if err == nil {
 		log.Warnf("config file already exists at %s", configFilePath)
-		overwriteConfirmation, err := prompts.GetInputBoolean("Do you want to overwrite the existing config file? (y/n)", false)
-		cobra.CheckErr(err)
-		if overwriteConfirmation == "n" {
+		if !overwriteConfigFile {
 			log.Infof("skipping config file creation")
 			return
 		}
+		err = os.Remove(configFilePath)
+		if err != nil {
+			log.Warnf("error while removing the config file %s", err)
+			cobra.CheckErr(err)
+		}
 	}
 
-	err = os.Remove(configFilePath)
-	if err != nil && !os.IsNotExist(err) {
-		log.Warnf("error while removing the config file %s", err)
-		cobra.CheckErr(err)
-	}
 	_, err = os.Create(configFilePath)
 	cobra.CheckErr(err)
 	contentData, err := Content.ReadFile("config.yaml.tmpl")
@@ -60,12 +57,12 @@ func createOrUpdateDefaultConfigFile(pd *prompts.ProjectDetails, gpd *prompts.Gi
 	var filePaths []*string
 	filePaths = append(filePaths, &configFilePath)
 	data := make(map[string]interface{})
-	data["ProjectName"] = pd.ProjectName
-	data["GitRepositoryName"] = gpd.RepositoryName
-	data["GitRepositoryURL"] = gpd.PlatformURL + "/" + gpd.PlatformUserName + "/" + gpd.RepositoryName
-	data["GitPlatformName"] = gpd.PlatformName
-	data["GitPlatformURL"] = gpd.PlatformURL
-	data["GitPlatformUserName"] = gpd.PlatformUserName
+	data["ProjectName"] = projectName
+	data["GitRepositoryName"] = repositoryName
+	data["GitRepositoryURL"] = platformURL + "/" + platformUserName + "/" + repositoryName
+	data["GitPlatformName"] = platformName
+	data["GitPlatformURL"] = platformURL
+	data["GitPlatformUserName"] = platformUserName
 	if serverType == "grpc" {
 		data["IsRestAndGrpcServer"] = false
 		data["IsGrpcServer"] = true
@@ -75,7 +72,6 @@ func createOrUpdateDefaultConfigFile(pd *prompts.ProjectDetails, gpd *prompts.Gi
 		data["IsGrpcServer"] = false
 		data["IsRestServer"] = false
 	} else {
-		log.Info("defaulting to serverType config `rest`")
 		data["IsRestAndGrpcServer"] = false
 		data["IsGrpcServer"] = false
 		data["IsRestServer"] = true
@@ -96,4 +92,11 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// initCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	initCmd.Flags().StringVar(&projectName, "projectName", "myproject", "Project Name")
+	initCmd.Flags().StringVar(&platformName, "platformName", "github", "Git Platform Name")
+	initCmd.Flags().StringVar(&platformURL, "platformURL", "https://github.com", "Git Platform URL")
+	initCmd.Flags().StringVar(&platformUserName, "platformUserName", "myusername", "Git Platform User Name")
+	initCmd.Flags().StringVar(&repositoryName, "repositoryName", "myproject", "Git Repository Name")
+	initCmd.Flags().StringVar(&serverType, "serverType", "rest", "Server Type (rest, grpc, rest-grpc)")
+	initCmd.Flags().BoolVar(&overwriteConfigFile, "overwriteConfigFile", false, "Overwrite the config file if it already exists")
 }

@@ -13,3 +13,5 @@ openapitools.json
 /deploy/build/
 compage
 /config.yaml
+
+dist/
