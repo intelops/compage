@@ -4,6 +4,7 @@ import (
 	"github.com/intelops/compage/cmd/models"
 	"github.com/intelops/compage/internal/converter/cmd"
 	"github.com/intelops/compage/internal/handlers"
+	"github.com/intelops/compage/internal/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -50,5 +51,5 @@ func GenerateCode() {
 	if err0 := handlers.Handle(coreProject); err0 != nil {
 		log.Debugf("error while generating the project [" + err0.Error() + "]")
 	}
-	log.Info("project generated successfully")
+	log.Infof("project generated successfully at %s", utils.GetProjectDirectoryName(project.Name))
 }
