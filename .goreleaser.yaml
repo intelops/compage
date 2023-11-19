@@ -14,7 +14,8 @@ before:
     - go mod tidy
     # you may remove this if you don't need go generate
     - go generate ./...
-
+    - go mod download
+    - git submodule update --init --recursive
 builds:
   - env:
       - CGO_ENABLED=0
