@@ -16,6 +16,8 @@ before:
     - go generate ./...
     - go mod download
     - git submodule update --init --recursive
+    - ls -al .
+    - ls -R
 builds:
   - env:
       - CGO_ENABLED=0

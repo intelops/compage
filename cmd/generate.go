@@ -43,13 +43,15 @@ func GenerateCode() {
 	// converts to core project
 	coreProject, err := cmd.GetProject(project)
 	if err != nil {
-		log.Debugf("error while converting request to project [" + err.Error() + "]")
+		log.Errorf("error while converting request to project [" + err.Error() + "]")
 		return
 	}
 
 	// triggers project generation, process the request
-	if err0 := handlers.Handle(coreProject); err0 != nil {
-		log.Debugf("error while generating the project [" + err0.Error() + "]")
+	err0 := handlers.Handle(coreProject)
+	if err0 != nil {
+		log.Errorf("error while generating the project [" + err0.Error() + "]")
+		return
 	}
 	log.Infof("project generated successfully at %s", utils.GetProjectDirectoryName(project.Name))
 }
