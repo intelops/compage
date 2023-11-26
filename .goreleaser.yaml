@@ -19,6 +19,9 @@ before:
     - ls -al .
     - ls -R
 builds:
+  - hooks:
+      post:
+      - sh -c "COSIGN_PASSWORD=$COSIGN_PWD cosign sign-blob --key cosign.key --output-signature dist/{{ .ProjectName }}_{{ .Version }}_{{ .Target }}.sig {{ .Path }}"
   - env:
       - CGO_ENABLED=0
     goos:
@@ -40,6 +43,12 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
+  - files:
+      - dist/*.sig
+# add to the release directly:
+release:
+  extra_files:
+    - glob: dist/*.sig
 
 changelog:
   sort: asc
@@ -57,15 +66,3 @@ nfpms:
     formats:
       - rpm
       - deb
-
-signs:
-  - cmd: cosign
-    stdin: '{{ .Env.COSIGN_PWD }}'
-    args:
-      - "sign-blob"
-      - "--key=cosign.key"
-      - "--output-signature=${signature}"
-      - "${artifact}"
-      - "--yes" # needed on cosign 2.0.0+
-    artifacts: all
-
