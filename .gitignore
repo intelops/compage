@@ -15,3 +15,5 @@ compage
 /config.yaml
 
 dist/
+/cosign.key
+/cosign.pub

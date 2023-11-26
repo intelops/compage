@@ -60,7 +60,7 @@ nfpms:
 
 signs:
   - cmd: cosign
-    stdin: '{{ .Env.COSIGN_PWD }}'
+    stdin: '{{ .Env.COSIGN_PASSWORD }}'
     args:
       - "sign-blob"
       - "--key=cosign.key"
