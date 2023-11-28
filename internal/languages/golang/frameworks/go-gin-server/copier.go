@@ -31,10 +31,14 @@ const ModelsPath = RestServerPath + "/models"
 
 const NoSQLDBClientsPath = DaosPath + "/clients/nosqls"
 const NoSQLControllerFile = "nosqls-controller.go.tmpl"
+const NoSQLColumnBasedControllerFile = "nosqls-column-based-controller.go.tmpl"
 const NoSQLServiceFile = "nosqls-service.go.tmpl"
 const MongoDBDaoFile = "mongodb-dao.go.tmpl"
+const ScyllaDBDaoFile = "scylladb-dao.go.tmpl"
 const MongoDBConfigFile = "mongodb.go.tmpl"
+const ScyllaDBConfigFile = "scylladb.go.tmpl"
 const NoSQLModelFile = "nosqls-model.go.tmpl"
+const NoSQLColumnBasedModelFile = "nosqls-column-based-model.go.tmpl"
 
 const SQLDBClientsPath = DaosPath + "/clients/sqls"
 const SQLControllerFile = "sqls-controller.go.tmpl"
@@ -60,6 +64,7 @@ const ConfigFile = "rest-opentel-config.go.tmpl"
 
 // MongoDB nosql databases
 const MongoDB = "MongoDB"
+const ScyllaDB = "ScyllaDB"
 
 // SQLite sql databases
 const SQLite = "SQLite"
@@ -325,6 +330,22 @@ func (c *Copier) addSQLDetails(resource *corenode.Resource) error {
 	return nil
 }
 
+func (c *Copier) addNoSQLDetails(resource *corenode.Resource) error {
+	var createQueryColumns *string
+
+	for key, value := range resource.Fields {
+		dbDataType, err := c.getNoSQLDBDataType(value.Type)
+		if err != nil {
+			log.Debugf("error while getting db data type for %s", value.Type)
+			return err
+		}
+		createQueryColumns = c.getNoSQLCreateQueryColumns(createQueryColumns, key, value, dbDataType)
+	}
+	// create query columns
+	c.Data["CreateQueryColumns"] = createQueryColumns
+	return nil
+}
+
 func (c *Copier) getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAndParams, updateQueryExecColumns *string, key string, value corenode.FieldMetadata) (*string, *string) {
 	if updateQueryColumnsAndParams != nil {
 		if value.IsComposite {
@@ -402,6 +423,24 @@ func (c *Copier) getCreateQueryColumns(createQueryColumns *string, key string, v
 	return createQueryColumns
 }
 
+// Query Columns for NoSQL Column Based DB
+func (c *Copier) getNoSQLCreateQueryColumns(createQueryColumns *string, key string, value corenode.FieldMetadata, dbDataType string) *string {
+	if createQueryColumns != nil {
+		if value.IsComposite {
+			*createQueryColumns += "\n\t\t" + cases.Lower(language.Und, cases.NoLower).String(key) + " " + dbDataType + ","
+		} else {
+			*createQueryColumns += "\n\t\t" + cases.Lower(language.Und, cases.NoLower).String(key) + " " + dbDataType + ","
+		}
+	} else {
+		createQueryColumns = new(string)
+		if value.IsComposite {
+			*createQueryColumns = "\n\t\t" + cases.Lower(language.Und, cases.NoLower).String(key) + " " + dbDataType + ","
+		} else {
+			*createQueryColumns = "\n\t\t" + cases.Lower(language.Und, cases.NoLower).String(key) + " " + dbDataType + ","
+		}
+	}
+	return createQueryColumns
+}
 func (c *Copier) getGetQueryScanColumns(getQueryScanColumns *string, key string, value corenode.FieldMetadata) *string {
 	if getQueryScanColumns != nil {
 		if value.IsComposite {
@@ -442,6 +481,16 @@ func (c *Copier) addResourceSpecificTemplateData(resource *corenode.Resource) er
 		}
 	}
 
+	if c.IsNoSQLDB {
+		if c.NoSQLDB == ScyllaDB {
+			err := c.addNoSQLDetails(resource)
+			if err != nil {
+				log.Debug("error while adding nosql details to resource specific template data", err)
+				return err
+			}
+		}
+	}
+
 	// Add another map with the below keys at root level (this is for specific resource for this iteration)
 	restResourceData := c.ResourceConfig[resource.Name]
 	c.Data["SmallKebabCaseResourceNameSingular"] = restResourceData.SmallKebabCaseResourceNameSingular
@@ -463,24 +512,7 @@ func (c *Copier) addResourceSpecificTemplateData(resource *corenode.Resource) er
 }
 
 func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*string) ([]*string, error) {
-	// copy controller files to a generated project
-	targetResourceControllerFileName := c.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + strings.Replace(NoSQLControllerFile, "nosqls-", "", 1)
-	_, err := utils.CopyFile(targetResourceControllerFileName, c.TemplatesRootPath+ControllersPath+"/"+NoSQLControllerFile)
-	if err != nil {
-		log.Debugf("error copying controller file: %v", err)
-		return nil, err
-	}
-	filePaths = append(filePaths, &targetResourceControllerFileName)
-
-	// copy model files to a generated project
-	targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + strings.Replace(NoSQLModelFile, "nosqls-", "", 1)
-	_, err = utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+NoSQLModelFile)
-	if err != nil {
-		log.Debugf("error copying model file: %v", err)
-		return nil, err
-	}
-	filePaths = append(filePaths, &targetResourceModelFileName)
-
+	var err error
 	// copy service files to a generated project
 	targetResourceServiceFileName := c.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + strings.Replace(NoSQLServiceFile, "nosqls-", "", 1)
 	_, err = utils.CopyFile(targetResourceServiceFileName, c.TemplatesRootPath+ServicesPath+"/"+NoSQLServiceFile)
@@ -492,9 +524,56 @@ func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*stri
 
 	var targetResourceDaoFileName string
 	if c.NoSQLDB == MongoDB {
+		// copy controller files to a generated project
+		targetResourceControllerFileName := c.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + strings.Replace(NoSQLControllerFile, "nosqls-", "", 1)
+		_, err := utils.CopyFile(targetResourceControllerFileName, c.TemplatesRootPath+ControllersPath+"/"+NoSQLControllerFile)
+		if err != nil {
+			log.Debugf("error copying controller file: %v", err)
+			return nil, err
+		}
+		filePaths = append(filePaths, &targetResourceControllerFileName)
+
+		// copy model files to a generated project
+		targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + strings.Replace(NoSQLModelFile, "nosqls-", "", 1)
+		_, err = utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+NoSQLModelFile)
+		if err != nil {
+			log.Debugf("error copying model file: %v", err)
+			return nil, err
+		}
+		filePaths = append(filePaths, &targetResourceModelFileName)
+
 		// dao files
 		targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + MongoDBDaoFile
 		_, err = utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+MongoDBDaoFile)
+		if err != nil {
+			log.Debugf("error copying mongodb dao file: %v", err)
+			return nil, err
+		}
+		filePaths = append(filePaths, &targetResourceDaoFileName)
+	}
+
+	if c.NoSQLDB == ScyllaDB {
+		// copy controller files to a generated project
+		targetResourceControllerFileName := c.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + strings.Replace(NoSQLColumnBasedControllerFile, "nosqls-column-based-", "", 1)
+		_, err := utils.CopyFile(targetResourceControllerFileName, c.TemplatesRootPath+ControllersPath+"/"+NoSQLColumnBasedControllerFile)
+		if err != nil {
+			log.Debugf("error copying controller file: %v", err)
+			return nil, err
+		}
+		filePaths = append(filePaths, &targetResourceControllerFileName)
+
+		// copy model files to a generated project
+		targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + strings.Replace(NoSQLColumnBasedModelFile, "nosqls-column-based-", "", 1)
+		_, err = utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+NoSQLColumnBasedModelFile)
+		if err != nil {
+			log.Debugf("error copying model file: %v", err)
+			return nil, err
+		}
+		filePaths = append(filePaths, &targetResourceModelFileName)
+
+		// dao files
+		targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + ScyllaDBDaoFile
+		_, err = utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+ScyllaDBDaoFile)
 		if err != nil {
 			log.Debugf("error copying mongodb dao file: %v", err)
 			return nil, err
@@ -738,6 +817,19 @@ func (c *Copier) CreateRestServer() error {
 				filePaths = append(filePaths, &targetMongoDBConfigFileName)
 				return executor.Execute(filePaths, c.Data)
 			}
+
+			if c.NoSQLDB == ScyllaDB {
+				var filePaths []*string
+				// client files
+				targetScyllaDBConfigFileName := c.NodeDirectoryName + NoSQLDBClientsPath + "/" + ScyllaDBConfigFile
+				_, err := utils.CopyFile(targetScyllaDBConfigFileName, c.TemplatesRootPath+NoSQLDBClientsPath+"/"+ScyllaDBConfigFile)
+				if err != nil {
+					log.Debugf("error copying scylla config file: %v", err)
+					return err
+				}
+				filePaths = append(filePaths, &targetScyllaDBConfigFileName)
+				return executor.Execute(filePaths, c.Data)
+			}
 		}
 	}
 	return nil
@@ -780,6 +872,13 @@ func (c *Copier) getSQLDBDataType(value string) (string, error) {
 		return commonUtils.GetSqliteDataType(value), nil
 	} else if c.SQLDB == MySQL {
 		return commonUtils.GetMySQLDataType(value), nil
+	}
+	return "", errors.New("database not supported")
+}
+
+func (c *Copier) getNoSQLDBDataType(value string) (string, error) {
+	if c.NoSQLDB == ScyllaDB {
+		return commonUtils.GetColumnBasedDBDataType(value), nil
 	}
 	return "", errors.New("database not supported")
 }
