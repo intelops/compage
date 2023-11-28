@@ -79,6 +79,7 @@ func createOrUpdateDefaultConfigFile() {
 	}
 	err = executor.Execute(filePaths, data)
 	cobra.CheckErr(err)
+	log.Infof("config file created at %s", configFilePath)
 }
 
 func init() {

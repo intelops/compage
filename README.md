@@ -31,7 +31,8 @@ IoT and edge services, K8s controllers, K8s CRDs, K8s custom APIs, K8s Operators
 by automatically applying best practice methods like software supply chain security measures, SBOM, openAPI,
 cloud-events, vulnerability reports, etc. Auto generate code after defining requirements in UI as architecture diagram.
 
-**Specify the requirements for backend workloads in the yaml file, and then auto-generate code, customize it and maintain it.**
+**Specify the requirements for backend workloads in the yaml file, and then auto-generate code, customize it and
+maintain it.**
 > Our goal is to support both auto-generate code and import existing code. Let's see how far we can go with importing
 > existing code support. One step at a time!
 
@@ -91,6 +92,7 @@ Solution: **Compage**
 -------------------------
 
 #### Current features in compage
+
 - An opensource tool that runs on your local cluster (mostly a local cluster running on developer's machine), helps to
   visually develop backend workloads for cloud-native & K8s.
 - Easy to adopt & use.
@@ -104,7 +106,7 @@ Solution: **Compage**
 
 #### Languages supported:
 
-> OpenApi Generator based templates (REST)
+> OpenApi Generator-based templates (REST)
 
 - GoLang
 - Java
@@ -123,22 +125,79 @@ contribution.
 
 #### How to use Compage?
 
-- A user can download the compage executable binary from releases page suitable for the user's machine architecture. The user can even build the binary from source code.
-- Once the binary is downloaded, user can create a yaml file as configuration to be supplied to compage binary. The yaml file can be created by running the command `compage init` and then user can edit the yaml file to add the required configuration.
+- A user can download the compage executable binary from releases page suitable for the user's machine architecture. The
+  user can even build the binary from source code.
+- Once the binary is downloaded, user can create a yaml file as configuration to be supplied to compage binary. The yaml
+  file can be created by running the command `compage init` and then user can edit the yaml file to add the required
+  configuration.
 
-#### Build from source code
+### Getting Started
+
+To use Compage:
+
+- Download the `compage` binary for your platform from the
+  official [release page](https://github.com/intelops/compage/releases).
+
+#### Verifying Binary Signatures
+
+Compage's release process signs binaries using Cosign's keyless signing mode.
+To verify a specific binary, retrieve the release checksum, signature, and public certificate for your desired `TAG`.
+Detailed instructions are available in the [Sigstore blog](https://blog.sigstore.dev/cosign-2-0-released/).
+
 ```shell
-## clone the repo
-git clone https://github.com/intelops/compage.git
-## change directory to compage
-cd compage
-go build -o compage .
-## initialize the config.yaml file
-./compage init --serverType grpc
-## edit the config.yaml file as per your requirement
-## generate the code. Below command accepts serverType [rest, grpc and rest-grpc] 
-./compage generate
+# Example commands to verify a binary
+$ wget  https://github.com/intelops/compage/releases/download/v2.0.0-beta/checksums.txt
+$ wget  https://github.com/intelops/compage/releases/download/v2.0.0-beta/checksums.txt.pem
+$ wget  https://github.com/intelops/compage/releases/download/v2.0.0-beta/checksums.txt.sig
+
+cosign  verify-blob  \
+--certificate-identity  "https://github.com/intelops/compage/.github/workflows/release.yml@refs/tags/v2.0.0-beta"  \
+--certificate-oidc-issuer  "https://token.actions.githubusercontent.com"  \
+--cert ./checksums.txt.pem  \
+--signature ./checksums.txt.sig  \
+./checksums.txt
 ```
+
+If verification is successful, you'll see "**Verified OK.**"
+
+#### Installation
+
+- Download the compage binary from the official [release page](https://github.com/intelops/compage/releases)
+- Move the executable to your `PATH` for convenience.
+
+#### Quick Start
+
+For a quick start, run the following command to generate a sample project:
+
+```shell
+compage init
+compage generate
+```
+
+#### Building from Source
+
+The easiest way to build the `compage` executable is using
+
+```shell
+go build -o compage .
+```
+
+This will build the binary from source and place the `compage` binary in the current folder.
+
+To build compage from source:
+
+- Clone the compage repository: `git clone https://github.com/intelops/compage.git`
+- Navigate to the project directory: `cd compage`
+- Build compage: `CGO_ENABLED=0 go build -o compage .`
+
+The generated binary - compage will be available in the current working directory. You can move it to your PATH or use it
+from the current directory.
+
+The `init` command of the compage has a serverType argument which can be used to generate the code for the serverType:
+
+- `rest` for Rest API
+- `grpc` for gRPC
+- `rest-grpc` for Rest API and gRPC
 
 ## Contributing
 
