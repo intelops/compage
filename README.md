@@ -134,10 +134,10 @@ git clone https://github.com/intelops/compage.git
 cd compage
 go build -o compage .
 ## initialize the config.yaml file
-./compage init
+./compage init --serverType grpc
 ## edit the config.yaml file as per your requirement
 ## generate the code. Below command accepts serverType [rest, grpc and rest-grpc] 
-./compage generate grpc
+./compage generate
 ```
 
 ## Contributing
