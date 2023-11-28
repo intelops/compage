@@ -11,6 +11,11 @@ import (
 
 // GetProjectDirectoryName returns tarFile parent path
 func GetProjectDirectoryName(name string) string {
+	projectDirectoryName := os.Getenv("COMPAGE_GENERATED_PROJECT_FOLDER")
+	if projectDirectoryName != "" {
+		return projectDirectoryName + "/" + name
+	}
+
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Debugf("Error getting user home directory: %s", err)

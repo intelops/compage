@@ -7,6 +7,7 @@ import (
 	"github.com/intelops/compage/internal/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 // generateCmd represents the generate command
@@ -23,7 +24,17 @@ Change the file as per your needs and then run the compage generate command to g
 
 func init() {
 	rootCmd.AddCommand(generateCmd)
-
+	wD, err := os.Getwd()
+	if err != nil {
+		log.Errorf("error while getting the current directory [" + err.Error() + "]")
+		return
+	}
+	// set the project folder environment variable, if this is set, then the project will be generated in this folder
+	err = os.Setenv("COMPAGE_GENERATED_PROJECT_FOLDER", wD)
+	if err != nil {
+		log.Errorf("error while setting the project folder [" + err.Error() + "]")
+		return
+	}
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command

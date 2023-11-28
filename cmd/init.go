@@ -39,6 +39,7 @@ func createOrUpdateDefaultConfigFile() {
 			log.Infof("skipping config file creation")
 			return
 		}
+		log.Infof("overwriting the config file")
 		err = os.Remove(configFilePath)
 		if err != nil {
 			log.Warnf("error while removing the config file %s", err)
