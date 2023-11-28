@@ -7,27 +7,41 @@
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
 
 version: 1
+project_name: compage
 
 before:
   hooks:
-    # You may remove this if you don't use go modules.
     - go mod tidy
-    # you may remove this if you don't need go generate
-    - go generate ./...
     - go mod download
     - git submodule update --init --recursive
-    - ls -al .
-    - ls -R
+
 builds:
-  - hooks:
-      post:
-      - sh -c "COSIGN_PASSWORD=$COSIGN_PWD cosign sign-blob --key cosign.key --output-signature dist/{{ .ProjectName }}_{{ .Version }}_{{ .Target }}.sig {{ .Path }}"
   - env:
       - CGO_ENABLED=0
     goos:
       - linux
       - windows
       - darwin
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      # trims path
+      - -trimpath
+    ldflags:
+      #   # CommitDate makes the release reproducible
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }}
+
+checksum:
+  name_template: 'checksums.txt'
+
+source:
+  enabled: true
+
+sboms:
+  - artifacts: archive
+  - id: source # Two different sbom configurations need two different IDs
+    artifacts: source
 
 archives:
   - format: tar.gz
@@ -43,12 +57,20 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
-  - files:
-      - dist/*.sig
-# add to the release directly:
-release:
-  extra_files:
-    - glob: dist/*.sig
+
+
+# signs the checksum file
+signs:
+  - cmd: cosign
+    certificate: '${artifact}.pem'
+    args:
+      - sign-blob
+      - '--output-certificate=${certificate}'
+      - '--output-signature=${signature}'
+      - '${artifact}'
+      - "--yes"
+    artifacts: checksum
+    output: true
 
 changelog:
   sort: asc

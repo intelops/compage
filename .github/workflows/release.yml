@@ -67,24 +67,38 @@ jobs:
           output: 'dependency-results.sbom.json'
           image-ref: '.'
           github-pat: ${{ secrets.GH_TOKEN }}
-#  goreleaser:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 0
-#          submodules: 'recursive'
-#          token: ${{ secrets.GH_TOKEN }}
-#      - run: git fetch --force --tags
-#      - name: Initialize and update submodules
-#        run: git submodule update --init --recursive
-#      - uses: actions/setup-go@v4
-#        with:
-#          go-version: 1.21
-#      - uses: goreleaser/goreleaser-action@v5
-#        with:
-#          distribution: goreleaser
-#          version: latest
-#          args: release --clean --debug
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: 'recursive'
+          token: ${{ secrets.GH_TOKEN }}
+      - run: git fetch --force --tags
+      - name: Initialize and update submodules
+        run: git submodule update --init --recursive
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 1.21
+          cache: true
+      - uses: sigstore/cosign-installer@v3.1.2         # installs cosign
+      - uses: anchore/sbom-action/download-syft@v0.14.3 # installs syft
+      - uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: verify release
+        run: |
+          COMMIT=$(git rev-list --tags --max-count=1)
+          TAG=$(git describe --tags ${COMMIT})
+          wget https://github.com/intelops/compage/releases/download/${TAG}/checksums.txt
+          cosign verify-blob \
+            --certificate-identity "https://github.com/intelops/compage/.github/workflows/release.yml@refs/tags/${TAG}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            --cert "https://github.com/intelops/compage/releases/download/${TAG}/checksums.txt.pem" \
+            --signature "https://github.com/intelops/compage/releases/download/${TAG}/checksums.txt.sig" \
+            ./checksums.txt
