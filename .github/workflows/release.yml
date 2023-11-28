@@ -91,13 +91,13 @@ jobs:
           cache: true
       - uses: sigstore/cosign-installer@v3.1.2         # installs cosign
       - uses: anchore/sbom-action/download-syft@v0.14.3 # installs syft
-      - uses: goreleaser/goreleaser-action@v5
-        with:
-          distribution: goreleaser
-          version: latest
-          args: release --clean
+      - name: Install GoReleaser
+        run: go install github.com/goreleaser/goreleaser@latest
+
+      - name: Run GoReleaser
+        run: goreleaser release --rm-dist
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: verify release
         run: |
           COMMIT=$(git rev-list --tags --max-count=1)
