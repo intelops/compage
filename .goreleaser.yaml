@@ -88,3 +88,13 @@ nfpms:
     formats:
       - rpm
       - deb
+
+files:
+  # Include specific files or directories from submodules
+  - templates/compage-template-go/**
+  - templates/compage-template-java/**
+  - templates/compage-template-javascript/**
+  - templates/compage-template-python/**
+  - templates/compage-template-typescript/**
+  - templates/compage-template-rust/**
+  - templates/compage-template-ruby/**
