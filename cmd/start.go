@@ -85,7 +85,7 @@ func checkIfGitSubmodulesExist() bool {
 		// check if the item in templates directory is directory,
 		// and it's a valid template (by looking into available templates)
 		if file.IsDir() && slices.Contains(templates, file.Name()) {
-			// check in specific template folder.
+			// check in specific template directory.
 			filesInDir, err0 := os.ReadDir(templatesPath + "/" + file.Name())
 			if err0 != nil {
 				log.Fatal(err0)

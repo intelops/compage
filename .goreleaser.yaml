@@ -9,12 +9,6 @@
 version: 1
 project_name: compage
 
-before:
-  hooks:
-    - go mod tidy
-    - go mod download
-    - git submodule update --init --recursive
-
 builds:
   - env:
       - CGO_ENABLED=0
@@ -88,14 +82,3 @@ nfpms:
     formats:
       - rpm
       - deb
-
-#blobs:
-#  - extra_files:
-#    # Include specific files or directories from submodules
-#    - templates/compage-template-go/**
-#    - templates/compage-template-java/**
-#    - templates/compage-template-javascript/**
-#    - templates/compage-template-python/**
-#    - templates/compage-template-typescript/**
-#    - templates/compage-template-rust/**
-#    - templates/compage-template-ruby/**

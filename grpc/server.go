@@ -48,7 +48,7 @@ func (s *server) GenerateCode(projectRequest *project.GenerateCodeRequest, serve
 			"error while converting request to project ["+err1.Error()+"]")
 	}
 
-	// delete tmp/project-name folder
+	// delete tmp/project-name directory
 	defer func(name string) {
 		if err2 := os.RemoveAll(name); err2 != nil {
 			log.Debugf("err : %s", err2)

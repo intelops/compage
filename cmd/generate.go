@@ -29,10 +29,10 @@ func init() {
 		log.Errorf("error while getting the current directory [" + err.Error() + "]")
 		return
 	}
-	// set the project folder environment variable, if this is set, then the project will be generated in this folder
-	err = os.Setenv("COMPAGE_GENERATED_PROJECT_FOLDER", wD)
+	// set the project directory environment variable, if this is set, then the project will be generated in this folder
+	err = os.Setenv("COMPAGE_GENERATED_PROJECT_DIRECTORY", wD)
 	if err != nil {
-		log.Errorf("error while setting the project folder [" + err.Error() + "]")
+		log.Errorf("error while setting the project directory [" + err.Error() + "]")
 		return
 	}
 	// Here you will define your flags and configuration settings.
@@ -56,6 +56,17 @@ func GenerateCode() {
 	if err != nil {
 		log.Errorf("error while converting request to project [" + err.Error() + "]")
 		return
+	}
+
+	// pull all required templates
+	for _, node := range coreProject.CompageJSON.Nodes {
+		// make sure that the latest template is pulled
+		err = CloneOrPullRepository(node.Language)
+		if err != nil {
+			log.Errorf("error while pulling the template [" + err.Error() + "]")
+			return
+		}
+		log.Debugf("template pulled successfully for language %s", node.Language)
 	}
 
 	// triggers project generation, process the request
