@@ -8,7 +8,7 @@ import (
 var (
 	_, b, _, _ = runtime.Caller(0)
 
-	// root folder of this project
+	// root directory of this project
 	root = filepath.Join(filepath.Dir(b), "../..")
 )
 

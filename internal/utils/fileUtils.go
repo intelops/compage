@@ -11,7 +11,7 @@ import (
 
 // GetProjectDirectoryName returns tarFile parent path
 func GetProjectDirectoryName(name string) string {
-	projectDirectoryName := os.Getenv("COMPAGE_GENERATED_PROJECT_FOLDER")
+	projectDirectoryName := os.Getenv("COMPAGE_GENERATED_PROJECT_DIRECTORY")
 	if projectDirectoryName != "" {
 		return projectDirectoryName + "/" + name
 	}
@@ -146,4 +146,18 @@ func contains(filePaths []*string, filePathName string) bool {
 		}
 	}
 	return false
+}
+
+func DirectoryExists(directoryPath string) (bool, error) {
+	_, err := os.Stat(directoryPath)
+	if os.IsNotExist(err) {
+		// The directory does not exist
+		return false, nil
+	} else if err != nil {
+		// An error occurred while checking
+		return false, err
+	}
+
+	// directory exists
+	return true, nil
 }
