@@ -30,7 +30,7 @@ func InitGrpcTracer(serviceName, collectorURL, insecure string) *sdktrace.Tracer
 	)
 
 	if err != nil {
-		log.Debugf("error while configuring opentel, %v", err)
+		log.Errorf("error while configuring opentel, %v", err)
 		os.Exit(1)
 	}
 

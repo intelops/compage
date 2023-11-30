@@ -3,12 +3,11 @@ package javascript
 import (
 	"github.com/intelops/compage/internal/languages"
 	"github.com/intelops/compage/internal/utils"
+	log "github.com/sirupsen/logrus"
 )
 
-// TemplatesPath directory of template files
-const TemplatesPath = "templates/compage-template-javascript"
-
-var templatesRootPath = utils.GetProjectRootPath(TemplatesPath)
+// TemplateDirectoryName directory of template files
+const TemplateDirectoryName = "compage-template-javascript"
 
 // LJavaScriptNode language specific struct.
 type LJavaScriptNode struct {
@@ -21,5 +20,10 @@ func (n *LJavaScriptNode) FillDefaults() error {
 }
 
 func GetJavaScriptTemplatesRootPath() string {
+	templatesRootPath, err := utils.GetTemplatesRootPath(TemplateDirectoryName)
+	if err != nil {
+		log.Errorf("error while getting the project root path [" + err.Error() + "]")
+		return ""
+	}
 	return templatesRootPath
 }

@@ -18,7 +18,7 @@ func GetProjectDirectoryName(name string) string {
 
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		log.Debugf("Error getting user home directory: %s", err)
+		log.Errorf("Error getting user home directory: %s", err)
 		panic(err)
 	}
 	return userHomeDir + CodeGeneratorPath + "/" + name

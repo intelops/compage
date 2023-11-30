@@ -3,10 +3,11 @@ package java
 import (
 	"github.com/intelops/compage/internal/languages"
 	"github.com/intelops/compage/internal/utils"
+	log "github.com/sirupsen/logrus"
 )
 
-// TemplatesPath directory of template files
-const TemplatesPath = "templates/compage-template-java"
+// TemplateDirectoryName directory of template files
+const TemplateDirectoryName = "compage-template-java"
 
 var LJavaPlayFramework = "java-play-framework"
 var LJavaMicronautServer = "java-micronaut-server"
@@ -14,8 +15,6 @@ var Spring = "spring"
 var LJavaUndertowServer = "java-undertow-server"
 
 var OpenAPISupportedFrameworks = []string{LJavaMicronautServer, Spring, LJavaUndertowServer, LJavaPlayFramework}
-
-var templatesRootPath = utils.GetProjectRootPath(TemplatesPath)
 
 // LJavaNode language specific struct.
 type LJavaNode struct {
@@ -28,5 +27,10 @@ func (n *LJavaNode) FillDefaults() error {
 }
 
 func GetJavaTemplatesRootPath() string {
+	templatesRootPath, err := utils.GetTemplatesRootPath(TemplateDirectoryName)
+	if err != nil {
+		log.Errorf("error while getting the project root path [" + err.Error() + "]")
+		return ""
+	}
 	return templatesRootPath
 }

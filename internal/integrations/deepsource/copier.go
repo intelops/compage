@@ -4,6 +4,7 @@ import (
 	"github.com/intelops/compage/internal/core"
 	"github.com/intelops/compage/internal/languages/executor"
 	"github.com/intelops/compage/internal/utils"
+	log "github.com/sirupsen/logrus"
 )
 
 const TomlFile = ".deepsource.toml.tmpl"
@@ -25,9 +26,14 @@ func NewCopier(project *core.Project) *Copier {
 		"GitPlatformUserName": project.GitPlatformUserName,
 	}
 
+	templatesRootPath, err := utils.GetTemplatesRootPath("common-templates")
+	if err != nil {
+		log.Errorf("error while getting the project root path [" + err.Error() + "]")
+		return nil
+	}
 	return &Copier{
 		// TODO change this path to constant. Add language specific analysers in a generic way later.
-		TemplatesRootPath:    utils.GetProjectRootPath("templates/common-templates"),
+		TemplatesRootPath:    templatesRootPath,
 		ProjectDirectoryName: utils.GetProjectDirectoryName(project.Name),
 		GitRepositoryName:    project.GitRepositoryName,
 		Data:                 data,

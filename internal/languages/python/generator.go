@@ -42,41 +42,48 @@ func Generate(ctx context.Context) error {
 	}
 
 	// k8s files need to be generated for the whole project so, it should be here.
-	m := getIntegrationsCopier(pythonValues)
+	m, err := getIntegrationsCopier(pythonValues)
+	if err != nil {
+		log.Errorf("error while getting the integrations copier [" + err.Error() + "]")
+		return err
+	}
 
 	k8sCopier := m["k8s"].(*kubernetes.Copier)
-	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
-		log.Debugf("err : %s", err)
+	if err = k8sCopier.CreateKubernetesFiles(); err != nil {
+		log.Errorf("err : %s", err)
 		return err
 	}
 
 	// devspace.yaml and devspace_start.sh need to be generated for the whole project so, it should be here.
 	devspaceCopier := m["devspace"].(*devspace.Copier)
-	if err := devspaceCopier.CreateDevspaceConfigs(); err != nil {
-		log.Debugf("err : %s", err)
+	if err = devspaceCopier.CreateDevspaceConfigs(); err != nil {
+		log.Errorf("err : %s", err)
 		return err
 	}
 
 	return nil
 }
 
-func getIntegrationsCopier(pythonValues Values) map[string]interface{} {
+func getIntegrationsCopier(pythonValues Values) (map[string]interface{}, error) {
+	pythonTemplatesRootPath := GetPythonTemplatesRootPath()
+	if pythonTemplatesRootPath == "" {
+		return nil, errors.New("python templates root path is empty")
+	}
 	gitPlatformUserName := pythonValues.Values.Get(languages.GitPlatformUserName)
 	gitRepositoryName := pythonValues.Values.Get(languages.GitRepositoryName)
 	nodeName := pythonValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := pythonValues.Values.NodeDirectoryName
 	isRestServer := pythonValues.PythonNode.RestConfig.Server != nil
 	restServerPort := pythonValues.PythonNode.RestConfig.Server.Port
-	path := GetPythonTemplatesRootPath()
 
 	// create python specific k8sCopier
-	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, pythonTemplatesRootPath, isRestServer, restServerPort)
 
 	// create python specific devspaceCopier
-	devspaceCopier := devspace.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	devspaceCopier := devspace.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, pythonTemplatesRootPath, isRestServer, restServerPort)
 
 	return map[string]interface{}{
 		"k8s":      k8sCopier,
 		"devspace": devspaceCopier,
-	}
+	}, nil
 }
