@@ -9,17 +9,16 @@ import (
 )
 
 func CloneOrPullRepository(language string) error {
-	repoURL := getRepositoryURLByLanguage(language)
-	if repoURL == "" {
-		log.Errorf("language %s not supported", language)
-		return errors.New("language not supported")
-	}
-	userHomeDir, err := os.UserHomeDir()
+	repoURL, repositoryPath, err := getRepositoryURLByLanguage(language)
 	if err != nil {
 		log.Errorf("error:%v", err)
 		return err
 	}
-	repositoryPath := userHomeDir + "/.compage/templates/compage-template-" + language
+	if repoURL == "" || repositoryPath == "" {
+		log.Errorf("language %s not supported", language)
+		return errors.New("language not supported")
+	}
+
 	exists, err := utils.DirectoryExists(repositoryPath)
 	if err != nil {
 		log.Errorf("error checking directory existence: %v", err)
@@ -36,23 +35,31 @@ func CloneOrPullRepository(language string) error {
 	return nil
 }
 
-func getRepositoryURLByLanguage(language string) string {
-	if language == "go" {
-		return "https://github.com/intelops/compage-template-go.git"
-	} else if language == "python" {
-		return "https://github.com/intelops/compage-template-python.git"
-	} else if language == "java" {
-		return "https://github.com/intelops/compage-template-java.git"
-	} else if language == "javascript" {
-		return "https://github.com/intelops/compage-template-javascript.git"
-	} else if language == "ruby" {
-		return "https://github.com/intelops/compage-template-ruby.git"
-	} else if language == "rust" {
-		return "https://github.com/intelops/compage-template-rust.git"
-	} else if language == "typescript" {
-		return "https://github.com/intelops/compage-template-typescript.git"
+func getRepositoryURLByLanguage(language string) (string, string, error) {
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", "", err
 	}
-	return ""
+	repositoryPath := userHomeDir + "/.compage/templates/compage-template-" + language
+	if language == "go" {
+		return "https://github.com/intelops/compage-template-go.git", repositoryPath, nil
+	} else if language == "python" {
+		return "https://github.com/intelops/compage-template-python.git", repositoryPath, nil
+	} else if language == "java" {
+		return "https://github.com/intelops/compage-template-java.git", repositoryPath, nil
+	} else if language == "javascript" {
+		return "https://github.com/intelops/compage-template-javascript.git", repositoryPath, nil
+	} else if language == "ruby" {
+		return "https://github.com/intelops/compage-template-ruby.git", repositoryPath, nil
+	} else if language == "rust" {
+		return "https://github.com/intelops/compage-template-rust.git", repositoryPath, nil
+	} else if language == "typescript" {
+		return "https://github.com/intelops/compage-template-typescript.git", repositoryPath, nil
+	} else if language == "common" {
+		repositoryPath = userHomeDir + "/.compage/templates/common-templates"
+		return "https://github.com/intelops/common-templates.git", repositoryPath, nil
+	}
+	return "", "", nil
 }
 
 func cloneNewRepository(repoURL string, cloneDir string) {

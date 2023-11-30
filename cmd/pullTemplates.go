@@ -18,6 +18,9 @@ var pullTemplatesCmd = &cobra.Command{
 	Short: "Pulls the compage supported templates in the ~/.compage/templates directory",
 	Long:  `Compage supports multiple templates for different languages. You can pull just the required template by lana or all the templates.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// common template is required for all the languages
+		err := CloneOrPullRepository("common")
+		cobra.CheckErr(err)
 		if all {
 			err := CloneOrPullRepository("go")
 			cobra.CheckErr(err)

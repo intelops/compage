@@ -167,41 +167,41 @@ func (c *Copier) createGrpcServerDirectories() error {
 	servicesDirectory := c.NodeDirectoryName + ServicesPath
 	daosDirectory := c.NodeDirectoryName + DaosPath
 	if err := utils.CreateDirectories(configDirectory); err != nil {
-		log.Debugf("error creating config directory: %v", err)
+		log.Errorf("error creating config directory: %v", err)
 		return err
 	}
 	if err := utils.CreateDirectories(apiDirectory); err != nil {
-		log.Debugf("error creating api directory: %v", err)
+		log.Errorf("error creating api directory: %v", err)
 		return err
 	}
 	if err := utils.CreateDirectories(controllersDirectory); err != nil {
-		log.Debugf("error creating controllers directory: %v", err)
+		log.Errorf("error creating controllers directory: %v", err)
 		return err
 	}
 	if err := utils.CreateDirectories(modelsDirectory); err != nil {
-		log.Debugf("error creating models directory: %v", err)
+		log.Errorf("error creating models directory: %v", err)
 		return err
 	}
 	if err := utils.CreateDirectories(servicesDirectory); err != nil {
-		log.Debugf("error creating services directory: %v", err)
+		log.Errorf("error creating services directory: %v", err)
 		return err
 	}
 	if err := utils.CreateDirectories(daosDirectory); err != nil {
-		log.Debugf("error creating daos directory: %v", err)
+		log.Errorf("error creating daos directory: %v", err)
 		return err
 	}
 	if c.IsSQLDB {
 		// create directories for every resource's db client.
 		sqlDBClientsDirectory := c.NodeDirectoryName + SQLDBClientsPath
 		if err := utils.CreateDirectories(sqlDBClientsDirectory); err != nil {
-			log.Debugf("error creating sql db clients directory: %v", err)
+			log.Errorf("error creating sql db clients directory: %v", err)
 			return err
 		}
 	} else if c.IsNoSQLDB {
 		// create directories for every resource's db client.
 		noSQLDBClientsDirectory := c.NodeDirectoryName + NoSQLDBClientsPath
 		if err := utils.CreateDirectories(noSQLDBClientsDirectory); err != nil {
-			log.Debugf("error creating nosql db clients directory: %v", err)
+			log.Errorf("error creating nosql db clients directory: %v", err)
 			return err
 		}
 	}
@@ -219,14 +219,14 @@ func (c *Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error 
 		// copy sql controller/service/dao/models files to generated project
 		filePaths, err = c.copySQLDBResourceFiles(resourceName, filePaths)
 		if err != nil {
-			log.Debugf("error copying sql db resources: %v", err)
+			log.Errorf("error copying sql db resources: %v", err)
 			return err
 		}
 	} else if c.IsNoSQLDB {
 		// copy nosql controller/service/dao/models to generated project
 		filePaths, err = c.copyNoSQLDBResourceFiles(resourceName, filePaths)
 		if err != nil {
-			log.Debugf("error copying sql db resources: %v", err)
+			log.Errorf("error copying sql db resources: %v", err)
 			return err
 		}
 	}
@@ -234,7 +234,7 @@ func (c *Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error 
 	// add resource-specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
 	if err != nil {
-		log.Debugf("error adding resource specific template data: %v", err)
+		log.Errorf("error adding resource specific template data: %v", err)
 		return err
 	}
 
@@ -250,7 +250,7 @@ func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*stri
 	targetResourceControllerFileName := c.NodeDirectoryName + ControllersPath + "/" + resourceName + "-" + strings.Replace(NoSQLControllerFile, "nosqls-", "", 1)
 	_, err := utils.CopyFile(targetResourceControllerFileName, c.TemplatesRootPath+ControllersPath+"/"+NoSQLControllerFile)
 	if err != nil {
-		log.Debugf("error copying controller file: %v", err)
+		log.Errorf("error copying controller file: %v", err)
 		return nil, err
 	}
 	filePaths = append(filePaths, &targetResourceControllerFileName)
@@ -259,7 +259,7 @@ func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*stri
 	targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + strings.Replace(NoSQLModelFile, "nosqls-", "", 1)
 	_, err = utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+NoSQLModelFile)
 	if err != nil {
-		log.Debugf("error copying model file: %v", err)
+		log.Errorf("error copying model file: %v", err)
 		return nil, err
 	}
 	filePaths = append(filePaths, &targetResourceModelFileName)
@@ -268,7 +268,7 @@ func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*stri
 	targetResourceServiceFileName := c.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + strings.Replace(NoSQLServiceFile, "nosqls-", "", 1)
 	_, err = utils.CopyFile(targetResourceServiceFileName, c.TemplatesRootPath+ServicesPath+"/"+NoSQLServiceFile)
 	if err != nil {
-		log.Debugf("error copying service file: %v", err)
+		log.Errorf("error copying service file: %v", err)
 		return nil, err
 	}
 	filePaths = append(filePaths, &targetResourceServiceFileName)
@@ -277,7 +277,7 @@ func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*stri
 	targetResourceAPIFileName := c.NodeDirectoryName + APIPath + "/" + resourceName + "-" + strings.Replace(NoSQLAPIProtoFile, "nosqls-", "", 1)
 	_, err = utils.CopyFile(targetResourceAPIFileName, c.TemplatesRootPath+APIPath+"/"+NoSQLAPIProtoFile)
 	if err != nil {
-		log.Debugf("error copying api.proto file: %v", err)
+		log.Errorf("error copying api.proto file: %v", err)
 		return nil, err
 	}
 	filePaths = append(filePaths, &targetResourceAPIFileName)
@@ -288,7 +288,7 @@ func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*stri
 		targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + MongoDBDaoFile
 		_, err = utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+MongoDBDaoFile)
 		if err != nil {
-			log.Debugf("error copying mongodb dao file: %v", err)
+			log.Errorf("error copying mongodb dao file: %v", err)
 			return nil, err
 		}
 		filePaths = append(filePaths, &targetResourceDaoFileName)
@@ -303,7 +303,7 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string
 
 	_, err := utils.CopyFile(targetResourceControllerFileName, c.TemplatesRootPath+ControllersPath+"/"+SQLControllerFile)
 	if err != nil {
-		log.Debugf("error copying controller file: %v", err)
+		log.Errorf("error copying controller file: %v", err)
 		return nil, err
 	}
 	filePaths = append(filePaths, &targetResourceControllerFileName)

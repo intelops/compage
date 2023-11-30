@@ -3,15 +3,14 @@ package golang
 import (
 	"github.com/intelops/compage/internal/languages"
 	"github.com/intelops/compage/internal/utils"
+	log "github.com/sirupsen/logrus"
 )
 
-// TemplatesPath directory of template files
-const TemplatesPath = "templates/compage-template-go"
+// TemplateDirectoryName directory of template files
+const TemplateDirectoryName = "compage-template-go"
 const GoGinServerFramework = "go-gin-server"
 const GoGrpcServerFramework = "go-grpc-server"
 const CommonFiles = "common-files"
-
-var templatesRootPath = utils.GetProjectRootPath(TemplatesPath)
 
 // LGolangNode language specific struct.
 type LGolangNode struct {
@@ -42,5 +41,10 @@ func (n *LGolangNode) FillDefaults() error {
 }
 
 func GetGoTemplatesRootPath() string {
+	templatesRootPath, err := utils.GetTemplatesRootPath(TemplateDirectoryName)
+	if err != nil {
+		log.Errorf("error while getting the project root path [" + err.Error() + "]")
+		return ""
+	}
 	return templatesRootPath
 }

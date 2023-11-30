@@ -3,12 +3,11 @@ package rust
 import (
 	"github.com/intelops/compage/internal/languages"
 	"github.com/intelops/compage/internal/utils"
+	log "github.com/sirupsen/logrus"
 )
 
-// TemplatesPath directory of template files
-const TemplatesPath = "templates/compage-template-rust"
-
-var templatesRootPath = utils.GetProjectRootPath(TemplatesPath)
+// TemplateDirectoryName directory of template files
+const TemplateDirectoryName = "compage-template-rust"
 
 // LRustNode language specific struct.
 type LRustNode struct {
@@ -21,5 +20,10 @@ func (n *LRustNode) FillDefaults() error {
 }
 
 func GetRustTemplatesRootPath() string {
+	templatesRootPath, err := utils.GetTemplatesRootPath(TemplateDirectoryName)
+	if err != nil {
+		log.Errorf("error while getting the project root path [" + err.Error() + "]")
+		return ""
+	}
 	return templatesRootPath
 }

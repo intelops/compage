@@ -59,6 +59,12 @@ func GenerateCode() {
 	}
 
 	// pull all required templates
+	// pull the common templates
+	err = CloneOrPullRepository("common")
+	if err != nil {
+		log.Errorf("error while pulling the common templates [" + err.Error() + "]")
+		return
+	}
 	for _, node := range coreProject.CompageJSON.Nodes {
 		// make sure that the latest template is pulled
 		err = CloneOrPullRepository(node.Language)

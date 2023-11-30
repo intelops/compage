@@ -152,7 +152,7 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 func (c *Copier) createRestClientDirectories() error {
 	clientDirectory := c.NodeDirectoryName + RestClientPath
 	if err := utils.CreateDirectories(clientDirectory); err != nil {
-		log.Debugf("error creating client directory: %v", err)
+		log.Errorf("error creating client directory: %v", err)
 		return err
 	}
 
@@ -167,37 +167,37 @@ func (c *Copier) createRestServerDirectories() error {
 	servicesDirectory := c.NodeDirectoryName + ServicesPath
 	daosDirectory := c.NodeDirectoryName + DaosPath
 	if err := utils.CreateDirectories(configDirectory); err != nil {
-		log.Debugf("error creating config directory: %v", err)
+		log.Errorf("error creating config directory: %v", err)
 		return err
 	}
 	if err := utils.CreateDirectories(controllersDirectory); err != nil {
-		log.Debugf("error creating controllers directory: %v", err)
+		log.Errorf("error creating controllers directory: %v", err)
 		return err
 	}
 	if err := utils.CreateDirectories(modelsDirectory); err != nil {
-		log.Debugf("error creating models directory: %v", err)
+		log.Errorf("error creating models directory: %v", err)
 		return err
 	}
 	if err := utils.CreateDirectories(servicesDirectory); err != nil {
-		log.Debugf("error creating services directory: %v", err)
+		log.Errorf("error creating services directory: %v", err)
 		return err
 	}
 	if err := utils.CreateDirectories(daosDirectory); err != nil {
-		log.Debugf("error creating daos directory: %v", err)
+		log.Errorf("error creating daos directory: %v", err)
 		return err
 	}
 	if c.IsSQLDB {
 		// create directories for every resource's db client.
 		sqlDBClientsDirectory := c.NodeDirectoryName + SQLDBClientsPath
 		if err := utils.CreateDirectories(sqlDBClientsDirectory); err != nil {
-			log.Debugf("error creating sql db clients directory: %v", err)
+			log.Errorf("error creating sql db clients directory: %v", err)
 			return err
 		}
 	} else if c.IsNoSQLDB {
 		// create directories for every resource's db client.
 		noSQLDBClientsDirectory := c.NodeDirectoryName + NoSQLDBClientsPath
 		if err := utils.CreateDirectories(noSQLDBClientsDirectory); err != nil {
-			log.Debugf("error creating nosql db clients directory: %v", err)
+			log.Errorf("error creating nosql db clients directory: %v", err)
 			return err
 		}
 	}
@@ -214,7 +214,7 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 	if c.IsSQLDB {
 		filePaths, err = c.copySQLDBResourceFiles(resourceName, filePaths)
 		if err != nil {
-			log.Debugf("error copying sql db resources: %v", err)
+			log.Errorf("error copying sql db resources: %v", err)
 			return err
 		}
 	}
@@ -223,7 +223,7 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 	if c.IsNoSQLDB {
 		filePaths, err = c.copyNoSQLDBResourceFiles(resourceName, filePaths)
 		if err != nil {
-			log.Debugf("error copying sql db resources: %v", err)
+			log.Errorf("error copying sql db resources: %v", err)
 			return err
 		}
 	}
@@ -231,7 +231,7 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 	// add resource-specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
 	if err != nil {
-		log.Debugf("error adding resource specific template data: %v", err)
+		log.Errorf("error adding resource specific template data: %v", err)
 		return err
 	}
 
@@ -283,7 +283,7 @@ func (c *Copier) copyRestClientResourceFiles(restClient *corenode.RestClient) er
 	targetResourceClientFileName := c.NodeDirectoryName + RestClientPath + "/" + restClient.SourceNodeName + "-" + ClientFile
 	_, err := utils.CopyFile(targetResourceClientFileName, c.TemplatesRootPath+RestClientPath+"/"+ClientFile)
 	if err != nil {
-		log.Debugf("error while copying rest client file %s", targetResourceClientFileName)
+		log.Errorf("error while copying rest client file %s", targetResourceClientFileName)
 		return err
 	}
 	var filePaths []*string
@@ -305,7 +305,7 @@ func (c *Copier) addSQLDetails(resource *corenode.Resource) error {
 	for key, value := range resource.Fields {
 		dbDataType, err := c.getSQLDBDataType(value.Type)
 		if err != nil {
-			log.Debugf("error while getting db data type for %s", value.Type)
+			log.Errorf("error while getting db data type for %s", value.Type)
 			return err
 		}
 		createQueryColumns = c.getCreateQueryColumns(createQueryColumns, key, value, dbDataType)

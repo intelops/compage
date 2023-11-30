@@ -10,13 +10,13 @@ func Process(ctx context.Context) error {
 
 	// fills default config for java
 	if err := javaValues.JavaNode.FillDefaults(); err != nil {
-		log.Debugf("err : %s", err)
+		log.Errorf("err : %s", err)
 		return err
 	}
 
 	// generate java project
 	if err := Generate(ctx); err != nil {
-		log.Debugf("err : %s", err)
+		log.Errorf("err : %s", err)
 		return err
 	}
 
