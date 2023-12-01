@@ -17,7 +17,7 @@ type Copier struct {
 	Data                 map[string]interface{}
 }
 
-func NewCopier(project *core.Project) *Copier {
+func NewCopier(project *core.Project) (*Copier, error) {
 	// retrieve project named directory
 	//gitPlatformUserName, gitRepositoryName, projectDirectoryName, templatesRootPath string
 	// populate map to replace templates
@@ -29,7 +29,7 @@ func NewCopier(project *core.Project) *Copier {
 	templatesRootPath, err := utils.GetTemplatesRootPath("common-templates")
 	if err != nil {
 		log.Errorf("error while getting the project root path [" + err.Error() + "]")
-		return nil
+		return nil, err
 	}
 	return &Copier{
 		// TODO change this path to constant. Add language specific analysers in a generic way later.
@@ -37,7 +37,7 @@ func NewCopier(project *core.Project) *Copier {
 		ProjectDirectoryName: utils.GetProjectDirectoryName(project.Name),
 		GitRepositoryName:    project.GitRepositoryName,
 		Data:                 data,
-	}
+	}, nil
 }
 
 // CreateReadMeFile creates required directory and copies files from language template.
