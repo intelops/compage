@@ -36,6 +36,8 @@ var pullTemplatesCmd = &cobra.Command{
 			cobra.CheckErr(err)
 			err = CloneOrPullRepository("typescript")
 			cobra.CheckErr(err)
+			err = CloneOrPullRepository("dotnet")
+			cobra.CheckErr(err)
 		} else {
 			err := CloneOrPullRepository(languageTemplate)
 			cobra.CheckErr(err)

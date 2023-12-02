@@ -65,6 +65,8 @@ This command will start thr gRPC server and allow the gRPC clients to get connec
 		cobra.CheckErr(err)
 		err = CloneOrPullRepository("typescript")
 		cobra.CheckErr(err)
+		err = CloneOrPullRepository("dotnet")
+		cobra.CheckErr(err)
 
 		// check if the git submodules have been pulled (mainly need to check this on developer's machine)
 		if checkIfGitSubmodulesExist() {

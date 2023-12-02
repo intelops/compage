@@ -1369,3 +1369,60 @@ func TestWsServerGenerator(t *testing.T) {
 		}
 	}
 }
+
+func TestDotNetCleanArchitectureGenerator(t *testing.T) {
+	restServerConfigJSON := `{
+    "edges": {},
+    "nodes": {
+        "node-b0": {
+            "id": "node-b0",
+			"name": "student-service",
+			"language": "dotnet",
+			"restConfig": {
+				"server": {
+					"sqlDB": "SQLite",
+					"port": "5005",
+					"resources": [
+						{
+							"fields": {
+								"Name": {
+									"datatype": "string"
+								},
+								"RollNumber": {
+									"datatype": "int32"
+								},
+								"College": {
+									"datatype": "string"
+								}
+							},
+							"name": "Student"
+						}
+					]
+				},
+				"framework": "dotnet-clean-architecture",
+				"template": "compage"
+            }
+        }
+    }
+}`
+	input := project.GenerateCodeRequest{
+		GitPlatformURL:      "https://github.com",
+		GitPlatformUserName: "mahendraintelops",
+		GitRepositoryName:   "first-project-github",
+		ProjectName:         "first-rest-server-project-dotnet",
+		ProjectJSON:         restServerConfigJSON,
+	}
+	defer func() {
+		//_ = os.RemoveAll("/tmp/first-rest-server-project-dotnet")
+	}()
+
+	// retrieve project struct
+	getProject, err := grpc.GetProject(&input)
+	if err != nil {
+		t.Errorf("grpc.GetProject conversion failed = %v", getProject)
+	}
+	// trigger project generation
+	if err0 := handlers.Handle(getProject); err0 != nil {
+		t.Errorf("handlers.Handle failed %s", err0.Error())
+	}
+}

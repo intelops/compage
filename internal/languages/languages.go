@@ -16,6 +16,7 @@ const Rust = "rust"
 const JavaScript = "javascript"
 const TypeScript = "typescript"
 const Ruby = "ruby"
+const DotNet = "dotnet"
 
 type LanguageNode struct {
 	ID          string                 `json:"ID"`
