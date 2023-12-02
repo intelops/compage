@@ -1,4 +1,4 @@
-package dotnet_clean_architecture_framework
+package dotnet_clean_architecture
 
 import (
 	"github.com/gertd/go-pluralize"

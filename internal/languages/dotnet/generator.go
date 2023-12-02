@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/intelops/compage/internal/languages"
-	"github.com/intelops/compage/internal/languages/dotnet/frameworks/dotnet-clean-architecture-framework"
+	"github.com/intelops/compage/internal/languages/dotnet/frameworks/dotnet-clean-architecture"
 	"github.com/intelops/compage/internal/languages/templates"
 	log "github.com/sirupsen/logrus"
 )
@@ -55,7 +55,7 @@ func generateRESTConfig(_ context.Context, dotNetValues *DotNetValues) error {
 	return nil
 }
 
-func getDotNetCleanArchitectureCopier(dotNetValues *DotNetValues) (*dotnet_clean_architecture_framework.Copier, error) {
+func getDotNetCleanArchitectureCopier(dotNetValues *DotNetValues) (*dotnet_clean_architecture.Copier, error) {
 	dotNetTemplatesRootPath := GetDotNetTemplatesRootPath()
 	if dotNetTemplatesRootPath == "" {
 		return nil, errors.New("dotnet templates root path is empty")
@@ -68,6 +68,6 @@ func getDotNetCleanArchitectureCopier(dotNetValues *DotNetValues) (*dotnet_clean
 	nodeName := dotNetValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := dotNetValues.Values.NodeDirectoryName
 
-	copier := dotnet_clean_architecture_framework.NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path)
+	copier := dotnet_clean_architecture.NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path)
 	return copier, nil
 }
