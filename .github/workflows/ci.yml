@@ -48,6 +48,7 @@ jobs:
           export GOPATH=$HOME/go
           export GOBIN=$GOPATH/bin
           export PATH=$PATH:$GOPATH:$GOBIN:$HOME/ogc
+          go run main.go pullTemplates --all
           go test -v ./... -race -coverprofile=coverage.out -coverpkg=./... -covermode=atomic
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
