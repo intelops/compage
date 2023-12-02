@@ -127,9 +127,11 @@ func validate(compageJSON *core.CompageJSON) error {
 // GetMetadata converts string to map
 func GetMetadata(metadataInput string) map[string]interface{} {
 	metadata := map[string]interface{}{}
-	if err0 := json.Unmarshal([]byte(metadataInput), &metadata); err0 != nil {
-		log.Errorf("error unmarshalling metadata: %v", err0)
-		return nil
+	if len(metadataInput) > 0 {
+		if err0 := json.Unmarshal([]byte(metadataInput), &metadata); err0 != nil {
+			log.Errorf("error unmarshalling metadata: %v", err0)
+			return nil
+		}
 	}
 	return metadata
 }
