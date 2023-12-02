@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	log "github.com/sirupsen/logrus"
 	"time"
 
 	"github.com/intelops/compage/cmd/models"
@@ -12,6 +13,7 @@ import (
 func GetProject(input *models.Project) (*core.Project, error) {
 	compageJSON, err := converter.GetCompageJSONForCMD(input.CompageJSON)
 	if err != nil {
+		log.Errorf("error getting compageJSON: %v", err)
 		return nil, err
 	}
 

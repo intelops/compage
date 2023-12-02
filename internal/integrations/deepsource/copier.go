@@ -44,6 +44,7 @@ func NewCopier(project *core.Project) (*Copier, error) {
 func (c Copier) CreateDeepSourceFiles() error {
 	destDirectory := c.ProjectDirectoryName
 	if err := utils.CreateDirectories(destDirectory); err != nil {
+		log.Errorf("error while creating directories [" + err.Error() + "]")
 		return err
 	}
 
@@ -52,6 +53,7 @@ func (c Copier) CreateDeepSourceFiles() error {
 	targetDeepSourceTomlFileName := c.ProjectDirectoryName + "/" + TomlFile
 	_, err := utils.CopyFile(targetDeepSourceTomlFileName, c.TemplatesRootPath+"/"+TomlFile)
 	if err != nil {
+		log.Errorf("error while copying file [" + err.Error() + "]")
 		return err
 	}
 	filePaths = append(filePaths, &targetDeepSourceTomlFileName)

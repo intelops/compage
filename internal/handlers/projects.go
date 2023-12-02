@@ -47,7 +47,7 @@ func Handle(coreProject *core.Project) error {
 	if err != nil {
 		return errors.New("deep source copier is nil")
 	}
-	if err := deepSourceCopier.CreateDeepSourceFiles(); err != nil {
+	if err = deepSourceCopier.CreateDeepSourceFiles(); err != nil {
 		log.Errorf("error while creating deepsource files [" + err.Error() + "]")
 		return err
 	}
@@ -57,7 +57,7 @@ func Handle(coreProject *core.Project) error {
 	if err != nil {
 		return errors.New("readme copier is nil")
 	}
-	if err := readMeCopier.CreateReadMeFile(); err != nil {
+	if err = readMeCopier.CreateReadMeFile(); err != nil {
 		log.Errorf("error while creating README.md file [" + err.Error() + "]")
 		return err
 	}
