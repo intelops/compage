@@ -10,8 +10,8 @@ func RunGoFmt(directoryName string) error {
 	args := []string{"-s", "-w", directoryName}
 	output, err := exec.Command("gofmt", args...).Output()
 	if err != nil {
-		log.Debugf("Output : %s", string(output))
-		log.Debugf("err : %s", err)
+		log.Errorf("Output : %s", string(output))
+		log.Errorf("err : %s", err)
 		return err
 	}
 	if string(output) != "" {

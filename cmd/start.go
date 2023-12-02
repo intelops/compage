@@ -5,6 +5,7 @@ import (
 	"github.com/intelops/compage/config"
 	project "github.com/intelops/compage/gen/api/v1"
 	server "github.com/intelops/compage/grpc"
+	"github.com/intelops/compage/internal/utils"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -48,9 +49,27 @@ This command will start thr gRPC server and allow the gRPC clients to get connec
 			}
 		}()
 
+		err := CloneOrPullRepository("common")
+		cobra.CheckErr(err)
+		err = CloneOrPullRepository("go")
+		cobra.CheckErr(err)
+		err = CloneOrPullRepository("python")
+		cobra.CheckErr(err)
+		err = CloneOrPullRepository("java")
+		cobra.CheckErr(err)
+		err = CloneOrPullRepository("javascript")
+		cobra.CheckErr(err)
+		err = CloneOrPullRepository("ruby")
+		cobra.CheckErr(err)
+		err = CloneOrPullRepository("rust")
+		cobra.CheckErr(err)
+		err = CloneOrPullRepository("typescript")
+		cobra.CheckErr(err)
+
 		// check if the git submodules have been pulled (mainly need to check this on developer's machine)
 		if checkIfGitSubmodulesExist() {
-			startGrpcServer()
+			err = startGrpcServer()
+			cobra.CheckErr(err)
 		} else {
 			log.Error("starting gRPC server failed as git submodules don't exist")
 		}
@@ -72,23 +91,30 @@ func init() {
 }
 
 func checkIfGitSubmodulesExist() bool {
-	templatesPath := "templates"
 	// currently available templates
-	templates := []string{"compage-templates", "compage-template-go", "compage-template-java", "compage-template-python", "compage-template-javascript", "compage-template-ruby", "compage-template-rust", "compage-template-typescript"}
+	templates := []string{"common-templates", "compage-template-go", "compage-template-java", "compage-template-python", "compage-template-javascript", "compage-template-ruby", "compage-template-rust", "compage-template-typescript"}
+
 	// read the templates directory and list down files in it.
-	files, err := os.ReadDir(templatesPath)
+	baseTemplateRootPath, err := utils.GetBaseTemplateRootPath()
 	if err != nil {
-		log.Fatal(err)
+		log.Error("error while getting base template root path [" + err.Error() + "]")
+		return false
+	}
+	files, err := os.ReadDir(baseTemplateRootPath)
+	if err != nil {
+		log.Error("error while reading templates directory [" + err.Error() + "]")
+		return false
 	}
 	// iterate over files in templates directory
 	for _, file := range files {
 		// check if the item in templates directory is directory,
 		// and it's a valid template (by looking into available templates)
 		if file.IsDir() && slices.Contains(templates, file.Name()) {
-			// check in specific template folder.
-			filesInDir, err0 := os.ReadDir(templatesPath + "/" + file.Name())
+			// check in specific template directory.
+			filesInDir, err0 := os.ReadDir(baseTemplateRootPath + "/" + file.Name())
 			if err0 != nil {
-				log.Fatal(err0)
+				log.Error("error while reading templates directory [" + err0.Error() + "]")
+				return false
 			}
 			// if there are no directories or files in specific template, this means that the `git submodules update --remote` command wasn't fired before.
 			if len(filesInDir) <= 0 {
@@ -100,10 +126,11 @@ func checkIfGitSubmodulesExist() bool {
 	return true
 }
 
-func startGrpcServer() {
+func startGrpcServer() error {
 	listener, err := net.Listen("tcp", "0.0.0.0:50051")
 	if err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		log.Errorf("failed to listen: %v", err)
+		return err
 	}
 	log.Println("started gRPC server on '0.0.0.0:50051'")
 	grpcServer := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()))
@@ -115,8 +142,9 @@ func startGrpcServer() {
 	reflection.Register(grpcServer)
 
 	go func() {
-		if err := grpcServer.Serve(listener); err != nil {
-			log.Printf("grpcServer.Serve: %v", err)
+		if err = grpcServer.Serve(listener); err != nil {
+			log.Errorf("failed to serve: %v", err)
+			return
 		}
 	}()
 
@@ -125,4 +153,5 @@ func startGrpcServer() {
 	<-done
 	grpcServer.GracefulStop()
 	log.Printf("Server stopped")
+	return nil
 }

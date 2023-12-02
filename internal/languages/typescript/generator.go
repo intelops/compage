@@ -39,30 +39,37 @@ func Generate(ctx context.Context) error {
 	}
 
 	// k8s files need to be generated for the whole project so, it should be here.
-	m := getIntegrationsCopier(typescriptValues)
+	m, err := getIntegrationsCopier(typescriptValues)
+	if err != nil {
+		log.Errorf("error while getting the integrations copier [" + err.Error() + "]")
+		return err
+	}
 
 	k8sCopier := m["k8s"].(*kubernetes.Copier)
 	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
-		log.Debugf("err : %s", err)
+		log.Errorf("err : %s", err)
 		return err
 	}
 
 	return nil
 }
 
-func getIntegrationsCopier(typescriptValues Values) map[string]interface{} {
+func getIntegrationsCopier(typescriptValues Values) (map[string]interface{}, error) {
+	typeScriptTemplatesRootPath := GetTypeScriptTemplatesRootPath()
+	if typeScriptTemplatesRootPath == "" {
+		return nil, errors.New("typescript templates root path is empty")
+	}
 	gitPlatformUserName := typescriptValues.Values.Get(languages.GitPlatformUserName)
 	gitRepositoryName := typescriptValues.Values.Get(languages.GitRepositoryName)
 	nodeName := typescriptValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := typescriptValues.Values.NodeDirectoryName
 	isRestServer := typescriptValues.TypeScriptNode.RestConfig.Server != nil
 	restServerPort := typescriptValues.TypeScriptNode.RestConfig.Server.Port
-	path := GetTypeScriptTemplatesRootPath()
 
 	// create typescript specific copier
-	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, typeScriptTemplatesRootPath, isRestServer, restServerPort)
 
 	return map[string]interface{}{
 		"k8s": k8sCopier,
-	}
+	}, nil
 }

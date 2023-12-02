@@ -4,6 +4,7 @@ import (
 	"github.com/intelops/compage/internal/core"
 	"github.com/intelops/compage/internal/languages/executor"
 	"github.com/intelops/compage/internal/utils"
+	log "github.com/sirupsen/logrus"
 )
 
 const File = "README.md.tmpl"
@@ -16,7 +17,7 @@ type Copier struct {
 	Data                 map[string]interface{}
 }
 
-func NewCopier(project *core.Project) *Copier {
+func NewCopier(project *core.Project) (*Copier, error) {
 	// retrieve project named directory
 	//gitPlatformUserName, gitRepositoryName, projectDirectoryName, templatesRootPath string
 	// populate map to replace templates
@@ -25,19 +26,25 @@ func NewCopier(project *core.Project) *Copier {
 		"GitPlatformUserName": project.GitPlatformUserName,
 	}
 
+	templatesRootPath, err := utils.GetTemplatesRootPath("common-templates")
+	if err != nil {
+		log.Errorf("error while getting the project root path [" + err.Error() + "]")
+		return nil, err
+	}
 	return &Copier{
 		// TODO change this path to constant. Add language specific analysers in a generic way later.
-		TemplatesRootPath:    utils.GetProjectRootPath("templates/common-templates"),
+		TemplatesRootPath:    templatesRootPath,
 		ProjectDirectoryName: utils.GetProjectDirectoryName(project.Name),
 		GitRepositoryName:    project.GitRepositoryName,
 		Data:                 data,
-	}
+	}, nil
 }
 
 // CreateReadMeFile creates required directory and copies files from language template.
 func (c Copier) CreateReadMeFile() error {
 	destDirectory := c.ProjectDirectoryName
 	if err := utils.CreateDirectories(destDirectory); err != nil {
+		log.Errorf("error while creating directories [" + err.Error() + "]")
 		return err
 	}
 
@@ -46,6 +53,7 @@ func (c Copier) CreateReadMeFile() error {
 	targetReadMeFileName := c.ProjectDirectoryName + "/" + File
 	_, err := utils.CopyFile(targetReadMeFileName, c.TemplatesRootPath+"/"+File)
 	if err != nil {
+		log.Errorf("error while copying file [" + err.Error() + "]")
 		return err
 	}
 	filePaths = append(filePaths, &targetReadMeFileName)

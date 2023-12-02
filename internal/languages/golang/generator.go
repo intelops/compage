@@ -27,13 +27,13 @@ func Generate(ctx context.Context) error {
 	// rest config
 	err := generateRESTConfig(ctx, &goValues)
 	if err != nil {
-		log.Debugf("err : %s", err)
+		log.Errorf("err : %s", err)
 		return err
 	}
 	// grpc config
 	err = generateGRPCConfig(&goValues)
 	if err != nil {
-		log.Debugf("err : %s", err)
+		log.Errorf("err : %s", err)
 		return err
 	}
 	// ws config
@@ -42,16 +42,20 @@ func Generate(ctx context.Context) error {
 	}
 	// common files need to be generated for the project (custom template for rest and grpc) so, it should be here.
 	if (n.RestConfig != nil && n.RestConfig.Server != nil && n.RestConfig.Template == templates.Compage) || (n.GrpcConfig != nil && n.GrpcConfig.Server != nil && n.GrpcConfig.Template == templates.Compage) {
-		commonFilesCopier := getCommonFilesCopier(goValues)
-		if err := commonFilesCopier.CreateCommonFiles(); err != nil {
-			log.Debugf("err : %s", err)
+		commonFilesCopier, err0 := getCommonFilesCopier(goValues)
+		if err0 != nil {
+			log.Errorf("error while getting the commonFilesCopier [" + err0.Error() + "]")
+			return err0
+		}
+		if err = commonFilesCopier.CreateCommonFiles(); err != nil {
+			log.Errorf("err : %s", err)
 			return err
 		}
 	}
 	// integrations config
 	err = generateIntegrationConfig(&goValues)
 	if err != nil {
-		log.Debugf("err : %s", err)
+		log.Errorf("err : %s", err)
 		return err
 	}
 
@@ -59,39 +63,43 @@ func Generate(ctx context.Context) error {
 }
 
 func generateIntegrationConfig(goValues *GoValues) error {
-	m := getIntegrationsCopier(goValues)
+	m, err := getIntegrationsCopier(goValues)
+	if err != nil {
+		log.Errorf("error while getting the integrations copier [" + err.Error() + "]")
+		return err
+	}
 	// dockerfile needs to be generated for the whole project, so it should be here.
 	dockerCopier := m["docker"].(*docker.Copier)
-	if err := dockerCopier.CreateDockerFile(); err != nil {
-		log.Debugf("err : %s", err)
+	if err = dockerCopier.CreateDockerFile(); err != nil {
+		log.Errorf("err : %s", err)
 		return err
 	}
 
 	// k8s files need to be generated for the whole project, so it should be here.
 	k8sCopier := m["k8s"].(*kubernetes.Copier)
-	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
-		log.Debugf("err : %s", err)
+	if err = k8sCopier.CreateKubernetesFiles(); err != nil {
+		log.Errorf("err : %s", err)
 		return err
 	}
 
 	// githubActions files need to be generated for the whole project so, it should be here.
 	githubActionsCopier := m["githubActions"].(*githubactions.Copier)
-	if err := githubActionsCopier.CreateYamls(); err != nil {
-		log.Debugf("err : %s", err)
+	if err = githubActionsCopier.CreateYamls(); err != nil {
+		log.Errorf("err : %s", err)
 		return err
 	}
 
 	// devspace.yaml and devspace_start.sh need to be generated for the whole project, so it should be here.
 	devspaceCopier := m["devspace"].(*devspace.Copier)
-	if err := devspaceCopier.CreateDevspaceConfigs(); err != nil {
-		log.Debugf("err : %s", err)
+	if err = devspaceCopier.CreateDevspaceConfigs(); err != nil {
+		log.Errorf("err : %s", err)
 		return err
 	}
 
 	// devcontainer.json and Dockerfile need to be generated for the whole project, so it should be here.
 	devContainerCopier := m["devcontainer"].(*devcontainer.Copier)
-	if err := devContainerCopier.CreateDevContainerConfigs(); err != nil {
-		log.Debugf("err : %s", err)
+	if err = devContainerCopier.CreateDevContainerConfigs(); err != nil {
+		log.Errorf("err : %s", err)
 		return err
 	}
 
@@ -104,27 +112,31 @@ func generateGRPCConfig(goValues *GoValues) error {
 		// check for the templates
 		if n.GrpcConfig.Template == templates.Compage {
 			if n.GrpcConfig.Framework == GoGrpcServerFramework {
-				goGrpcServerCopier := getGoGrpcServerCopier(goValues)
+				goGrpcServerCopier, err := getGoGrpcServerCopier(goValues)
+				if err != nil {
+					log.Errorf("error while getting the goGrpcServerCopier [" + err.Error() + "]")
+					return err
+				}
 				// copy all files at root level
-				if err := goGrpcServerCopier.CreateRootLevelFiles(); err != nil {
-					log.Debugf("err : %s", err)
+				if err = goGrpcServerCopier.CreateRootLevelFiles(); err != nil {
+					log.Errorf("err : %s", err)
 					return err
 				}
 				if n.GrpcConfig.Server != nil {
-					if err := goGrpcServerCopier.CreateGrpcServer(); err != nil {
-						log.Debugf("err : %s", err)
+					if err = goGrpcServerCopier.CreateGrpcServer(); err != nil {
+						log.Errorf("err : %s", err)
 						return err
 					}
 					// generate protoc commands on proto file for the code generated
-					if err := RunMakeProto(goValues.Values.NodeDirectoryName); err != nil {
-						log.Debugf("err : %s", err)
+					if err = RunMakeProto(goValues.Values.NodeDirectoryName); err != nil {
+						log.Errorf("err : %s", err)
 						return err
 					}
 				}
 				if n.GrpcConfig.Clients != nil {
 					//  grpcConfig.clients - present when client config is provided
-					if err := goGrpcServerCopier.CreateGrpcClients(); err != nil {
-						log.Debugf("err : %s", err)
+					if err = goGrpcServerCopier.CreateGrpcClients(); err != nil {
+						log.Errorf("err : %s", err)
 						return err
 					}
 				}
@@ -146,23 +158,27 @@ func generateRESTConfig(ctx context.Context, goValues *GoValues) error {
 		// check for the templates
 		if n.RestConfig.Template == templates.Compage {
 			if n.RestConfig.Framework == GoGinServerFramework {
-				goGinServerCopier := getGoGinServerCopier(goValues)
+				goGinServerCopier, err := getGoGinServerCopier(goValues)
+				if err != nil {
+					log.Errorf("error while getting the goGinServerCopier [" + err.Error() + "]")
+					return err
+				}
 				if n.RestConfig.Server != nil {
-					if err := goGinServerCopier.CreateRestServer(); err != nil {
-						log.Debugf("err : %s", err)
+					if err = goGinServerCopier.CreateRestServer(); err != nil {
+						log.Errorf("err : %s", err)
 						return err
 					}
 				}
 				if n.RestConfig.Clients != nil {
 					//  restConfig.clients - present when client config is provided
-					if err := goGinServerCopier.CreateRestClients(); err != nil {
-						log.Debugf("err : %s", err)
+					if err = goGinServerCopier.CreateRestClients(); err != nil {
+						log.Errorf("err : %s", err)
 						return err
 					}
 				}
 				// copy all files at root level, fire this at last
-				if err := goGinServerCopier.CreateRootLevelFiles(); err != nil {
-					log.Debugf("err : %s", err)
+				if err = goGinServerCopier.CreateRootLevelFiles(); err != nil {
+					log.Errorf("err : %s", err)
 					return err
 				}
 			} else {
@@ -187,13 +203,18 @@ func generateRESTConfig(ctx context.Context, goValues *GoValues) error {
 	return nil
 }
 
-func getCommonFilesCopier(goValues GoValues) *commonfiles.Copier {
+func getCommonFilesCopier(goValues GoValues) (*commonfiles.Copier, error) {
+	goTemplatesRootPath := GetGoTemplatesRootPath()
+	if goTemplatesRootPath == "" {
+		return nil, errors.New("go templates root path is empty")
+	}
+	path := goTemplatesRootPath + "/frameworks/" + CommonFiles
+
 	gitPlatformURL := goValues.Values.Get(languages.GitPlatformURL)
 	gitPlatformUserName := goValues.Values.Get(languages.GitPlatformUserName)
 	gitRepositoryName := goValues.Values.Get(languages.GitRepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := goValues.Values.NodeDirectoryName
-	path := GetGoTemplatesRootPath() + "/frameworks/" + CommonFiles
 
 	// rest
 	isRestServer := goValues.LGoLangNode.RestConfig != nil && goValues.LGoLangNode.RestConfig.Server != nil
@@ -249,10 +270,16 @@ func getCommonFilesCopier(goValues GoValues) *commonfiles.Copier {
 	}
 	// create golang specific commonFilesCopier
 	copier := commonfiles.NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort, isRestSQLDB, restSQLDB, isGrpcSQLDB, grpcSQLDB, isRestNoSQLDB, restNoSQLDB, isGrpcNoSQLDB, grpcNoSQLDB, restResources, grpcResources, restClients, grpcClients)
-	return copier
+	return copier, nil
 }
 
-func getGoGrpcServerCopier(goValues *GoValues) *gogrpcserver.Copier {
+func getGoGrpcServerCopier(goValues *GoValues) (*gogrpcserver.Copier, error) {
+	goTemplatesRootPath := GetGoTemplatesRootPath()
+	if goTemplatesRootPath == "" {
+		return nil, errors.New("go templates root path is empty")
+	}
+	path := goTemplatesRootPath + "/frameworks/" + GoGrpcServerFramework
+
 	//gitPlatformName := goValues.Values.Get(languages.GitPlatformName)
 	gitPlatformURL := goValues.Values.Get(languages.GitPlatformURL)
 	gitPlatformUserName := goValues.Values.Get(languages.GitPlatformUserName)
@@ -283,13 +310,18 @@ func getGoGrpcServerCopier(goValues *GoValues) *gogrpcserver.Copier {
 	}
 
 	grpcClients := goValues.LGoLangNode.GrpcConfig.Clients
-	path := GetGoTemplatesRootPath() + "/frameworks/" + GoGrpcServerFramework
 	// create golang specific copier
 	copier := gogrpcserver.NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isGrpcServer, grpcServerPort, isGrpcSQLDB, grpcSQLDB, isGrpcNoSQLDB, grpcNoSQLDB, grpcResources, grpcClients)
-	return copier
+	return copier, nil
 }
 
-func getGoGinServerCopier(goValues *GoValues) *goginserver.Copier {
+func getGoGinServerCopier(goValues *GoValues) (*goginserver.Copier, error) {
+	goTemplatesRootPath := GetGoTemplatesRootPath()
+	if goTemplatesRootPath == "" {
+		return nil, errors.New("go templates root path is empty")
+	}
+	path := goTemplatesRootPath + "/frameworks/" + GoGinServerFramework
+
 	gitPlatformURL := goValues.Values.Get(languages.GitPlatformURL)
 	gitPlatformUserName := goValues.Values.Get(languages.GitPlatformUserName)
 	gitRepositoryName := goValues.Values.Get(languages.GitRepositoryName)
@@ -320,13 +352,17 @@ func getGoGinServerCopier(goValues *GoValues) *goginserver.Copier {
 	}
 
 	restClients := goValues.LGoLangNode.RestConfig.Clients
-	path := GetGoTemplatesRootPath() + "/frameworks/" + GoGinServerFramework
 	// create golang specific copier
 	copier := goginserver.NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isRestSQLDB, restSQLDB, isRestNoSQLDB, restNoSQLDB, restResources, restClients)
-	return copier
+	return copier, nil
 }
 
-func getIntegrationsCopier(goValues *GoValues) map[string]interface{} {
+func getIntegrationsCopier(goValues *GoValues) (map[string]interface{}, error) {
+	goTemplatesRootPath := GetGoTemplatesRootPath()
+	if goTemplatesRootPath == "" {
+		return nil, errors.New("go templates root path is empty")
+	}
+
 	gitPlatformUserName := goValues.Values.Get(languages.GitPlatformUserName)
 	gitRepositoryName := goValues.Values.Get(languages.GitRepositoryName)
 	nodeName := goValues.Values.Get(languages.NodeName)
@@ -349,24 +385,23 @@ func getIntegrationsCopier(goValues *GoValues) map[string]interface{} {
 		grpcServerPort = ""
 	}
 
-	path := GetGoTemplatesRootPath()
 	projectDirectoryName := utils.GetProjectDirectoryName(goValues.Values.ProjectName)
 	projectName := goValues.Values.ProjectName
 
 	// create golang specific dockerCopier
-	dockerCopier := docker.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
+	dockerCopier := docker.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
 	// create golang specific k8sCopier
-	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
+	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
 	// create golang specific githubActionsCopier
-	githubActionsCopier := githubactions.NewCopier(gitPlatformUserName, gitRepositoryName, projectDirectoryName, nodeName, nodeDirectoryName, path)
+	githubActionsCopier := githubactions.NewCopier(gitPlatformUserName, gitRepositoryName, projectDirectoryName, nodeName, nodeDirectoryName, goTemplatesRootPath)
 
 	// create golang specific devspaceCopier
-	devspaceCopier := devspace.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
+	devspaceCopier := devspace.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
 	// create golang specific devContainerCopier
-	devContainerCopier := devcontainer.NewCopier(gitPlatformUserName, gitRepositoryName, projectName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
+	devContainerCopier := devcontainer.NewCopier(gitPlatformUserName, gitRepositoryName, projectName, nodeName, nodeDirectoryName, goTemplatesRootPath, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
 	return map[string]interface{}{
 		"docker":        dockerCopier,
@@ -374,5 +409,5 @@ func getIntegrationsCopier(goValues *GoValues) map[string]interface{} {
 		"githubActions": githubActionsCopier,
 		"devspace":      devspaceCopier,
 		"devcontainer":  devContainerCopier,
-	}
+	}, nil
 }

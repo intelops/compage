@@ -18,7 +18,8 @@ var generateCmd = &cobra.Command{
 
 Change the file as per your needs and then run the compage generate command to generate the code.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		GenerateCode()
+		err := GenerateCode()
+		cobra.CheckErr(err)
 	},
 }
 
@@ -29,10 +30,10 @@ func init() {
 		log.Errorf("error while getting the current directory [" + err.Error() + "]")
 		return
 	}
-	// set the project folder environment variable, if this is set, then the project will be generated in this folder
-	err = os.Setenv("COMPAGE_GENERATED_PROJECT_FOLDER", wD)
+	// set the project directory environment variable, if this is set, then the project will be generated in this folder
+	err = os.Setenv("COMPAGE_GENERATED_PROJECT_DIRECTORY", wD)
 	if err != nil {
-		log.Errorf("error while setting the project folder [" + err.Error() + "]")
+		log.Errorf("error while setting the project directory [" + err.Error() + "]")
 		return
 	}
 	// Here you will define your flags and configuration settings.
@@ -46,7 +47,7 @@ func init() {
 	// generateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func GenerateCode() {
+func GenerateCode() error {
 	// Read the file from the current directory and convert it to project
 	project, err := models.ReadConfigYAMLFile("config.yaml")
 	cobra.CheckErr(err)
@@ -55,14 +56,32 @@ func GenerateCode() {
 	coreProject, err := cmd.GetProject(project)
 	if err != nil {
 		log.Errorf("error while converting request to project [" + err.Error() + "]")
-		return
+		return err
+	}
+
+	// pull all required templates
+	// pull the common templates
+	err = CloneOrPullRepository("common")
+	if err != nil {
+		log.Errorf("error while pulling the common templates [" + err.Error() + "]")
+		return err
+	}
+	for _, node := range coreProject.CompageJSON.Nodes {
+		// make sure that the latest template is pulled
+		err = CloneOrPullRepository(node.Language)
+		if err != nil {
+			log.Errorf("error while pulling the template [" + err.Error() + "]")
+			return err
+		}
+		log.Debugf("template pulled successfully for language %s", node.Language)
 	}
 
 	// triggers project generation, process the request
 	err0 := handlers.Handle(coreProject)
 	if err0 != nil {
 		log.Errorf("error while generating the project [" + err0.Error() + "]")
-		return
+		return err
 	}
 	log.Infof("project generated successfully at %s", utils.GetProjectDirectoryName(project.Name))
+	return nil
 }

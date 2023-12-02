@@ -10,13 +10,13 @@ func Process(ctx context.Context) error {
 
 	// fills default config for python
 	if err := pythonValues.PythonNode.FillDefaults(); err != nil {
-		log.Debugf("err : %s", err)
+		log.Errorf("err : %s", err)
 		return err
 	}
 
 	// generate python project
 	if err := Generate(ctx); err != nil {
-		log.Debugf("err : %s", err)
+		log.Errorf("err : %s", err)
 		return err
 	}
 

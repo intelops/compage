@@ -25,11 +25,12 @@ var initCmd = &cobra.Command{
 
 You can change the file as per your needs and then run the compage generate command to generate the code.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		createOrUpdateDefaultConfigFile()
+		err := createOrUpdateDefaultConfigFile()
+		cobra.CheckErr(err)
 	},
 }
 
-func createOrUpdateDefaultConfigFile() {
+func createOrUpdateDefaultConfigFile() error {
 	// create default config file
 	configFilePath := "config.yaml"
 	_, err := os.Stat(configFilePath)
@@ -37,24 +38,32 @@ func createOrUpdateDefaultConfigFile() {
 		log.Warnf("config file already exists at %s", configFilePath)
 		if !overwriteConfigFile {
 			log.Infof("skipping config file creation")
-			return
+			return err
 		}
 		log.Infof("overwriting the config file")
 		err = os.Remove(configFilePath)
 		if err != nil {
-			log.Warnf("error while removing the config file %s", err)
+			log.Errorf("error while removing the config file %s", err)
 			cobra.CheckErr(err)
 		}
 	}
 
 	_, err = os.Create(configFilePath)
-	cobra.CheckErr(err)
+	if err != nil {
+		log.Errorf("error while creating the config file %s", err)
+		return err
+	}
 	contentData, err := Content.ReadFile("config.yaml.tmpl")
-	cobra.CheckErr(err)
+	if err != nil {
+		log.Errorf("error while reading the config file %s", err)
+		return err
+	}
 	// copy the default config file and use go template to replace the values
 	err = os.WriteFile(configFilePath, contentData, 0644)
-	cobra.CheckErr(err)
-
+	if err != nil {
+		log.Errorf("error while creating the config file %s", err)
+		return err
+	}
 	var filePaths []*string
 	filePaths = append(filePaths, &configFilePath)
 	data := make(map[string]interface{})
@@ -78,8 +87,12 @@ func createOrUpdateDefaultConfigFile() {
 		data["IsRestServer"] = true
 	}
 	err = executor.Execute(filePaths, data)
-	cobra.CheckErr(err)
+	if err != nil {
+		log.Errorf("error while creating the config file %s", err)
+		return err
+	}
 	log.Infof("config file created at %s", configFilePath)
+	return nil
 }
 
 func init() {

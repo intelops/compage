@@ -45,64 +45,70 @@ func Generate(ctx context.Context) error {
 	}
 
 	// k8s files need to be generated for the whole project so, it should be here.
-	m := getIntegrationsCopier(javascriptValues)
-
+	m, err := getIntegrationsCopier(javascriptValues)
+	if err != nil {
+		log.Errorf("error while getting the integrations copier [" + err.Error() + "]")
+		return err
+	}
 	// dockerfile needs to be generated for the whole project so, it should be here.
 	dockerCopier := m["docker"].(*docker.Copier)
 	if err := dockerCopier.CreateDockerFile(); err != nil {
-		log.Debugf("err : %s", err)
+		log.Errorf("err : %s", err)
 		return err
 	}
 
 	k8sCopier := m["k8s"].(*kubernetes.Copier)
 	if err := k8sCopier.CreateKubernetesFiles(); err != nil {
-		log.Debugf("err : %s", err)
+		log.Errorf("err : %s", err)
 		return err
 	}
 
 	// githubActions files need to be generated for the whole project so, it should be here.
 	githubActionsCopier := m["githubActions"].(*githubactions.Copier)
 	if err := githubActionsCopier.CreateYamls(); err != nil {
-		log.Debugf("err : %s", err)
+		log.Errorf("err : %s", err)
 		return err
 	}
 
 	// devspace.yaml and devspace_start.sh need to be generated for the whole project so, it should be here.
 	devspaceCopier := m["devspace"].(*devspace.Copier)
 	if err := devspaceCopier.CreateDevspaceConfigs(); err != nil {
-		log.Debugf("err : %s", err)
+		log.Errorf("err : %s", err)
 		return err
 	}
 
 	return nil
 }
 
-func getIntegrationsCopier(javascriptValues Values) map[string]interface{} {
+func getIntegrationsCopier(javascriptValues Values) (map[string]interface{}, error) {
+	javaScriptTemplatesRootPath := GetJavaScriptTemplatesRootPath()
+	if javaScriptTemplatesRootPath == "" {
+		return nil, errors.New("javascript templates root path is empty")
+	}
 	gitPlatformUserName := javascriptValues.Values.Get(languages.GitPlatformUserName)
 	gitRepositoryName := javascriptValues.Values.Get(languages.GitRepositoryName)
 	nodeName := javascriptValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := javascriptValues.Values.NodeDirectoryName
 	isRestServer := javascriptValues.JavaScriptNode.RestConfig.Server != nil
 	restServerPort := javascriptValues.JavaScriptNode.RestConfig.Server.Port
-	path := GetJavaScriptTemplatesRootPath()
 	projectDirectoryName := utils.GetProjectDirectoryName(javascriptValues.Values.ProjectName)
 
 	// create javascript specific dockerCopier
-	dockerCopier := docker.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	dockerCopier := docker.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, javaScriptTemplatesRootPath, isRestServer, restServerPort)
 
 	// create javascript specific k8sCopier
-	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, javaScriptTemplatesRootPath, isRestServer, restServerPort)
 
 	// create javascript specific githubActionsCopier
-	githubActionsCopier := githubactions.NewCopier(gitPlatformUserName, gitRepositoryName, projectDirectoryName, nodeName, nodeDirectoryName, path)
+	githubActionsCopier := githubactions.NewCopier(gitPlatformUserName, gitRepositoryName, projectDirectoryName, nodeName, nodeDirectoryName, javaScriptTemplatesRootPath)
 
 	// create javascript specific devspaceCopier
-	devspaceCopier := devspace.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort)
+	devspaceCopier := devspace.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, javaScriptTemplatesRootPath, isRestServer, restServerPort)
 
 	return map[string]interface{}{
 		"docker":        dockerCopier,
 		"k8s":           k8sCopier,
 		"githubActions": githubActionsCopier,
 		"devspace":      devspaceCopier,
-	}
+	}, nil
 }

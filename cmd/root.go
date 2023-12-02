@@ -3,6 +3,7 @@ package cmd
 import (
 	"embed"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -29,6 +30,7 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
+		log.Errorf("error executing root command: %v", err)
 		os.Exit(1)
 	}
 }
@@ -54,11 +56,11 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		// Find home directory.
-		home, err := os.UserHomeDir()
+		userHomeDir, err := os.UserHomeDir()
 		cobra.CheckErr(err)
 
 		// Search config in home directory with name ".compage" (without extension).
-		viper.AddConfigPath(home + "/.compage")
+		viper.AddConfigPath(userHomeDir + "/.compage")
 		viper.SetConfigType("yaml")
 		viper.SetConfigName("config")
 	}
@@ -67,6 +69,10 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+		_, err = fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+		if err != nil {
+			log.Errorf("error while printing config file path [%s]", err.Error())
+			return
+		}
 	}
 }

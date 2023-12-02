@@ -22,9 +22,9 @@ func RunMakeProto(directoryName string) error {
 			var stdOut bytes.Buffer
 			command.Stdout = &stdOut
 			if err := command.Run(); err != nil {
-				log.Debugf("%s\n", err)
-				log.Debugf("%s\n", stdOut.String())
-				log.Debugf("%s\n", stdErr.String())
+				log.Errorf("%s\n", err)
+				log.Errorf("%s\n", stdOut.String())
+				log.Errorf("%s\n", stdErr.String())
 				return err
 			}
 			if len(stdErr.String()) > 0 {

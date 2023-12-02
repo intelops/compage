@@ -46,7 +46,7 @@ func NewLanguageNode(compageJSON *core.CompageJSON, node *corenode.Node) (*Langu
 
 	// Retrieves clients for node to other servers(other nodes). This is required for custom template plus the cli/frameworks plan for next release
 	if err := PopulateClientsForNode(compageJSON, node); err != nil {
-		log.Debugf("error while populating clients for node : %s", err)
+		log.Errorf("error while populating clients for node : %s", err)
 		return nil, err
 	}
 	return languageNode, nil
@@ -146,7 +146,7 @@ func PopulateClientsForNode(compageJSON *core.CompageJSON, nodeP *corenode.Node)
 	// WS Clients
 	err := populateWSConfig(compageJSON, nodeP)
 	if err != nil {
-		log.Debugf("Error while populating ws config for node %s", nodeP.ID)
+		log.Errorf("Error while populating ws config for node %s", nodeP.ID)
 		return err
 	}
 	return nil
