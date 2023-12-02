@@ -60,7 +60,6 @@ ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 
 COPY --from=builder /app /
-COPY templates /app/templates
 
 # test if the below command avoids loading the files later.
 RUN go version

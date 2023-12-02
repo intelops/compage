@@ -26,13 +26,11 @@ func CloneOrPullRepository(language string) error {
 	}
 	if exists {
 		log.Debugf("directory %s exists.\n", repositoryPath)
-		pullExistingRepository(repositoryPath)
-		return nil
+		return pullExistingRepository(repositoryPath)
 	}
 	log.Debugf("directory %s does not exist.\n", repositoryPath)
 	log.Infof("cloning repository %s into %s\n", repoURL, repositoryPath)
-	cloneNewRepository(repoURL, repositoryPath)
-	return nil
+	return cloneNewRepository(repoURL, repositoryPath)
 }
 
 func getRepositoryURLByLanguage(language string) (string, string, error) {
@@ -41,50 +39,38 @@ func getRepositoryURLByLanguage(language string) (string, string, error) {
 		return "", "", err
 	}
 	repositoryPath := userHomeDir + "/.compage/templates/compage-template-" + language
-	if language == "go" {
-		return "https://github.com/intelops/compage-template-go.git", repositoryPath, nil
-	} else if language == "python" {
-		return "https://github.com/intelops/compage-template-python.git", repositoryPath, nil
-	} else if language == "java" {
-		return "https://github.com/intelops/compage-template-java.git", repositoryPath, nil
-	} else if language == "javascript" {
-		return "https://github.com/intelops/compage-template-javascript.git", repositoryPath, nil
-	} else if language == "ruby" {
-		return "https://github.com/intelops/compage-template-ruby.git", repositoryPath, nil
-	} else if language == "rust" {
-		return "https://github.com/intelops/compage-template-rust.git", repositoryPath, nil
-	} else if language == "typescript" {
-		return "https://github.com/intelops/compage-template-typescript.git", repositoryPath, nil
-	} else if language == "common" {
+	repositoryURL := "https://github.com/intelops/compage-template-" + language + ".git"
+	if language == "common" {
 		repositoryPath = userHomeDir + "/.compage/templates/common-templates"
 		return "https://github.com/intelops/common-templates.git", repositoryPath, nil
 	}
-	return "", "", nil
+	return repositoryURL, repositoryPath, nil
 }
 
-func cloneNewRepository(repoURL string, cloneDir string) {
+func cloneNewRepository(repoURL string, cloneDir string) error {
 	_, err := git.PlainClone(cloneDir, false, &git.CloneOptions{
 		URL:      repoURL,
 		Progress: os.Stdout,
 	})
 	if err != nil {
 		log.Errorf("error:%v", err)
-		return
+		return err
 	}
 	log.Infof("repository[%s] cloned successfully.", repoURL)
+	return nil
 }
 
-func pullExistingRepository(existingRepositoryPath string) {
+func pullExistingRepository(existingRepositoryPath string) error {
 	r, err := git.PlainOpen(existingRepositoryPath)
 	if err != nil {
 		log.Errorf("error:%v", err)
-		return
+		return err
 	}
 	// Get the working directory for the repository
 	w, err := r.Worktree()
 	if err != nil {
 		log.Errorf("error:%v", err)
-		return
+		return err
 	}
 	// Pull the latest changes from the origin remote and merge into the current branch
 	log.Info("git pull origin")
@@ -93,21 +79,22 @@ func pullExistingRepository(existingRepositoryPath string) {
 		if errors.Is(err, git.NoErrAlreadyUpToDate) {
 			// This is a special error that means we don't have any new changes
 			log.Info(err)
-			return
+			return nil
 		}
 		log.Errorf("error:%v", err)
-		return
+		return err
 	}
 	// Print the latest commit that was just pulled
 	ref, err := r.Head()
 	if err != nil {
 		log.Errorf("error:%v", err)
-		return
+		return err
 	}
 	commit, err := r.CommitObject(ref.Hash())
 	if err != nil {
 		log.Errorf("error:%v", err)
-		return
+		return err
 	}
 	log.Info(commit)
+	return nil
 }
