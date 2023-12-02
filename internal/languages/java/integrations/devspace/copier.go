@@ -3,6 +3,7 @@ package devspace
 import (
 	"github.com/intelops/compage/internal/languages/executor"
 	"github.com/intelops/compage/internal/utils"
+	log "github.com/sirupsen/logrus"
 	"strings"
 )
 
@@ -48,6 +49,7 @@ func (c Copier) CreateDevspaceConfigs() error {
 	const DevspaceSrcPath = "/devspace/"
 	_, err := utils.CopyFile(targetDevspaceYamlName, c.TemplatesRootPath+DevspaceSrcPath+YamlFile)
 	if err != nil {
+		log.Errorf("error while copying file [" + err.Error() + "]")
 		return err
 	}
 	filePaths = append(filePaths, &targetDevspaceYamlName)
@@ -56,6 +58,7 @@ func (c Copier) CreateDevspaceConfigs() error {
 	targetDevspaceStartShFileName := c.NodeDirectoryName + "/" + StartShFile
 	_, err = utils.CopyFile(targetDevspaceStartShFileName, c.TemplatesRootPath+DevspaceSrcPath+StartShFile)
 	if err != nil {
+		log.Errorf("error while copying file [" + err.Error() + "]")
 		return err
 	}
 	filePaths = append(filePaths, &targetDevspaceStartShFileName)

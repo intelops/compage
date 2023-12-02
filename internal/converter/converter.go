@@ -6,6 +6,7 @@ import (
 	"github.com/intelops/compage/internal/core"
 	"github.com/intelops/compage/internal/languages"
 	"github.com/intelops/compage/internal/languages/templates"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/exp/maps"
 )
 
@@ -14,6 +15,7 @@ func GetNodes(nodes interface{}) interface{} {
 	if nodes != nil {
 		nodesBytes, err := json.Marshal(maps.Values(nodes.(map[string]interface{})))
 		if err != nil {
+			log.Errorf("error marshalling nodes: %v", err)
 			return err
 		}
 		return string(nodesBytes)
@@ -26,6 +28,7 @@ func GetEdges(edges interface{}) interface{} {
 	if edges != nil {
 		edgesBytes, err := json.Marshal(maps.Values(edges.(map[string]interface{})))
 		if err != nil {
+			log.Errorf("error marshalling edges: %v", err)
 			return err
 		}
 		return string(edgesBytes)
@@ -50,20 +53,24 @@ func ConvertMap(x map[string]interface{}) map[string]interface{} {
 func GetCompageJSONForGRPC(jsonString string) (*core.CompageJSON, error) {
 	x := map[string]interface{}{}
 	if err := json.Unmarshal([]byte(jsonString), &x); err != nil {
+		log.Errorf("error unmarshalling compageJSON: %v", err)
 		return nil, err
 	}
 	convertedX := ConvertMap(x)
 	convertedXBytes, err1 := json.Marshal(convertedX)
 	if err1 != nil {
+		log.Errorf("error marshalling compageJSON: %v", err1)
 		return nil, err1
 	}
 	compageJSON := &core.CompageJSON{}
 	if err2 := json.Unmarshal(convertedXBytes, compageJSON); err2 != nil {
+		log.Errorf("error unmarshalling compageJSON: %v", err2)
 		return nil, err2
 	}
 
 	// Validate compageJSON
 	if err3 := validate(compageJSON); err3 != nil {
+		log.Errorf("error validating compageJSON: %v", err3)
 		return nil, err3
 	}
 
@@ -74,15 +81,18 @@ func GetCompageJSONForGRPC(jsonString string) (*core.CompageJSON, error) {
 func GetCompageJSONForCMD(jsonMap map[string]interface{}) (*core.CompageJSON, error) {
 	convertedXBytes, err1 := json.Marshal(jsonMap)
 	if err1 != nil {
+		log.Errorf("error marshalling compageJSON: %v", err1)
 		return nil, err1
 	}
 	compageJSON := &core.CompageJSON{}
 	if err2 := json.Unmarshal(convertedXBytes, compageJSON); err2 != nil {
+		log.Errorf("error unmarshalling compageJSON: %v", err2)
 		return nil, err2
 	}
 
 	// Validate compageJSON
 	if err3 := validate(compageJSON); err3 != nil {
+		log.Errorf("error validating compageJSON: %v", err3)
 		return nil, err3
 	}
 
@@ -118,6 +128,7 @@ func validate(compageJSON *core.CompageJSON) error {
 func GetMetadata(metadataInput string) map[string]interface{} {
 	metadata := map[string]interface{}{}
 	if err0 := json.Unmarshal([]byte(metadataInput), &metadata); err0 != nil {
+		log.Errorf("error unmarshalling metadata: %v", err0)
 		return nil
 	}
 	return metadata

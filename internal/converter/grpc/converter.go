@@ -4,6 +4,7 @@ import (
 	project "github.com/intelops/compage/gen/api/v1"
 	"github.com/intelops/compage/internal/converter"
 	"github.com/intelops/compage/internal/core"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -11,6 +12,7 @@ import (
 func GetProject(input *project.GenerateCodeRequest) (*core.Project, error) {
 	compageJSON, err := converter.GetCompageJSONForGRPC(input.ProjectJSON)
 	if err != nil {
+		log.Errorf("error getting compageJSON: %v", err)
 		return nil, err
 	}
 

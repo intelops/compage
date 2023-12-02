@@ -43,11 +43,13 @@ func _(destDirectory string, srcDirectory string) error {
 func CopyAllInSrcDirToDestDir(destDirectory, srcDirectory string, copyNestedDir bool) error {
 	openedDir, err := os.Open(srcDirectory)
 	if err != nil {
+		log.Errorf("error while opening directory: %v", err)
 		return err
 	}
 
 	fileInfo, err := openedDir.Stat()
 	if err != nil {
+		log.Errorf("error while getting directory stat: %v", err)
 		return err
 	}
 	if !fileInfo.IsDir() {
@@ -55,22 +57,26 @@ func CopyAllInSrcDirToDestDir(destDirectory, srcDirectory string, copyNestedDir 
 	}
 
 	if err0 := os.Mkdir(destDirectory, 0755); err0 != nil && !os.IsExist(err0) {
+		log.Errorf("error while creating directory: %v", err0)
 		return err0
 	}
 
 	files, err := os.ReadDir(srcDirectory)
 	if err != nil {
+		log.Errorf("error while reading directory: %v", err)
 		return err
 	}
 	for _, file := range files {
 		if !file.IsDir() {
 			_, err0 := CopyFile(destDirectory+"/"+file.Name(), srcDirectory+"/"+file.Name())
 			if err0 != nil {
+				log.Errorf("error while copying file: %v", err0)
 				return err0
 			}
 		} else if copyNestedDir {
 			err0 := CopyAllInSrcDirToDestDir(destDirectory+"/"+file.Name(), srcDirectory+"/"+file.Name(), copyNestedDir)
 			if err0 != nil {
+				log.Errorf("error while copying directory: %v", err0)
 				return err0
 			}
 		}
@@ -82,6 +88,7 @@ func CopyAllInSrcDirToDestDir(destDirectory, srcDirectory string, copyNestedDir 
 func CopyFile(destFilePath, srcFilePath string) (int64, error) {
 	srcFileStat, err := os.Stat(srcFilePath)
 	if err != nil {
+		log.Errorf("error while getting source file stat: %v", err)
 		return 0, err
 	}
 	if !srcFileStat.Mode().IsRegular() {
@@ -90,6 +97,7 @@ func CopyFile(destFilePath, srcFilePath string) (int64, error) {
 
 	sourceFile, err := os.Open(srcFilePath)
 	if err != nil {
+		log.Errorf("error while opening source file: %v", err)
 		return 0, err
 	}
 	defer func(source *os.File) {
@@ -98,6 +106,7 @@ func CopyFile(destFilePath, srcFilePath string) (int64, error) {
 
 	destinationFile, err := os.Create(destFilePath)
 	if err != nil {
+		log.Errorf("error while creating destination file: %v", err)
 		return 0, err
 	}
 	defer func(destination *os.File) {
@@ -119,6 +128,7 @@ func GetDirectoriesAndFilePaths(templatesPath string) ([]*string, []*string, err
 	// Get all directories on /templates and check if there are repeated files
 	err := filepath.Walk(templatesPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
+			log.Errorf("error while walking through templates directory: %v", err)
 			return err
 		}
 		if !info.IsDir() {
@@ -151,9 +161,11 @@ func contains(filePaths []*string, filePathName string) bool {
 func DirectoryExists(directoryPath string) (bool, error) {
 	_, err := os.Stat(directoryPath)
 	if os.IsNotExist(err) {
+		log.Errorf("directory does not exist: %v", err)
 		// The directory does not exist
 		return false, nil
 	} else if err != nil {
+		log.Errorf("error while checking directory existence: %v", err)
 		// An error occurred while checking
 		return false, err
 	}

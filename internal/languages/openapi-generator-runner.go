@@ -40,6 +40,7 @@ func runOpenAPIGenerator(args ...string) error {
 func writeFile(content string) (string, error) {
 	file, err := os.CreateTemp("/tmp", "openapi")
 	if err != nil {
+		log.Errorf("err : %s", err)
 		return "", err
 	}
 

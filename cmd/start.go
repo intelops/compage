@@ -68,7 +68,8 @@ This command will start thr gRPC server and allow the gRPC clients to get connec
 
 		// check if the git submodules have been pulled (mainly need to check this on developer's machine)
 		if checkIfGitSubmodulesExist() {
-			startGrpcServer()
+			err = startGrpcServer()
+			cobra.CheckErr(err)
 		} else {
 			log.Error("starting gRPC server failed as git submodules don't exist")
 		}
@@ -125,11 +126,11 @@ func checkIfGitSubmodulesExist() bool {
 	return true
 }
 
-func startGrpcServer() {
+func startGrpcServer() error {
 	listener, err := net.Listen("tcp", "0.0.0.0:50051")
 	if err != nil {
 		log.Errorf("failed to listen: %v", err)
-		return
+		return err
 	}
 	log.Println("started gRPC server on '0.0.0.0:50051'")
 	grpcServer := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()))
@@ -152,4 +153,5 @@ func startGrpcServer() {
 	<-done
 	grpcServer.GracefulStop()
 	log.Printf("Server stopped")
+	return nil
 }

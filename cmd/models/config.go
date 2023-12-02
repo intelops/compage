@@ -1,6 +1,7 @@
 package models
 
 import (
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"os"
 )
@@ -31,12 +32,14 @@ type Project struct {
 func ReadConfigYAMLFile(configFile string) (*Project, error) {
 	data, err := os.ReadFile(configFile)
 	if err != nil {
+		log.Errorf("error reading config file: %v", err)
 		return nil, err
 	}
 
 	var project Project
 	// Unmarshal YAML data into the provided struct
 	if err := yaml.Unmarshal(data, &project); err != nil {
+		log.Errorf("error unmarshalling YAML data: %v", err)
 		return nil, err
 	}
 

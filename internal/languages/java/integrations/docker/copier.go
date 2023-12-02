@@ -3,6 +3,7 @@ package docker
 import (
 	"github.com/intelops/compage/internal/languages/executor"
 	"github.com/intelops/compage/internal/utils"
+	log "github.com/sirupsen/logrus"
 	"strings"
 )
 
@@ -47,6 +48,7 @@ func (c Copier) CreateDockerFile() error {
 	targetDockerFileName := c.NodeDirectoryName + "/" + File
 	_, err := utils.CopyFile(targetDockerFileName, c.TemplatesRootPath+"/"+File)
 	if err != nil {
+		log.Errorf("error while copying file [" + err.Error() + "]")
 		return err
 	}
 	filePaths = append(filePaths, &targetDockerFileName)
