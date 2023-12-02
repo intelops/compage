@@ -622,11 +622,11 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string
 // CreateRestConfigs creates/copies relevant files to a generated project
 func (c *Copier) CreateRestConfigs() error {
 	if err := c.CreateRestServer(); err != nil {
-		log.Debugf("error creating rest server: %v", err)
+		log.Errorf("error creating rest server: %v", err)
 		return err
 	}
 	if err := c.CreateRestClients(); err != nil {
-		log.Debugf("error creating rest clients: %v", err)
+		log.Errorf("error creating rest clients: %v", err)
 		return err
 	}
 	return nil
@@ -638,13 +638,13 @@ func (c *Copier) CreateRestServer() error {
 	if c.IsRestServer {
 		// create directories for controller, service, dao, models
 		if err := c.createRestServerDirectories(); err != nil {
-			log.Debugf("error creating rest server directories: %v", err)
+			log.Errorf("error creating rest server directories: %v", err)
 			return err
 		}
 		// copy files with respect to the names of resources
 		for _, resource := range c.Resources {
 			if err := c.copyRestServerResourceFiles(resource); err != nil {
-				log.Debugf("error copying rest server resource files: %v", err)
+				log.Errorf("error copying rest server resource files: %v", err)
 				return err
 			}
 		}
@@ -749,12 +749,14 @@ func (c *Copier) CreateRestClients() error {
 	if c.HasRestClients {
 		// create directories for a client
 		if err := c.createRestClientDirectories(); err != nil {
+			log.Errorf("error creating rest client directories: %v", err)
 			return err
 		}
 
 		// copy files with respect to the names of resources
 		for _, client := range c.RestClients {
 			if err := c.copyRestClientResourceFiles(client); err != nil {
+				log.Errorf("error copying rest client resource files: %v", err)
 				return err
 			}
 		}
@@ -766,10 +768,12 @@ func (c *Copier) CreateRestClients() error {
 func (c *Copier) CreateRootLevelFiles() error {
 	err := utils.CopyFiles(c.NodeDirectoryName, c.TemplatesRootPath)
 	if err != nil {
+		log.Errorf("error copying root level files: %v", err)
 		return err
 	}
 	_, files, err0 := utils.GetDirectoriesAndFilePaths(c.NodeDirectoryName)
 	if err0 != nil {
+		log.Errorf("error getting directories and file paths: %v", err0)
 		return err0
 	}
 	return executor.Execute(files, c.Data)

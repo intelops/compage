@@ -44,7 +44,7 @@ This command will start thr gRPC server and allow the gRPC clients to get connec
 		defer func() {
 			if grpcTraceProvider != nil {
 				if err := grpcTraceProvider.Shutdown(context.Background()); err != nil {
-					log.Printf("Error shutting down tracer provider: %v", err)
+					log.Errorf("Error shutting down tracer provider: %v", err)
 				}
 			}
 		}()

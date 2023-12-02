@@ -59,7 +59,7 @@ func (c Copier) CreateKubernetesFiles() error {
 
 	var filePaths []*string
 	if c.IsRestServer || c.IsGrpcServer {
-		// copy service files to generated kubernetes manifests
+		// copy service files to the generated kubernetes manifests
 		targetKubernetesServiceFileName := c.NodeDirectoryName + Path + "/" + ServiceFile
 		_, err := utils.CopyFile(targetKubernetesServiceFileName, c.TemplatesRootPath+Path+"/"+ServiceFile)
 		if err != nil {
@@ -67,7 +67,7 @@ func (c Copier) CreateKubernetesFiles() error {
 		}
 		filePaths = append(filePaths, &targetKubernetesServiceFileName)
 	}
-	// copy deployment files to generated kubernetes manifests
+	// copy deployment files to the generated kubernetes manifests
 	targetKubernetesDeploymentFileName := c.NodeDirectoryName + Path + "/" + DeploymentFile
 	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, c.TemplatesRootPath+Path+"/"+DeploymentFile)
 	if err != nil {

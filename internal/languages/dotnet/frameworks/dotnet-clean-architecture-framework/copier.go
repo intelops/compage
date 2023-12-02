@@ -46,7 +46,7 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 func (c *Copier) createRestServerDirectories() error {
 	rootDirectory := c.NodeDirectoryName
 	if err := utils.CreateDirectories(rootDirectory); err != nil {
-		log.Debugf("error creating root directory: %v", err)
+		log.Errorf("error creating root directory: %v", err)
 		return err
 	}
 	return nil
@@ -55,7 +55,7 @@ func (c *Copier) createRestServerDirectories() error {
 // CreateRestConfigs creates/copies relevant files to generated project
 func (c *Copier) CreateRestConfigs() error {
 	if err := c.CreateRestServer(); err != nil {
-		log.Debugf("error creating rest server: %v", err)
+		log.Errorf("error creating rest server: %v", err)
 		return err
 	}
 	return nil
@@ -67,7 +67,7 @@ func (c *Copier) CreateRestServer() error {
 	if c.IsRestServer {
 		// create directories for controller, service, dao, models
 		if err := c.createRestServerDirectories(); err != nil {
-			log.Debugf("error creating rest server directories: %v", err)
+			log.Errorf("error creating rest server directories: %v", err)
 			return err
 		}
 	}

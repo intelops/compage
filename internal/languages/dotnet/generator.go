@@ -37,13 +37,13 @@ func generateRESTConfig(_ context.Context, dotNetValues *DotNetValues) error {
 				}
 				if n.RestConfig.Server != nil {
 					if err := dotNetCleanArchitectureCopier.CreateRestServer(); err != nil {
-						log.Debugf("err : %s", err)
+						log.Errorf("err : %s", err)
 						return err
 					}
 				}
 				// copy all files at root level, fire this at last
 				if err := dotNetCleanArchitectureCopier.CreateRootLevelFiles(); err != nil {
-					log.Debugf("err : %s", err)
+					log.Errorf("err : %s", err)
 					return err
 				}
 			} else {

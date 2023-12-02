@@ -152,6 +152,7 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 func (c *Copier) createGrpcClientDirectories() error {
 	clientDirectory := c.NodeDirectoryName + GrpcClientPath
 	if err := utils.CreateDirectories(clientDirectory); err != nil {
+		log.Errorf("error creating client directory: %v", err)
 		return err
 	}
 
@@ -665,9 +666,11 @@ func (c *Copier) getCreateQueryColumns(createQueryColumns *string, key string, v
 // CreateGrpcConfigs creates/copies relevant files to a generated project
 func (c *Copier) CreateGrpcConfigs() error {
 	if err := c.CreateGrpcServer(); err != nil {
+		log.Errorf("error creating grpc server: %v", err)
 		return err
 	}
 	if err := c.CreateGrpcClients(); err != nil {
+		log.Errorf("error creating grpc clients: %v", err)
 		return err
 	}
 	return nil
@@ -679,11 +682,13 @@ func (c *Copier) CreateGrpcServer() error {
 	if c.IsGrpcServer {
 		// create directories for controller, service, dao[for every resource's db clients], models
 		if err := c.createGrpcServerDirectories(); err != nil {
+			log.Errorf("error creating grpc server directories: %v", err)
 			return err
 		}
 		// copy files with respect to the names of resources
 		for _, resource := range c.Resources {
 			if err := c.copyGrpcServerResourceFiles(resource); err != nil {
+				log.Errorf("error copying grpc server resource files: %v", err)
 				return err
 			}
 		}
@@ -694,13 +699,13 @@ func (c *Copier) CreateGrpcServer() error {
 		targetOpenTelConfigFileName := c.NodeDirectoryName + ConfigPath + "/" + ConfigFile
 		_, err := utils.CopyFile(targetOpenTelConfigFileName, c.TemplatesRootPath+ConfigPath+"/"+ConfigFile)
 		if err != nil {
-			log.Debugf("error copying opentel config file: %v", err)
+			log.Errorf("error copying opentel config file: %v", err)
 			return err
 		}
 		filePaths = append(filePaths, &targetOpenTelConfigFileName)
 		err = executor.Execute(filePaths, c.Data)
 		if err != nil {
-			log.Debugf("error executing opentel config file: %v", err)
+			log.Errorf("error executing opentel config file: %v", err)
 			return err
 		}
 
@@ -711,8 +716,9 @@ func (c *Copier) CreateGrpcServer() error {
 				var filePaths []*string
 				// client files
 				targetSQLiteConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + SqliteDBConfigFile
-				_, err := utils.CopyFile(targetSQLiteConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SqliteDBConfigFile)
+				_, err = utils.CopyFile(targetSQLiteConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SqliteDBConfigFile)
 				if err != nil {
+					log.Errorf("error copying sqlite config file: %v", err)
 					return err
 				}
 				filePaths = append(filePaths, &targetSQLiteConfigFileName)
@@ -721,8 +727,9 @@ func (c *Copier) CreateGrpcServer() error {
 				var filePaths []*string
 				// client files
 				targetMySQLConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + MySQLDBConfigFile
-				_, err := utils.CopyFile(targetMySQLConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBConfigFile)
+				_, err = utils.CopyFile(targetMySQLConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLDBConfigFile)
 				if err != nil {
+					log.Errorf("error copying mysql config file: %v", err)
 					return err
 				}
 				filePaths = append(filePaths, &targetMySQLConfigFileName)
@@ -731,9 +738,9 @@ func (c *Copier) CreateGrpcServer() error {
 				var filePaths []*string
 				// client files
 				targetSQLiteConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + SQLiteGORMDBConfigFile
-				_, err := utils.CopyFile(targetSQLiteConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SQLiteGORMDBConfigFile)
+				_, err = utils.CopyFile(targetSQLiteConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+SQLiteGORMDBConfigFile)
 				if err != nil {
-					log.Debugf("error copying sqlite gorm config file: %v", err)
+					log.Errorf("error copying sqlite gorm config file: %v", err)
 					return err
 				}
 				filePaths = append(filePaths, &targetSQLiteConfigFileName)
@@ -742,9 +749,9 @@ func (c *Copier) CreateGrpcServer() error {
 				var filePaths []*string
 				// client files
 				targetMySQLConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + MySQLGORMDBConfigFile
-				_, err := utils.CopyFile(targetMySQLConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLGORMDBConfigFile)
+				_, err = utils.CopyFile(targetMySQLConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MySQLGORMDBConfigFile)
 				if err != nil {
-					log.Debugf("error copying mysql gorm config file: %v", err)
+					log.Errorf("error copying mysql gorm config file: %v", err)
 					return err
 				}
 				filePaths = append(filePaths, &targetMySQLConfigFileName)
@@ -753,9 +760,9 @@ func (c *Copier) CreateGrpcServer() error {
 				var filePaths []*string
 				// client files
 				targetMapConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + MapDBConfigFile
-				_, err := utils.CopyFile(targetMapConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MapDBConfigFile)
+				_, err = utils.CopyFile(targetMapConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MapDBConfigFile)
 				if err != nil {
-					log.Debugf("error copying map config file: %v", err)
+					log.Errorf("error copying map config file: %v", err)
 					return err
 				}
 				filePaths = append(filePaths, &targetMapConfigFileName)
@@ -768,9 +775,9 @@ func (c *Copier) CreateGrpcServer() error {
 				var filePaths []*string
 				// client files
 				targetMongoDBConfigFileName := c.NodeDirectoryName + NoSQLDBClientsPath + "/" + MongoDBConfigFile
-				_, err := utils.CopyFile(targetMongoDBConfigFileName, c.TemplatesRootPath+NoSQLDBClientsPath+"/"+MongoDBConfigFile)
+				_, err = utils.CopyFile(targetMongoDBConfigFileName, c.TemplatesRootPath+NoSQLDBClientsPath+"/"+MongoDBConfigFile)
 				if err != nil {
-					log.Debugf("error copying mongodb config file: %v", err)
+					log.Errorf("error copying mongodb config file: %v", err)
 					return err
 				}
 				filePaths = append(filePaths, &targetMongoDBConfigFileName)
@@ -785,6 +792,7 @@ func (c *Copier) CreateGrpcServer() error {
 func (c *Copier) CreateGrpcClients() error {
 	// create directories for a client
 	if err := c.createGrpcClientDirectories(); err != nil {
+		log.Errorf("error creating grpc client directories: %v", err)
 		return err
 	}
 	// if the node is client, add client code
@@ -800,6 +808,7 @@ func (c *Copier) CreateGrpcClients() error {
 	if c.IsGrpcServer {
 		// create self-client
 		if err := c.copySelfGrpcClientResourceFiles(); err != nil {
+			log.Errorf("error copying self grpc client resource files: %v", err)
 			return err
 		}
 	}

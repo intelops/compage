@@ -3,6 +3,7 @@ package kubernetes
 import (
 	"github.com/intelops/compage/internal/languages/executor"
 	"github.com/intelops/compage/internal/utils"
+	log "github.com/sirupsen/logrus"
 	"strings"
 )
 
@@ -45,23 +46,26 @@ func NewCopier(gitPlafformUserName, gitRepositoryName, nodeName, nodeDirectoryNa
 func (c Copier) CreateKubernetesFiles() error {
 	destKubernetesDirectory := c.NodeDirectoryName + Path
 	if err := utils.CreateDirectories(destKubernetesDirectory); err != nil {
+		log.Errorf("error creating root directory: %v", err)
 		return err
 	}
 
 	var filePaths []*string
 	if c.IsRestServer {
-		// copy service files to generated kubernetes manifests
+		// copy service files to the generated kubernetes manifests
 		targetKubernetesServiceFileName := c.NodeDirectoryName + Path + "/" + ServiceFile
 		_, err := utils.CopyFile(targetKubernetesServiceFileName, c.TemplatesRootPath+Path+"/"+ServiceFile)
 		if err != nil {
+			log.Errorf("error while copying the file [" + err.Error() + "]" + targetKubernetesServiceFileName)
 			return err
 		}
 		filePaths = append(filePaths, &targetKubernetesServiceFileName)
 	}
-	// copy deployment files to generated kubernetes manifests
+	// copy deployment files to the generated kubernetes manifests
 	targetKubernetesDeploymentFileName := c.NodeDirectoryName + Path + "/" + DeploymentFile
 	_, err := utils.CopyFile(targetKubernetesDeploymentFileName, c.TemplatesRootPath+Path+"/"+DeploymentFile)
 	if err != nil {
+		log.Errorf("error while copying the file [" + err.Error() + "]" + targetKubernetesDeploymentFileName)
 		return err
 	}
 	filePaths = append(filePaths, &targetKubernetesDeploymentFileName)

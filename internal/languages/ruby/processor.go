@@ -14,7 +14,7 @@ func Process(ctx context.Context) error {
 		return err
 	}
 
-	// generate ruby project
+	// generate the ruby project
 	if err := Generate(ctx); err != nil {
 		log.Errorf("err : %s", err)
 		return err

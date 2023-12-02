@@ -195,6 +195,7 @@ func generateRESTConfig(ctx context.Context, goValues *GoValues) error {
 			}
 
 			if err := languages.ProcessOpenAPITemplate(ctx); err != nil {
+				log.Errorf("err : %s", err)
 				return err
 			}
 		}
