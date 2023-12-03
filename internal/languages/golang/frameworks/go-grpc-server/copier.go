@@ -217,14 +217,14 @@ func (c *Copier) copyGrpcServerResourceFiles(resource *corenode.Resource) error 
 	resourceName := strcase.ToKebab(resource.Name)
 
 	if c.IsSQLDB {
-		// copy sql controller/service/dao/models files to generated project
+		// copy sql controller/service/dao/models files to a generated project
 		filePaths, err = c.copySQLDBResourceFiles(resourceName, filePaths)
 		if err != nil {
 			log.Errorf("error copying sql db resources: %v", err)
 			return err
 		}
 	} else if c.IsNoSQLDB {
-		// copy nosql controller/service/dao/models to generated project
+		// copy nosql controller/service/dao/models to a generated project
 		filePaths, err = c.copyNoSQLDBResourceFiles(resourceName, filePaths)
 		if err != nil {
 			log.Errorf("error copying sql db resources: %v", err)

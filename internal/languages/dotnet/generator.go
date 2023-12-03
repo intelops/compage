@@ -55,7 +55,7 @@ func generateRESTConfig(_ context.Context, dotNetValues *DotNetValues) error {
 	return nil
 }
 
-func getDotNetCleanArchitectureCopier(dotNetValues *DotNetValues) (*dotnet_clean_architecture.Copier, error) {
+func getDotNetCleanArchitectureCopier(dotNetValues *DotNetValues) (*dotnetcleanarchitecture.Copier, error) {
 	dotNetTemplatesRootPath := GetDotNetTemplatesRootPath()
 	if dotNetTemplatesRootPath == "" {
 		return nil, errors.New("dotnet templates root path is empty")
@@ -68,6 +68,6 @@ func getDotNetCleanArchitectureCopier(dotNetValues *DotNetValues) (*dotnet_clean
 	nodeName := dotNetValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := dotNetValues.Values.NodeDirectoryName
 
-	copier := dotnet_clean_architecture.NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path)
+	copier := dotnetcleanarchitecture.NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path)
 	return copier, nil
 }
