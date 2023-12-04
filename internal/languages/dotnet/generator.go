@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	corenode "github.com/intelops/compage/internal/core/node"
 	"github.com/intelops/compage/internal/languages"
 	"github.com/intelops/compage/internal/languages/dotnet/frameworks/dotnet-clean-architecture"
 	"github.com/intelops/compage/internal/languages/templates"
@@ -68,6 +69,32 @@ func getDotNetCleanArchitectureCopier(dotNetValues *DotNetValues) (*dotnetcleana
 	nodeName := dotNetValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := dotNetValues.Values.NodeDirectoryName
 
-	copier := dotnetcleanarchitecture.NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path)
+	isRestServer := dotNetValues.LDotNetLangNode.RestConfig != nil && dotNetValues.LDotNetLangNode.RestConfig.Server != nil
+	var restServerPort string
+	var restSQLDB string
+	var isRestSQLDB bool
+	var restNoSQLDB string
+	var isRestNoSQLDB bool
+	var restResources []*corenode.Resource
+	if isRestServer {
+		restServerPort = dotNetValues.LDotNetLangNode.RestConfig.Server.Port
+		restResources = dotNetValues.LDotNetLangNode.RestConfig.Server.Resources
+		isRestSQLDB = dotNetValues.LDotNetLangNode.RestConfig.Server.SQLDB != ""
+		restSQLDB = dotNetValues.LDotNetLangNode.RestConfig.Server.SQLDB
+		isRestNoSQLDB = dotNetValues.LDotNetLangNode.RestConfig.Server.NoSQLDB != ""
+		restNoSQLDB = dotNetValues.LDotNetLangNode.RestConfig.Server.NoSQLDB
+	} else {
+		restServerPort = ""
+		isRestSQLDB = false
+		restSQLDB = ""
+		isRestNoSQLDB = false
+		restNoSQLDB = ""
+		restResources = []*corenode.Resource{}
+	}
+
+	restClients := dotNetValues.LDotNetLangNode.RestConfig.Clients
+	// create golang specific copier
+	copier := dotnetcleanarchitecture.NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isRestSQLDB, restSQLDB, isRestNoSQLDB, restNoSQLDB, restResources, restClients)
+
 	return copier, nil
 }

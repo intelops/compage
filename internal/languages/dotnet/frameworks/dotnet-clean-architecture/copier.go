@@ -2,6 +2,9 @@ package dotnetcleanarchitecture
 
 import (
 	"github.com/gertd/go-pluralize"
+	"github.com/iancoleman/strcase"
+	corenode "github.com/intelops/compage/internal/core/node"
+	frameworks "github.com/intelops/compage/internal/languages/dotnet/frameworks"
 	"github.com/intelops/compage/internal/languages/executor"
 	log "github.com/sirupsen/logrus"
 
@@ -9,6 +12,9 @@ import (
 
 	"github.com/intelops/compage/internal/utils"
 )
+
+// TODO REMOVE later
+const RestClientPath = "/pkg/rest/client"
 
 const ApplicationPath = "/Application"
 const ApplicationCSProjFile = "/Application/Application.csproj"
@@ -117,11 +123,20 @@ type Copier struct {
 	TemplatesRootPath string
 	Data              map[string]interface{}
 	IsRestServer      bool
+	HasRestClients    bool
+	SQLDB             string
+	IsSQLDB           bool
+	NoSQLDB           string
+	IsNoSQLDB         bool
 	RestServerPort    string
+	Resources         []*corenode.Resource
+	ResourceConfig    map[string]*frameworks.RestResourceData
+	RestClients       []*corenode.RestClient
 	PluralizeClient   *pluralize.Client
 }
 
-func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, templatesRootPath string) *Copier {
+func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, templatesRootPath string, isRestServer bool, restServerPort string, isSQLDB bool, sqlDB string, isNoSQLDB bool, noSQLDB string, resources []*corenode.Resource, restClients []*corenode.RestClient) *Copier {
+	var restResourceConfig = make(map[string]*frameworks.RestResourceData)
 	pluralizeClient := pluralize.NewClient()
 
 	// populate map to replace templates
@@ -132,30 +147,108 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 		"GitPlatformURL":      strings.Replace(gitPlatformURL, "https://", "", -1),
 	}
 
+	data["SQLDB"] = sqlDB
+	data["IsSQLDB"] = isSQLDB
+	data["NoSQLDB"] = noSQLDB
+	data["IsNoSQLDB"] = isNoSQLDB
+
+	if isRestServer {
+		var restResourceData []*frameworks.RestResourceData
+		for _, r := range resources {
+			lowerCamelResourceName := strcase.ToLowerCamel(r.Name)
+			resourceData := frameworks.RestResourceData{
+				SmallKebabCaseResourceNameSingular: strcase.ToKebab(r.Name),
+				SmallSnakeCaseResourceNameSingular: strcase.ToSnake(r.Name),
+				SmallResourceNameSingular:          lowerCamelResourceName,
+				SmallResourceNamePlural:            pluralizeClient.Plural(lowerCamelResourceName),
+				CapsResourceNameSingular:           r.Name,
+				CapsResourceNamePlural:             pluralizeClient.Plural(r.Name),
+			}
+			frameworks.AddRESTAllowedMethods(&resourceData, r.AllowedMethods)
+			restResourceConfig[r.Name] = &resourceData
+			restResourceData = append(restResourceData, &resourceData)
+		}
+		data["RestResources"] = restResourceData
+		data["RestServerPort"] = restServerPort
+		data["IsRestServer"] = isRestServer
+	}
+
+	hasRestClients := len(restClients) > 0
+
 	return &Copier{
 		TemplatesRootPath: templatesRootPath,
 		NodeDirectoryName: nodeDirectoryName,
 		Data:              data,
+		IsRestServer:      isRestServer,
+		RestServerPort:    restServerPort,
+		HasRestClients:    hasRestClients,
+		SQLDB:             sqlDB,
+		IsSQLDB:           isSQLDB,
+		NoSQLDB:           noSQLDB,
+		IsNoSQLDB:         isNoSQLDB,
+		Resources:         resources,
+		ResourceConfig:    restResourceConfig,
+		RestClients:       restClients,
 		PluralizeClient:   pluralizeClient,
 	}
 }
 
-// createRestServerDirectories creates rest server directories.
-func (c *Copier) createRestServerDirectories() error {
-	rootDirectory := c.NodeDirectoryName
-	if err := utils.CreateDirectories(rootDirectory); err != nil {
-		log.Errorf("error creating root directory: %v", err)
+// createRestClientDirectories creates rest client directories.
+func (c *Copier) createRestClientDirectories() error {
+	clientDirectory := c.NodeDirectoryName + RestClientPath
+	if err := utils.CreateDirectories(clientDirectory); err != nil {
+		log.Errorf("error creating client directory: %v", err)
 		return err
 	}
+
 	return nil
 }
 
-// CreateRestConfigs creates/copies relevant files to a generated project
-func (c *Copier) CreateRestConfigs() error {
-	if err := c.CreateRestServer(); err != nil {
-		log.Errorf("error creating rest server: %v", err)
+// createRestServerDirectories creates rest server directories.
+func (c *Copier) createRestServerDirectories() error {
+	applicationDirectory := c.NodeDirectoryName + ApplicationPath
+	//applicationCommandsDirectory := c.NodeDirectoryName + ApplicationCommandsPath
+	//applicationExceptionsDirectory := c.NodeDirectoryName + ApplicationExceptionsPath
+	//applicationExtensionsDirectory := c.NodeDirectoryName + ApplicationExtensionsPath
+	//applicationHandlersDirectory := c.NodeDirectoryName + ApplicationHandlersPath
+
+	coreDirectory := c.NodeDirectoryName + CorePath
+	infrastructureDirectory := c.NodeDirectoryName + InfrastructurePath
+	splitted := strings.Split(c.NodeDirectoryName, "/")
+	projectNameDirectory := c.NodeDirectoryName + "/" + splitted[len(splitted)-1]
+	testsDirectory := c.NodeDirectoryName + TestsPath
+	if err := utils.CreateDirectories(applicationDirectory); err != nil {
+		log.Errorf("error creating application directory: %v", err)
 		return err
 	}
+
+	if err := utils.CreateDirectories(applicationDirectory); err != nil {
+		log.Errorf("error creating application directory: %v", err)
+		return err
+	}
+
+	if err := utils.CreateDirectories(applicationDirectory); err != nil {
+		log.Errorf("error creating application directory: %v", err)
+		return err
+	}
+
+	if err := utils.CreateDirectories(coreDirectory); err != nil {
+		log.Errorf("error creating core directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(infrastructureDirectory); err != nil {
+		log.Errorf("error creating infrastructure directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(projectNameDirectory); err != nil {
+		log.Errorf("error creating project name directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(testsDirectory); err != nil {
+		log.Errorf("error creating tests directory: %v", err)
+		return err
+	}
+
 	return nil
 }
 
