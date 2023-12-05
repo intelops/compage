@@ -207,10 +207,10 @@ func (c *Copier) createRestClientDirectories() error {
 // createRestServerDirectories creates rest server directories.
 func (c *Copier) createRestServerDirectories() error {
 	applicationDirectory := c.NodeDirectoryName + ApplicationPath
-	//applicationCommandsDirectory := c.NodeDirectoryName + ApplicationCommandsPath
-	//applicationExceptionsDirectory := c.NodeDirectoryName + ApplicationExceptionsPath
-	//applicationExtensionsDirectory := c.NodeDirectoryName + ApplicationExtensionsPath
-	//applicationHandlersDirectory := c.NodeDirectoryName + ApplicationHandlersPath
+	applicationCommandsDirectory := c.NodeDirectoryName + ApplicationCommandsPath
+	applicationExceptionsDirectory := c.NodeDirectoryName + ApplicationExceptionsPath
+	applicationExtensionsDirectory := c.NodeDirectoryName + ApplicationExtensionsPath
+	applicationHandlersDirectory := c.NodeDirectoryName + ApplicationHandlersPath
 
 	coreDirectory := c.NodeDirectoryName + CorePath
 	infrastructureDirectory := c.NodeDirectoryName + InfrastructurePath
@@ -219,6 +219,22 @@ func (c *Copier) createRestServerDirectories() error {
 	testsDirectory := c.NodeDirectoryName + TestsPath
 	if err := utils.CreateDirectories(applicationDirectory); err != nil {
 		log.Errorf("error creating application directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(applicationCommandsDirectory); err != nil {
+		log.Errorf("error creating application commands directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(applicationExceptionsDirectory); err != nil {
+		log.Errorf("error creating application exceptions directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(applicationExtensionsDirectory); err != nil {
+		log.Errorf("error creating application extensions directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(applicationHandlersDirectory); err != nil {
+		log.Errorf("error creating application handlers directory: %v", err)
 		return err
 	}
 
