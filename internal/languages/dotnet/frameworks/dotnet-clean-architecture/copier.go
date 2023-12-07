@@ -89,20 +89,19 @@ const InfrastructureRepositoriesPath = "/Infrastructure/Repositories"
 const InfrastructureRepositoriesRepositoryBaseFile = "/Infrastructure/Repositories/RepositoryBase.cs.tmpl"
 const InfrastructureRepositoriesResourceNameRepositoryFile = "/Infrastructure/Repositories/ResourceNameRepository.cs.tmpl"
 
-const ProjectNamePath = "/ProjectName"
-const ProjectNameCSProjFile = "/ProjectName/ProjectName.csproj"
-const ProjectNameProgramFile = "/ProjectName/Program.cs.tmpl"
-const ProjectNameCSProjUSerFile = "/ProjectName/ProjectName.csproj.user.tmpl"
-const ProjectNameAppSettingsDevelopmentFile = "/ProjectName/appsettings.Development.json.tmpl"
-const ProjectNameAppSettingsFile = "/ProjectName/appsettings.json.tmpl"
+const ProjectNameCSProjFile = "/ProjectName.csproj"
+const ProjectNameProgramFile = "/Program.cs.tmpl"
+const ProjectNameCSProjUSerFile = "/ProjectName.csproj.user.tmpl"
+const ProjectNameAppSettingsDevelopmentFile = "/appsettings.Development.json.tmpl"
+const ProjectNameAppSettingsFile = "/appsettings.json.tmpl"
 
 // controllers
-const ProjectNameControllersPath = "/ProjectName/Controllers"
-const ProjectNameControllersResourceNameServiceControllerFile = "/ProjectName/Controllers/ResourceNameServiceController.cs.tmpl"
+const ProjectNameControllersPath = "/Controllers"
+const ProjectNameControllersResourceNameServiceControllerFile = "/Controllers/ResourceNameServiceController.cs.tmpl"
 
 // properties
-const ProjectNamePropertiesPath = "/ProjectName/Properties"
-const ProjectNamePropertiesLaunchSettingsFile = "/ProjectName/Properties/launchSettings.json.tmpl"
+const ProjectNamePropertiesPath = "/Properties"
+const ProjectNamePropertiesLaunchSettingsFile = "/Properties/launchSettings.json.tmpl"
 
 const TestsPath = "/Tests"
 const TestsApplicationTestsCSProjFile = "/Tests/Application.Tests.csproj.tmpl"
@@ -211,12 +210,10 @@ func (c *Copier) createRestServerDirectories() error {
 	applicationExceptionsDirectory := c.NodeDirectoryName + ApplicationExceptionsPath
 	applicationExtensionsDirectory := c.NodeDirectoryName + ApplicationExtensionsPath
 	applicationHandlersDirectory := c.NodeDirectoryName + ApplicationHandlersPath
+	applicationMappersDirectory := c.NodeDirectoryName + ApplicationMappersPath
+	applicationQueriesDirectory := c.NodeDirectoryName + ApplicationQueriesPath
+	applicationResponsesDirectory := c.NodeDirectoryName + ApplicationResponsesPath
 
-	coreDirectory := c.NodeDirectoryName + CorePath
-	infrastructureDirectory := c.NodeDirectoryName + InfrastructurePath
-	splitted := strings.Split(c.NodeDirectoryName, "/")
-	projectNameDirectory := c.NodeDirectoryName + "/" + splitted[len(splitted)-1]
-	testsDirectory := c.NodeDirectoryName + TestsPath
 	if err := utils.CreateDirectories(applicationDirectory); err != nil {
 		log.Errorf("error creating application directory: %v", err)
 		return err
@@ -237,31 +234,86 @@ func (c *Copier) createRestServerDirectories() error {
 		log.Errorf("error creating application handlers directory: %v", err)
 		return err
 	}
-
-	if err := utils.CreateDirectories(applicationDirectory); err != nil {
-		log.Errorf("error creating application directory: %v", err)
+	if err := utils.CreateDirectories(applicationMappersDirectory); err != nil {
+		log.Errorf("error creating application mappers directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(applicationQueriesDirectory); err != nil {
+		log.Errorf("error creating application queries directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(applicationResponsesDirectory); err != nil {
+		log.Errorf("error creating application responses directory: %v", err)
 		return err
 	}
 
-	if err := utils.CreateDirectories(applicationDirectory); err != nil {
-		log.Errorf("error creating application directory: %v", err)
-		return err
-	}
-
+	coreDirectory := c.NodeDirectoryName + CorePath
+	coreCommonDirectory := c.NodeDirectoryName + CoreCommonPath
+	coreEntitiesDirectory := c.NodeDirectoryName + CoreEntitiesPath
+	coreRepositoriesDirectory := c.NodeDirectoryName + CoreRepositoriesPath
 	if err := utils.CreateDirectories(coreDirectory); err != nil {
 		log.Errorf("error creating core directory: %v", err)
 		return err
 	}
+	if err := utils.CreateDirectories(coreCommonDirectory); err != nil {
+		log.Errorf("error creating core common directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(coreEntitiesDirectory); err != nil {
+		log.Errorf("error creating core entities directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(coreRepositoriesDirectory); err != nil {
+		log.Errorf("error creating core repositories directory: %v", err)
+		return err
+	}
+
+	infrastructureDirectory := c.NodeDirectoryName + InfrastructurePath
+	infrastructureDataDirectory := c.NodeDirectoryName + InfrastructureDataPath
+	infrastructureExtensionsDirectory := c.NodeDirectoryName + InfrastructureExtensionsPath
+	infrastructureRepositoriesDirectory := c.NodeDirectoryName + InfrastructureRepositoriesPath
 	if err := utils.CreateDirectories(infrastructureDirectory); err != nil {
 		log.Errorf("error creating infrastructure directory: %v", err)
 		return err
 	}
+	if err := utils.CreateDirectories(infrastructureDataDirectory); err != nil {
+		log.Errorf("error creating infrastructure data directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(infrastructureExtensionsDirectory); err != nil {
+		log.Errorf("error creating infrastructure extensions directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(infrastructureRepositoriesDirectory); err != nil {
+		log.Errorf("error creating infrastructure repositories directory: %v", err)
+		return err
+	}
+
+	splitted := strings.Split(c.NodeDirectoryName, "/")
+	projectNameDirectory := c.NodeDirectoryName + "/" + splitted[len(splitted)-1]
+	projectNameControllersDirectory := projectNameDirectory + ProjectNameControllersPath
+	projectNamePropertiesDirectory := projectNameDirectory + ProjectNamePropertiesPath
 	if err := utils.CreateDirectories(projectNameDirectory); err != nil {
 		log.Errorf("error creating project name directory: %v", err)
 		return err
 	}
+	if err := utils.CreateDirectories(projectNameControllersDirectory); err != nil {
+		log.Errorf("error creating project name controllers directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(projectNamePropertiesDirectory); err != nil {
+		log.Errorf("error creating project name properties directory: %v", err)
+		return err
+	}
+
+	testsDirectory := c.NodeDirectoryName + TestsPath
+	testsHandlersDirectory := c.NodeDirectoryName + TestsHandlersPath
 	if err := utils.CreateDirectories(testsDirectory); err != nil {
 		log.Errorf("error creating tests directory: %v", err)
+		return err
+	}
+	if err := utils.CreateDirectories(testsHandlersDirectory); err != nil {
+		log.Errorf("error creating tests handlers directory: %v", err)
 		return err
 	}
 
