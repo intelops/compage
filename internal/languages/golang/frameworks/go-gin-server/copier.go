@@ -619,19 +619,6 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string
 	return filePaths, nil
 }
 
-// CreateRestConfigs creates/copies relevant files to a generated project
-func (c *Copier) CreateRestConfigs() error {
-	if err := c.CreateRestServer(); err != nil {
-		log.Errorf("error creating rest server: %v", err)
-		return err
-	}
-	if err := c.CreateRestClients(); err != nil {
-		log.Errorf("error creating rest clients: %v", err)
-		return err
-	}
-	return nil
-}
-
 // CreateRestServer creates/copies relevant files to a generated project
 func (c *Copier) CreateRestServer() error {
 	// if the node is server, add server code
