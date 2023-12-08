@@ -80,16 +80,6 @@ func processNode(coreProject *core.Project, compageNode *corenode.Node) error {
 	// add values(LanguageNode and configs from coreProject) to context.
 	languageCtx := languages.AddValuesToContext(context.Background(), coreProject, languageNode)
 
-	// extract nodeDirectoryName for formatter
-	values := languageCtx.Value(languages.ContextKeyLanguageContextVars).(languages.Values)
-	nodeDirectoryName := values.NodeDirectoryName
-
-	// create node directory in projectDirectory depicting a subproject
-	if err0 := utils.CreateDirectories(nodeDirectoryName); err0 != nil {
-		log.Errorf("err : %s", err0)
-		return err0
-	}
-
 	err = runLanguageProcess(languageNode, languageCtx)
 	if err != nil {
 		log.Errorf("err : %s", err)
