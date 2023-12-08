@@ -73,7 +73,7 @@ const CoreRepositoriesIResourceNameRepositoryFile = "/Core/Repositories/IResourc
 const CoreRepositoriesIAsyncRepositoryFile = "/Core/Repositories/IAsyncRepository.cs.tmpl"
 
 const InfrastructurePath = "/Infrastructure"
-const InfrastructureCSProjFile = "/Infrastructure/Infrastructure.csproj"
+const InfrastructureCSProjFile = "/Infrastructure/Infrastructure.csproj.tmpl"
 
 // data
 const InfrastructureDataPath = "/Infrastructure/Data"
@@ -89,7 +89,7 @@ const InfrastructureRepositoriesPath = "/Infrastructure/Repositories"
 const InfrastructureRepositoriesRepositoryBaseFile = "/Infrastructure/Repositories/RepositoryBase.cs.tmpl"
 const InfrastructureRepositoriesResourceNameRepositoryFile = "/Infrastructure/Repositories/ResourceNameRepository.cs.tmpl"
 
-const ProjectNameCSProjFile = "/ProjectName.csproj"
+const ProjectNameCSProjFile = "/ProjectName.csproj.tmpl"
 const ProjectNameProgramFile = "/Program.cs.tmpl"
 const ProjectNameCSProjUSerFile = "/ProjectName.csproj.user.tmpl"
 const ProjectNameAppSettingsDevelopmentFile = "/appsettings.Development.json.tmpl"
@@ -379,10 +379,18 @@ func (c *Copier) CreateRestServer() error {
 		// copy below files to the generated project
 		// core/common/EntityBase.cs
 		// core/Repositories/IAsyncRepository.cs
-		// core/ProjectName.Core.csproj
-
+		// core/Core.csproj
 		if err := c.copyCoreFiles(); err != nil {
 			log.Errorf("error copying core files: %v", err)
+			return err
+		}
+
+		// copy below files to the generated project
+		// infrastructure/Infrastructure.csproj
+		// infrastructure/Data/DatabaseContext.cs
+		// infrastructure/Data/DatabaseContextFactory.cs
+		if err := c.copyInfrastructureFiles(); err != nil {
+			log.Errorf("error copying infrastructure files: %v", err)
 			return err
 		}
 
@@ -439,6 +447,38 @@ func (c *Copier) copyCoreFiles() error {
 	}
 
 	filePaths = append(filePaths, &targetCoreRepositoriesAsyncRepositoryFileName)
+
+	return executor.Execute(filePaths, c.Data)
+}
+
+func (c *Copier) copyInfrastructureFiles() error {
+	var filePaths []*string
+	// infrastructure/Infrastructure.csproj
+	targetInfrastructureCSProjFileName := c.NodeDirectoryName + InfrastructureCSProjFile
+	_, err := utils.CopyFile(targetInfrastructureCSProjFileName, c.TemplatesRootPath+InfrastructureCSProjFile)
+	if err != nil {
+		log.Errorf("error copying infrastructure Infrastructure.csproj file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetInfrastructureCSProjFileName)
+
+	// infrastructure/Data/DatabaseContextFactory.cs
+	targetDatabaseContextFactoryFileName := c.NodeDirectoryName + InfrastructureDataDatabaseContextFactoryFile
+	_, err = utils.CopyFile(targetDatabaseContextFactoryFileName, c.TemplatesRootPath+InfrastructureDataDatabaseContextFactoryFile)
+	if err != nil {
+		log.Errorf("error copying infrastructure DatabaseContextFactory file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetDatabaseContextFactoryFileName)
+
+	// infrastructure/Repositories/RepositoryBase.cs
+	targetRepositoriesRepositoryBaseFileName := c.NodeDirectoryName + InfrastructureRepositoriesRepositoryBaseFile
+	_, err = utils.CopyFile(targetRepositoriesRepositoryBaseFileName, c.TemplatesRootPath+InfrastructureRepositoriesRepositoryBaseFile)
+	if err != nil {
+		log.Errorf("error copying infrastructure RepositoryBase file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetRepositoriesRepositoryBaseFileName)
 
 	return executor.Execute(filePaths, c.Data)
 }
