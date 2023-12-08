@@ -104,17 +104,17 @@ const ProjectNamePropertiesPath = "/Properties"
 const ProjectNamePropertiesLaunchSettingsFile = "/Properties/launchSettings.json.tmpl"
 
 const TestsPath = "/Tests"
-const TestsApplicationTestsCSProjFile = "/Tests/Application.Tests.csproj.tmpl"
-const TestsGlobalUsingsFile = "/Tests/GlobalUsings.cs.tmpl"
+const TestsApplicationTestsCSProjFile = "/Tests/Application.Tests/Application.Tests.csproj.tmpl"
+const TestsGlobalUsingsFile = "/Tests/Application.Tests/GlobalUsings.cs.tmpl"
 
 // handlers
-const TestsHandlersPath = "/Tests/Handlers"
-const TestsHandlersResourceNameServicePath = "/Tests/Handlers/ResourceNameService"
-const TestsHandlersCreateResourceNameCommandHandlerTestsCSFile = "/Tests/Handlers/ResourceNameService/CreateResourceNameCommandHandlerTests.cs.tmpl"
-const TestsHandlersDeleteResourceNameCommandHandlerTestsCSFile = "/Tests/Handlers/ResourceNameService/DeleteResourceNameCommandHandlerTests.cs.tmpl"
-const TestsHandlersUpdateResourceNameCommandHandlerTestsCSFile = "/Tests/Handlers/ResourceNameService/UpdateResourceNameCommandHandlerTests.cs.tmpl"
-const TestsHandlersTestsHandlersGetResourceNameByIDQueryHandlerTestsCSFile = "/Tests/Handlers/ResourceNameService/GetResourceNameByIDQueryHandlerTests.cs.tmpl"
-const TestsHandlersGetAllResourceNamesQueryHandlerTestsCSFile = "/Tests/Handlers/ResourceNameService/GetAllResourceNamesQueryHandlerTests.cs.tmpl"
+const TestsHandlersPath = "/Tests/Application.Tests/Handlers"
+const TestsHandlersResourceNameServicePath = "/Tests/Application.Tests/Handlers/ResourceNameService"
+const TestsHandlersCreateResourceNameCommandHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/CreateResourceNameCommandHandlerTests.cs.tmpl"
+const TestsHandlersDeleteResourceNameCommandHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/DeleteResourceNameCommandHandlerTests.cs.tmpl"
+const TestsHandlersUpdateResourceNameCommandHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/UpdateResourceNameCommandHandlerTests.cs.tmpl"
+const TestsHandlersTestsHandlersGetResourceNameByIDQueryHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/GetResourceNameByIDQueryHandlerTests.cs.tmpl"
+const TestsHandlersGetAllResourceNamesQueryHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/GetAllResourceNamesQueryHandlerTests.cs.tmpl"
 
 // Copier Language specific *Copier
 type Copier struct {
@@ -402,6 +402,13 @@ func (c *Copier) CreateRestServer() error {
 			return err
 		}
 
+		// copy below files to the generated project
+		// tests/Application.Tests.csproj
+		// tests/GlobalUsings.cs
+		if err := c.copyTestsFiles(); err != nil {
+			log.Errorf("error copying tests files: %v", err)
+			return err
+		}
 		// copy files with respect to the names of resources
 		for _, resource := range c.Resources {
 			if err := c.copyRestServerResourceFiles(resource); err != nil {
@@ -510,6 +517,29 @@ func (c *Copier) copyApplicationFiles() error {
 		return err
 	}
 	filePaths = append(filePaths, &targetApplicationExtensionsServiceRegistrationFileName)
+
+	return executor.Execute(filePaths, c.Data)
+}
+
+func (c *Copier) copyTestsFiles() error {
+	var filePaths []*string
+	// tests/Application.Tests.csproj
+	targetApplicationTestsCSProjFileName := c.NodeDirectoryName + TestsApplicationTestsCSProjFile
+	_, err := utils.CopyFile(targetApplicationTestsCSProjFileName, c.TemplatesRootPath+TestsApplicationTestsCSProjFile)
+	if err != nil {
+		log.Errorf("error copying tests Application.Tests.csproj file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationTestsCSProjFileName)
+
+	// tests/GlobalUsings.cs
+	targetGlobalUsingsFileName := c.NodeDirectoryName + TestsGlobalUsingsFile
+	_, err = utils.CopyFile(targetGlobalUsingsFileName, c.TemplatesRootPath+TestsGlobalUsingsFile)
+	if err != nil {
+		log.Errorf("error copying tests GlobalUsings file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetGlobalUsingsFileName)
 
 	return executor.Execute(filePaths, c.Data)
 }
