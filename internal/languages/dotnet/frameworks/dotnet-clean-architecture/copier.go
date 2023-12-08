@@ -17,7 +17,7 @@ import (
 const RestClientPath = "/pkg/rest/client"
 
 const ApplicationPath = "/Application"
-const ApplicationCSProjFile = "/Application/Application.csproj"
+const ApplicationCSProjFile = "/Application/Application.csproj.tmpl"
 
 // commands
 const ApplicationCommandsPath = "/Application/Commands"
@@ -377,6 +377,14 @@ func (c *Copier) CreateRestServer() error {
 		}
 
 		// copy below files to the generated project
+		// application/Application.csproj
+		// application/Extensions/ServiceRegistration.cs
+		if err := c.copyApplicationFiles(); err != nil {
+			log.Errorf("error copying application files: %v", err)
+			return err
+		}
+
+		// copy below files to the generated project
 		// core/common/EntityBase.cs
 		// core/Repositories/IAsyncRepository.cs
 		// core/Core.csproj
@@ -479,6 +487,29 @@ func (c *Copier) copyInfrastructureFiles() error {
 		return err
 	}
 	filePaths = append(filePaths, &targetRepositoriesRepositoryBaseFileName)
+
+	return executor.Execute(filePaths, c.Data)
+}
+
+func (c *Copier) copyApplicationFiles() error {
+	var filePaths []*string
+	// application/Application.csproj
+	targetApplicationCSProjFileName := c.NodeDirectoryName + ApplicationCSProjFile
+	_, err := utils.CopyFile(targetApplicationCSProjFileName, c.TemplatesRootPath+ApplicationCSProjFile)
+	if err != nil {
+		log.Errorf("error copying application Application.csproj file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationCSProjFileName)
+
+	// application/Extensions/ServiceRegistration.cs
+	targetApplicationExtensionsServiceRegistrationFileName := c.NodeDirectoryName + ApplicationExtensionsServiceRegistrationFile
+	_, err = utils.CopyFile(targetApplicationExtensionsServiceRegistrationFileName, c.TemplatesRootPath+ApplicationExtensionsServiceRegistrationFile)
+	if err != nil {
+		log.Errorf("error copying application ServiceRegistration file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationExtensionsServiceRegistrationFileName)
 
 	return executor.Execute(filePaths, c.Data)
 }
