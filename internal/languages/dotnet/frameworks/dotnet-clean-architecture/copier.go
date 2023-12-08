@@ -57,7 +57,7 @@ const ApplicationResponsesPath = "/Application/Responses"
 const ApplicationResponsesResourceNameResponseFile = "/Application/Responses/ResourceNameResponse.cs.tmpl"
 
 const CorePath = "/Core"
-const CoreCoreCSProjFile = "/Core/Core.csproj"
+const CoreCoreCSProjFile = "/Core/Core.csproj.tmpl"
 
 // common
 const CoreCommonPath = "/Core/Common"
@@ -320,6 +320,52 @@ func (c *Copier) createRestServerDirectories() error {
 	return nil
 }
 
+// copyRestServerResourceFiles copies rest server resource files from template and renames them as per resource config.
+func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error {
+	var filePaths []*string
+	var err error
+	// copy sql files (core)
+	if c.IsSQLDB {
+		// add files to filePaths and copy them to the generated project
+	}
+	// add resource-specific data to map in c needed for templates.
+	err = c.addResourceSpecificTemplateData(resource)
+	if err != nil {
+		log.Errorf("error adding resource specific template data: %v", err)
+		return err
+	}
+
+	// apply template
+	return executor.Execute(filePaths, c.Data)
+}
+
+func (c *Copier) addResourceSpecificTemplateData(resource *corenode.Resource) error {
+	// make every field public by making its first character capital.
+	fields := map[string]string{}
+	for key, value := range resource.Fields {
+		fields[key] = value.Type
+	}
+	c.Data["Fields"] = fields
+	// Add another map with the below keys at root level (this is for specific resource for this iteration)
+	restResourceData := c.ResourceConfig[resource.Name]
+	c.Data["SmallKebabCaseResourceNameSingular"] = restResourceData.SmallKebabCaseResourceNameSingular
+	c.Data["SmallSnakeCaseResourceNameSingular"] = restResourceData.SmallSnakeCaseResourceNameSingular
+	c.Data["SmallResourceNameSingular"] = restResourceData.SmallResourceNameSingular
+	c.Data["SmallResourceNamePlural"] = restResourceData.SmallResourceNamePlural
+	c.Data["CapsResourceNameSingular"] = restResourceData.CapsResourceNameSingular
+	c.Data["CapsResourceNamePlural"] = restResourceData.CapsResourceNamePlural
+	c.Data["IsRESTCreateAllowed"] = restResourceData.IsRESTCreateAllowed
+	c.Data["IsRESTListAllowed"] = restResourceData.IsRESTListAllowed
+	c.Data["IsRESTGetAllowed"] = restResourceData.IsRESTGetAllowed
+	c.Data["IsRESTPutAllowed"] = restResourceData.IsRESTPutAllowed
+	c.Data["IsRESTDeleteAllowed"] = restResourceData.IsRESTDeleteAllowed
+	c.Data["IsRESTPatchAllowed"] = restResourceData.IsRESTPatchAllowed
+	c.Data["IsRESTOptionsAllowed"] = restResourceData.IsRESTPatchAllowed
+	c.Data["IsRESTHeadAllowed"] = restResourceData.IsRESTHeadAllowed
+
+	return nil
+}
+
 // CreateRestServer creates/copies relevant files to a generated project
 func (c *Copier) CreateRestServer() error {
 	// if the node is server, add server code
@@ -329,6 +375,24 @@ func (c *Copier) CreateRestServer() error {
 			log.Errorf("error creating rest server directories: %v", err)
 			return err
 		}
+
+		// copy below files to the generated project
+		// core/common/EntityBase.cs
+		// core/Repositories/IAsyncRepository.cs
+		// core/ProjectName.Core.csproj
+
+		if err := c.copyCoreFiles(); err != nil {
+			log.Errorf("error copying core files: %v", err)
+			return err
+		}
+
+		// copy files with respect to the names of resources
+		for _, resource := range c.Resources {
+			if err := c.copyRestServerResourceFiles(resource); err != nil {
+				log.Errorf("error copying rest server resource files: %v", err)
+				return err
+			}
+		}
 	}
 	return nil
 }
@@ -337,11 +401,44 @@ func (c *Copier) CreateRestServer() error {
 func (c *Copier) CreateRootLevelFiles() error {
 	err := utils.CopyFiles(c.NodeDirectoryName, c.TemplatesRootPath)
 	if err != nil {
+		log.Errorf("error copying root level files: %v", err)
 		return err
 	}
 	_, files, err0 := utils.GetDirectoriesAndFilePaths(c.NodeDirectoryName)
 	if err0 != nil {
+		log.Errorf("error getting directories and file paths: %v", err0)
 		return err0
 	}
 	return executor.Execute(files, c.Data)
+}
+
+func (c *Copier) copyCoreFiles() error {
+	var filePaths []*string
+	// CoreCommonEntityBaseFile
+	targetCoreCommonEntityBaseFileName := c.NodeDirectoryName + CoreCommonEntityBaseFile
+	_, err := utils.CopyFile(targetCoreCommonEntityBaseFileName, c.TemplatesRootPath+CoreCommonEntityBaseFile)
+	if err != nil {
+		log.Errorf("error copying Core Common EntityBase file: %v", err)
+		return err
+	}
+
+	// CoreCoreCSProjFile
+	targetCoreCoreCSProjFileName := c.NodeDirectoryName + CoreCoreCSProjFile
+	_, err = utils.CopyFile(targetCoreCoreCSProjFileName, c.TemplatesRootPath+CoreCoreCSProjFile)
+	if err != nil {
+		log.Errorf("error copying Core Core.csproj file: %v", err)
+		return err
+	}
+
+	// CoreRepositoriesIAsyncRepositoryFile
+	targetCoreRepositoriesAsyncRepositoryFileName := c.NodeDirectoryName + CoreRepositoriesIAsyncRepositoryFile
+	_, err = utils.CopyFile(targetCoreRepositoriesAsyncRepositoryFileName, c.TemplatesRootPath+CoreCommonEntityBaseFile)
+	if err != nil {
+		log.Errorf("error copying Core Repositories IAsyncRepository file: %v", err)
+		return err
+	}
+
+	filePaths = append(filePaths, &targetCoreRepositoriesAsyncRepositoryFileName)
+
+	return executor.Execute(filePaths, c.Data)
 }
