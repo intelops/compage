@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/iancoleman/strcase"
 	corenode "github.com/intelops/compage/internal/core/node"
 	"github.com/intelops/compage/internal/languages"
 	"github.com/intelops/compage/internal/languages/dotnet/frameworks/dotnet-clean-architecture"
 	"github.com/intelops/compage/internal/languages/templates"
 	log "github.com/sirupsen/logrus"
+	"strings"
 )
 
 // Generate generates dotnet specific code according to config passed
@@ -67,8 +69,8 @@ func getDotNetCleanArchitectureCopier(dotNetValues *DotNetValues) (*dotnetcleana
 	gitPlatformUserName := dotNetValues.Values.Get(languages.GitPlatformUserName)
 	gitRepositoryName := dotNetValues.Values.Get(languages.GitRepositoryName)
 	nodeName := dotNetValues.Values.Get(languages.NodeName)
-	nodeDirectoryName := dotNetValues.Values.NodeDirectoryName
-
+	// dotnet nodes usually have a directory name same as node name itself but in caps.
+	nodeDirectoryName := strings.Replace(dotNetValues.Values.NodeDirectoryName, nodeName, strcase.ToCamel(nodeName), 1)
 	isRestServer := dotNetValues.LDotNetLangNode.RestConfig != nil && dotNetValues.LDotNetLangNode.RestConfig.Server != nil
 	var restServerPort string
 	var restSQLDB string
