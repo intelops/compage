@@ -66,7 +66,7 @@ func TestRestServerGeneratorNoSql(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-rest-server-project-nosql",
 		ProjectName:         "first-rest-server-project-nosql",
 		ProjectJSON:         restServerConfigJSON,
 	}
@@ -141,7 +141,7 @@ func TestRestServerGeneratorSqlMap(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-rest-server-project-map",
 		ProjectName:         "first-rest-server-project-map",
 		ProjectJSON:         restServerConfigJSON,
 	}
@@ -220,7 +220,7 @@ func TestRestServerGeneratorSqlSQLite(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-rest-server-project-sqlite",
 		ProjectName:         "first-rest-server-project-sqlite",
 		ProjectJSON:         restServerConfigJSON,
 	}
@@ -295,7 +295,7 @@ func TestRestServerGeneratorSqlMySQL(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-rest-server-project-mysql",
 		ProjectName:         "first-rest-server-project-mysql",
 		ProjectJSON:         restServerConfigJSON,
 	}
@@ -370,7 +370,7 @@ func TestRestServerGeneratorSqlSQLiteGORM(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-rest-server-project-sqlite-gorm",
 		ProjectName:         "first-rest-server-project-sqlite-gorm",
 		ProjectJSON:         restServerConfigJSON,
 	}
@@ -445,7 +445,7 @@ func TestRestServerGeneratorSqlMySQLGORM(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-rest-server-project-mysql-gorm",
 		ProjectName:         "first-rest-server-project-mysql-gorm",
 		ProjectJSON:         restServerConfigJSON,
 	}
@@ -583,7 +583,7 @@ func TestGrpcServerGeneratorNoSql(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-grpc-server-project-nosql",
 		ProjectName:         "first-grpc-server-project-nosql",
 		ProjectJSON:         grpcServerConfigJSON,
 	}
@@ -652,7 +652,7 @@ func TestGrpcServerGeneratorSqlMap(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-grpc-server-project-map",
 		ProjectName:         "first-grpc-server-project-map",
 		ProjectJSON:         grpcServerConfigJSON,
 	}
@@ -725,7 +725,7 @@ func TestGrpcServerGeneratorSqlSQLite(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-grpc-server-project-sqlite",
 		ProjectName:         "first-grpc-server-project-sqlite",
 		ProjectJSON:         grpcServerConfigJSON,
 	}
@@ -794,7 +794,7 @@ func TestGrpcServerGeneratorSqlMySQL(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-grpc-server-project-mysql",
 		ProjectName:         "first-grpc-server-project-mysql",
 		ProjectJSON:         grpcServerConfigJSON,
 	}
@@ -863,7 +863,7 @@ func TestGrpcServerGeneratorSqlSQLiteGORM(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-grpc-server-project-sqlite-gorm",
 		ProjectName:         "first-grpc-server-project-sqlite-gorm",
 		ProjectJSON:         grpcServerConfigJSON,
 	}
@@ -932,7 +932,7 @@ func TestGrpcServerGeneratorSqlMySQLGORM(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-grpc-server-project-mysql-gorm",
 		ProjectName:         "first-grpc-server-project-mysql-gorm",
 		ProjectJSON:         grpcServerConfigJSON,
 	}
@@ -1106,7 +1106,7 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-rest-server-clients-and-grpc-server-clients-cross-config-project",
 		ProjectName:         "first-rest-server-clients-and-grpc-server-clients-cross-config-project",
 		ProjectJSON:         restGrpcServerClientsCrossConfigJSON,
 	}
@@ -1215,7 +1215,7 @@ func TestRestClientAndGrpcClientCrossConfigGenerator(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-rest-client-and-grpc-client-cross-config-project",
 		ProjectName:         "first-rest-client-and-grpc-client-cross-config-project",
 		ProjectJSON:         restGrpcClientCrossConfigJSON,
 	}
@@ -1290,7 +1290,7 @@ func TestRestAndGrpcServerGenerator(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-rest-and-grpc-server-project",
 		ProjectName:         "first-rest-and-grpc-server-project",
 		ProjectJSON:         restAndGrpcServerConfigJSON,
 	}
@@ -1347,7 +1347,7 @@ func TestWsServerGenerator(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-ws-server-project",
 		ProjectName:         "first-ws-server-project",
 		ProjectJSON:         wsServerConfigJSON,
 	}
@@ -1408,7 +1408,7 @@ func TestDotNetCleanArchitectureGenerator(t *testing.T) {
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "mahendraintelops",
-		GitRepositoryName:   "first-project-github",
+		GitRepositoryName:   "first-rest-server-project-dotnet",
 		ProjectName:         "first-rest-server-project-dotnet",
 		ProjectJSON:         restServerConfigJSON,
 	}
