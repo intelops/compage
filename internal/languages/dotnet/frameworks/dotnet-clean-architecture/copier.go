@@ -328,6 +328,41 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 	if c.IsSQLDB {
 		// add files to filePaths and copy them to the generated project
 	}
+
+	// create directories for resource commands
+	resourceCommandsDirectory := c.NodeDirectoryName + ApplicationCommandsPath + "/" + resource.Name + "Service"
+	if err := utils.CreateDirectories(resourceCommandsDirectory); err != nil {
+		log.Errorf("error creating resource commands directory: %v", err)
+		return err
+	}
+
+	// copy application/commands/ResourceNameService/CreateResourceNameCommand.cs
+	targetApplicationCommandsCreateResourceNameCommandFileName := c.NodeDirectoryName + ApplicationCommandsPath + "/" + resource.Name + "Service" + "/" + "Create" + resource.Name + "Command.cs"
+	_, err = utils.CopyFile(targetApplicationCommandsCreateResourceNameCommandFileName, c.TemplatesRootPath+ApplicationCommandsCreateResourceNameCommandCSFile)
+	if err != nil {
+		log.Errorf("error copying application commands CreateResourceNameCommand.cs file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationCommandsCreateResourceNameCommandFileName)
+
+	// copy application/commands/ResourceNameService/DeleteResourceNameCommand.cs
+	targetApplicationCommandsDeleteResourceNameCommandFileName := c.NodeDirectoryName + ApplicationCommandsPath + "/" + resource.Name + "Service" + "/" + "Delete" + resource.Name + "Command.cs"
+	_, err = utils.CopyFile(targetApplicationCommandsDeleteResourceNameCommandFileName, c.TemplatesRootPath+ApplicationCommandsDeleteResourceNameCommandCSFile)
+	if err != nil {
+		log.Errorf("error copying application commands DeleteResourceNameCommand.cs file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationCommandsDeleteResourceNameCommandFileName)
+
+	// copy application/commands/ResourceNameService/UpdateResourceNameCommand.cs
+	targetApplicationCommandsUpdateResourceNameCommandFileName := c.NodeDirectoryName + ApplicationCommandsPath + "/" + resource.Name + "Service" + "/" + "Update" + resource.Name + "Command.cs"
+	_, err = utils.CopyFile(targetApplicationCommandsUpdateResourceNameCommandFileName, c.TemplatesRootPath+ApplicationCommandsUpdateResourceNameCommandCSFile)
+	if err != nil {
+		log.Errorf("error copying application commands UpdateResourceNameCommand.cs file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationCommandsUpdateResourceNameCommandFileName)
+
 	// add resource-specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
 	if err != nil {
