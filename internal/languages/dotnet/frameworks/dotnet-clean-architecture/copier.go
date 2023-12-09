@@ -39,8 +39,8 @@ const ApplicationHandlersResourceNameServicePath = "/Application/Handlers/Resour
 const ApplicationHandlersCreateResourceNameCommandHandlerCSFile = "/Application/Handlers/ResourceNameService/CreateResourceNameCommandHandler.cs.tmpl"
 const ApplicationHandlersDeleteResourceNameCommandHandlerCSFile = "/Application/Handlers/ResourceNameService/DeleteResourceNameCommandHandler.cs.tmpl"
 const ApplicationHandlersUpdateResourceNameCommandHandlerCSFile = "/Application/Handlers/ResourceNameService/UpdateResourceNameCommandHandler.cs.tmpl"
-const ApplicationHandlersGetResourceNameByIDQueryHandlerCSFile = "/Application/Handlers/ResourceNameService/GetResourceNameByIDQueryHandler.cs.tmpl"
-const ApplicationHandlersGetAllResourceNamesQueryHandlerCSFile = "/Application/Handlers/ResourceNameService/GetAllResourceNamesQueryHandler.cs.tmpl"
+const ApplicationHandlersGetResourceNameByIDQueryHandlerCSFile = "/Application/Handlers/ResourceNameService/GetResourceNameByIdQueryHandler.cs.tmpl"
+const ApplicationHandlersGetAllResourceNameQueryHandlerCSFile = "/Application/Handlers/ResourceNameService/GetAllResourceNameQueryHandler.cs.tmpl"
 
 // mappers
 const ApplicationMappersPath = "/Application/Mappers"
@@ -50,7 +50,7 @@ const ApplicationMappersResourceNameMappingProfileFile = "/Application/Mappers/R
 const ApplicationQueriesPath = "/Application/Queries"
 const ApplicationQueriesResourceNameServicePath = "/Application/Queries/ResourceNameService"
 const ApplicationQueriesGetAllResourceNamesQueryCSFile = "/Application/Queries/ResourceNameService/GetAllResourceNamesQuery.cs.tmpl"
-const ApplicationQueriesGetResourceNameByIDQueryCSFile = "/Application/Queries/ResourceNameService/GetResourceNameByIDQuery.cs.tmpl"
+const ApplicationQueriesGetResourceNameByIDQueryCSFile = "/Application/Queries/ResourceNameService/GetResourceNameByIdQuery.cs.tmpl"
 
 // responses
 const ApplicationResponsesPath = "/Application/Responses"
@@ -113,7 +113,7 @@ const TestsHandlersResourceNameServicePath = "/Tests/Application.Tests/Handlers/
 const TestsHandlersCreateResourceNameCommandHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/CreateResourceNameCommandHandlerTests.cs.tmpl"
 const TestsHandlersDeleteResourceNameCommandHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/DeleteResourceNameCommandHandlerTests.cs.tmpl"
 const TestsHandlersUpdateResourceNameCommandHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/UpdateResourceNameCommandHandlerTests.cs.tmpl"
-const TestsHandlersTestsHandlersGetResourceNameByIDQueryHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/GetResourceNameByIDQueryHandlerTests.cs.tmpl"
+const TestsHandlersTestsHandlersGetResourceNameByIDQueryHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/GetResourceNameByIdQueryHandlerTests.cs.tmpl"
 const TestsHandlersGetAllResourceNamesQueryHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/GetAllResourceNamesQueryHandlerTests.cs.tmpl"
 
 // Copier Language specific *Copier
@@ -372,6 +372,59 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 		return err
 	}
 	filePaths = append(filePaths, &targetApplicationExceptionsResourceNameNotFoundExceptionFileName)
+
+	// handlers
+	// create directories for resource handlers
+	resourceHandlersDirectory := c.NodeDirectoryName + ApplicationHandlersPath + "/" + resource.Name + "Service"
+	if err := utils.CreateDirectories(resourceHandlersDirectory); err != nil {
+		log.Errorf("error creating resource handlers directory: %v", err)
+		return err
+	}
+
+	// copy application/handlers/ResourceNameService/CreateResourceNameCommandHandler.cs
+	targetApplicationHandlersCreateResourceNameCommandHandlerFileName := c.NodeDirectoryName + ApplicationHandlersPath + "/" + resource.Name + "Service" + "/" + "Create" + resource.Name + "CommandHandler.cs"
+	_, err = utils.CopyFile(targetApplicationHandlersCreateResourceNameCommandHandlerFileName, c.TemplatesRootPath+ApplicationHandlersCreateResourceNameCommandHandlerCSFile)
+	if err != nil {
+		log.Errorf("error copying application handlers CreateResourceNameCommandHandler.cs file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationHandlersCreateResourceNameCommandHandlerFileName)
+
+	// copy application/handlers/ResourceNameService/GetAllResourceNamesQueryHandler.cs
+	targetApplicationHandlersGetAllResourceNameQueryHandlerFileName := c.NodeDirectoryName + ApplicationHandlersPath + "/" + resource.Name + "Service" + "/" + "GetAll" + resource.Name + "sQueryHandler.cs"
+	_, err = utils.CopyFile(targetApplicationHandlersGetAllResourceNameQueryHandlerFileName, c.TemplatesRootPath+ApplicationHandlersGetAllResourceNameQueryHandlerCSFile)
+	if err != nil {
+		log.Errorf("error copying application handlers GetAllResourceNameQueryHandler.cs file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationHandlersGetAllResourceNameQueryHandlerFileName)
+
+	// copy application/handlers/ResourceNameService/GetResourceNameByIdQueryHandler.cs
+	targetApplicationHandlersGetResourceNameHandlerFileName := c.NodeDirectoryName + ApplicationHandlersPath + "/" + resource.Name + "Service" + "/" + "Get" + resource.Name + "ByIdQueryHandler.cs"
+	_, err = utils.CopyFile(targetApplicationHandlersGetResourceNameHandlerFileName, c.TemplatesRootPath+ApplicationHandlersGetResourceNameByIDQueryHandlerCSFile)
+	if err != nil {
+		log.Errorf("error copying application handlers GetResourceNameByIdQueryHandler.cs file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationHandlersGetResourceNameHandlerFileName)
+
+	// copy application/handlers/ResourceNameService/UpdateResourceNameCommandHandler.cs
+	targetApplicationHandlersUpdateResourceNameCommandHandlerFileName := c.NodeDirectoryName + ApplicationHandlersPath + "/" + resource.Name + "Service" + "/" + "Update" + resource.Name + "CommandHandler.cs"
+	_, err = utils.CopyFile(targetApplicationHandlersUpdateResourceNameCommandHandlerFileName, c.TemplatesRootPath+ApplicationHandlersUpdateResourceNameCommandHandlerCSFile)
+	if err != nil {
+		log.Errorf("error copying application handlers UpdateResourceNameCommandHandler.cs file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationHandlersUpdateResourceNameCommandHandlerFileName)
+
+	// copy application/handlers/ResourceNameService/DeleteResourceNameCommandHandler.cs
+	targetApplicationHandlersDeleteResourceNameCommandHandlerFileName := c.NodeDirectoryName + ApplicationHandlersPath + "/" + resource.Name + "Service" + "/" + "Delete" + resource.Name + "CommandHandler.cs"
+	_, err = utils.CopyFile(targetApplicationHandlersDeleteResourceNameCommandHandlerFileName, c.TemplatesRootPath+ApplicationHandlersDeleteResourceNameCommandHandlerCSFile)
+	if err != nil {
+		log.Errorf("error copying application handlers DeleteResourceNameCommandHandler.cs file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationHandlersDeleteResourceNameCommandHandlerFileName)
 
 	// add resource-specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
