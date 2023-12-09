@@ -27,7 +27,7 @@ const ApplicationCommandsUpdateResourceNameCommandCSFile = "/Application/Command
 
 // exceptions
 const ApplicationExceptionsPath = "/Application/Exceptions"
-const ApplicationExceptionsResourceNameExceptionFile = "/Application/Exceptions/ResourceNameNotFoundException.cs.tmpl"
+const ApplicationExceptionsResourceNameNotFoundExceptionCSFile = "/Application/Exceptions/ResourceNameNotFoundException.cs.tmpl"
 
 // extensions
 const ApplicationExtensionsPath = "/Application/Extensions"
@@ -362,6 +362,16 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 		return err
 	}
 	filePaths = append(filePaths, &targetApplicationCommandsUpdateResourceNameCommandFileName)
+
+	// create exceptions files
+	// copy application/exceptions/ResourceNameNotFoundException.cs
+	targetApplicationExceptionsResourceNameNotFoundExceptionFileName := c.NodeDirectoryName + ApplicationExceptionsPath + "/" + resource.Name + "NotFoundException.cs"
+	_, err = utils.CopyFile(targetApplicationExceptionsResourceNameNotFoundExceptionFileName, c.TemplatesRootPath+ApplicationExceptionsResourceNameNotFoundExceptionCSFile)
+	if err != nil {
+		log.Errorf("error copying application exceptions ResourceNameNotFoundException.cs file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationExceptionsResourceNameNotFoundExceptionFileName)
 
 	// add resource-specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
