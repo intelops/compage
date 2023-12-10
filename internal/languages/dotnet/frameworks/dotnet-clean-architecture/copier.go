@@ -31,7 +31,7 @@ const ApplicationExceptionsResourceNameNotFoundExceptionCSFile = "/Application/E
 
 // extensions
 const ApplicationExtensionsPath = "/Application/Extensions"
-const ApplicationExtensionsServiceRegistrationFile = "/Application/Extensions/ServiceRegistration.cs.tmpl"
+const ApplicationExtensionsServiceRegistrationCSFile = "/Application/Extensions/ServiceRegistration.cs.tmpl"
 
 // handlers
 const ApplicationHandlersPath = "/Application/Handlers"
@@ -44,7 +44,7 @@ const ApplicationHandlersGetAllResourceNameQueryHandlerCSFile = "/Application/Ha
 
 // mappers
 const ApplicationMappersPath = "/Application/Mappers"
-const ApplicationMappersMappingProfileFile = "/Application/Mappers/MappingProfile.cs.tmpl"
+const ApplicationMappersMappingProfileCSFile = "/Application/Mappers/MappingProfile.cs.tmpl"
 
 // queries
 const ApplicationQueriesPath = "/Application/Queries"
@@ -54,7 +54,7 @@ const ApplicationQueriesGetResourceNameByIDQueryCSFile = "/Application/Queries/R
 
 // responses
 const ApplicationResponsesPath = "/Application/Responses"
-const ApplicationResponsesResourceNameResponseFile = "/Application/Responses/ResourceNameResponse.cs.tmpl"
+const ApplicationResponsesResourceNameResponseCSFile = "/Application/Responses/ResourceNameResponse.cs.tmpl"
 
 const CorePath = "/Core"
 const CoreCoreCSProjFile = "/Core/Core.csproj.tmpl"
@@ -65,39 +65,39 @@ const CoreCommonEntityBaseFile = "/Core/Common/EntityBase.cs.tmpl"
 
 // entities
 const CoreEntitiesPath = "/Core/Entities"
-const CoreEntitiesResourceNameFile = "/Core/Entities/ResourceName.cs.tmpl"
+const CoreEntitiesResourceNameCSFile = "/Core/Entities/ResourceName.cs.tmpl"
 
 // repositories
 const CoreRepositoriesPath = "/Core/Repositories"
-const CoreRepositoriesIResourceNameRepositoryFile = "/Core/Repositories/IResourceNameRepository.cs.tmpl"
-const CoreRepositoriesIAsyncRepositoryFile = "/Core/Repositories/IAsyncRepository.cs.tmpl"
+const CoreRepositoriesIResourceNameRepositoryCSFile = "/Core/Repositories/IResourceNameRepository.cs.tmpl"
+const CoreRepositoriesIAsyncRepositoryCSFile = "/Core/Repositories/IAsyncRepository.cs.tmpl"
 
 const InfrastructurePath = "/Infrastructure"
 const InfrastructureCSProjFile = "/Infrastructure/Infrastructure.csproj.tmpl"
 
 // data
 const InfrastructureDataPath = "/Infrastructure/Data"
-const InfrastructureDataDatabaseContextFile = "/Infrastructure/Data/DatabaseContext.cs.tmpl"
-const InfrastructureDataDatabaseContextFactoryFile = "/Infrastructure/Data/DatabaseContextFactory.cs.tmpl"
+const InfrastructureDataDatabaseContextCSFile = "/Infrastructure/Data/DatabaseContext.cs.tmpl"
+const InfrastructureDataDatabaseContextFactoryCSFile = "/Infrastructure/Data/DatabaseContextFactory.cs.tmpl"
 
 // extensions
 const InfrastructureExtensionsPath = "/Infrastructure/Extensions"
-const InfrastructureExtensionsServiceCollectionExtensionsFile = "/Infrastructure/Extensions/ServiceCollectionExtensions.cs.tmpl"
+const InfrastructureExtensionsServiceCollectionExtensionsCSFile = "/Infrastructure/Extensions/ServiceCollectionExtensions.cs.tmpl"
 
 // repositories
 const InfrastructureRepositoriesPath = "/Infrastructure/Repositories"
-const InfrastructureRepositoriesRepositoryBaseFile = "/Infrastructure/Repositories/RepositoryBase.cs.tmpl"
-const InfrastructureRepositoriesResourceNameRepositoryFile = "/Infrastructure/Repositories/ResourceNameRepository.cs.tmpl"
+const InfrastructureRepositoriesRepositoryBaseCSFile = "/Infrastructure/Repositories/RepositoryBase.cs.tmpl"
+const InfrastructureRepositoriesResourceNameRepositoryCSFile = "/Infrastructure/Repositories/ResourceNameRepository.cs.tmpl"
 
 const ProjectNameCSProjFile = "/ProjectName.csproj.tmpl"
-const ProjectNameProgramFile = "/Program.cs.tmpl"
+const ProjectNameProgramCSFile = "/Program.cs.tmpl"
 const ProjectNameCSProjUSerFile = "/ProjectName.csproj.user.tmpl"
 const ProjectNameAppSettingsDevelopmentFile = "/appsettings.Development.json.tmpl"
 const ProjectNameAppSettingsFile = "/appsettings.json.tmpl"
 
 // controllers
 const ProjectNameControllersPath = "/Controllers"
-const ProjectNameControllersResourceNameServiceControllerFile = "/Controllers/ResourceNameServiceController.cs.tmpl"
+const ProjectNameControllersResourceNameServiceControllerCSFile = "/Controllers/ResourceNameServiceController.cs.tmpl"
 
 // properties
 const ProjectNamePropertiesPath = "/Properties"
@@ -105,7 +105,7 @@ const ProjectNamePropertiesLaunchSettingsFile = "/Properties/launchSettings.json
 
 const TestsPath = "/Tests"
 const TestsApplicationTestsCSProjFile = "/Tests/Application.Tests/Application.Tests.csproj.tmpl"
-const TestsGlobalUsingsFile = "/Tests/Application.Tests/GlobalUsings.cs.tmpl"
+const TestsGlobalUsingsCSFile = "/Tests/Application.Tests/GlobalUsings.cs.tmpl"
 
 // handlers
 const TestsHandlersPath = "/Tests/Application.Tests/Handlers"
@@ -429,12 +429,37 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 	// mappers
 	// copy application/mappers/MapperProfile.cs
 	targetApplicationMappersMappingProfileFileName := c.NodeDirectoryName + ApplicationMappersPath + "/MappingProfile.cs"
-	_, err = utils.CopyFile(targetApplicationMappersMappingProfileFileName, c.TemplatesRootPath+ApplicationMappersMappingProfileFile)
+	_, err = utils.CopyFile(targetApplicationMappersMappingProfileFileName, c.TemplatesRootPath+ApplicationMappersMappingProfileCSFile)
 	if err != nil {
 		log.Errorf("error copying application mappers MappingProfile.cs file: %v", err)
 		return err
 	}
 	filePaths = append(filePaths, &targetApplicationMappersMappingProfileFileName)
+
+	// queries
+	// create directories for resource queries
+	resourceQueriesDirectory := c.NodeDirectoryName + ApplicationQueriesPath + "/" + resource.Name + "Service"
+	if err := utils.CreateDirectories(resourceQueriesDirectory); err != nil {
+		log.Errorf("error creating resource queries directory: %v", err)
+		return err
+	}
+	// copy application/queries/GetResourceNameByIdQuery.cs
+	targetApplicationQueriesGetResourceNameByIDQueryFileName := c.NodeDirectoryName + ApplicationQueriesPath + "/" + resource.Name + "Service" + "/" + "Get" + resource.Name + "ByIdQuery.cs"
+	_, err = utils.CopyFile(targetApplicationQueriesGetResourceNameByIDQueryFileName, c.TemplatesRootPath+ApplicationQueriesGetResourceNameByIDQueryCSFile)
+	if err != nil {
+		log.Errorf("error copying application queries GetResourceNameByIdQuery.cs file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationQueriesGetResourceNameByIDQueryFileName)
+
+	// copy application/queries/GetAllResourceNamesQuery.cs
+	targetApplicationQueriesGetAllResourceNamesQueryFileName := c.NodeDirectoryName + ApplicationQueriesPath + "/" + resource.Name + "Service" + "/" + "GetAll" + resource.Name + "sQuery.cs"
+	_, err = utils.CopyFile(targetApplicationQueriesGetAllResourceNamesQueryFileName, c.TemplatesRootPath+ApplicationQueriesGetAllResourceNamesQueryCSFile)
+	if err != nil {
+		log.Errorf("error copying application queries GetAllResourceNamesQuery.cs file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationQueriesGetAllResourceNamesQueryFileName)
 
 	// add resource-specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
@@ -561,11 +586,11 @@ func (c *Copier) copyCoreFiles() error {
 		return err
 	}
 
-	// CoreRepositoriesIAsyncRepositoryFile
-	targetCoreRepositoriesAsyncRepositoryFileName := c.NodeDirectoryName + CoreRepositoriesIAsyncRepositoryFile
+	// CoreRepositoriesIAsyncRepositoryCSFile
+	targetCoreRepositoriesAsyncRepositoryFileName := c.NodeDirectoryName + CoreRepositoriesIAsyncRepositoryCSFile
 	_, err = utils.CopyFile(targetCoreRepositoriesAsyncRepositoryFileName, c.TemplatesRootPath+CoreCommonEntityBaseFile)
 	if err != nil {
-		log.Errorf("error copying Core Repositories IAsyncRepository file: %v", err)
+		log.Errorf("error copying Core Repositories IAsyncRepository.cs file: %v", err)
 		return err
 	}
 
@@ -586,8 +611,8 @@ func (c *Copier) copyInfrastructureFiles() error {
 	filePaths = append(filePaths, &targetInfrastructureCSProjFileName)
 
 	// infrastructure/Data/DatabaseContextFactory.cs
-	targetDatabaseContextFactoryFileName := c.NodeDirectoryName + InfrastructureDataDatabaseContextFactoryFile
-	_, err = utils.CopyFile(targetDatabaseContextFactoryFileName, c.TemplatesRootPath+InfrastructureDataDatabaseContextFactoryFile)
+	targetDatabaseContextFactoryFileName := c.NodeDirectoryName + InfrastructureDataDatabaseContextFactoryCSFile
+	_, err = utils.CopyFile(targetDatabaseContextFactoryFileName, c.TemplatesRootPath+InfrastructureDataDatabaseContextFactoryCSFile)
 	if err != nil {
 		log.Errorf("error copying infrastructure DatabaseContextFactory file: %v", err)
 		return err
@@ -595,8 +620,8 @@ func (c *Copier) copyInfrastructureFiles() error {
 	filePaths = append(filePaths, &targetDatabaseContextFactoryFileName)
 
 	// infrastructure/Repositories/RepositoryBase.cs
-	targetRepositoriesRepositoryBaseFileName := c.NodeDirectoryName + InfrastructureRepositoriesRepositoryBaseFile
-	_, err = utils.CopyFile(targetRepositoriesRepositoryBaseFileName, c.TemplatesRootPath+InfrastructureRepositoriesRepositoryBaseFile)
+	targetRepositoriesRepositoryBaseFileName := c.NodeDirectoryName + InfrastructureRepositoriesRepositoryBaseCSFile
+	_, err = utils.CopyFile(targetRepositoriesRepositoryBaseFileName, c.TemplatesRootPath+InfrastructureRepositoriesRepositoryBaseCSFile)
 	if err != nil {
 		log.Errorf("error copying infrastructure RepositoryBase file: %v", err)
 		return err
@@ -618,8 +643,8 @@ func (c *Copier) copyApplicationFiles() error {
 	filePaths = append(filePaths, &targetApplicationCSProjFileName)
 
 	// application/Extensions/ServiceRegistration.cs
-	targetApplicationExtensionsServiceRegistrationFileName := c.NodeDirectoryName + ApplicationExtensionsServiceRegistrationFile
-	_, err = utils.CopyFile(targetApplicationExtensionsServiceRegistrationFileName, c.TemplatesRootPath+ApplicationExtensionsServiceRegistrationFile)
+	targetApplicationExtensionsServiceRegistrationFileName := c.NodeDirectoryName + ApplicationExtensionsServiceRegistrationCSFile
+	_, err = utils.CopyFile(targetApplicationExtensionsServiceRegistrationFileName, c.TemplatesRootPath+ApplicationExtensionsServiceRegistrationCSFile)
 	if err != nil {
 		log.Errorf("error copying application ServiceRegistration file: %v", err)
 		return err
@@ -641,8 +666,8 @@ func (c *Copier) copyTestsFiles() error {
 	filePaths = append(filePaths, &targetApplicationTestsCSProjFileName)
 
 	// tests/GlobalUsings.cs
-	targetGlobalUsingsFileName := c.NodeDirectoryName + TestsGlobalUsingsFile
-	_, err = utils.CopyFile(targetGlobalUsingsFileName, c.TemplatesRootPath+TestsGlobalUsingsFile)
+	targetGlobalUsingsFileName := c.NodeDirectoryName + TestsGlobalUsingsCSFile
+	_, err = utils.CopyFile(targetGlobalUsingsFileName, c.TemplatesRootPath+TestsGlobalUsingsCSFile)
 	if err != nil {
 		log.Errorf("error copying tests GlobalUsings file: %v", err)
 		return err
