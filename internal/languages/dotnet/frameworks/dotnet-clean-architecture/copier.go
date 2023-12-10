@@ -83,6 +83,7 @@ const InfrastructureDataDatabaseContextFactoryCSFile = "/Infrastructure/Data/Dat
 // extensions
 const InfrastructureExtensionsPath = "/Infrastructure/Extensions"
 const InfrastructureExtensionsServicesCollectionExtensionsCSFile = "/Infrastructure/Extensions/ServicesCollectionExtensions.cs.tmpl"
+const InfrastructureExtensionsOpenTelemetryRegistrationCSFile = "/Infrastructure/Extensions/OpenTelemetryRegistration.cs.tmpl"
 
 // repositories
 const InfrastructureRepositoriesPath = "/Infrastructure/Repositories"
@@ -553,6 +554,15 @@ func (c *Copier) addInfrastructureRelatedDirectoriesAndFiles(resource *corenode.
 		return err
 	}
 	*paths = append(*paths, &targetInfrastructureExtensionsServicesCollectionExtensionsFileName)
+
+	// copy infrastructure/extensions/OpenTelemetryRegistration.cs
+	targetInfrastructureExtensionsOpenTelemetryRegistrationFileName := c.NodeDirectoryName + InfrastructureExtensionsPath + "/" + "OpenTelemetryRegistration.cs"
+	_, err = utils.CopyFile(targetInfrastructureExtensionsOpenTelemetryRegistrationFileName, c.TemplatesRootPath+InfrastructureExtensionsOpenTelemetryRegistrationCSFile)
+	if err != nil {
+		log.Errorf("error copying infrastructure extensions open telemetry registration file: %v", err)
+		return err
+	}
+	*paths = append(*paths, &targetInfrastructureExtensionsOpenTelemetryRegistrationFileName)
 
 	// copy infrastructure/repositories/ResourcesNameRepository.cs
 	targetInfrastructureRepositoriesResourceNameRepositoryFileName := c.NodeDirectoryName + InfrastructureRepositoriesPath + "/" + resource.Name + "Repository.cs"
