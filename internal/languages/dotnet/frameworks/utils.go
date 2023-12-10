@@ -1,5 +1,7 @@
 package frameworks
 
+import "strings"
+
 type RestResourceData struct {
 	SmallKebabCaseResourceNameSingular string
 	SmallSnakeCaseResourceNameSingular string
@@ -46,4 +48,9 @@ func AddRESTAllowedMethods(restResourceData *RestResourceData, restAllowedMethod
 			restResourceData.IsRESTOptionsAllowed = true
 		}
 	}
+}
+
+func GetMicroServiceName(name string) string {
+	splitted := strings.Split(name, "/")
+	return splitted[len(splitted)-1]
 }

@@ -146,6 +146,7 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 	data := map[string]interface{}{
 		"GitRepositoryName":   gitRepositoryName,
 		"NodeName":            strings.ToLower(nodeName),
+		"MicroServiceName":    frameworks.GetMicroServiceName(nodeDirectoryName),
 		"GitPlatformUserName": gitPlatformUserName,
 		"GitPlatformURL":      strings.Replace(gitPlatformURL, "https://", "", -1),
 	}
@@ -194,11 +195,6 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 		RestClients:       restClients,
 		PluralizeClient:   pluralizeClient,
 	}
-}
-
-func getMicroServiceName(name string) string {
-	splitted := strings.Split(name, "/")
-	return splitted[len(splitted)-1]
 }
 
 // createRestServerDirectories creates rest server directories.
@@ -287,7 +283,7 @@ func (c *Copier) createRestServerDirectories() error {
 		return err
 	}
 
-	microServiceNameDirectory := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName)
+	microServiceNameDirectory := c.NodeDirectoryName + "/" + frameworks.GetMicroServiceName(c.NodeDirectoryName)
 	microServiceNameControllersDirectory := microServiceNameDirectory + MicroServiceNameControllersPath
 	microServiceNamePropertiesDirectory := microServiceNameDirectory + MicroServiceNamePropertiesPath
 	if err := utils.CreateDirectories(microServiceNameDirectory); err != nil {
@@ -579,7 +575,7 @@ func (c *Copier) addInfrastructureRelatedDirectoriesAndFiles(resource *corenode.
 func (c *Copier) addMicroServiceNameRelatedDirectoriesAndFiles(resource *corenode.Resource, filePaths *[]*string) error {
 	var err error
 	// copy MicroServiceName/Controllers/ResourceNameServiceController.cs
-	targetMicroServiceNameControllersResourceNameServiceControllerFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + MicroServiceNameControllersPath + "/" + resource.Name + "ServiceController.cs"
+	targetMicroServiceNameControllersResourceNameServiceControllerFileName := c.NodeDirectoryName + "/" + frameworks.GetMicroServiceName(c.NodeDirectoryName) + MicroServiceNameControllersPath + "/" + resource.Name + "ServiceController.cs"
 	_, err = utils.CopyFile(targetMicroServiceNameControllersResourceNameServiceControllerFileName, c.TemplatesRootPath+MicroServiceNameControllersResourceNameServiceControllerCSFile)
 	if err != nil {
 		log.Errorf("error copying MicroServiceName controllers resource name service controller file: %v", err)
@@ -588,7 +584,7 @@ func (c *Copier) addMicroServiceNameRelatedDirectoriesAndFiles(resource *corenod
 	*filePaths = append(*filePaths, &targetMicroServiceNameControllersResourceNameServiceControllerFileName)
 
 	// copy MicroServiceName/Properties/launchSettings.json
-	targetMicroServiceNamePropertiesLaunchSettingsJSONFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + MicroServiceNamePropertiesPath + "/" + "launchSettings.json"
+	targetMicroServiceNamePropertiesLaunchSettingsJSONFileName := c.NodeDirectoryName + "/" + frameworks.GetMicroServiceName(c.NodeDirectoryName) + MicroServiceNamePropertiesPath + "/" + "launchSettings.json"
 	_, err = utils.CopyFile(targetMicroServiceNamePropertiesLaunchSettingsJSONFileName, c.TemplatesRootPath+MicroServiceNamePropertiesLaunchSettingsJSONFile)
 	if err != nil {
 		log.Errorf("error copying MicroServiceName properties launch settings json file: %v", err)
@@ -597,7 +593,7 @@ func (c *Copier) addMicroServiceNameRelatedDirectoriesAndFiles(resource *corenod
 	*filePaths = append(*filePaths, &targetMicroServiceNamePropertiesLaunchSettingsJSONFileName)
 
 	// copy MicroServiceName/MicroServiceName.csproj
-	targetMicroServiceNameCSProjFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + "/" + getMicroServiceName(c.NodeDirectoryName) + ".csproj"
+	targetMicroServiceNameCSProjFileName := c.NodeDirectoryName + "/" + frameworks.GetMicroServiceName(c.NodeDirectoryName) + "/" + frameworks.GetMicroServiceName(c.NodeDirectoryName) + ".csproj"
 	_, err = utils.CopyFile(targetMicroServiceNameCSProjFileName, c.TemplatesRootPath+MicroServiceNameCSProjFile)
 	if err != nil {
 		log.Errorf("error copying MicroServiceName csproj file: %v", err)
@@ -606,7 +602,7 @@ func (c *Copier) addMicroServiceNameRelatedDirectoriesAndFiles(resource *corenod
 	*filePaths = append(*filePaths, &targetMicroServiceNameCSProjFileName)
 
 	// copy MicroServiceName/MicroServiceName.csproj.user
-	targetMicroServiceNameCSProjUserFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + "/" + getMicroServiceName(c.NodeDirectoryName) + ".csproj.user"
+	targetMicroServiceNameCSProjUserFileName := c.NodeDirectoryName + "/" + frameworks.GetMicroServiceName(c.NodeDirectoryName) + "/" + frameworks.GetMicroServiceName(c.NodeDirectoryName) + ".csproj.user"
 	_, err = utils.CopyFile(targetMicroServiceNameCSProjUserFileName, c.TemplatesRootPath+MicroServiceNameCSProjUserFile)
 	if err != nil {
 		log.Errorf("error copying MicroServiceName csproj.user file: %v", err)
@@ -615,7 +611,7 @@ func (c *Copier) addMicroServiceNameRelatedDirectoriesAndFiles(resource *corenod
 	*filePaths = append(*filePaths, &targetMicroServiceNameCSProjUserFileName)
 
 	// copy MicroServiceName/Program.cs
-	targetMicroServiceNameProgramCSFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + "/" + "Program.cs"
+	targetMicroServiceNameProgramCSFileName := c.NodeDirectoryName + "/" + frameworks.GetMicroServiceName(c.NodeDirectoryName) + "/" + "Program.cs"
 	_, err = utils.CopyFile(targetMicroServiceNameProgramCSFileName, c.TemplatesRootPath+MicroServiceNameProgramCSFile)
 	if err != nil {
 		log.Errorf("error copying MicroServiceName program cs file: %v", err)
@@ -624,7 +620,7 @@ func (c *Copier) addMicroServiceNameRelatedDirectoriesAndFiles(resource *corenod
 	*filePaths = append(*filePaths, &targetMicroServiceNameProgramCSFileName)
 
 	// copy MicroServiceName/appsettings.Development.json
-	targetMicroServiceNameAppSettingsDevelopmentFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + "/" + "appsettings.Development.json"
+	targetMicroServiceNameAppSettingsDevelopmentFileName := c.NodeDirectoryName + "/" + frameworks.GetMicroServiceName(c.NodeDirectoryName) + "/" + "appsettings.Development.json"
 	_, err = utils.CopyFile(targetMicroServiceNameAppSettingsDevelopmentFileName, c.TemplatesRootPath+MicroServiceNameAppSettingsDevelopmentFile)
 	if err != nil {
 		log.Errorf("error copying MicroServiceName appsettings.Development.json file: %v", err)
@@ -633,7 +629,7 @@ func (c *Copier) addMicroServiceNameRelatedDirectoriesAndFiles(resource *corenod
 	*filePaths = append(*filePaths, &targetMicroServiceNameAppSettingsDevelopmentFileName)
 
 	// copy MicroServiceName/appsettings.json
-	targetMicroServiceNameAppSettingsFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + "/" + "appsettings.json"
+	targetMicroServiceNameAppSettingsFileName := c.NodeDirectoryName + "/" + frameworks.GetMicroServiceName(c.NodeDirectoryName) + "/" + "appsettings.json"
 	_, err = utils.CopyFile(targetMicroServiceNameAppSettingsFileName, c.TemplatesRootPath+MicroServiceNameAppSettingsFile)
 	if err != nil {
 		log.Errorf("error copying MicroServiceName appsettings.json file: %v", err)
@@ -861,7 +857,7 @@ func (c *Copier) copyTestsFiles() error {
 
 func (c *Copier) copyMicroServiceNameSlnFile() error {
 	filePaths := &[]*string{}
-	targetMicroServiceNameSLNFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + ".sln"
+	targetMicroServiceNameSLNFileName := c.NodeDirectoryName + "/" + frameworks.GetMicroServiceName(c.NodeDirectoryName) + ".sln"
 	_, err := utils.CopyFile(targetMicroServiceNameSLNFileName, c.TemplatesRootPath+MicroServiceNameSlnFile)
 	if err != nil {
 		log.Errorf("error copying MicroServiceName.sln file: %v", err)

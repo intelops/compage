@@ -8,6 +8,8 @@ import (
 	corenode "github.com/intelops/compage/internal/core/node"
 	"github.com/intelops/compage/internal/languages"
 	"github.com/intelops/compage/internal/languages/dotnet/frameworks/dotnet-clean-architecture"
+	"github.com/intelops/compage/internal/languages/dotnet/integrations/docker"
+	"github.com/intelops/compage/internal/languages/dotnet/integrations/kubernetes"
 	"github.com/intelops/compage/internal/languages/templates"
 	log "github.com/sirupsen/logrus"
 	"strings"
@@ -21,6 +23,13 @@ func Generate(ctx context.Context) error {
 	err := generateRESTConfig(ctx, &goValues)
 	if err != nil {
 		log.Debugf("err : %s", err)
+		return err
+	}
+
+	// integrations config
+	err = generateIntegrationConfig(&goValues)
+	if err != nil {
+		log.Errorf("err : %s", err)
 		return err
 	}
 
@@ -63,8 +72,8 @@ func getDotNetCleanArchitectureCopier(dotNetValues *DotNetValues) (*dotnetcleana
 	gitPlatformURL := dotNetValues.Values.Get(languages.GitPlatformURL)
 	gitPlatformUserName := dotNetValues.Values.Get(languages.GitPlatformUserName)
 	gitRepositoryName := dotNetValues.Values.Get(languages.GitRepositoryName)
-	nodeName := dotNetValues.Values.Get(languages.NodeName)
 	// dotnet nodes usually have a directory name same as node name itself but in caps.
+	nodeName := dotNetValues.Values.Get(languages.NodeName)
 	nodeDirectoryName := strings.Replace(dotNetValues.Values.NodeDirectoryName, nodeName, strcase.ToCamel(nodeName), 1)
 	isRestServer := dotNetValues.LDotNetLangNode.RestConfig != nil && dotNetValues.LDotNetLangNode.RestConfig.Server != nil
 	var restServerPort string
@@ -94,4 +103,59 @@ func getDotNetCleanArchitectureCopier(dotNetValues *DotNetValues) (*dotnetcleana
 	copier := dotnetcleanarchitecture.NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, path, isRestServer, restServerPort, isRestSQLDB, restSQLDB, isRestNoSQLDB, restNoSQLDB, restResources, restClients)
 
 	return copier, nil
+}
+
+func generateIntegrationConfig(dotNetValues *DotNetValues) error {
+	m, err := getIntegrationsCopier(dotNetValues)
+	if err != nil {
+		log.Errorf("error while getting the integrations copier [" + err.Error() + "]")
+		return err
+	}
+	// dockerfile needs to be generated for the whole project, so it should be here.
+	dockerCopier := m["docker"].(*docker.Copier)
+	if err = dockerCopier.CreateDockerFile(); err != nil {
+		log.Errorf("err : %s", err)
+		return err
+	}
+
+	// k8s files need to be generated for the whole project, so it should be here.
+	k8sCopier := m["k8s"].(*kubernetes.Copier)
+	if err = k8sCopier.CreateKubernetesFiles(); err != nil {
+		log.Errorf("err : %s", err)
+		return err
+	}
+
+	return nil
+}
+
+func getIntegrationsCopier(dotNetValues *DotNetValues) (map[string]interface{}, error) {
+	dotNetTemplatesRootPath := GetDotNetTemplatesRootPath()
+	if dotNetTemplatesRootPath == "" {
+		return nil, errors.New("dotnet templates root path is empty")
+	}
+
+	gitPlatformUserName := dotNetValues.Values.Get(languages.GitPlatformUserName)
+	gitRepositoryName := dotNetValues.Values.Get(languages.GitRepositoryName)
+	nodeName := dotNetValues.Values.Get(languages.NodeName)
+	// dotnet nodes usually have a directory name same as node name itself but in caps.
+	nodeDirectoryName := strings.Replace(dotNetValues.Values.NodeDirectoryName, nodeName, strcase.ToCamel(nodeName), 1)
+	// rest
+	isRestServer := dotNetValues.LDotNetLangNode.RestConfig != nil && dotNetValues.LDotNetLangNode.RestConfig.Server != nil
+	var restServerPort string
+	if isRestServer {
+		restServerPort = dotNetValues.LDotNetLangNode.RestConfig.Server.Port
+	} else {
+		restServerPort = ""
+	}
+
+	// create dotnet specific dockerCopier
+	dockerCopier := docker.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, dotNetTemplatesRootPath, isRestServer, restServerPort)
+
+	// create dotnet specific k8sCopier
+	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, dotNetTemplatesRootPath, isRestServer, restServerPort)
+
+	return map[string]interface{}{
+		"docker": dockerCopier,
+		"k8s":    k8sCopier,
+	}, nil
 }
