@@ -89,19 +89,20 @@ const InfrastructureRepositoriesPath = "/Infrastructure/Repositories"
 const InfrastructureRepositoriesRepositoryBaseCSFile = "/Infrastructure/Repositories/RepositoryBase.cs.tmpl"
 const InfrastructureRepositoriesResourceNameRepositoryCSFile = "/Infrastructure/Repositories/ResourceNameRepository.cs.tmpl"
 
-const ProjectNameCSProjFile = "/ProjectName.csproj.tmpl"
-const ProjectNameProgramCSFile = "/Program.cs.tmpl"
-const ProjectNameCSProjUSerFile = "/ProjectName.csproj.user.tmpl"
-const ProjectNameAppSettingsDevelopmentFile = "/appsettings.Development.json.tmpl"
-const ProjectNameAppSettingsFile = "/appsettings.json.tmpl"
+// microServiceName
+const MicroServiceNameCSProjFile = "/MicroServiceName/MicroServiceName.csproj.tmpl"
+const MicroServiceNameProgramCSFile = "/MicroServiceName/Program.cs.tmpl"
+const MicroServiceNameCSProjUSerFile = "/MicroServiceName/MicroServiceName.csproj.user.tmpl"
+const MicroServiceNameAppSettingsDevelopmentFile = "/MicroServiceName/appsettings.Development.json.tmpl"
+const MicroServiceNameAppSettingsFile = "/MicroServiceName/appsettings.json.tmpl"
 
 // controllers
-const ProjectNameControllersPath = "/Controllers"
-const ProjectNameControllersResourceNameServiceControllerCSFile = "/Controllers/ResourceNameServiceController.cs.tmpl"
+const MicroServiceNameControllersPath = "/Controllers"
+const MicroServiceNameControllersResourceNameServiceControllerCSFile = "/MicroServiceName/Controllers/ResourceNameServiceController.cs.tmpl"
 
 // properties
-const ProjectNamePropertiesPath = "/Properties"
-const ProjectNamePropertiesLaunchSettingsFile = "/Properties/launchSettings.json.tmpl"
+const MicroServiceNamePropertiesPath = "/Properties"
+const MicroServiceNamePropertiesLaunchSettingsFile = "/MicroServiceName/Properties/launchSettings.json.tmpl"
 
 const TestsPath = "/Tests"
 const TestsApplicationTestsCSProjFile = "/Tests/Application.Tests/Application.Tests.csproj.tmpl"
@@ -192,6 +193,11 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 	}
 }
 
+func getMicroServiceName(name string) string {
+	splitted := strings.Split(name, "/")
+	return splitted[len(splitted)-1]
+}
+
 // createRestServerDirectories creates rest server directories.
 func (c *Copier) createRestServerDirectories() error {
 	applicationDirectory := c.NodeDirectoryName + ApplicationPath
@@ -278,19 +284,18 @@ func (c *Copier) createRestServerDirectories() error {
 		return err
 	}
 
-	splitted := strings.Split(c.NodeDirectoryName, "/")
-	projectNameDirectory := c.NodeDirectoryName + "/" + splitted[len(splitted)-1]
-	projectNameControllersDirectory := projectNameDirectory + ProjectNameControllersPath
-	projectNamePropertiesDirectory := projectNameDirectory + ProjectNamePropertiesPath
-	if err := utils.CreateDirectories(projectNameDirectory); err != nil {
+	microServiceNameDirectory := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName)
+	microServiceNameControllersDirectory := microServiceNameDirectory + MicroServiceNameControllersPath
+	microServiceNamePropertiesDirectory := microServiceNameDirectory + MicroServiceNamePropertiesPath
+	if err := utils.CreateDirectories(microServiceNameDirectory); err != nil {
 		log.Errorf("error creating project name directory: %v", err)
 		return err
 	}
-	if err := utils.CreateDirectories(projectNameControllersDirectory); err != nil {
+	if err := utils.CreateDirectories(microServiceNameControllersDirectory); err != nil {
 		log.Errorf("error creating project name controllers directory: %v", err)
 		return err
 	}
-	if err := utils.CreateDirectories(projectNamePropertiesDirectory); err != nil {
+	if err := utils.CreateDirectories(microServiceNamePropertiesDirectory); err != nil {
 		log.Errorf("error creating project name properties directory: %v", err)
 		return err
 	}
@@ -336,6 +341,13 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 	err = c.addInfrastructureRelatedDirectoriesAndFiles(resource, filePaths)
 	if err != nil {
 		log.Errorf("error adding infrastructure related directories and files: %v", err)
+		return err
+	}
+
+	// add files for MicroServiceName
+	err = c.addMicroServiceNameRelatedDirectoriesAndFiles(resource, filePaths)
+	if err != nil {
+		log.Errorf("error adding project name related directories and files: %v", err)
 		return err
 	}
 
@@ -549,6 +561,19 @@ func (c *Copier) addInfrastructureRelatedDirectoriesAndFiles(resource *corenode.
 	}
 	*paths = append(*paths, &targetInfrastructureRepositoriesResourceNameRepositoryFileName)
 
+	return nil
+}
+
+func (c *Copier) addMicroServiceNameRelatedDirectoriesAndFiles(resource *corenode.Resource, filePaths *[]*string) error {
+	var err error
+	// copy MicroServiceName/Controllers/ResourceNameServiceController.cs
+	targetMicroServiceNameControllersResourceNameServiceControllerFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + MicroServiceNameControllersPath + "/" + resource.Name + "ServiceController.cs"
+	_, err = utils.CopyFile(targetMicroServiceNameControllersResourceNameServiceControllerFileName, c.TemplatesRootPath+MicroServiceNameControllersResourceNameServiceControllerCSFile)
+	if err != nil {
+		log.Errorf("error copying MicroServiceName controllers resource name service controller file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetMicroServiceNameControllersResourceNameServiceControllerFileName)
 	return nil
 }
 
