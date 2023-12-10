@@ -21,7 +21,7 @@ func (n *LDotNetLangNode) FillDefaults() error {
 		if n.LanguageNode.RestConfig != nil && n.LanguageNode.RestConfig.Server != nil && n.LanguageNode.RestConfig.Server.Resources != nil {
 			for _, resource := range n.LanguageNode.RestConfig.Server.Resources {
 				if resource.AllowedMethods == nil {
-					defaultMethods := []string{"GET", "POST", "PUT", "DELETE"}
+					defaultMethods := []string{"GET", "POST", "PUT", "DELETE", "LIST"}
 					stringPointers := func() []*string {
 						s := make([]*string, len(defaultMethods))
 						for i := range defaultMethods {
