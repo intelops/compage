@@ -82,7 +82,7 @@ const InfrastructureDataDatabaseContextFactoryCSFile = "/Infrastructure/Data/Dat
 
 // extensions
 const InfrastructureExtensionsPath = "/Infrastructure/Extensions"
-const InfrastructureExtensionsServiceCollectionExtensionsCSFile = "/Infrastructure/Extensions/ServiceCollectionExtensions.cs.tmpl"
+const InfrastructureExtensionsServicesCollectionExtensionsCSFile = "/Infrastructure/Extensions/ServicesCollectionExtensions.cs.tmpl"
 
 // repositories
 const InfrastructureRepositoriesPath = "/Infrastructure/Repositories"
@@ -530,6 +530,16 @@ func (c *Copier) addInfrastructureRelatedDirectoriesAndFiles(resource *corenode.
 		return err
 	}
 	*paths = append(*paths, &targetInfrastructureDataDatabaseContextFileName)
+
+	// copy infrastructure/extensions/ServiceCollectionExtensions.cs
+	targetInfrastructureExtensionsServicesCollectionExtensionsFileName := c.NodeDirectoryName + InfrastructureExtensionsPath + "/" + "ServicesCollectionExtensions.cs"
+	_, err = utils.CopyFile(targetInfrastructureExtensionsServicesCollectionExtensionsFileName, c.TemplatesRootPath+InfrastructureExtensionsServicesCollectionExtensionsCSFile)
+	if err != nil {
+		log.Errorf("error copying infrastructure extensions services collection extensions file: %v", err)
+		return err
+	}
+	*paths = append(*paths, &targetInfrastructureExtensionsServicesCollectionExtensionsFileName)
+
 	return nil
 }
 
