@@ -102,7 +102,7 @@ const MicroServiceNameControllersResourceNameServiceControllerCSFile = "/MicroSe
 
 // properties
 const MicroServiceNamePropertiesPath = "/Properties"
-const MicroServiceNamePropertiesLaunchSettingsFile = "/MicroServiceName/Properties/launchSettings.json.tmpl"
+const MicroServiceNamePropertiesLaunchSettingsJSONFile = "/MicroServiceName/Properties/launchSettings.json.tmpl"
 
 const TestsPath = "/Tests"
 const TestsApplicationTestsCSProjFile = "/Tests/Application.Tests/Application.Tests.csproj.tmpl"
@@ -347,7 +347,7 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 	// add files for MicroServiceName
 	err = c.addMicroServiceNameRelatedDirectoriesAndFiles(resource, filePaths)
 	if err != nil {
-		log.Errorf("error adding project name related directories and files: %v", err)
+		log.Errorf("error adding MicroServiceName related directories and files: %v", err)
 		return err
 	}
 
@@ -574,6 +574,16 @@ func (c *Copier) addMicroServiceNameRelatedDirectoriesAndFiles(resource *corenod
 		return err
 	}
 	*filePaths = append(*filePaths, &targetMicroServiceNameControllersResourceNameServiceControllerFileName)
+
+	// copy MicroServiceName/Properties/launchSettings.json
+	targetMicroServiceNamePropertiesLaunchSettingsJSONFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + MicroServiceNamePropertiesPath + "/" + "launchSettings.json"
+	_, err = utils.CopyFile(targetMicroServiceNamePropertiesLaunchSettingsJSONFileName, c.TemplatesRootPath+MicroServiceNamePropertiesLaunchSettingsJSONFile)
+	if err != nil {
+		log.Errorf("error copying MicroServiceName properties launch settings json file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetMicroServiceNamePropertiesLaunchSettingsJSONFileName)
+
 	return nil
 }
 
