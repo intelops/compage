@@ -44,7 +44,7 @@ This command will start thr gRPC server and allow the gRPC clients to get connec
 		defer func() {
 			if grpcTraceProvider != nil {
 				if err := grpcTraceProvider.Shutdown(context.Background()); err != nil {
-					log.Printf("Error shutting down tracer provider: %v", err)
+					log.Errorf("Error shutting down tracer provider: %v", err)
 				}
 			}
 		}()
@@ -64,6 +64,8 @@ This command will start thr gRPC server and allow the gRPC clients to get connec
 		err = CloneOrPullRepository("rust")
 		cobra.CheckErr(err)
 		err = CloneOrPullRepository("typescript")
+		cobra.CheckErr(err)
+		err = CloneOrPullRepository("dotnet")
 		cobra.CheckErr(err)
 
 		// check if the git submodules have been pulled (mainly need to check this on developer's machine)

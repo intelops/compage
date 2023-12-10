@@ -26,6 +26,7 @@ func Generate(ctx context.Context) error {
 					return errors.New("at least rest-config needs to be provided, OpenAPIFileYamlContent is empty")
 				}
 				if err := languages.ProcessOpenAPITemplate(ctx); err != nil {
+					log.Errorf("err : %s", err)
 					return err
 				}
 			}

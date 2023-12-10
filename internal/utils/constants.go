@@ -1,6 +1,6 @@
 package utils
 
-// CodeGeneratorPath Constant for referencing temporary directory to hold generated project.
+// CodeGeneratorPath Constant for referencing temporary directory to hold a generated project.
 const CodeGeneratorPath = "/.compage/workdir"
 
 // TemplateExtension template's extension.

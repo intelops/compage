@@ -1,4 +1,4 @@
-package ruby
+package dotnet
 
 import (
 	"context"
@@ -6,15 +6,15 @@ import (
 )
 
 func Process(ctx context.Context) error {
-	rubyValues := ctx.Value(contextKeyRubyContextVars).(Values)
+	dotNetValues := ctx.Value(contextKeyDotNetContextVars).(DotNetValues)
 
-	// fills default config for ruby
-	if err := rubyValues.RubyNode.FillDefaults(); err != nil {
+	// fills default config for DotNet
+	if err := dotNetValues.LDotNetLangNode.FillDefaults(); err != nil {
 		log.Errorf("err : %s", err)
 		return err
 	}
 
-	// generate the ruby project
+	// generate DotNet project
 	if err := Generate(ctx); err != nil {
 		log.Errorf("err : %s", err)
 		return err

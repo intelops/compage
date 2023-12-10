@@ -89,6 +89,7 @@ func sendFile(projectName string, server project.ProjectService_GenerateCodeServ
 		return status.Error(codes.NotFound, "file is not found")
 	}
 	if err := server.SendHeader(f.Metadata()); err != nil {
+		log.Errorf("err : %s", err)
 		return status.Error(codes.Internal, "error during sending header")
 	}
 	fileChunk := &project.GenerateCodeResponse{FileChunk: make([]byte, chunkSize)}
@@ -105,6 +106,7 @@ Loop:
 		fileChunk.FileChunk = fileChunk.FileChunk[:n]
 		serverErr := server.Send(fileChunk)
 		if serverErr != nil {
+			log.Errorf("err : %s", serverErr)
 			return status.Errorf(codes.Internal, "server.Send: %v", serverErr)
 		}
 	}

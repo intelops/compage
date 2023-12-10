@@ -2,6 +2,7 @@ package executor
 
 import (
 	"github.com/intelops/compage/internal/utils"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"strings"
 	"text/template"
@@ -18,9 +19,11 @@ func ExecuteWithFuncs(filePaths []*string, data map[string]interface{}, funcMap 
 		fileName := (*filePathName)[strings.LastIndex(*filePathName, utils.SubstrString)+1:]
 		createdFile, err := os.Create(strings.TrimSuffix(*filePathName, utils.TemplateExtension))
 		if err != nil {
+			log.Errorf("error while creating the file [" + err.Error() + "]" + *filePathName)
 			return err
 		}
 		if err0 := parsedTemplates.ExecuteTemplate(createdFile, fileName, data); err0 != nil {
+			log.Errorf("error while executing the template [" + err0.Error() + "]" + *filePathName)
 			return err0
 		}
 	}
@@ -29,6 +32,7 @@ func ExecuteWithFuncs(filePaths []*string, data map[string]interface{}, funcMap 
 	for _, filePathName := range filePaths {
 		if strings.HasSuffix(*filePathName, ".tmpl") {
 			if err := os.Remove(*filePathName); err != nil {
+				log.Errorf("error while removing the template file [" + err.Error() + "]" + *filePathName)
 				return err
 			}
 		}
@@ -44,9 +48,11 @@ func Execute(filePaths []*string, data map[string]interface{}) error {
 		fileName := (*filePathName)[strings.LastIndex(*filePathName, utils.SubstrString)+1:]
 		createdFile, err := os.Create(strings.TrimSuffix(*filePathName, utils.TemplateExtension))
 		if err != nil {
+			log.Errorf("error while creating the file [" + err.Error() + "]" + *filePathName)
 			return err
 		}
 		if err0 := parsedTemplates.ExecuteTemplate(createdFile, fileName, data); err0 != nil {
+			log.Errorf("error while executing the template [" + err0.Error() + "]" + *filePathName)
 			return err0
 		}
 	}
@@ -55,6 +61,7 @@ func Execute(filePaths []*string, data map[string]interface{}) error {
 	for _, filePathName := range filePaths {
 		if strings.HasSuffix(*filePathName, ".tmpl") {
 			if err := os.Remove(*filePathName); err != nil {
+				log.Errorf("error while removing the template file [" + err.Error() + "]" + *filePathName)
 				return err
 			}
 		}
@@ -70,9 +77,11 @@ func ExecuteGhActions(filePaths []*string, data map[string]interface{}) error {
 		fileName := (*filePathName)[strings.LastIndex(*filePathName, utils.SubstrString)+1:]
 		createdFile, err := os.Create(strings.TrimSuffix(*filePathName, utils.TemplateExtension))
 		if err != nil {
+			log.Errorf("error while creating the file [" + err.Error() + "]" + *filePathName)
 			return err
 		}
 		if err0 := parsedTemplates.ExecuteTemplate(createdFile, fileName, data); err0 != nil {
+			log.Errorf("error while executing the template [" + err0.Error() + "]" + *filePathName)
 			return err0
 		}
 	}
@@ -81,6 +90,7 @@ func ExecuteGhActions(filePaths []*string, data map[string]interface{}) error {
 	for _, filePathName := range filePaths {
 		if strings.HasSuffix(*filePathName, ".tmpl") {
 			if err := os.Remove(*filePathName); err != nil {
+				log.Errorf("error while removing the template file [" + err.Error() + "]" + *filePathName)
 				return err
 			}
 		}

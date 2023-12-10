@@ -8,6 +8,7 @@ import (
 	"github.com/intelops/compage/internal/integrations/deepsource"
 	"github.com/intelops/compage/internal/integrations/readme"
 	"github.com/intelops/compage/internal/languages"
+	"github.com/intelops/compage/internal/languages/dotnet"
 	"github.com/intelops/compage/internal/languages/golang"
 	"github.com/intelops/compage/internal/languages/java"
 	"github.com/intelops/compage/internal/languages/javascript"
@@ -79,16 +80,6 @@ func processNode(coreProject *core.Project, compageNode *corenode.Node) error {
 	// add values(LanguageNode and configs from coreProject) to context.
 	languageCtx := languages.AddValuesToContext(context.Background(), coreProject, languageNode)
 
-	// extract nodeDirectoryName for formatter
-	values := languageCtx.Value(languages.ContextKeyLanguageContextVars).(languages.Values)
-	nodeDirectoryName := values.NodeDirectoryName
-
-	// create node directory in projectDirectory depicting a subproject
-	if err0 := utils.CreateDirectories(nodeDirectoryName); err0 != nil {
-		log.Errorf("err : %s", err0)
-		return err0
-	}
-
 	err = runLanguageProcess(languageNode, languageCtx)
 	if err != nil {
 		log.Errorf("err : %s", err)
@@ -146,6 +137,13 @@ func runLanguageProcess(languageNode *languages.LanguageNode, languageCtx contex
 		rubyCtx := ruby.AddValuesToContext(languageCtx)
 		if err1 := ruby.Process(rubyCtx); err1 != nil {
 			log.Errorf("err : %s", err1)
+			return err1
+		}
+	} else if languageNode.Language == languages.DotNet {
+		// add values(LanguageNode and configs from coreProject) to context.
+		dotnetCtx := dotnet.AddValuesToContext(languageCtx)
+		if err1 := dotnet.Process(dotnetCtx); err1 != nil {
+			log.Debugf("err : %s", err1)
 			return err1
 		}
 	}
