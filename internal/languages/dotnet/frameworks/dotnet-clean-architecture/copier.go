@@ -461,6 +461,16 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 	}
 	filePaths = append(filePaths, &targetApplicationQueriesGetAllResourceNamesQueryFileName)
 
+	// responses
+	// copy application/responses/ResourceNameResponse.cs
+	targetApplicationResponsesResourceNameResponseFileName := c.NodeDirectoryName + ApplicationResponsesPath + "/" + resource.Name + "Response.cs"
+	_, err = utils.CopyFile(targetApplicationResponsesResourceNameResponseFileName, c.TemplatesRootPath+ApplicationResponsesResourceNameResponseCSFile)
+	if err != nil {
+		log.Errorf("error copying application responses ResourceNameResponse.cs file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationResponsesResourceNameResponseFileName)
+
 	// add resource-specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
 	if err != nil {
