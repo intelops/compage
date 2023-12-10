@@ -1403,7 +1403,7 @@ func TestDotNetCleanArchitectureGenerator(t *testing.T) {
 									"datatype": "string"
 								},
 								"Street": {
-									"datatype": "int32"
+									"datatype": "string"
 								}
 							},
 							"name": "Address"

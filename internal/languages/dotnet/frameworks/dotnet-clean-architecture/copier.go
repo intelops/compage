@@ -192,17 +192,6 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 	}
 }
 
-// createRestClientDirectories creates rest client directories.
-func (c *Copier) createRestClientDirectories() error {
-	clientDirectory := c.NodeDirectoryName + RestClientPath
-	if err := utils.CreateDirectories(clientDirectory); err != nil {
-		log.Errorf("error creating client directory: %v", err)
-		return err
-	}
-
-	return nil
-}
-
 // createRestServerDirectories creates rest server directories.
 func (c *Copier) createRestServerDirectories() error {
 	applicationDirectory := c.NodeDirectoryName + ApplicationPath
@@ -322,12 +311,12 @@ func (c *Copier) createRestServerDirectories() error {
 
 // copyRestServerResourceFiles copies rest server resource files from template and renames them as per resource config.
 func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error {
-	var filePaths []*string
+	filePaths := &[]*string{}
 	var err error
 	// copy sql files (core)
-	if c.IsSQLDB {
-		// add files to filePaths and copy them to the generated project
-	}
+	//if c.IsSQLDB {
+	//	// add files to filePaths and copy them to the generated project
+	//}
 
 	// add files for application
 	err = c.addApplicationRelatedDirectoriesAndFiles(resource, filePaths)
@@ -344,7 +333,7 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 		log.Errorf("error copying core entities resource name file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetCoreEntitiesResourceNameFileName)
+	*filePaths = append(*filePaths, &targetCoreEntitiesResourceNameFileName)
 
 	// add resource-specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
@@ -354,10 +343,10 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 	}
 
 	// apply template
-	return executor.Execute(filePaths, c.Data)
+	return executor.Execute(*filePaths, c.Data)
 }
 
-func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Resource, filePaths []*string) error {
+func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Resource, filePaths *[]*string) error {
 	var err error
 	// create directories for resource commands
 	resourceCommandsDirectory := c.NodeDirectoryName + ApplicationCommandsPath + "/" + resource.Name + "Service"
@@ -373,7 +362,7 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 		log.Errorf("error copying application commands CreateResourceNameCommand.cs file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationCommandsCreateResourceNameCommandFileName)
+	*filePaths = append(*filePaths, &targetApplicationCommandsCreateResourceNameCommandFileName)
 
 	// copy application/commands/ResourceNameService/DeleteResourceNameCommand.cs
 	targetApplicationCommandsDeleteResourceNameCommandFileName := c.NodeDirectoryName + ApplicationCommandsPath + "/" + resource.Name + "Service" + "/" + "Delete" + resource.Name + "Command.cs"
@@ -382,7 +371,7 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 		log.Errorf("error copying application commands DeleteResourceNameCommand.cs file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationCommandsDeleteResourceNameCommandFileName)
+	*filePaths = append(*filePaths, &targetApplicationCommandsDeleteResourceNameCommandFileName)
 
 	// copy application/commands/ResourceNameService/UpdateResourceNameCommand.cs
 	targetApplicationCommandsUpdateResourceNameCommandFileName := c.NodeDirectoryName + ApplicationCommandsPath + "/" + resource.Name + "Service" + "/" + "Update" + resource.Name + "Command.cs"
@@ -391,7 +380,7 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 		log.Errorf("error copying application commands UpdateResourceNameCommand.cs file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationCommandsUpdateResourceNameCommandFileName)
+	*filePaths = append(*filePaths, &targetApplicationCommandsUpdateResourceNameCommandFileName)
 
 	// create exceptions files
 	// copy application/exceptions/ResourceNameNotFoundException.cs
@@ -401,7 +390,7 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 		log.Errorf("error copying application exceptions ResourceNameNotFoundException.cs file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationExceptionsResourceNameNotFoundExceptionFileName)
+	*filePaths = append(*filePaths, &targetApplicationExceptionsResourceNameNotFoundExceptionFileName)
 
 	// handlers
 	// create directories for resource handlers
@@ -418,7 +407,7 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 		log.Errorf("error copying application handlers CreateResourceNameCommandHandler.cs file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationHandlersCreateResourceNameCommandHandlerFileName)
+	*filePaths = append(*filePaths, &targetApplicationHandlersCreateResourceNameCommandHandlerFileName)
 
 	// copy application/handlers/ResourceNameService/GetAllResourceNamesQueryHandler.cs
 	targetApplicationHandlersGetAllResourceNameQueryHandlerFileName := c.NodeDirectoryName + ApplicationHandlersPath + "/" + resource.Name + "Service" + "/" + "GetAll" + resource.Name + "sQueryHandler.cs"
@@ -427,7 +416,7 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 		log.Errorf("error copying application handlers GetAllResourceNameQueryHandler.cs file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationHandlersGetAllResourceNameQueryHandlerFileName)
+	*filePaths = append(*filePaths, &targetApplicationHandlersGetAllResourceNameQueryHandlerFileName)
 
 	// copy application/handlers/ResourceNameService/GetResourceNameByIdQueryHandler.cs
 	targetApplicationHandlersGetResourceNameHandlerFileName := c.NodeDirectoryName + ApplicationHandlersPath + "/" + resource.Name + "Service" + "/" + "Get" + resource.Name + "ByIdQueryHandler.cs"
@@ -436,7 +425,7 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 		log.Errorf("error copying application handlers GetResourceNameByIdQueryHandler.cs file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationHandlersGetResourceNameHandlerFileName)
+	*filePaths = append(*filePaths, &targetApplicationHandlersGetResourceNameHandlerFileName)
 
 	// copy application/handlers/ResourceNameService/UpdateResourceNameCommandHandler.cs
 	targetApplicationHandlersUpdateResourceNameCommandHandlerFileName := c.NodeDirectoryName + ApplicationHandlersPath + "/" + resource.Name + "Service" + "/" + "Update" + resource.Name + "CommandHandler.cs"
@@ -445,7 +434,7 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 		log.Errorf("error copying application handlers UpdateResourceNameCommandHandler.cs file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationHandlersUpdateResourceNameCommandHandlerFileName)
+	*filePaths = append(*filePaths, &targetApplicationHandlersUpdateResourceNameCommandHandlerFileName)
 
 	// copy application/handlers/ResourceNameService/DeleteResourceNameCommandHandler.cs
 	targetApplicationHandlersDeleteResourceNameCommandHandlerFileName := c.NodeDirectoryName + ApplicationHandlersPath + "/" + resource.Name + "Service" + "/" + "Delete" + resource.Name + "CommandHandler.cs"
@@ -454,7 +443,7 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 		log.Errorf("error copying application handlers DeleteResourceNameCommandHandler.cs file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationHandlersDeleteResourceNameCommandHandlerFileName)
+	*filePaths = append(*filePaths, &targetApplicationHandlersDeleteResourceNameCommandHandlerFileName)
 
 	// mappers
 	// copy application/mappers/MapperProfile.cs
@@ -464,7 +453,7 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 		log.Errorf("error copying application mappers MappingProfile.cs file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationMappersMappingProfileFileName)
+	*filePaths = append(*filePaths, &targetApplicationMappersMappingProfileFileName)
 
 	// queries
 	// create directories for resource queries
@@ -480,7 +469,7 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 		log.Errorf("error copying application queries GetResourceNameByIdQuery.cs file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationQueriesGetResourceNameByIDQueryFileName)
+	*filePaths = append(*filePaths, &targetApplicationQueriesGetResourceNameByIDQueryFileName)
 
 	// copy application/queries/GetAllResourceNamesQuery.cs
 	targetApplicationQueriesGetAllResourceNamesQueryFileName := c.NodeDirectoryName + ApplicationQueriesPath + "/" + resource.Name + "Service" + "/" + "GetAll" + resource.Name + "sQuery.cs"
@@ -489,7 +478,7 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 		log.Errorf("error copying application queries GetAllResourceNamesQuery.cs file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationQueriesGetAllResourceNamesQueryFileName)
+	*filePaths = append(*filePaths, &targetApplicationQueriesGetAllResourceNamesQueryFileName)
 
 	// responses
 	// copy application/responses/ResourceNameResponse.cs
@@ -499,7 +488,7 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 		log.Errorf("error copying application responses ResourceNameResponse.cs file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationResponsesResourceNameResponseFileName)
+	*filePaths = append(*filePaths, &targetApplicationResponsesResourceNameResponseFileName)
 
 	return nil
 }
@@ -601,7 +590,7 @@ func (c *Copier) CreateRootLevelFiles() error {
 }
 
 func (c *Copier) copyCoreFiles() error {
-	var filePaths []*string
+	filePaths := &[]*string{}
 	// CoreCommonEntityBaseFile
 	targetCoreCommonEntityBaseFileName := c.NodeDirectoryName + CoreCommonEntityBaseFile
 	_, err := utils.CopyFile(targetCoreCommonEntityBaseFileName, c.TemplatesRootPath+CoreCommonEntityBaseFile)
@@ -626,13 +615,13 @@ func (c *Copier) copyCoreFiles() error {
 		return err
 	}
 
-	filePaths = append(filePaths, &targetCoreRepositoriesAsyncRepositoryFileName)
+	*filePaths = append(*filePaths, &targetCoreRepositoriesAsyncRepositoryFileName)
 
-	return executor.Execute(filePaths, c.Data)
+	return executor.Execute(*filePaths, c.Data)
 }
 
 func (c *Copier) copyInfrastructureFiles() error {
-	var filePaths []*string
+	filePaths := &[]*string{}
 	// infrastructure/Infrastructure.csproj
 	targetInfrastructureCSProjFileName := c.NodeDirectoryName + InfrastructureCSProjFile
 	_, err := utils.CopyFile(targetInfrastructureCSProjFileName, c.TemplatesRootPath+InfrastructureCSProjFile)
@@ -640,7 +629,7 @@ func (c *Copier) copyInfrastructureFiles() error {
 		log.Errorf("error copying infrastructure Infrastructure.csproj file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetInfrastructureCSProjFileName)
+	*filePaths = append(*filePaths, &targetInfrastructureCSProjFileName)
 
 	// infrastructure/Data/DatabaseContextFactory.cs
 	targetDatabaseContextFactoryFileName := c.NodeDirectoryName + InfrastructureDataDatabaseContextFactoryCSFile
@@ -649,7 +638,7 @@ func (c *Copier) copyInfrastructureFiles() error {
 		log.Errorf("error copying infrastructure DatabaseContextFactory file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetDatabaseContextFactoryFileName)
+	*filePaths = append(*filePaths, &targetDatabaseContextFactoryFileName)
 
 	// infrastructure/Repositories/RepositoryBase.cs
 	targetRepositoriesRepositoryBaseFileName := c.NodeDirectoryName + InfrastructureRepositoriesRepositoryBaseCSFile
@@ -658,13 +647,13 @@ func (c *Copier) copyInfrastructureFiles() error {
 		log.Errorf("error copying infrastructure RepositoryBase file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetRepositoriesRepositoryBaseFileName)
+	*filePaths = append(*filePaths, &targetRepositoriesRepositoryBaseFileName)
 
-	return executor.Execute(filePaths, c.Data)
+	return executor.Execute(*filePaths, c.Data)
 }
 
 func (c *Copier) copyApplicationFiles() error {
-	var filePaths []*string
+	filePaths := &[]*string{}
 	// application/Application.csproj
 	targetApplicationCSProjFileName := c.NodeDirectoryName + ApplicationCSProjFile
 	_, err := utils.CopyFile(targetApplicationCSProjFileName, c.TemplatesRootPath+ApplicationCSProjFile)
@@ -672,7 +661,7 @@ func (c *Copier) copyApplicationFiles() error {
 		log.Errorf("error copying application Application.csproj file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationCSProjFileName)
+	*filePaths = append(*filePaths, &targetApplicationCSProjFileName)
 
 	// application/Extensions/ServiceRegistration.cs
 	targetApplicationExtensionsServiceRegistrationFileName := c.NodeDirectoryName + ApplicationExtensionsServiceRegistrationCSFile
@@ -681,13 +670,13 @@ func (c *Copier) copyApplicationFiles() error {
 		log.Errorf("error copying application ServiceRegistration file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationExtensionsServiceRegistrationFileName)
+	*filePaths = append(*filePaths, &targetApplicationExtensionsServiceRegistrationFileName)
 
-	return executor.Execute(filePaths, c.Data)
+	return executor.Execute(*filePaths, c.Data)
 }
 
 func (c *Copier) copyTestsFiles() error {
-	var filePaths []*string
+	filePaths := &[]*string{}
 	// tests/Application.Tests.csproj
 	targetApplicationTestsCSProjFileName := c.NodeDirectoryName + TestsApplicationTestsCSProjFile
 	_, err := utils.CopyFile(targetApplicationTestsCSProjFileName, c.TemplatesRootPath+TestsApplicationTestsCSProjFile)
@@ -695,7 +684,7 @@ func (c *Copier) copyTestsFiles() error {
 		log.Errorf("error copying tests Application.Tests.csproj file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetApplicationTestsCSProjFileName)
+	*filePaths = append(*filePaths, &targetApplicationTestsCSProjFileName)
 
 	// tests/GlobalUsings.cs
 	targetGlobalUsingsFileName := c.NodeDirectoryName + TestsGlobalUsingsCSFile
@@ -704,7 +693,7 @@ func (c *Copier) copyTestsFiles() error {
 		log.Errorf("error copying tests GlobalUsings file: %v", err)
 		return err
 	}
-	filePaths = append(filePaths, &targetGlobalUsingsFileName)
+	*filePaths = append(*filePaths, &targetGlobalUsingsFileName)
 
-	return executor.Execute(filePaths, c.Data)
+	return executor.Execute(*filePaths, c.Data)
 }
