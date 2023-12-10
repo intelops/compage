@@ -329,9 +329,39 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 		// add files to filePaths and copy them to the generated project
 	}
 
+	// add files for application
+	err = c.addApplicationRelatedDirectoriesAndFiles(resource, filePaths)
+	if err != nil {
+		log.Errorf("error adding application related directories and files: %v", err)
+		return err
+	}
+
+	// add files for core
+	// copy core/entities/ResourceName.cs
+	targetCoreEntitiesResourceNameFileName := c.NodeDirectoryName + CoreEntitiesPath + "/" + resource.Name + ".cs"
+	_, err = utils.CopyFile(targetCoreEntitiesResourceNameFileName, c.TemplatesRootPath+CoreEntitiesResourceNameCSFile)
+	if err != nil {
+		log.Errorf("error copying core entities resource name file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetCoreEntitiesResourceNameFileName)
+
+	// add resource-specific data to map in c needed for templates.
+	err = c.addResourceSpecificTemplateData(resource)
+	if err != nil {
+		log.Errorf("error adding resource specific template data: %v", err)
+		return err
+	}
+
+	// apply template
+	return executor.Execute(filePaths, c.Data)
+}
+
+func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Resource, filePaths []*string) error {
+	var err error
 	// create directories for resource commands
 	resourceCommandsDirectory := c.NodeDirectoryName + ApplicationCommandsPath + "/" + resource.Name + "Service"
-	if err := utils.CreateDirectories(resourceCommandsDirectory); err != nil {
+	if err = utils.CreateDirectories(resourceCommandsDirectory); err != nil {
 		log.Errorf("error creating resource commands directory: %v", err)
 		return err
 	}
@@ -439,7 +469,7 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 	// queries
 	// create directories for resource queries
 	resourceQueriesDirectory := c.NodeDirectoryName + ApplicationQueriesPath + "/" + resource.Name + "Service"
-	if err := utils.CreateDirectories(resourceQueriesDirectory); err != nil {
+	if err = utils.CreateDirectories(resourceQueriesDirectory); err != nil {
 		log.Errorf("error creating resource queries directory: %v", err)
 		return err
 	}
@@ -471,15 +501,7 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 	}
 	filePaths = append(filePaths, &targetApplicationResponsesResourceNameResponseFileName)
 
-	// add resource-specific data to map in c needed for templates.
-	err = c.addResourceSpecificTemplateData(resource)
-	if err != nil {
-		log.Errorf("error adding resource specific template data: %v", err)
-		return err
-	}
-
-	// apply template
-	return executor.Execute(filePaths, c.Data)
+	return nil
 }
 
 func (c *Copier) addResourceSpecificTemplateData(resource *corenode.Resource) error {
