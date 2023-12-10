@@ -44,11 +44,6 @@ func generateRESTConfig(_ context.Context, dotNetValues *DotNetValues) error {
 						return err
 					}
 				}
-				// copy all files at root level, fire this at last
-				if err := dotNetCleanArchitectureCopier.CreateRootLevelFiles(); err != nil {
-					log.Errorf("err : %s", err)
-					return err
-				}
 			} else {
 				return fmt.Errorf("unsupported framework %s for template %s for language %s", n.RestConfig.Framework, n.RestConfig.Template, n.Language)
 			}

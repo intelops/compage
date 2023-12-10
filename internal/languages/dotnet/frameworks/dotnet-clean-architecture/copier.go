@@ -40,7 +40,7 @@ const ApplicationHandlersCreateResourceNameCommandHandlerCSFile = "/Application/
 const ApplicationHandlersDeleteResourceNameCommandHandlerCSFile = "/Application/Handlers/ResourceNameService/DeleteResourceNameCommandHandler.cs.tmpl"
 const ApplicationHandlersUpdateResourceNameCommandHandlerCSFile = "/Application/Handlers/ResourceNameService/UpdateResourceNameCommandHandler.cs.tmpl"
 const ApplicationHandlersGetResourceNameByIDQueryHandlerCSFile = "/Application/Handlers/ResourceNameService/GetResourceNameByIdQueryHandler.cs.tmpl"
-const ApplicationHandlersGetAllResourceNameQueryHandlerCSFile = "/Application/Handlers/ResourceNameService/GetAllResourceNameQueryHandler.cs.tmpl"
+const ApplicationHandlersGetAllResourceNamesQueryHandlerCSFile = "/Application/Handlers/ResourceNameService/GetAllResourceNamesQueryHandler.cs.tmpl"
 
 // mappers
 const ApplicationMappersPath = "/Application/Mappers"
@@ -92,7 +92,7 @@ const InfrastructureRepositoriesResourceNameRepositoryCSFile = "/Infrastructure/
 // microServiceName
 const MicroServiceNameCSProjFile = "/MicroServiceName/MicroServiceName.csproj.tmpl"
 const MicroServiceNameProgramCSFile = "/MicroServiceName/Program.cs.tmpl"
-const MicroServiceNameCSProjUSerFile = "/MicroServiceName/MicroServiceName.csproj.user.tmpl"
+const MicroServiceNameCSProjUserFile = "/MicroServiceName/MicroServiceName.csproj.user.tmpl"
 const MicroServiceNameAppSettingsDevelopmentFile = "/MicroServiceName/appsettings.Development.json.tmpl"
 const MicroServiceNameAppSettingsFile = "/MicroServiceName/appsettings.json.tmpl"
 
@@ -107,6 +107,8 @@ const MicroServiceNamePropertiesLaunchSettingsJSONFile = "/MicroServiceName/Prop
 const TestsPath = "/Tests"
 const TestsApplicationTestsCSProjFile = "/Tests/Application.Tests/Application.Tests.csproj.tmpl"
 const TestsGlobalUsingsCSFile = "/Tests/Application.Tests/GlobalUsings.cs.tmpl"
+
+const MicroServiceNameSlnFile = "/MicroServiceName.sln.tmpl"
 
 // handlers
 const TestsHandlersPath = "/Tests/Application.Tests/Handlers"
@@ -426,13 +428,13 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 	*filePaths = append(*filePaths, &targetApplicationHandlersCreateResourceNameCommandHandlerFileName)
 
 	// copy application/handlers/ResourceNameService/GetAllResourceNamesQueryHandler.cs
-	targetApplicationHandlersGetAllResourceNameQueryHandlerFileName := c.NodeDirectoryName + ApplicationHandlersPath + "/" + resource.Name + "Service" + "/" + "GetAll" + resource.Name + "sQueryHandler.cs"
-	_, err = utils.CopyFile(targetApplicationHandlersGetAllResourceNameQueryHandlerFileName, c.TemplatesRootPath+ApplicationHandlersGetAllResourceNameQueryHandlerCSFile)
+	targetApplicationHandlersGetAllResourceNamesQueryHandlerFileName := c.NodeDirectoryName + ApplicationHandlersPath + "/" + resource.Name + "Service" + "/" + "GetAll" + c.PluralizeClient.Plural(resource.Name) + "QueryHandler.cs"
+	_, err = utils.CopyFile(targetApplicationHandlersGetAllResourceNamesQueryHandlerFileName, c.TemplatesRootPath+ApplicationHandlersGetAllResourceNamesQueryHandlerCSFile)
 	if err != nil {
-		log.Errorf("error copying application handlers GetAllResourceNameQueryHandler.cs file: %v", err)
+		log.Errorf("error copying application handlers GetAllResourceNamesQueryHandler.cs file: %v", err)
 		return err
 	}
-	*filePaths = append(*filePaths, &targetApplicationHandlersGetAllResourceNameQueryHandlerFileName)
+	*filePaths = append(*filePaths, &targetApplicationHandlersGetAllResourceNamesQueryHandlerFileName)
 
 	// copy application/handlers/ResourceNameService/GetResourceNameByIdQueryHandler.cs
 	targetApplicationHandlersGetResourceNameHandlerFileName := c.NodeDirectoryName + ApplicationHandlersPath + "/" + resource.Name + "Service" + "/" + "Get" + resource.Name + "ByIdQueryHandler.cs"
@@ -584,6 +586,51 @@ func (c *Copier) addMicroServiceNameRelatedDirectoriesAndFiles(resource *corenod
 	}
 	*filePaths = append(*filePaths, &targetMicroServiceNamePropertiesLaunchSettingsJSONFileName)
 
+	// copy MicroServiceName/MicroServiceName.csproj
+	targetMicroServiceNameCSProjFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + "/" + getMicroServiceName(c.NodeDirectoryName) + ".csproj"
+	_, err = utils.CopyFile(targetMicroServiceNameCSProjFileName, c.TemplatesRootPath+MicroServiceNameCSProjFile)
+	if err != nil {
+		log.Errorf("error copying MicroServiceName csproj file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetMicroServiceNameCSProjFileName)
+
+	// copy MicroServiceName/MicroServiceName.csproj.user
+	targetMicroServiceNameCSProjUserFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + "/" + getMicroServiceName(c.NodeDirectoryName) + ".csproj.user"
+	_, err = utils.CopyFile(targetMicroServiceNameCSProjUserFileName, c.TemplatesRootPath+MicroServiceNameCSProjUserFile)
+	if err != nil {
+		log.Errorf("error copying MicroServiceName csproj.user file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetMicroServiceNameCSProjUserFileName)
+
+	// copy MicroServiceName/Program.cs
+	targetMicroServiceNameProgramCSFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + "/" + "Program.cs"
+	_, err = utils.CopyFile(targetMicroServiceNameProgramCSFileName, c.TemplatesRootPath+MicroServiceNameProgramCSFile)
+	if err != nil {
+		log.Errorf("error copying MicroServiceName program cs file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetMicroServiceNameProgramCSFileName)
+
+	// copy MicroServiceName/appsettings.Development.json
+	targetMicroServiceNameAppSettingsDevelopmentFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + "/" + "appsettings.Development.json"
+	_, err = utils.CopyFile(targetMicroServiceNameAppSettingsDevelopmentFileName, c.TemplatesRootPath+MicroServiceNameAppSettingsDevelopmentFile)
+	if err != nil {
+		log.Errorf("error copying MicroServiceName appsettings.Development.json file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetMicroServiceNameAppSettingsDevelopmentFileName)
+
+	// copy MicroServiceName/appsettings.json
+	targetMicroServiceNameAppSettingsFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + "/" + "appsettings.json"
+	_, err = utils.CopyFile(targetMicroServiceNameAppSettingsFileName, c.TemplatesRootPath+MicroServiceNameAppSettingsFile)
+	if err != nil {
+		log.Errorf("error copying MicroServiceName appsettings.json file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetMicroServiceNameAppSettingsFileName)
+
 	return nil
 }
 
@@ -657,6 +704,14 @@ func (c *Copier) CreateRestServer() error {
 			log.Errorf("error copying tests files: %v", err)
 			return err
 		}
+
+		// copy below files to the generated project
+		// MicroServiceName.sln
+		if err := c.copyMicroServiceNameSlnFile(); err != nil {
+			log.Errorf("error copying MicroServiceName.sln file: %v", err)
+			return err
+		}
+
 		// copy files with respect to the names of resources
 		for _, resource := range c.Resources {
 			if err := c.copyRestServerResourceFiles(resource); err != nil {
@@ -692,6 +747,7 @@ func (c *Copier) copyCoreFiles() error {
 		log.Errorf("error copying Core Common EntityBase file: %v", err)
 		return err
 	}
+	*filePaths = append(*filePaths, &targetCoreCommonEntityBaseFileName)
 
 	// CoreCoreCSProjFile
 	targetCoreCoreCSProjFileName := c.NodeDirectoryName + CoreCoreCSProjFile
@@ -700,10 +756,11 @@ func (c *Copier) copyCoreFiles() error {
 		log.Errorf("error copying Core Core.csproj file: %v", err)
 		return err
 	}
+	*filePaths = append(*filePaths, &targetCoreCoreCSProjFileName)
 
 	// CoreRepositoriesIAsyncRepositoryCSFile
 	targetCoreRepositoriesAsyncRepositoryFileName := c.NodeDirectoryName + CoreRepositoriesIAsyncRepositoryCSFile
-	_, err = utils.CopyFile(targetCoreRepositoriesAsyncRepositoryFileName, c.TemplatesRootPath+CoreCommonEntityBaseFile)
+	_, err = utils.CopyFile(targetCoreRepositoriesAsyncRepositoryFileName, c.TemplatesRootPath+CoreRepositoriesIAsyncRepositoryCSFile)
 	if err != nil {
 		log.Errorf("error copying Core Repositories IAsyncRepository.cs file: %v", err)
 		return err
@@ -788,6 +845,19 @@ func (c *Copier) copyTestsFiles() error {
 		return err
 	}
 	*filePaths = append(*filePaths, &targetGlobalUsingsFileName)
+
+	return executor.Execute(*filePaths, c.Data)
+}
+
+func (c *Copier) copyMicroServiceNameSlnFile() error {
+	filePaths := &[]*string{}
+	targetMicroServiceNameSLNFileName := c.NodeDirectoryName + "/" + getMicroServiceName(c.NodeDirectoryName) + ".sln"
+	_, err := utils.CopyFile(targetMicroServiceNameSLNFileName, c.TemplatesRootPath+MicroServiceNameSlnFile)
+	if err != nil {
+		log.Errorf("error copying MicroServiceName.sln file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetMicroServiceNameSLNFileName)
 
 	return executor.Execute(*filePaths, c.Data)
 }

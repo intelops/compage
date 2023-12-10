@@ -1389,7 +1389,7 @@ func TestDotNetCleanArchitectureGenerator(t *testing.T) {
 									"datatype": "string"
 								},
 								"RollNumber": {
-									"datatype": "int32"
+									"datatype": "int"
 								},
 								"College": {
 									"datatype": "string"
