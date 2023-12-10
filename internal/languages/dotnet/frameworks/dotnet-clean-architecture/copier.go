@@ -44,7 +44,7 @@ const ApplicationHandlersGetAllResourceNameQueryHandlerCSFile = "/Application/Ha
 
 // mappers
 const ApplicationMappersPath = "/Application/Mappers"
-const ApplicationMappersResourceNameMappingProfileFile = "/Application/Mappers/ResourceNameMappingProfile.cs.tmpl"
+const ApplicationMappersMappingProfileFile = "/Application/Mappers/MappingProfile.cs.tmpl"
 
 // queries
 const ApplicationQueriesPath = "/Application/Queries"
@@ -425,6 +425,16 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 		return err
 	}
 	filePaths = append(filePaths, &targetApplicationHandlersDeleteResourceNameCommandHandlerFileName)
+
+	// mappers
+	// copy application/mappers/MapperProfile.cs
+	targetApplicationMappersMappingProfileFileName := c.NodeDirectoryName + ApplicationMappersPath + "/MappingProfile.cs"
+	_, err = utils.CopyFile(targetApplicationMappersMappingProfileFileName, c.TemplatesRootPath+ApplicationMappersMappingProfileFile)
+	if err != nil {
+		log.Errorf("error copying application mappers MappingProfile.cs file: %v", err)
+		return err
+	}
+	filePaths = append(filePaths, &targetApplicationMappersMappingProfileFileName)
 
 	// add resource-specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)

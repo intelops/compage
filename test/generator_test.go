@@ -1396,6 +1396,17 @@ func TestDotNetCleanArchitectureGenerator(t *testing.T) {
 								}
 							},
 							"name": "Student"
+						},
+						{
+							"fields": {
+								"City": {
+									"datatype": "string"
+								},
+								"Street": {
+									"datatype": "int32"
+								}
+							},
+							"name": "Address"
 						}
 					]
 				},
