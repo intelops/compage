@@ -540,6 +540,15 @@ func (c *Copier) addInfrastructureRelatedDirectoriesAndFiles(resource *corenode.
 	}
 	*paths = append(*paths, &targetInfrastructureExtensionsServicesCollectionExtensionsFileName)
 
+	// copy infrastructure/repositories/ResourcesNameRepository.cs
+	targetInfrastructureRepositoriesResourceNameRepositoryFileName := c.NodeDirectoryName + InfrastructureRepositoriesPath + "/" + resource.Name + "Repository.cs"
+	_, err = utils.CopyFile(targetInfrastructureRepositoriesResourceNameRepositoryFileName, c.TemplatesRootPath+InfrastructureRepositoriesResourceNameRepositoryCSFile)
+	if err != nil {
+		log.Errorf("error copying infrastructure repositories resource name repository file: %v", err)
+		return err
+	}
+	*paths = append(*paths, &targetInfrastructureRepositoriesResourceNameRepositoryFileName)
+
 	return nil
 }
 
