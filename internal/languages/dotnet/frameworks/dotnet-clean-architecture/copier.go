@@ -332,6 +332,13 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 		return err
 	}
 
+	// add files for infrastructure
+	err = c.addInfrastructureRelatedDirectoriesAndFiles(resource, filePaths)
+	if err != nil {
+		log.Errorf("error adding infrastructure related directories and files: %v", err)
+		return err
+	}
+
 	// add resource-specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
 	if err != nil {
@@ -510,6 +517,19 @@ func (c *Copier) addCoreRelatedDirectoriesAndFiles(resource *corenode.Resource, 
 	}
 	*filePaths = append(*filePaths, &targetCoreRepositoriesIResourceNameRepositoryFileName)
 
+	return nil
+}
+
+func (c *Copier) addInfrastructureRelatedDirectoriesAndFiles(resource *corenode.Resource, paths *[]*string) error {
+	var err error
+	// copy infrastructure/data/DatabaseContext.cs
+	targetInfrastructureDataDatabaseContextFileName := c.NodeDirectoryName + InfrastructureDataPath + "/" + "DatabaseContext.cs"
+	_, err = utils.CopyFile(targetInfrastructureDataDatabaseContextFileName, c.TemplatesRootPath+InfrastructureDataDatabaseContextCSFile)
+	if err != nil {
+		log.Errorf("error copying infrastructure data database context file: %v", err)
+		return err
+	}
+	*paths = append(*paths, &targetInfrastructureDataDatabaseContextFileName)
 	return nil
 }
 
