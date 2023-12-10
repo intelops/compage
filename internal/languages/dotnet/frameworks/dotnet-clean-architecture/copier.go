@@ -326,14 +326,11 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 	}
 
 	// add files for core
-	// copy core/entities/ResourceName.cs
-	targetCoreEntitiesResourceNameFileName := c.NodeDirectoryName + CoreEntitiesPath + "/" + resource.Name + ".cs"
-	_, err = utils.CopyFile(targetCoreEntitiesResourceNameFileName, c.TemplatesRootPath+CoreEntitiesResourceNameCSFile)
+	err = c.addCoreRelatedDirectoriesAndFiles(resource, filePaths)
 	if err != nil {
-		log.Errorf("error copying core entities resource name file: %v", err)
+		log.Errorf("error adding core related directories and files: %v", err)
 		return err
 	}
-	*filePaths = append(*filePaths, &targetCoreEntitiesResourceNameFileName)
 
 	// add resource-specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
@@ -395,7 +392,7 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 	// handlers
 	// create directories for resource handlers
 	resourceHandlersDirectory := c.NodeDirectoryName + ApplicationHandlersPath + "/" + resource.Name + "Service"
-	if err := utils.CreateDirectories(resourceHandlersDirectory); err != nil {
+	if err = utils.CreateDirectories(resourceHandlersDirectory); err != nil {
 		log.Errorf("error creating resource handlers directory: %v", err)
 		return err
 	}
@@ -489,6 +486,29 @@ func (c *Copier) addApplicationRelatedDirectoriesAndFiles(resource *corenode.Res
 		return err
 	}
 	*filePaths = append(*filePaths, &targetApplicationResponsesResourceNameResponseFileName)
+
+	return nil
+}
+
+func (c *Copier) addCoreRelatedDirectoriesAndFiles(resource *corenode.Resource, filePaths *[]*string) error {
+	var err error
+	// copy core/entities/ResourceName.cs
+	targetCoreEntitiesResourceNameFileName := c.NodeDirectoryName + CoreEntitiesPath + "/" + resource.Name + ".cs"
+	_, err = utils.CopyFile(targetCoreEntitiesResourceNameFileName, c.TemplatesRootPath+CoreEntitiesResourceNameCSFile)
+	if err != nil {
+		log.Errorf("error copying core entities resource name file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetCoreEntitiesResourceNameFileName)
+
+	// copy core/repositories/IResourceNameRepository.cs
+	targetCoreRepositoriesIResourceNameRepositoryFileName := c.NodeDirectoryName + CoreRepositoriesPath + "/" + "I" + resource.Name + "Repository.cs"
+	_, err = utils.CopyFile(targetCoreRepositoriesIResourceNameRepositoryFileName, c.TemplatesRootPath+CoreRepositoriesIResourceNameRepositoryCSFile)
+	if err != nil {
+		log.Errorf("error copying core repositories resource name repository file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetCoreRepositoriesIResourceNameRepositoryFileName)
 
 	return nil
 }
