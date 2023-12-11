@@ -12,8 +12,11 @@ import (
 
 var cfgFile string
 
-//go:embed config.yaml.tmpl
-var Content embed.FS
+//go:embed go-config.yaml.tmpl
+var GoConfigContent embed.FS
+
+//go:embed dotnet-config.yaml.tmpl
+var DotNetConfigContent embed.FS
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
