@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/intelops/compage/internal/languages/executor"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 var (
@@ -14,6 +16,7 @@ var (
 	platformUserName    string
 	repositoryName      string
 	serverType          string
+	language            string
 	overwriteConfigFile bool
 )
 
@@ -31,9 +34,10 @@ You can change the file as per your needs and then run the compage generate comm
 }
 
 func createOrUpdateDefaultConfigFile() error {
+	var err error
 	// create default config file
 	configFilePath := "config.yaml"
-	_, err := os.Stat(configFilePath)
+	_, err = os.Stat(configFilePath)
 	if err == nil {
 		log.Warnf("config file already exists at %s", configFilePath)
 		if !overwriteConfigFile {
@@ -48,50 +52,94 @@ func createOrUpdateDefaultConfigFile() error {
 		}
 	}
 
+	if language != "go" && language != "dotnet" {
+		message := fmt.Sprintf("language %s is not supported", language)
+		log.Errorf(message)
+		return fmt.Errorf(message)
+	}
+
 	_, err = os.Create(configFilePath)
 	if err != nil {
 		log.Errorf("error while creating the config file %s", err)
 		return err
 	}
-	contentData, err := Content.ReadFile("config.yaml.tmpl")
-	if err != nil {
-		log.Errorf("error while reading the config file %s", err)
-		return err
+
+	if language == "go" {
+		var goContentData []byte
+		goContentData, err = GoConfigContent.ReadFile("go-config.yaml.tmpl")
+		if err != nil {
+			log.Errorf("error while reading the config file %s", err)
+			return err
+		}
+		// copy the default config file and use go template to replace the values
+		err = os.WriteFile(configFilePath, goContentData, 0644)
+		if err != nil {
+			log.Errorf("error while creating the config file %s", err)
+			return err
+		}
+		var filePaths []*string
+		filePaths = append(filePaths, &configFilePath)
+		data := make(map[string]interface{})
+		data["ProjectName"] = projectName
+		data["GitRepositoryName"] = repositoryName
+		data["GitRepositoryURL"] = platformURL + "/" + platformUserName + "/" + repositoryName
+		data["GitPlatformName"] = platformName
+		data["GitPlatformURL"] = platformURL
+		data["GitPlatformUserName"] = platformUserName
+		if serverType == "grpc" {
+			data["IsRestAndGrpcServer"] = false
+			data["IsGrpcServer"] = true
+			data["IsRestServer"] = false
+		} else if serverType == "rest-grpc" {
+			data["IsRestAndGrpcServer"] = true
+			data["IsGrpcServer"] = false
+			data["IsRestServer"] = false
+		} else {
+			data["IsRestAndGrpcServer"] = false
+			data["IsGrpcServer"] = false
+			data["IsRestServer"] = true
+		}
+		err = executor.Execute(filePaths, data)
+		if err != nil {
+			log.Errorf("error while creating the config file %s", err)
+			return err
+		}
+		log.Infof("config file created at %s", configFilePath)
+	} else if language == "dotnet" {
+		var dotnetContentData []byte
+		dotnetContentData, err = DotNetConfigContent.ReadFile("dotnet-config.yaml.tmpl")
+		if err != nil {
+			log.Errorf("error while reading the config file %s", err)
+			return err
+		}
+		// copy the default config file and use go template to replace the values
+		err = os.WriteFile(configFilePath, dotnetContentData, 0644)
+		if err != nil {
+			log.Errorf("error while creating the config file %s", err)
+			return err
+		}
+		var filePaths []*string
+		filePaths = append(filePaths, &configFilePath)
+		data := make(map[string]interface{})
+		data["ProjectName"] = projectName
+		data["GitRepositoryName"] = repositoryName
+		data["GitRepositoryURL"] = platformURL + "/" + platformUserName + "/" + repositoryName
+		data["GitPlatformName"] = platformName
+		data["GitPlatformURL"] = platformURL
+		data["GitPlatformUserName"] = platformUserName
+		if serverType == "rest" {
+			data["IsRestAndGrpcServer"] = false
+			data["IsGrpcServer"] = false
+			data["IsRestServer"] = true
+		}
+		err = executor.Execute(filePaths, data)
+		if err != nil {
+			log.Errorf("error while creating the config file %s", err)
+			return err
+		}
+		log.Infof("config file created at %s", configFilePath)
 	}
-	// copy the default config file and use go template to replace the values
-	err = os.WriteFile(configFilePath, contentData, 0644)
-	if err != nil {
-		log.Errorf("error while creating the config file %s", err)
-		return err
-	}
-	var filePaths []*string
-	filePaths = append(filePaths, &configFilePath)
-	data := make(map[string]interface{})
-	data["ProjectName"] = projectName
-	data["GitRepositoryName"] = repositoryName
-	data["GitRepositoryURL"] = platformURL + "/" + platformUserName + "/" + repositoryName
-	data["GitPlatformName"] = platformName
-	data["GitPlatformURL"] = platformURL
-	data["GitPlatformUserName"] = platformUserName
-	if serverType == "grpc" {
-		data["IsRestAndGrpcServer"] = false
-		data["IsGrpcServer"] = true
-		data["IsRestServer"] = false
-	} else if serverType == "rest-grpc" {
-		data["IsRestAndGrpcServer"] = true
-		data["IsGrpcServer"] = false
-		data["IsRestServer"] = false
-	} else {
-		data["IsRestAndGrpcServer"] = false
-		data["IsGrpcServer"] = false
-		data["IsRestServer"] = true
-	}
-	err = executor.Execute(filePaths, data)
-	if err != nil {
-		log.Errorf("error while creating the config file %s", err)
-		return err
-	}
-	log.Infof("config file created at %s", configFilePath)
+
 	return nil
 }
 
@@ -114,4 +162,5 @@ func init() {
 	initCmd.Flags().StringVar(&repositoryName, "repositoryName", "myproject", "Git Repository Name")
 	initCmd.Flags().StringVar(&serverType, "serverType", "rest", "Server Type (rest, grpc, rest-grpc)")
 	initCmd.Flags().BoolVar(&overwriteConfigFile, "overwriteConfigFile", false, "Overwrite the config file if it already exists")
+	initCmd.Flags().StringVar(&language, "language", "go", "Language (go, dotnet)")
 }

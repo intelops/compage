@@ -1,6 +1,7 @@
 package dotnetcleanarchitecture
 
 import (
+	"errors"
 	"github.com/gertd/go-pluralize"
 	"github.com/iancoleman/strcase"
 	corenode "github.com/intelops/compage/internal/core/node"
@@ -112,12 +113,11 @@ const TestsGlobalUsingsCSFile = "/Tests/Application.Tests/GlobalUsings.cs.tmpl"
 const MicroServiceNameSlnFile = "/MicroServiceName.sln.tmpl"
 
 // handlers
-const TestsHandlersPath = "/Tests/Application.Tests/Handlers"
-const TestsHandlersResourceNameServicePath = "/Tests/Application.Tests/Handlers/ResourceNameService"
+const TestsApplicationTestsHandlersPath = "/Tests/Application.Tests/Handlers"
 const TestsHandlersCreateResourceNameCommandHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/CreateResourceNameCommandHandlerTests.cs.tmpl"
 const TestsHandlersDeleteResourceNameCommandHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/DeleteResourceNameCommandHandlerTests.cs.tmpl"
 const TestsHandlersUpdateResourceNameCommandHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/UpdateResourceNameCommandHandlerTests.cs.tmpl"
-const TestsHandlersTestsHandlersGetResourceNameByIDQueryHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/GetResourceNameByIdQueryHandlerTests.cs.tmpl"
+const TestsHandlersGetResourceNameByIDQueryHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/GetResourceNameByIdQueryHandlerTests.cs.tmpl"
 const TestsHandlersGetAllResourceNamesQueryHandlerTestsCSFile = "/Tests/Application.Tests/Handlers/ResourceNameService/GetAllResourceNamesQueryHandlerTests.cs.tmpl"
 
 // Copier Language specific *Copier
@@ -300,7 +300,7 @@ func (c *Copier) createRestServerDirectories() error {
 	}
 
 	testsDirectory := c.NodeDirectoryName + TestsPath
-	testsHandlersDirectory := c.NodeDirectoryName + TestsHandlersPath
+	testsHandlersDirectory := c.NodeDirectoryName + TestsApplicationTestsHandlersPath
 	if err := utils.CreateDirectories(testsDirectory); err != nil {
 		log.Errorf("error creating tests directory: %v", err)
 		return err
@@ -318,9 +318,9 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 	filePaths := &[]*string{}
 	var err error
 	// copy sql files (core)
-	//if c.IsSQLDB {
-	//	// add files to filePaths and copy them to the generated project
-	//}
+	if !c.IsSQLDB || c.SQLDB != "MSSQL" {
+		return errors.New("only MSSQL is supported")
+	}
 
 	// add files for application
 	err = c.addApplicationRelatedDirectoriesAndFiles(resource, filePaths)
@@ -350,6 +350,12 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 		return err
 	}
 
+	// add files for tests
+	err = c.addTestsRelatedDirectoriesAndFiles(resource, filePaths)
+	if err != nil {
+		log.Errorf("error adding tests related directories and files: %v", err)
+		return err
+	}
 	// add resource-specific data to map in c needed for templates.
 	err = c.addResourceSpecificTemplateData(resource)
 	if err != nil {
@@ -636,6 +642,63 @@ func (c *Copier) addMicroServiceNameRelatedDirectoriesAndFiles(resource *corenod
 		return err
 	}
 	*filePaths = append(*filePaths, &targetMicroServiceNameAppSettingsFileName)
+
+	return nil
+}
+
+func (c *Copier) addTestsRelatedDirectoriesAndFiles(resource *corenode.Resource, filePaths *[]*string) error {
+	var err error
+
+	// create a directory for resource Application.Tests/handlers/ResourceNameService
+	resourceHandlersResourceNameDirectory := c.NodeDirectoryName + TestsApplicationTestsHandlersPath + "/" + resource.Name + "Service"
+	if err = utils.CreateDirectories(resourceHandlersResourceNameDirectory); err != nil {
+		log.Errorf("error creating resource handlers resource name directory: %v", err)
+		return err
+	}
+	// copy tests/Application.Tests/Handlers/ResourceNameService/CreateResourceNameCommandHandlerTests.cs
+	targetTestsApplicationTestsHandlersResourceNameServiceCreateResourceNameCommandHandlerTestsFileName := resourceHandlersResourceNameDirectory + "/" + "Create" + resource.Name + "CommandHandlerTests.cs"
+	_, err = utils.CopyFile(targetTestsApplicationTestsHandlersResourceNameServiceCreateResourceNameCommandHandlerTestsFileName, c.TemplatesRootPath+TestsHandlersCreateResourceNameCommandHandlerTestsCSFile)
+	if err != nil {
+		log.Errorf("error copying tests application tests handlers resource name service create resource name command handler tests cs file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetTestsApplicationTestsHandlersResourceNameServiceCreateResourceNameCommandHandlerTestsFileName)
+
+	// copy tests/Application.Tests/Handlers/ResourceNameService/GetAllResourceNamesQueryHandlerTests.cs
+	targetTestsApplicationTestsHandlersResourceNameServiceGetAllResourceNamesQueryHandlerTestsFileName := resourceHandlersResourceNameDirectory + "/" + "GetAll" + c.PluralizeClient.Plural(resource.Name) + "QueryHandlerTests.cs"
+	_, err = utils.CopyFile(targetTestsApplicationTestsHandlersResourceNameServiceGetAllResourceNamesQueryHandlerTestsFileName, c.TemplatesRootPath+TestsHandlersGetAllResourceNamesQueryHandlerTestsCSFile)
+	if err != nil {
+		log.Errorf("error copying tests application tests handlers resource name service get all resource names query handler tests cs file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetTestsApplicationTestsHandlersResourceNameServiceGetAllResourceNamesQueryHandlerTestsFileName)
+
+	// copy tests/Application.Tests/Handlers/ResourceNameService/GetResourceNameByIdQueryHandlerTests.cs
+	targetTestsApplicationTestsHandlersResourceNameServiceGetResourceNameByIDQueryHandlerTestsFileName := resourceHandlersResourceNameDirectory + "/" + "Get" + resource.Name + "ByIdQueryHandlerTests.cs"
+	_, err = utils.CopyFile(targetTestsApplicationTestsHandlersResourceNameServiceGetResourceNameByIDQueryHandlerTestsFileName, c.TemplatesRootPath+TestsHandlersGetResourceNameByIDQueryHandlerTestsCSFile)
+	if err != nil {
+		log.Errorf("error copying tests application tests handlers resource name service get resource name by id query handler tests cs file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetTestsApplicationTestsHandlersResourceNameServiceGetResourceNameByIDQueryHandlerTestsFileName)
+
+	// copy tests/Application.Tests/Handlers/ResourceNameService/UpdateResourceNameCommandHandlerTests.cs
+	targetTestsApplicationTestsHandlersResourceNameServiceUpdateResourceNameCommandHandlerTestsFileName := resourceHandlersResourceNameDirectory + "/" + "Update" + resource.Name + "CommandHandlerTests.cs"
+	_, err = utils.CopyFile(targetTestsApplicationTestsHandlersResourceNameServiceUpdateResourceNameCommandHandlerTestsFileName, c.TemplatesRootPath+TestsHandlersUpdateResourceNameCommandHandlerTestsCSFile)
+	if err != nil {
+		log.Errorf("error copying tests application tests handlers resource name service update resource name command handler tests cs file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetTestsApplicationTestsHandlersResourceNameServiceUpdateResourceNameCommandHandlerTestsFileName)
+
+	// copy tests/Application.Tests/Handlers/ResourceNameService/DeleteResourceNameCommandHandlerTests.cs
+	targetTestsApplicationTestsHandlersResourceNameServiceDeleteResourceNameCommandHandlerTestsFileName := resourceHandlersResourceNameDirectory + "/" + "Delete" + resource.Name + "CommandHandlerTests.cs"
+	_, err = utils.CopyFile(targetTestsApplicationTestsHandlersResourceNameServiceDeleteResourceNameCommandHandlerTestsFileName, c.TemplatesRootPath+TestsHandlersDeleteResourceNameCommandHandlerTestsCSFile)
+	if err != nil {
+		log.Errorf("error copying tests application tests handlers resource name service delete resource name command handler tests cs file: %v", err)
+		return err
+	}
+	*filePaths = append(*filePaths, &targetTestsApplicationTestsHandlersResourceNameServiceDeleteResourceNameCommandHandlerTestsFileName)
 
 	return nil
 }

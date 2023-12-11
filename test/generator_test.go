@@ -1380,7 +1380,7 @@ func TestDotNetCleanArchitectureGenerator(t *testing.T) {
 			"language": "dotnet",
 			"restConfig": {
 				"server": {
-					"sqlDB": "SQLite",
+					"sqlDB": "MSSQL",
 					"port": "5005",
 					"resources": [
 						{
@@ -1424,7 +1424,7 @@ func TestDotNetCleanArchitectureGenerator(t *testing.T) {
 		ProjectJSON:         restServerConfigJSON,
 	}
 	defer func() {
-		//_ = os.RemoveAll("/tmp/first-rest-server-project-dotnet")
+		_ = os.RemoveAll("/tmp/first-rest-server-project-dotnet")
 	}()
 
 	// retrieve project struct

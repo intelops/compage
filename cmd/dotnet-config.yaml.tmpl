@@ -1,0 +1,36 @@
+name: {{.ProjectName}}
+git:
+  repository:
+    name: {{.GitRepositoryName}}
+    url: {{.GitRepositoryURL}}
+  platform:
+    name: {{.GitPlatformName}}
+    url: {{.GitPlatformURL}}
+    userName: {{.GitPlatformUserName}}
+{{if .IsRestServer}}
+compageJSON:
+  edges: []
+  nodes:
+  - id: node-ef
+    name: user-service
+    language: dotnet
+    restConfig:
+      server:
+        sqlDB: MSSQL
+        port: '5170'
+        resources:
+          - fields:
+              Name:
+                datatype: string
+              Age:
+                datatype: int
+            name: User
+            allowedMethods:
+            - POST
+            - LIST
+            - GET
+            - PUT
+            - DELETE
+      framework: dotnet-clean-architecture
+      template: compage
+{{end}}
