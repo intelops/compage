@@ -6,6 +6,7 @@ import (
 	"github.com/intelops/compage/internal/core"
 	corenode "github.com/intelops/compage/internal/core/node"
 	"github.com/intelops/compage/internal/integrations/deepsource"
+	"github.com/intelops/compage/internal/integrations/license"
 	"github.com/intelops/compage/internal/integrations/readme"
 	"github.com/intelops/compage/internal/languages"
 	"github.com/intelops/compage/internal/languages/dotnet"
@@ -60,6 +61,16 @@ func Handle(coreProject *core.Project) error {
 	}
 	if err = readMeCopier.CreateReadMeFile(); err != nil {
 		log.Errorf("error while creating README.md file [" + err.Error() + "]")
+		return err
+	}
+
+	// add LICENSE at project level
+	licenseCopier, err := license.NewCopier(coreProject)
+	if err != nil {
+		return errors.New("license copier is nil")
+	}
+	if err = licenseCopier.CreateLicenseFiles(); err != nil {
+		log.Errorf("error while creating LICENSE file [" + err.Error() + "]")
 		return err
 	}
 
