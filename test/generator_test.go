@@ -12,9 +12,9 @@ import (
 
 func TestRestServerGeneratorNoSql(t *testing.T) {
 	restServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-ef": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-ef",
             "name": "user-service",
             "language": "go",
@@ -61,7 +61,7 @@ func TestRestServerGeneratorNoSql(t *testing.T) {
                 "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -87,9 +87,9 @@ func TestRestServerGeneratorNoSql(t *testing.T) {
 
 func TestRestServerGeneratorSqlMap(t *testing.T) {
 	restServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-ef": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-ef",
             "name": "user-service",
             "language": "go",
@@ -136,7 +136,7 @@ func TestRestServerGeneratorSqlMap(t *testing.T) {
                 "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -162,9 +162,9 @@ func TestRestServerGeneratorSqlMap(t *testing.T) {
 
 func TestRestServerGeneratorSqlSQLite(t *testing.T) {
 	restServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-ef": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-ef",
             "name": "user-service",
             "language": "go",
@@ -215,7 +215,7 @@ func TestRestServerGeneratorSqlSQLite(t *testing.T) {
                 "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -241,9 +241,9 @@ func TestRestServerGeneratorSqlSQLite(t *testing.T) {
 
 func TestRestServerGeneratorSqlMySQL(t *testing.T) {
 	restServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-ef": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-ef",
             "name": "user-service",
             "language": "go",
@@ -290,7 +290,7 @@ func TestRestServerGeneratorSqlMySQL(t *testing.T) {
                 "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -316,9 +316,9 @@ func TestRestServerGeneratorSqlMySQL(t *testing.T) {
 
 func TestRestServerGeneratorSqlSQLiteGORM(t *testing.T) {
 	restServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-ef": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-ef",
             "name": "user-service",
             "language": "go",
@@ -365,7 +365,7 @@ func TestRestServerGeneratorSqlSQLiteGORM(t *testing.T) {
                 "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -391,9 +391,9 @@ func TestRestServerGeneratorSqlSQLiteGORM(t *testing.T) {
 
 func TestRestServerGeneratorSqlMySQLGORM(t *testing.T) {
 	restServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-ef": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-ef",
             "name": "user-service",
             "language": "go",
@@ -440,7 +440,7 @@ func TestRestServerGeneratorSqlMySQLGORM(t *testing.T) {
                 "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -466,9 +466,9 @@ func TestRestServerGeneratorSqlMySQLGORM(t *testing.T) {
 
 func TestRestServerWithOpenApiGenerator(t *testing.T) {
 	restServerWithOpenAPIConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-02": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-02",
             "name": "sample-service",
             "language": "$$LANGUAGE$$",
@@ -483,7 +483,7 @@ func TestRestServerWithOpenApiGenerator(t *testing.T) {
                 "framework": "$$FRAMEWORK$$"
             }
         }
-    }
+    ]
 }`
 	var tests = []struct {
 		language  string
@@ -535,9 +535,9 @@ func TestRestServerWithOpenApiGenerator(t *testing.T) {
 
 func TestGrpcServerGeneratorNoSql(t *testing.T) {
 	grpcServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-b0": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-b0",
             "name": "student-service",
             "language": "go",
@@ -578,7 +578,7 @@ func TestGrpcServerGeneratorNoSql(t *testing.T) {
                 "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -604,9 +604,9 @@ func TestGrpcServerGeneratorNoSql(t *testing.T) {
 
 func TestGrpcServerGeneratorSqlMap(t *testing.T) {
 	grpcServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-b0": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-b0",
             "name": "student-service",
             "language": "go",
@@ -647,7 +647,7 @@ func TestGrpcServerGeneratorSqlMap(t *testing.T) {
                 "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -673,9 +673,9 @@ func TestGrpcServerGeneratorSqlMap(t *testing.T) {
 
 func TestGrpcServerGeneratorSqlSQLite(t *testing.T) {
 	grpcServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-b0": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-b0",
             "name": "student-service",
             "language": "go",
@@ -720,7 +720,7 @@ func TestGrpcServerGeneratorSqlSQLite(t *testing.T) {
                 "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -746,9 +746,9 @@ func TestGrpcServerGeneratorSqlSQLite(t *testing.T) {
 
 func TestGrpcServerGeneratorSqlMySQL(t *testing.T) {
 	grpcServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-b0": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-b0",
             "name": "student-service",
             "language": "go",
@@ -789,7 +789,7 @@ func TestGrpcServerGeneratorSqlMySQL(t *testing.T) {
                 "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -815,9 +815,9 @@ func TestGrpcServerGeneratorSqlMySQL(t *testing.T) {
 
 func TestGrpcServerGeneratorSqlSQLiteGORM(t *testing.T) {
 	grpcServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-b0": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-b0",
             "name": "student-service",
             "language": "go",
@@ -858,7 +858,7 @@ func TestGrpcServerGeneratorSqlSQLiteGORM(t *testing.T) {
                 "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -884,9 +884,9 @@ func TestGrpcServerGeneratorSqlSQLiteGORM(t *testing.T) {
 
 func TestGrpcServerGeneratorSqlMySQLGORM(t *testing.T) {
 	grpcServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-b0": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-b0",
             "name": "student-service",
             "language": "go",
@@ -927,7 +927,7 @@ func TestGrpcServerGeneratorSqlMySQLGORM(t *testing.T) {
                 "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -953,28 +953,28 @@ func TestGrpcServerGeneratorSqlMySQLGORM(t *testing.T) {
 
 func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T) {
 	restGrpcServerClientsCrossConfigJSON := `{
-    "edges": {
-        "edge-d6": {
+    "edges": [
+        {
             "dest": "node-74",
             "id": "edge-d6",
             "src": "node-73",
             "name": "invoice-to-payment"
         },
-        "edge-12": {
+        {
             "dest": "node-73",
             "id": "edge-12",
             "src": "node-97",
             "name": "user-to-invoice"
         },
-        "edge-ce": {
+        {
             "dest": "node-74",
             "id": "edge-ce",
             "src": "node-97",
             "name": "user-to-payment"
         }
-    },
-    "nodes": {
-        "node-73": {
+    ],
+    "nodes": [
+        {
             "id": "node-73",
             "name": "invoice-service",
             "language": "go",
@@ -1010,7 +1010,7 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
                 ]
             }
         },
-        "node-97": {
+        {
             "id": "node-97",
             "name": "user-service",
             "language": "go",
@@ -1036,7 +1036,7 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
                 "framework": "go-gin-server"
             }
         },
-        "node-74": {
+        {
             "id": "node-74",
             "name": "payment-service",
             "language": "go",
@@ -1101,7 +1101,7 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
                 "framework": "go-grpc-server"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -1127,22 +1127,22 @@ func TestRestServerClientsAndGrpcServerClientsCrossConfigGenerator(t *testing.T)
 
 func TestRestClientAndGrpcClientCrossConfigGenerator(t *testing.T) {
 	restGrpcClientCrossConfigJSON := `{
-    "edges": {
-        "edge-5d": {
+    "edges": [
+        {
             "dest": "node-5d",
             "id": "edge-5d",
             "src": "node-cc",
             "name": "account-user"
         },
-        "edge-e6": {
+        {
             "dest": "node-cc",
             "id": "edge-e6",
             "src": "node-5d",
             "name": "user-account"
         }
-    },
-    "nodes": {
-        "node-5d": {
+    ],
+    "nodes": [
+        {
             "id": "node-5d",
             "name": "user-service",
             "language": "go",
@@ -1176,7 +1176,7 @@ func TestRestClientAndGrpcClientCrossConfigGenerator(t *testing.T) {
                 "framework": "go-grpc-server"
             }
         },
-        "node-cc": {
+        {
             "id": "node-cc",
             "name": "account-service",
             "language": "go",
@@ -1210,7 +1210,7 @@ func TestRestClientAndGrpcClientCrossConfigGenerator(t *testing.T) {
                 "framework": "go-grpc-server"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -1236,9 +1236,9 @@ func TestRestClientAndGrpcClientCrossConfigGenerator(t *testing.T) {
 
 func TestRestAndGrpcServerGenerator(t *testing.T) {
 	restAndGrpcServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-ef": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-ef",
             "name": "user-service",
             "language": "go",
@@ -1285,7 +1285,7 @@ func TestRestAndGrpcServerGenerator(t *testing.T) {
                 "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -1311,9 +1311,9 @@ func TestRestAndGrpcServerGenerator(t *testing.T) {
 
 func TestWsServerGenerator(t *testing.T) {
 	wsServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-b0": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-b0",
             "name": "student-service",
             "language": "go",
@@ -1342,7 +1342,7 @@ func TestWsServerGenerator(t *testing.T) {
                 "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
@@ -1372,49 +1372,49 @@ func TestWsServerGenerator(t *testing.T) {
 
 func TestDotNetCleanArchitectureGenerator(t *testing.T) {
 	restServerConfigJSON := `{
-    "edges": {},
-    "nodes": {
-        "node-b0": {
+    "edges": [],
+    "nodes": [
+        {
             "id": "node-b0",
-			"name": "student-service",
-			"language": "dotnet",
-			"restConfig": {
-				"server": {
-					"sqlDB": "MSSQL",
-					"port": "5005",
-					"resources": [
-						{
-							"fields": {
-								"Name": {
-									"datatype": "string"
-								},
-								"RollNumber": {
-									"datatype": "int"
-								},
-								"College": {
-									"datatype": "string"
-								}
-							},
-							"name": "Student"
-						},
-						{
-							"fields": {
-								"City": {
-									"datatype": "string"
-								},
-								"Street": {
-									"datatype": "string"
-								}
-							},
-							"name": "Address"
-						}
-					]
-				},
-				"framework": "dotnet-clean-architecture",
-				"template": "compage"
+            "name": "student-service",
+            "language": "dotnet",
+            "restConfig": {
+                "server": {
+                    "sqlDB": "MSSQL",
+                    "port": "5005",
+                    "resources": [
+                        {
+                            "fields": {
+                                "Name": {
+                                    "datatype": "string"
+                                },
+                                "RollNumber": {
+                                    "datatype": "int"
+                                },
+                                "College": {
+                                    "datatype": "string"
+                                }
+                            },
+                            "name": "Student"
+                        },
+                        {
+                            "fields": {
+                                "City": {
+                                    "datatype": "string"
+                                },
+                                "Street": {
+                                    "datatype": "string"
+                                }
+                            },
+                            "name": "Address"
+                        }
+                    ]
+                },
+                "framework": "dotnet-clean-architecture",
+                "template": "compage"
             }
         }
-    }
+    ]
 }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
