@@ -7,63 +7,12 @@ import (
 	"github.com/intelops/compage/internal/languages"
 	"github.com/intelops/compage/internal/languages/templates"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/exp/maps"
 )
-
-// GetNodes converts nodes map to string.
-func GetNodes(nodes interface{}) interface{} {
-	if nodes != nil {
-		nodesBytes, err := json.Marshal(maps.Values(nodes.(map[string]interface{})))
-		if err != nil {
-			log.Errorf("error marshalling nodes: %v", err)
-			return err
-		}
-		return string(nodesBytes)
-	}
-	return ""
-}
-
-// GetEdges converts an edge map to string.
-func GetEdges(edges interface{}) interface{} {
-	if edges != nil {
-		edgesBytes, err := json.Marshal(maps.Values(edges.(map[string]interface{})))
-		if err != nil {
-			log.Errorf("error marshalling edges: %v", err)
-			return err
-		}
-		return string(edgesBytes)
-	}
-	return ""
-}
-
-// ConvertMap converts compageJSON structure to {edges: [], nodes:[]}
-func ConvertMap(x map[string]interface{}) map[string]interface{} {
-	// convert key-value-based edges to edges Slice
-	if x["edges"] != nil {
-		x["edges"] = maps.Values(x["edges"].(map[string]interface{}))
-	}
-	// convert key-value-based nodes to nodes Slice
-	if x["nodes"] != nil {
-		x["nodes"] = maps.Values(x["nodes"].(map[string]interface{}))
-	}
-	return x
-}
 
 // GetCompageJSONForGRPC converts json string to CompageJSON struct
 func GetCompageJSONForGRPC(jsonString string) (*core.CompageJSON, error) {
-	x := map[string]interface{}{}
-	if err := json.Unmarshal([]byte(jsonString), &x); err != nil {
-		log.Errorf("error unmarshalling compageJSON: %v", err)
-		return nil, err
-	}
-	convertedX := ConvertMap(x)
-	convertedXBytes, err1 := json.Marshal(convertedX)
-	if err1 != nil {
-		log.Errorf("error marshalling compageJSON: %v", err1)
-		return nil, err1
-	}
 	compageJSON := &core.CompageJSON{}
-	if err2 := json.Unmarshal(convertedXBytes, compageJSON); err2 != nil {
+	if err2 := json.Unmarshal([]byte(jsonString), compageJSON); err2 != nil {
 		log.Errorf("error unmarshalling compageJSON: %v", err2)
 		return nil, err2
 	}
