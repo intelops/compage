@@ -1424,7 +1424,7 @@ func TestDotNetCleanArchitectureGenerator(t *testing.T) {
 		ProjectJSON:         restServerConfigJSON,
 	}
 	defer func() {
-		_ = os.RemoveAll("/tmp/first-rest-server-project-dotnet")
+		_ = os.RemoveAll(utils.GetProjectDirectoryName("first-rest-server-project-dotnet"))
 	}()
 
 	// retrieve project struct

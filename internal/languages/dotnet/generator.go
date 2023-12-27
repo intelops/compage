@@ -9,8 +9,10 @@ import (
 	"github.com/intelops/compage/internal/languages"
 	"github.com/intelops/compage/internal/languages/dotnet/frameworks/dotnet-clean-architecture"
 	"github.com/intelops/compage/internal/languages/dotnet/integrations/docker"
+	"github.com/intelops/compage/internal/languages/dotnet/integrations/githubactions"
 	"github.com/intelops/compage/internal/languages/dotnet/integrations/kubernetes"
 	"github.com/intelops/compage/internal/languages/templates"
+	"github.com/intelops/compage/internal/utils"
 	log "github.com/sirupsen/logrus"
 	"strings"
 )
@@ -125,6 +127,13 @@ func generateIntegrationConfig(dotNetValues *DotNetValues) error {
 		return err
 	}
 
+	// githubActions files need to be generated for the whole project so, it should be here.
+	githubActionsCopier := m["githubActions"].(*githubactions.Copier)
+	if err = githubActionsCopier.CreateYamls(); err != nil {
+		log.Errorf("err : %s", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -139,6 +148,8 @@ func getIntegrationsCopier(dotNetValues *DotNetValues) (map[string]interface{}, 
 	nodeName := dotNetValues.Values.Get(languages.NodeName)
 	// dotnet nodes usually have a directory name same as node name itself but in caps.
 	nodeDirectoryName := strings.Replace(dotNetValues.Values.NodeDirectoryName, nodeName, strcase.ToCamel(nodeName), 1)
+	projectDirectoryName := utils.GetProjectDirectoryName(dotNetValues.Values.ProjectName)
+
 	// rest
 	isRestServer := dotNetValues.LDotNetLangNode.RestConfig != nil && dotNetValues.LDotNetLangNode.RestConfig.Server != nil
 	var restServerPort string
@@ -154,8 +165,12 @@ func getIntegrationsCopier(dotNetValues *DotNetValues) (map[string]interface{}, 
 	// create dotnet specific k8sCopier
 	k8sCopier := kubernetes.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, dotNetTemplatesRootPath, isRestServer, restServerPort)
 
+	// create dotnet specific githubActionsCopier
+	githubActionsCopier := githubactions.NewCopier(gitPlatformUserName, gitRepositoryName, projectDirectoryName, nodeName, nodeDirectoryName, dotNetTemplatesRootPath)
+
 	return map[string]interface{}{
-		"docker": dockerCopier,
-		"k8s":    k8sCopier,
+		"docker":        dockerCopier,
+		"k8s":           k8sCopier,
+		"githubActions": githubActionsCopier,
 	}, nil
 }
