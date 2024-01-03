@@ -36,6 +36,22 @@ func (n *LGolangNode) FillDefaults() error {
 				}
 			}
 		}
+		if n.LanguageNode.GrpcConfig != nil && n.LanguageNode.GrpcConfig.Server != nil && n.LanguageNode.GrpcConfig.Server.Resources != nil {
+			for _, resource := range n.LanguageNode.GrpcConfig.Server.Resources {
+				if resource.AllowedMethods == nil {
+					defaultMethods := []string{"GET", "POST", "PUT", "DELETE"}
+					stringPointers := func() []*string {
+						s := make([]*string, len(defaultMethods))
+						for i := range defaultMethods {
+							s[i] = &defaultMethods[i]
+						}
+						return s
+					}()
+
+					resource.AllowedMethods = stringPointers
+				}
+			}
+		}
 	}
 	return nil
 }
