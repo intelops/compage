@@ -113,6 +113,9 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 				SmallResourceNamePlural:            pluralizeClient.Plural(lowerCamelResourceName),
 				CapsResourceNameSingular:           r.Name,
 				CapsResourceNamePlural:             pluralizeClient.Plural(r.Name),
+				// these keys are important to create Primary keys in sql db
+				IsIntID:    r.PrimaryKeyType == "int" || r.PrimaryKeyType == "integer",
+				IsStringID: r.PrimaryKeyType == "string",
 			}
 			frameworks.AddRESTAllowedMethods(&resourceData, r.AllowedMethods)
 			restResourceConfig[r.Name] = &resourceData
@@ -239,6 +242,26 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 
 func (c *Copier) getFuncMap(resource *corenode.Resource) template.FuncMap {
 	funcMap := template.FuncMap{
+		"GetPrimaryKey": func(framework string) string {
+			if resource.PrimaryKeyType == "int" || resource.PrimaryKeyType == "integer" {
+				if framework == "gorm" {
+					return "ID int64 `gorm:\"primaryKey;autoIncrement\" json:\"id,omitempty\"`"
+				}
+				return "ID int64 `json:\"id,omitempty\"`"
+			} else if resource.PrimaryKeyType == "string" {
+				if framework == "gorm" {
+					return "ID uuid.UUID `gorm:\"type:uuid;primaryKey;primaryKey\"`"
+				}
+				return "ID string `json:\"id,omitempty\"`"
+			}
+			return "ID int64 `json:\"id,omitempty\"`"
+		},
+		"GetPrimaryKeyType": func() string {
+			if resource.PrimaryKeyType == "int" || resource.PrimaryKeyType == "integer" {
+				return "int64"
+			}
+			return "string"
+		},
 		"ToLowerCamelCase": func(key string) string {
 			return strcase.ToLowerCamel(key)
 		},
@@ -330,7 +353,7 @@ func (c *Copier) getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAn
 		if value.IsComposite {
 			*updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
 			// m here is a model's variable
-			*updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+			*updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
 			*updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
 			// m here is a model's variable
@@ -342,7 +365,7 @@ func (c *Copier) getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAn
 		if value.IsComposite {
 			*updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
 			// m here is a model's variable
-			*updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+			*updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
 			*updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
 			// m here is a model's variable
@@ -358,7 +381,7 @@ func (c *Copier) getQueryParamsNColumnsNExecColumns(insertQueryColumns, insertQu
 			*insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
 			*insertQueryParams += ", ?"
 			// m here is a model's variable
-			*insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+			*insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
 			*insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
 			*insertQueryParams += ", ?"
@@ -373,7 +396,7 @@ func (c *Copier) getQueryParamsNColumnsNExecColumns(insertQueryColumns, insertQu
 			*insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
 			*insertQueryParams = "?"
 			// m here is a model's variable
-			*insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+			*insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
 			*insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
 			*insertQueryParams = "?"
@@ -406,7 +429,7 @@ func (c *Copier) getGetQueryScanColumns(getQueryScanColumns *string, key string,
 	if getQueryScanColumns != nil {
 		if value.IsComposite {
 			// m here is a model's variable
-			*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+			*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
 			// m here is a model's variable
 			*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key)
@@ -415,7 +438,7 @@ func (c *Copier) getGetQueryScanColumns(getQueryScanColumns *string, key string,
 		getQueryScanColumns = new(string)
 		if value.IsComposite {
 			// m here is a model's variable
-			*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+			*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
 			// m here is a model's variable
 			*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key)
@@ -458,7 +481,8 @@ func (c *Copier) addResourceSpecificTemplateData(resource *corenode.Resource) er
 	c.Data["IsRESTPatchAllowed"] = restResourceData.IsRESTPatchAllowed
 	c.Data["IsRESTOptionsAllowed"] = restResourceData.IsRESTPatchAllowed
 	c.Data["IsRESTHeadAllowed"] = restResourceData.IsRESTHeadAllowed
-
+	c.Data["IsIntID"] = restResourceData.IsIntID
+	c.Data["IsStringID"] = restResourceData.IsStringID
 	return nil
 }
 

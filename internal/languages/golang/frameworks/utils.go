@@ -17,6 +17,8 @@ type RestResourceData struct {
 	IsRESTPatchAllowed                 bool
 	IsRESTHeadAllowed                  bool
 	IsRESTOptionsAllowed               bool
+	IsStringID                         bool
+	IsIntID                            bool
 }
 
 type GrpcResourceData struct {
@@ -34,6 +36,8 @@ type GrpcResourceData struct {
 	IsGRPCPatchAllowed                 bool
 	IsGRPCHeadAllowed                  bool
 	IsGRPCOptionsAllowed               bool
+	IsStringID                         bool
+	IsIntID                            bool
 }
 
 func AddRESTAllowedMethods(restResourceData *RestResourceData, restAllowedMethods []*string) {

@@ -61,6 +61,9 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 			SmallResourceNamePlural:   pluralizeClient.Plural(strings.ToLower(r.Name)),
 			CapsResourceNameSingular:  r.Name,
 			CapsResourceNamePlural:    pluralizeClient.Plural(r.Name),
+			// these keys are important to create Primary keys in sql db
+			IsIntID:    r.PrimaryKeyType == "int" || r.PrimaryKeyType == "integer",
+			IsStringID: r.PrimaryKeyType == "string",
 		}
 		frameworks.AddGRPCAllowedMethods(&grpcResourceData, r.AllowedMethods)
 		grpcResourcesData = append(grpcResourcesData, grpcResourceData)
@@ -83,6 +86,9 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 			CapsResourceNamePlural:    pluralizeClient.Plural(r.Name),
 			ResourcePostBody:          getResourcePostBody(r),
 			ResourcePutBody:           getResourcePutBody(r),
+			// these keys are important to create Primary keys in sql db
+			IsIntID:    r.PrimaryKeyType == "int" || r.PrimaryKeyType == "integer",
+			IsStringID: r.PrimaryKeyType == "string",
 		}
 		frameworks.AddRESTAllowedMethods(&resourceData, r.AllowedMethods)
 		restResourcesData = append(restResourcesData, resourceData)
