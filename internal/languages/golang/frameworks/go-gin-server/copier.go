@@ -252,7 +252,7 @@ func (c *Copier) getFuncMap(resource *corenode.Resource) template.FuncMap {
 				if framework == "gorm" {
 					return "ID uuid.UUID `gorm:\"type:uuid;primaryKey;primaryKey\"`"
 				}
-				return "ID string `json:\"id,omitempty\"`"
+				return "ID uuid.UUID `json:\"id,omitempty\"`"
 			}
 			return "ID int64 `json:\"id,omitempty\"`"
 		},
@@ -331,6 +331,16 @@ func (c *Copier) addSQLDetails(resource *corenode.Resource) error {
 		updateQueryColumnsAndParams, updateQueryExecColumns = c.getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAndParams, updateQueryExecColumns, key, value)
 		getQueryScanColumns = c.getGetQueryScanColumns(getQueryScanColumns, key, value)
 	}
+
+	if resource.PrimaryKeyType == "string" {
+		// add primary key to insert query columns and params
+		insertQueryColumns, insertQueryParams, insertQueryExecColumns = c.getQueryParamsNColumnsNExecColumns(insertQueryColumns, insertQueryParams, insertQueryExecColumns, "ID", corenode.FieldMetadata{Type: "string"})
+		// add primary key to update query columns and params
+		//updateQueryColumnsAndParams, updateQueryExecColumns = c.getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAndParams, updateQueryExecColumns, "ID", corenode.FieldMetadata{Type: "string"})
+		//// add primary key to get query scan columns
+		//getQueryScanColumns = c.getGetQueryScanColumns(getQueryScanColumns, "ID", corenode.FieldMetadata{Type: "string"})
+	}
+
 	// create query columns
 	c.Data["CreateQueryColumns"] = createQueryColumns
 
