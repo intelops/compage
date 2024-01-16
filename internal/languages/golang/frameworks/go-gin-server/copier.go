@@ -335,10 +335,6 @@ func (c *Copier) addSQLDetails(resource *corenode.Resource) error {
 	if resource.PrimaryKeyType == "string" {
 		// add primary key to insert query columns and params
 		insertQueryColumns, insertQueryParams, insertQueryExecColumns = c.getQueryParamsNColumnsNExecColumns(insertQueryColumns, insertQueryParams, insertQueryExecColumns, "ID", corenode.FieldMetadata{Type: "string"})
-		// add primary key to update query columns and params
-		//updateQueryColumnsAndParams, updateQueryExecColumns = c.getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAndParams, updateQueryExecColumns, "ID", corenode.FieldMetadata{Type: "string"})
-		//// add primary key to get query scan columns
-		//getQueryScanColumns = c.getGetQueryScanColumns(getQueryScanColumns, "ID", corenode.FieldMetadata{Type: "string"})
 	}
 
 	// create query columns

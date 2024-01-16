@@ -175,8 +175,7 @@ func TestRestServerGeneratorSqlSQLite(t *testing.T) {
                     "resources": [
                         {
                             "allowedMethods": [
-                                "GET",
-                                "POST"
+                                
                             ],
                             "fields": {
                                 "Name": {
@@ -193,6 +192,7 @@ func TestRestServerGeneratorSqlSQLite(t *testing.T) {
                                     "datatype": "rune"
                                 }
                             },
+							"primaryKeyType": "string",
                             "name": "User"
                         },
                         {
@@ -207,6 +207,7 @@ func TestRestServerGeneratorSqlSQLite(t *testing.T) {
                                     "datatype": "string"
                                 }
                             },
+							"primaryKeyType": "integer",
                             "name": "Address"
                         }
                     ]
@@ -268,6 +269,7 @@ func TestRestServerGeneratorSqlMySQL(t *testing.T) {
                                     "datatype": "rune"
                                 }
                             },
+							"primaryKeyType": "string",
                             "name": "User"
                         },
                         {
