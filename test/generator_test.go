@@ -345,6 +345,7 @@ func TestRestServerGeneratorSqlSQLiteGORM(t *testing.T) {
                                     "datatype": "rune"
                                 }
                             },
+							"primaryKeyType": "string",
                             "name": "User"
                         },
                         {
@@ -359,6 +360,7 @@ func TestRestServerGeneratorSqlSQLiteGORM(t *testing.T) {
                                     "datatype": "string"
                                 }
                             },
+							"primaryKeyType": "string",
                             "name": "Address"
                         }
                     ]

@@ -428,6 +428,26 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string
 
 func (c *Copier) getFuncMap(resource *corenode.Resource) template.FuncMap {
 	funcMap := template.FuncMap{
+		"GetPrimaryKey": func(framework string) string {
+			if resource.PrimaryKeyType == "int" || resource.PrimaryKeyType == "integer" {
+				if framework == "gorm" {
+					return "ID int64 `gorm:\"primaryKey;autoIncrement\" json:\"id,omitempty\"`"
+				}
+				return "ID int64 `json:\"id,omitempty\"`"
+			} else if resource.PrimaryKeyType == "string" {
+				if framework == "gorm" {
+					return "ID uuid.UUID `gorm:\"type:uuid;primaryKey\"`"
+				}
+				return "ID uuid.UUID `json:\"id,omitempty\"`"
+			}
+			return "ID int64 `json:\"id,omitempty\"`"
+		},
+		"GetPrimaryKeyType": func() string {
+			if resource.PrimaryKeyType == "int" || resource.PrimaryKeyType == "integer" {
+				return "int64"
+			}
+			return "string"
+		},
 		// this function increments message fields number (grpc message)
 		"incCount": func(count int) int {
 			return count + 2

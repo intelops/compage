@@ -250,7 +250,7 @@ func (c *Copier) getFuncMap(resource *corenode.Resource) template.FuncMap {
 				return "ID int64 `json:\"id,omitempty\"`"
 			} else if resource.PrimaryKeyType == "string" {
 				if framework == "gorm" {
-					return "ID uuid.UUID `gorm:\"type:uuid;primaryKey;primaryKey\"`"
+					return "ID uuid.UUID `gorm:\"type:uuid;primaryKey\"`"
 				}
 				return "ID uuid.UUID `json:\"id,omitempty\"`"
 			}
