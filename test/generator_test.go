@@ -854,7 +854,8 @@ func TestGrpcServerGeneratorSqlSQLiteGORM(t *testing.T) {
                                     "datatype": "bool"
                                 }
                             },
-                            "name": "Student"
+                            "name": "Student",
+							"primaryKeyType": "string"
                         }
                     ]
                 },

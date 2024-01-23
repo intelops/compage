@@ -571,6 +571,12 @@ func (c *Copier) addSQLDetails(resource *corenode.Resource) error {
 		updateQueryColumnsAndParams, updateQueryExecColumns = c.getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAndParams, updateQueryExecColumns, key, value)
 		getQueryScanColumns = c.getGetQueryScanColumns(getQueryScanColumns, key, value)
 	}
+
+	if resource.PrimaryKeyType == "string" {
+		// add primary key to insert query columns and params
+		insertQueryColumns, insertQueryParams, insertQueryExecColumns = c.getQueryParamsNColumnsNExecColumns(insertQueryColumns, insertQueryParams, insertQueryExecColumns, "ID", corenode.FieldMetadata{Type: "string"})
+	}
+
 	// create query columns
 	c.Data["CreateQueryColumns"] = createQueryColumns
 
