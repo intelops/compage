@@ -452,22 +452,30 @@ func (c *Copier) getFuncMap(resource *corenode.Resource) template.FuncMap {
 		"incCount": func(count int) int {
 			return count + 2
 		},
-		// this function lowercase's the first letter of the string in camel case style
-		"ToLowerCamelCase": func(key string) string {
-			return strcase.ToLowerCamel(key)
-		},
-		// this function adds a pointer to the type if the field is composite
-		"AddPointerIfCompositeField": func(key string) string {
+		"AddFieldWithDetails": func(key, value, configType string) string {
 			fieldMetaData, ok := resource.Fields[key]
-			if ok && fieldMetaData.IsComposite {
-				return "*" + fieldMetaData.Type
-			}
-			return fieldMetaData.Type
-		},
-		// This function helps the template to add a foreignKey based on composite field
-		"AddForeignKeyIfCompositeField": func(key, value string) string {
-			if fieldMetaData, ok := resource.Fields[key]; ok && fieldMetaData.IsComposite {
-				return fmt.Sprintf("%s %s `gorm:\"foreignKey:ID\" json:\"%s,omitempty\"`", key, value, strcase.ToLowerCamel(key))
+			if ok {
+				if fieldMetaData.IsComposite {
+					if configType == "gorm" {
+						return fmt.Sprintf("%s %s `gorm:\"foreignKey:ID\" json:\"%s,omitempty\"`", key, value, strcase.ToLowerCamel(key))
+					} else if configType == "mongo" {
+						return fmt.Sprintf("%s %s `json:\"%s,omitempty\" bson:\"%s,omitempty\"`", key, value, strcase.ToLowerCamel(key), strcase.ToLowerCamel(key))
+					} else if configType == "sql" {
+						return fmt.Sprintf("%s *%s `json:\"%s,omitempty\"`", key, value, strcase.ToLowerCamel(key))
+					}
+				} else if fieldMetaData.IsArray {
+					lowerCamelKey := strcase.ToLowerCamel(key)
+					pluralLowerCamelKey := c.PluralizeClient.Plural(lowerCamelKey)
+					//pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+					pluralUpperCamelKey := key
+					if configType == "gorm" {
+						return fmt.Sprintf("%s []%s `json:\"%s,omitempty\"`", pluralUpperCamelKey, value, pluralLowerCamelKey)
+					} else if configType == "mongo" {
+						return fmt.Sprintf("%s []%s `json:\"%s,omitempty\" bson:\"%s,omitempty\"`", pluralUpperCamelKey, value, pluralLowerCamelKey, pluralLowerCamelKey)
+					} else if configType == "sql" {
+						return fmt.Sprintf("%s []%s `json:\"%s,omitempty\"`", pluralUpperCamelKey, value, pluralLowerCamelKey)
+					}
+				}
 			}
 			return fmt.Sprintf("%s %s `json:\"%s,omitempty\"`", key, value, strcase.ToLowerCamel(key))
 		},
