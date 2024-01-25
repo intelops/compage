@@ -277,8 +277,7 @@ func (c *Copier) getFuncMap(resource *corenode.Resource) template.FuncMap {
 				} else if fieldMetaData.IsArray {
 					lowerCamelKey := strcase.ToLowerCamel(key)
 					pluralLowerCamelKey := c.PluralizeClient.Plural(lowerCamelKey)
-					//pluralUpperCamelKey := c.PluralizeClient.Plural(key)
-					pluralUpperCamelKey := key
+					pluralUpperCamelKey := c.PluralizeClient.Plural(key)
 					if configType == "gorm" {
 						return fmt.Sprintf("%s []%s `json:\"%s,omitempty\"`", pluralUpperCamelKey, value, pluralLowerCamelKey)
 					} else if configType == "mongo" {
@@ -372,9 +371,16 @@ func (c *Copier) getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAn
 			// m here is a model's variable
 			*updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
-			*updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
-			// m here is a model's variable
-			*updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				*updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey) + " = ?"
+				// m here is a model's variable
+				*updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+			} else {
+				*updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
+				// m here is a model's variable
+				*updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
 		}
 	} else {
 		updateQueryColumnsAndParams = new(string)
@@ -384,9 +390,16 @@ func (c *Copier) getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAn
 			// m here is a model's variable
 			*updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
-			*updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
-			// m here is a model's variable
-			*updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				*updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey) + " = ?"
+				// m here is a model's variable
+				*updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+			} else {
+				*updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
+				// m here is a model's variable
+				*updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
 		}
 	}
 	return updateQueryColumnsAndParams, updateQueryExecColumns
@@ -400,10 +413,18 @@ func (c *Copier) getQueryParamsNColumnsNExecColumns(insertQueryColumns, insertQu
 			// m here is a model's variable
 			*insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
-			*insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
-			*insertQueryParams += ", ?"
-			// m here is a model's variable
-			*insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				*insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+				*insertQueryParams += ", ?"
+				// m here is a model's variable
+				*insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+			} else {
+				*insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
+				*insertQueryParams += ", ?"
+				// m here is a model's variable
+				*insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
 		}
 	} else {
 		insertQueryParams = new(string)
@@ -415,10 +436,18 @@ func (c *Copier) getQueryParamsNColumnsNExecColumns(insertQueryColumns, insertQu
 			// m here is a model's variable
 			*insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
-			*insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
-			*insertQueryParams = "?"
-			// m here is a model's variable
-			*insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				*insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+				*insertQueryParams = "?"
+				// m here is a model's variable
+				*insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+			} else {
+				*insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
+				*insertQueryParams = "?"
+				// m here is a model's variable
+				*insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
 		}
 	}
 	return insertQueryColumns, insertQueryParams, insertQueryExecColumns
@@ -429,14 +458,24 @@ func (c *Copier) getCreateQueryColumns(createQueryColumns *string, key string, v
 		if value.IsComposite {
 			*createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NULL,"
 		} else {
-			*createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				*createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey) + " " + dbDataType + " NOT NULL,"
+			} else {
+				*createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
+			}
 		}
 	} else {
 		createQueryColumns = new(string)
 		if value.IsComposite {
 			*createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NULL,"
 		} else {
-			*createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				*createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey) + " " + dbDataType + " NOT NULL,"
+			} else {
+				*createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
+			}
 		}
 	}
 	return createQueryColumns
@@ -448,8 +487,14 @@ func (c *Copier) getGetQueryScanColumns(getQueryScanColumns *string, key string,
 			// m here is a model's variable
 			*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
-			// m here is a model's variable
-			*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key)
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				// m here is a model's variable
+				*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+			} else {
+				// m here is a model's variable
+				*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
 		}
 	} else {
 		getQueryScanColumns = new(string)
@@ -457,8 +502,14 @@ func (c *Copier) getGetQueryScanColumns(getQueryScanColumns *string, key string,
 			// m here is a model's variable
 			*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
-			// m here is a model's variable
-			*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key)
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				// m here is a model's variable
+				*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+			} else {
+				// m here is a model's variable
+				*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
 		}
 	}
 	return getQueryScanColumns
