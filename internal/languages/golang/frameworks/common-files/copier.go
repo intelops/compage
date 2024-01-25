@@ -84,8 +84,8 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 			SmallResourceNamePlural:   pluralizeClient.Plural(strings.ToLower(r.Name)),
 			CapsResourceNameSingular:  r.Name,
 			CapsResourceNamePlural:    pluralizeClient.Plural(r.Name),
-			ResourcePostBody:          getResourcePostBody(r),
-			ResourcePutBody:           getResourcePutBody(r),
+			ResourcePostBody:          getResourcePostBody(pluralizeClient, r),
+			ResourcePutBody:           getResourcePutBody(pluralizeClient, r),
 			// these keys are important to create Primary keys in sql db
 			IsIntID:    r.PrimaryKeyType == "int" || r.PrimaryKeyType == "integer",
 			IsStringID: r.PrimaryKeyType == "string",
@@ -145,17 +145,26 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 	}
 }
 
-func getResourcePostBody(r *corenode.Resource) string {
+func getResourcePostBody(pluralizeClient *pluralize.Client, r *corenode.Resource) string {
 	postBody := "{"
 	for key, value := range r.Fields {
 		var sprintf string
 		if value.IsComposite {
 			sprintf = fmt.Sprintf("\"%s\": {},", key)
 		} else {
-			if value.Type == "string" {
-				sprintf = fmt.Sprintf("\"%s\": \"%v\",", key, commonUtils.GetDefaultValueForDataType(value.Type))
+			if value.IsArray {
+				pluralUpperCamelKey := pluralizeClient.Plural(key)
+				if value.Type == "string" {
+					sprintf = fmt.Sprintf("\"%s\": [\"%v\"],", pluralUpperCamelKey, commonUtils.GetDefaultValueForDataType(value.Type))
+				} else {
+					sprintf = fmt.Sprintf("\"%s\": [%v],", pluralUpperCamelKey, commonUtils.GetDefaultValueForDataType(value.Type))
+				}
 			} else {
-				sprintf = fmt.Sprintf("\"%s\": %v,", key, commonUtils.GetDefaultValueForDataType(value.Type))
+				if value.Type == "string" {
+					sprintf = fmt.Sprintf("\"%s\": \"%v\",", key, commonUtils.GetDefaultValueForDataType(value.Type))
+				} else {
+					sprintf = fmt.Sprintf("\"%s\": %v,", key, commonUtils.GetDefaultValueForDataType(value.Type))
+				}
 			}
 		}
 		postBody += sprintf
@@ -165,17 +174,26 @@ func getResourcePostBody(r *corenode.Resource) string {
 	return postBody
 }
 
-func getResourcePutBody(r *corenode.Resource) string {
+func getResourcePutBody(pluralizeClient *pluralize.Client, r *corenode.Resource) string {
 	putBody := fmt.Sprintf("{\"%s\": %v,", "Id", 123)
 	for key, value := range r.Fields {
 		var sprintf string
 		if value.IsComposite {
 			sprintf = fmt.Sprintf("\"%s\": {},", key)
 		} else {
-			if value.Type == "string" {
-				sprintf = fmt.Sprintf("\"%s\": \"%v\",", key, commonUtils.GetDefaultValueForDataType(value.Type))
+			if value.IsArray {
+				pluralUpperCamelKey := pluralizeClient.Plural(key)
+				if value.Type == "string" {
+					sprintf = fmt.Sprintf("\"%s\": [\"%v\"],", pluralUpperCamelKey, commonUtils.GetDefaultValueForDataType(value.Type))
+				} else {
+					sprintf = fmt.Sprintf("\"%s\": [%v],", pluralUpperCamelKey, commonUtils.GetDefaultValueForDataType(value.Type))
+				}
 			} else {
-				sprintf = fmt.Sprintf("\"%s\": %v,", key, commonUtils.GetDefaultValueForDataType(value.Type))
+				if value.Type == "string" {
+					sprintf = fmt.Sprintf("\"%s\": \"%v\",", key, commonUtils.GetDefaultValueForDataType(value.Type))
+				} else {
+					sprintf = fmt.Sprintf("\"%s\": %v,", key, commonUtils.GetDefaultValueForDataType(value.Type))
+				}
 			}
 		}
 		putBody += sprintf
