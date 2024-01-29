@@ -1,5 +1,7 @@
 package utils
 
+import corenode "github.com/intelops/compage/internal/core/node"
+
 // GetFieldsDataTypeForProtobuf returns the protobuf data type for the given data type, Used in go struct
 func GetFieldsDataTypeForProtobuf(value string) string {
 	if value == "rune" ||
@@ -58,7 +60,12 @@ func GetProtoBufDataType(value string) string {
 	return value
 }
 
-func GetSqliteDataType(value string) string {
+func GetSqliteDataType(fieldMetadata corenode.FieldMetadata) string {
+	// if the field is an array, then the data type is TEXT
+	if fieldMetadata.IsArray {
+		return "TEXT"
+	}
+	value := fieldMetadata.Type
 	if value == "int" ||
 		value == "int16" ||
 		value == "int32" ||
@@ -86,7 +93,12 @@ func GetSqliteDataType(value string) string {
 	return "TEXT"
 }
 
-func GetMySQLDataType(value string) string {
+func GetMySQLDataType(fieldMetadata corenode.FieldMetadata) string {
+	// if the field is an array, then the data type is VARCHAR(100)
+	if fieldMetadata.IsArray {
+		return "VARCHAR(100)"
+	}
+	value := fieldMetadata.Type
 	if value == "int" ||
 		value == "int16" ||
 		value == "int32" ||

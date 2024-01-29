@@ -569,7 +569,7 @@ func (c *Copier) addSQLDetails(resource *corenode.Resource) error {
 	var getQueryScanColumns *string
 
 	for key, value := range resource.Fields {
-		dbDataType, err := c.getDBDataType(value.Type)
+		dbDataType, err := c.getDBDataType(value)
 		if err != nil {
 			log.Debugf("error while getting db data type for %s", value.Type)
 			return err
@@ -867,7 +867,7 @@ func (c *Copier) CreateRootLevelFiles() error {
 	return executor.Execute(files, c.Data)
 }
 
-func (c *Copier) getDBDataType(value string) (string, error) {
+func (c *Copier) getDBDataType(value corenode.FieldMetadata) (string, error) {
 	if c.SQLDB == SQLite {
 		return commonUtils.GetSqliteDataType(value), nil
 	} else if c.SQLDB == MySQL {
