@@ -80,7 +80,7 @@ func validateFlags() error {
 }
 
 func FetchUnitTestFromServer() error {
-	var excludedExtensionsUnitTests = []string{".toml", ".md", "LICENSE", "Dockerfile", "Tests", ".yaml", "yml", "Properties", ".json", ".csproj", "Application", "Infrastructure", "Core", ".sln", "Program.cs"}
+	var excludedExtensionsUnitTests = []string{".devcontainer", ".md", "LICENSE", "Dockerfile", "config", ".yaml", "yml", "kubernetes", ".json", ".csproj", ".gitignore", "Infrastructure", "Core", ".sln", "Program.cs", "services", ".sh", ".mod", ".sum", ".db", "useful-commands","models", "clients","services"}
 	var excludedExtensionsDocs = []string{".toml", ".md", "LICENSE", ".github", ".json", "Properties", ".csproj", ".sln" }
 
 	result, err := collectFolderAndFileData(compageProjectName, true, excludedExtensionsUnitTests)
