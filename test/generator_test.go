@@ -87,53 +87,53 @@ func TestRestServerGeneratorNoSql(t *testing.T) {
 
 func TestRestServerGeneratorNoSqlScyllaDB(t *testing.T) {
 	restServerConfigJSON := `{
-    "edges": [],
-    "nodes": [
-        {
-            "id": "node-ef",
-            "name": "user-service",
-            "language": "go",
-            "restConfig": {
-                "server": {
-                    "noSQLDB": "ScyllaDB",
-                    "port": "1337",
-                    "resources": [
-                        {
-                            "fields": {
-                                "Name": {
-                                    "datatype": "string"
+        "edges": [],
+        "nodes": [
+            {
+                "id": "node-ef",
+                "name": "user-service",
+                "language": "go",
+                "restConfig": {
+                    "server": {
+                        "noSQLDB": "ScyllaDB",
+                        "port": "1337",
+                        "resources": [
+                            {
+                                "fields": {
+                                    "Name": {
+                                        "datatype": "string"
+                                    },
+                                    "Address": {
+                                        "datatype": "Address"
+                                    },
+                                    "Age": {
+                                        "datatype": "int"
+                                    }
                                 },
-                                "Address": {
-                                    "datatype": "Address"
-                                },
-                                "Age": {
-                                    "datatype": "int"
-                                },
+                                "name": "User"
                             },
-                            "name": "User"
-                        },
-                        {
-                            "fields": {
-                                "Street": {
-                                    "datatype": "string"
+                            {
+                                "fields": {
+                                    "Street": {
+                                        "datatype": "string"
+                                    },
+                                    "PinCode": {
+                                        "datatype": "string"
+                                    },
+                                    "City": {
+                                        "datatype": "string"
+                                    }
                                 },
-                                "PinCode": {
-                                    "datatype": "string"
-                                },
-                                "City": {
-                                    "datatype": "string"
-                                }
-                            },
-                            "name": "Address"
-                        }
-                    ]
-                },
-                "framework": "go-gin-server",
-                "template": "compage"
+                                "name": "Address"
+                            }
+                        ]
+                    },
+                    "framework": "go-gin-server",
+                    "template": "compage"
+                }
             }
-        }
-    ]
-}`
+        ]
+    }`
 	input := project.GenerateCodeRequest{
 		GitPlatformURL:      "https://github.com",
 		GitPlatformUserName: "azar-intelops",
