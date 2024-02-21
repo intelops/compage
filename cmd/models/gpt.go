@@ -2,7 +2,6 @@ package models
 
 type Data struct {
 	Code     string `json:"code"`
-	CodeFlow string `json:"code_flow"`
 }
 
 type DocGenData struct {
