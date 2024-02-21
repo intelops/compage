@@ -174,6 +174,16 @@ compage init
 compage generate
 ```
 
+#### Quick Start for compageGPT
+Make sure you are running [`compage-llm-backend`](https://github.com/intelops/compage-llm-backend) on your local machine. You can find the steps to setup compage-llm-backend in the [README.md](https://github.com/intelops/compage-llm-backend/blob/main/README.md).
+```shell
+  # `compage genaiInit` Command checks if OPENAI_KEY is available in the system environment, validates the API KEY and sends a request for our LLM server which handles its validation and authentication with our server.
+  compage genaiInit
+
+  # To generate test files for the provided configured compage project in the current directory use `compage genaiUnitTestGen`.
+  compage genaiUnitTestGen
+```
+
 #### Building from Source
 
 The easiest way to build the `compage` executable is using
@@ -223,4 +233,3 @@ Refer the licence - [LICENCE](./LICENSE).
     <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=intelops/compage&type=Date" />
   </picture>
 </a>
-
