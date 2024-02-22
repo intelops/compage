@@ -147,6 +147,7 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 		"GitRepositoryName":   gitRepositoryName,
 		"NodeName":            strings.ToLower(nodeName),
 		"MicroServiceName":    frameworks.GetMicroServiceName(nodeDirectoryName),
+		"DataBaseName":        strings.Replace(gitRepositoryName, "-", "", -1),
 		"GitPlatformUserName": gitPlatformUserName,
 		"GitPlatformURL":      strings.Replace(gitPlatformURL, "https://", "", -1),
 	}
