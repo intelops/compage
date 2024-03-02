@@ -79,7 +79,7 @@ func GenerateCode() error {
 		log.Debugf("template pulled successfully for language %s", node.Language)
 
 		// check if the templates sha is matching
-		repoPath := "/home/mahendrabagul/.compage/templates/compage-template-go"
+		repoPath := "/Users/mahendrabagul/.compage/templates/compage-template-go"
 		repoURL := "git@github.com:intelops/compage-template-go.git"
 		branchName := "template-v8"
 		commitSimilar, err := git_checker.CheckIfSHACommitSimilar(repoPath, repoURL, branchName)

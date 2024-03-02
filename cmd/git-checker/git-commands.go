@@ -1,6 +1,7 @@
 package git_checker
 
 import (
+	"errors"
 	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
@@ -21,6 +22,16 @@ func CheckIfSHACommitSimilar(repoPath, repoURL, branchName string) (bool, error)
 	if err != nil {
 		log.Errorf("Error fetching remote Git commit SHA: %s", err)
 		return false, err
+	}
+
+	isDirty, err := IsRepoDirty(repoPath)
+	if err != nil {
+		log.Errorf("Error checking if repository is dirty: %s", err)
+		return false, err
+	}
+	if isDirty {
+		log.Errorf("Repository is dirty")
+		return false, errors.New("repository is dirty")
 	}
 
 	return localSHA == remoteSHA, nil
@@ -67,4 +78,30 @@ func GetRemoteGitCommitSHA(repoURL, branchName string) (string, error) {
 	}
 
 	return "", fmt.Errorf("branch %s not found", branchName)
+}
+
+func IsRepoDirty(repoPath string) (bool, error) {
+	// Open the given repository
+	repo, err := git.PlainOpen(repoPath)
+	if err != nil {
+		log.Errorf("Error opening repository: %s", err)
+		return false, err
+	}
+
+	// Get the working directory for the repository
+	worktree, err := repo.Worktree()
+	if err != nil {
+		log.Errorf("Error getting working directory: %s", err)
+		return false, err
+	}
+
+	// Check the status of the working directory
+	status, err := worktree.Status()
+	if err != nil {
+		log.Errorf("Error getting working directory status: %s", err)
+		return false, err
+	}
+
+	// The repository is dirty if there are any changes in the status
+	return !status.IsClean(), nil
 }
