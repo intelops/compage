@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"errors"
+	git_checker "github.com/intelops/compage/cmd/git-checker"
 	"github.com/intelops/compage/cmd/models"
 	"github.com/intelops/compage/internal/converter/cmd"
 	"github.com/intelops/compage/internal/handlers"
@@ -75,6 +77,20 @@ func GenerateCode() error {
 			return err
 		}
 		log.Debugf("template pulled successfully for language %s", node.Language)
+
+		// check if the templates sha is matching
+		repoPath := "/home/mahendrabagul/.compage/templates/compage-template-go"
+		repoURL := "git@github.com:intelops/compage-template-go.git"
+		branchName := "template-v8"
+		commitSimilar, err := git_checker.CheckIfSHACommitSimilar(repoPath, repoURL, branchName)
+		if err != nil {
+			log.Errorf("error while checking the commit sha [" + err.Error() + "]")
+			return err
+		}
+		if !commitSimilar {
+			log.Errorf("the templates are not matching with the latest commit, please pull the latest templates")
+			return errors.New("the templates are not matching with the latest commit, please pull the latest templates")
+		}
 	}
 
 	// triggers project generation, process the request
