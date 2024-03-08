@@ -1,6 +1,7 @@
 package test
 
 import (
+	"errors"
 	"github.com/intelops/compage/gen/api/v1"
 	"github.com/intelops/compage/internal/converter/grpc"
 	"github.com/intelops/compage/internal/handlers"
@@ -175,8 +176,7 @@ func TestRestServerGeneratorSqlSQLite(t *testing.T) {
                     "resources": [
                         {
                             "allowedMethods": [
-                                "GET",
-                                "POST"
+                                
                             ],
                             "fields": {
                                 "Name": {
@@ -193,12 +193,14 @@ func TestRestServerGeneratorSqlSQLite(t *testing.T) {
                                     "datatype": "rune"
                                 }
                             },
+							"primaryKeyType": "string",
                             "name": "User"
                         },
                         {
                             "fields": {
                                 "Street": {
-                                    "datatype": "string"
+                                    "datatype": "string",
+									"isArray": true
                                 },
                                 "PinCode": {
                                     "datatype": "string"
@@ -207,6 +209,7 @@ func TestRestServerGeneratorSqlSQLite(t *testing.T) {
                                     "datatype": "string"
                                 }
                             },
+							"primaryKeyType": "integer",
                             "name": "Address"
                         }
                     ]
@@ -268,6 +271,7 @@ func TestRestServerGeneratorSqlMySQL(t *testing.T) {
                                     "datatype": "rune"
                                 }
                             },
+							"primaryKeyType": "string",
                             "name": "User"
                         },
                         {
@@ -343,6 +347,7 @@ func TestRestServerGeneratorSqlSQLiteGORM(t *testing.T) {
                                     "datatype": "rune"
                                 }
                             },
+							"primaryKeyType": "string",
                             "name": "User"
                         },
                         {
@@ -357,6 +362,7 @@ func TestRestServerGeneratorSqlSQLiteGORM(t *testing.T) {
                                     "datatype": "string"
                                 }
                             },
+							"primaryKeyType": "string",
                             "name": "Address"
                         }
                     ]
@@ -526,7 +532,7 @@ func TestRestServerWithOpenApiGenerator(t *testing.T) {
 
 			// trigger project generation
 			ans := handlers.Handle(getProject)
-			if ans != tt.want {
+			if !errors.Is(ans, tt.want) {
 				t.Errorf("got %v, want %v", ans, tt.want)
 			}
 		})
@@ -850,7 +856,8 @@ func TestGrpcServerGeneratorSqlSQLiteGORM(t *testing.T) {
                                     "datatype": "bool"
                                 }
                             },
-                            "name": "Student"
+                            "name": "Student",
+							"primaryKeyType": "string"
                         }
                     ]
                 },

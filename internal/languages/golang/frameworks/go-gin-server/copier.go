@@ -113,6 +113,9 @@ func NewCopier(gitPlatformURL, gitPlatformUserName, gitRepositoryName, nodeName,
 				SmallResourceNamePlural:            pluralizeClient.Plural(lowerCamelResourceName),
 				CapsResourceNameSingular:           r.Name,
 				CapsResourceNamePlural:             pluralizeClient.Plural(r.Name),
+				// these keys are important to create Primary keys in sql db
+				IsIntID:    r.PrimaryKeyType == "int" || r.PrimaryKeyType == "integer",
+				IsStringID: r.PrimaryKeyType == "string",
 			}
 			frameworks.AddRESTAllowedMethods(&resourceData, r.AllowedMethods)
 			restResourceConfig[r.Name] = &resourceData
@@ -239,20 +242,50 @@ func (c *Copier) copyRestServerResourceFiles(resource *corenode.Resource) error 
 
 func (c *Copier) getFuncMap(resource *corenode.Resource) template.FuncMap {
 	funcMap := template.FuncMap{
-		"ToLowerCamelCase": func(key string) string {
-			return strcase.ToLowerCamel(key)
-		},
-		"AddPointerIfCompositeField": func(key string) string {
-			fieldMetaData, ok := resource.Fields[key]
-			if ok && fieldMetaData.IsComposite {
-				return "*" + fieldMetaData.Type
+		"GetPrimaryKey": func(framework string) string {
+			if resource.PrimaryKeyType == "int" || resource.PrimaryKeyType == "integer" {
+				if framework == "gorm" {
+					return "ID int64 `gorm:\"primaryKey;autoIncrement\" json:\"id,omitempty\"`"
+				}
+				return "ID int64 `json:\"id,omitempty\"`"
+			} else if resource.PrimaryKeyType == "string" {
+				if framework == "gorm" {
+					return "ID uuid.UUID `gorm:\"type:uuid;primaryKey\"`"
+				}
+				return "ID uuid.UUID `json:\"id,omitempty\"`"
 			}
-			return fieldMetaData.Type
+			return "ID int64 `json:\"id,omitempty\"`"
+		},
+		"GetPrimaryKeyType": func() string {
+			if resource.PrimaryKeyType == "int" || resource.PrimaryKeyType == "integer" {
+				return "int64"
+			}
+			return "string"
 		},
 		// This function helps the template to add a foreignKey based on composite field
-		"AddForeignKeyIfCompositeField": func(key, value string) string {
-			if fieldMetaData, ok := resource.Fields[key]; ok && fieldMetaData.IsComposite {
-				return fmt.Sprintf("%s %s `gorm:\"foreignKey:ID\" json:\"%s,omitempty\"`", key, value, strcase.ToLowerCamel(key))
+		"AddFieldWithDetails": func(key, value, configType string) string {
+			fieldMetaData, ok := resource.Fields[key]
+			if ok {
+				if fieldMetaData.IsComposite {
+					if configType == "gorm" {
+						return fmt.Sprintf("%s %s `gorm:\"foreignKey:ID\" json:\"%s,omitempty\"`", key, value, strcase.ToLowerCamel(key))
+					} else if configType == "mongo" {
+						return fmt.Sprintf("%s %s `json:\"%s,omitempty\" bson:\"%s,omitempty\"`", key, value, strcase.ToLowerCamel(key), strcase.ToLowerCamel(key))
+					} else if configType == "sql" {
+						return fmt.Sprintf("%s *%s `json:\"%s,omitempty\"`", key, value, strcase.ToLowerCamel(key))
+					}
+				} else if fieldMetaData.IsArray {
+					lowerCamelKey := strcase.ToLowerCamel(key)
+					pluralLowerCamelKey := c.PluralizeClient.Plural(lowerCamelKey)
+					pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+					if configType == "gorm" {
+						return fmt.Sprintf("%s []%s `json:\"%s,omitempty\"`", pluralUpperCamelKey, value, pluralLowerCamelKey)
+					} else if configType == "mongo" {
+						return fmt.Sprintf("%s []%s `json:\"%s,omitempty\" bson:\"%s,omitempty\"`", pluralUpperCamelKey, value, pluralLowerCamelKey, pluralLowerCamelKey)
+					} else if configType == "sql" {
+						return fmt.Sprintf("%s []%s `json:\"%s,omitempty\"`", pluralUpperCamelKey, value, pluralLowerCamelKey)
+					}
+				}
 			}
 			return fmt.Sprintf("%s %s `json:\"%s,omitempty\"`", key, value, strcase.ToLowerCamel(key))
 		},
@@ -298,7 +331,7 @@ func (c *Copier) addSQLDetails(resource *corenode.Resource) error {
 	var getQueryScanColumns *string
 
 	for key, value := range resource.Fields {
-		dbDataType, err := c.getSQLDBDataType(value.Type)
+		dbDataType, err := c.getSQLDBDataType(value)
 		if err != nil {
 			log.Errorf("error while getting db data type for %s", value.Type)
 			return err
@@ -308,6 +341,12 @@ func (c *Copier) addSQLDetails(resource *corenode.Resource) error {
 		updateQueryColumnsAndParams, updateQueryExecColumns = c.getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAndParams, updateQueryExecColumns, key, value)
 		getQueryScanColumns = c.getGetQueryScanColumns(getQueryScanColumns, key, value)
 	}
+
+	if resource.PrimaryKeyType == "string" {
+		// add primary key to insert query columns and params
+		insertQueryColumns, insertQueryParams, insertQueryExecColumns = c.getQueryParamsNColumnsNExecColumns(insertQueryColumns, insertQueryParams, insertQueryExecColumns, "ID", corenode.FieldMetadata{Type: "string"})
+	}
+
 	// create query columns
 	c.Data["CreateQueryColumns"] = createQueryColumns
 
@@ -330,11 +369,18 @@ func (c *Copier) getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAn
 		if value.IsComposite {
 			*updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
 			// m here is a model's variable
-			*updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+			*updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
-			*updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
-			// m here is a model's variable
-			*updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				*updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey) + " = ?"
+				// m here is a model's variable
+				*updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+			} else {
+				*updateQueryColumnsAndParams += ", " + cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
+				// m here is a model's variable
+				*updateQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
 		}
 	} else {
 		updateQueryColumnsAndParams = new(string)
@@ -342,11 +388,18 @@ func (c *Copier) getUpdateQueryColumnsAndParamsNExecColumns(updateQueryColumnsAn
 		if value.IsComposite {
 			*updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
 			// m here is a model's variable
-			*updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+			*updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
-			*updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
-			// m here is a model's variable
-			*updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				*updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey) + " = ?"
+				// m here is a model's variable
+				*updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+			} else {
+				*updateQueryColumnsAndParams = cases.Title(language.Und, cases.NoLower).String(key) + " = ?"
+				// m here is a model's variable
+				*updateQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
 		}
 	}
 	return updateQueryColumnsAndParams, updateQueryExecColumns
@@ -358,12 +411,20 @@ func (c *Copier) getQueryParamsNColumnsNExecColumns(insertQueryColumns, insertQu
 			*insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
 			*insertQueryParams += ", ?"
 			// m here is a model's variable
-			*insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+			*insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
-			*insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
-			*insertQueryParams += ", ?"
-			// m here is a model's variable
-			*insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				*insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+				*insertQueryParams += ", ?"
+				// m here is a model's variable
+				*insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+			} else {
+				*insertQueryColumns += ", " + cases.Title(language.Und, cases.NoLower).String(key)
+				*insertQueryParams += ", ?"
+				// m here is a model's variable
+				*insertQueryExecColumns += ", m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
 		}
 	} else {
 		insertQueryParams = new(string)
@@ -373,12 +434,20 @@ func (c *Copier) getQueryParamsNColumnsNExecColumns(insertQueryColumns, insertQu
 			*insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
 			*insertQueryParams = "?"
 			// m here is a model's variable
-			*insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+			*insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
-			*insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
-			*insertQueryParams = "?"
-			// m here is a model's variable
-			*insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				*insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+				*insertQueryParams = "?"
+				// m here is a model's variable
+				*insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+			} else {
+				*insertQueryColumns = cases.Title(language.Und, cases.NoLower).String(key)
+				*insertQueryParams = "?"
+				// m here is a model's variable
+				*insertQueryExecColumns = "m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
 		}
 	}
 	return insertQueryColumns, insertQueryParams, insertQueryExecColumns
@@ -389,14 +458,24 @@ func (c *Copier) getCreateQueryColumns(createQueryColumns *string, key string, v
 		if value.IsComposite {
 			*createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NULL,"
 		} else {
-			*createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				*createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey) + " " + dbDataType + " NOT NULL,"
+			} else {
+				*createQueryColumns += "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
+			}
 		}
 	} else {
 		createQueryColumns = new(string)
 		if value.IsComposite {
 			*createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NULL,"
 		} else {
-			*createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				*createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey) + " " + dbDataType + " NOT NULL,"
+			} else {
+				*createQueryColumns = "\n\t\t" + cases.Title(language.Und, cases.NoLower).String(key) + " " + dbDataType + " NOT NULL,"
+			}
 		}
 	}
 	return createQueryColumns
@@ -406,19 +485,31 @@ func (c *Copier) getGetQueryScanColumns(getQueryScanColumns *string, key string,
 	if getQueryScanColumns != nil {
 		if value.IsComposite {
 			// m here is a model's variable
-			*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+			*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
-			// m here is a model's variable
-			*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key)
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				// m here is a model's variable
+				*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+			} else {
+				// m here is a model's variable
+				*getQueryScanColumns += ", &m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
 		}
 	} else {
 		getQueryScanColumns = new(string)
 		if value.IsComposite {
 			// m here is a model's variable
-			*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key) + ".Id"
+			*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key) + ".ID"
 		} else {
-			// m here is a model's variable
-			*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key)
+			if value.IsArray {
+				pluralUpperCamelKey := c.PluralizeClient.Plural(key)
+				// m here is a model's variable
+				*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(pluralUpperCamelKey)
+			} else {
+				// m here is a model's variable
+				*getQueryScanColumns = "&m." + cases.Title(language.Und, cases.NoLower).String(key)
+			}
 		}
 	}
 	return getQueryScanColumns
@@ -458,7 +549,8 @@ func (c *Copier) addResourceSpecificTemplateData(resource *corenode.Resource) er
 	c.Data["IsRESTPatchAllowed"] = restResourceData.IsRESTPatchAllowed
 	c.Data["IsRESTOptionsAllowed"] = restResourceData.IsRESTPatchAllowed
 	c.Data["IsRESTHeadAllowed"] = restResourceData.IsRESTHeadAllowed
-
+	c.Data["IsIntID"] = restResourceData.IsIntID
+	c.Data["IsStringID"] = restResourceData.IsStringID
 	return nil
 }
 
@@ -766,7 +858,7 @@ func (c *Copier) CreateRootLevelFiles() error {
 	return executor.Execute(files, c.Data)
 }
 
-func (c *Copier) getSQLDBDataType(value string) (string, error) {
+func (c *Copier) getSQLDBDataType(value corenode.FieldMetadata) (string, error) {
 	if c.SQLDB == SQLite {
 		return commonUtils.GetSqliteDataType(value), nil
 	} else if c.SQLDB == MySQL {

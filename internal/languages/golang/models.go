@@ -22,8 +22,13 @@ func (n *LGolangNode) FillDefaults() error {
 	if n.LanguageNode != nil {
 		if n.LanguageNode.RestConfig != nil && n.LanguageNode.RestConfig.Server != nil && n.LanguageNode.RestConfig.Server.Resources != nil {
 			for _, resource := range n.LanguageNode.RestConfig.Server.Resources {
-				if resource.AllowedMethods == nil {
-					defaultMethods := []string{"GET", "POST", "PUT", "DELETE"}
+				// set default primaryKeyType
+				if len(resource.PrimaryKeyType) < 1 {
+					resource.PrimaryKeyType = "integer"
+				}
+				// set default allowed methods
+				if resource.AllowedMethods == nil || len(resource.AllowedMethods) < 1 {
+					defaultMethods := []string{"GET", "POST", "PUT", "DELETE", "LIST"}
 					stringPointers := func() []*string {
 						s := make([]*string, len(defaultMethods))
 						for i := range defaultMethods {
@@ -38,8 +43,8 @@ func (n *LGolangNode) FillDefaults() error {
 		}
 		if n.LanguageNode.GrpcConfig != nil && n.LanguageNode.GrpcConfig.Server != nil && n.LanguageNode.GrpcConfig.Server.Resources != nil {
 			for _, resource := range n.LanguageNode.GrpcConfig.Server.Resources {
-				if resource.AllowedMethods == nil {
-					defaultMethods := []string{"GET", "POST", "PUT", "DELETE"}
+				if resource.AllowedMethods == nil || len(resource.AllowedMethods) < 1 {
+					defaultMethods := []string{"GET", "POST", "PUT", "DELETE", "LIST"}
 					stringPointers := func() []*string {
 						s := make([]*string, len(defaultMethods))
 						for i := range defaultMethods {

@@ -91,12 +91,14 @@ type WsConfig struct {
 
 type FieldMetadata struct {
 	Type        string `json:"datatype,omitempty"`
+	IsArray     bool   `json:"isArray,omitempty"`
 	IsComposite bool   `json:"isComposite,omitempty"`
 }
 
 // Resource depicts the endpoints(e.g. /users, /accounts)
 type Resource struct {
 	Name           string    `json:"name"`
+	PrimaryKeyType string    `json:"primaryKeyType"`
 	AllowedMethods []*string `json:"allowedMethods"`
 	// resource fields (e.g., name, age in user)
 	Fields map[string]FieldMetadata `json:"fields"`
