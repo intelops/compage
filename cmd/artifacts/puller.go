@@ -11,7 +11,7 @@ import (
 )
 
 func PullOCIArtifact(language, version string) error {
-	artifactURL, artifactPath, err := oci_registry.GetOCIArtifactURLAndPathByLanguage(language, version)
+	artifactURL, artifactPath, err := ociregistry.GetOCIArtifactURLAndPathByLanguage(language, version)
 	if err != nil {
 		log.Errorf("error:%v", err)
 		return err
@@ -58,7 +58,7 @@ func PullOCIArtifact(language, version string) error {
 	}
 
 	log.Infof("pulling artifact %s into %s\n", artifactURL, artifactPath)
-	_, err = oci_registry.Pull(ctx, false)
+	_, err = ociregistry.Pull(ctx, false)
 	if err != nil {
 		log.Errorf("error:%v", err)
 		return err

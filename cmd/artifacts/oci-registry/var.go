@@ -1,4 +1,4 @@
-package oci_registry
+package ociregistry
 
 var (
 	ociLatestTag               = "latest"

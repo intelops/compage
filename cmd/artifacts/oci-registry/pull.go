@@ -1,4 +1,4 @@
-package oci_registry
+package ociregistry
 
 import (
 	"context"
@@ -40,10 +40,7 @@ func Pull(requestCtx context.Context, disableTLS bool) (template *string, err er
 	}
 
 	if ref.Reference == ociLatestTag || ref.Reference == "" {
-		ref.Reference, err = getLatestTagSortedBySemver(ref.Registry+"/"+ref.Repository, disableTLS)
-		if err != nil {
-			return nil, fmt.Errorf("get latest tag sorted by semver: %w", err)
-		}
+		return nil, fmt.Errorf("please don't use latest tag but specific version")
 	}
 
 	// Connect to a remote repository
