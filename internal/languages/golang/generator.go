@@ -205,7 +205,7 @@ func generateRESTConfig(ctx context.Context, goValues *GoValues) error {
 }
 
 func getCommonFilesCopier(goValues GoValues) (*commonfiles.Copier, error) {
-	goTemplatesRootPath := GetGoTemplatesRootPath()
+	goTemplatesRootPath := GetGoTemplatesRootPath(goValues.Values.Version)
 	if goTemplatesRootPath == "" {
 		return nil, errors.New("go templates root path is empty")
 	}
@@ -275,7 +275,7 @@ func getCommonFilesCopier(goValues GoValues) (*commonfiles.Copier, error) {
 }
 
 func getGoGrpcServerCopier(goValues *GoValues) (*gogrpcserver.Copier, error) {
-	goTemplatesRootPath := GetGoTemplatesRootPath()
+	goTemplatesRootPath := GetGoTemplatesRootPath(goValues.Values.Version)
 	if goTemplatesRootPath == "" {
 		return nil, errors.New("go templates root path is empty")
 	}
@@ -317,7 +317,7 @@ func getGoGrpcServerCopier(goValues *GoValues) (*gogrpcserver.Copier, error) {
 }
 
 func getGoGinServerCopier(goValues *GoValues) (*goginserver.Copier, error) {
-	goTemplatesRootPath := GetGoTemplatesRootPath()
+	goTemplatesRootPath := GetGoTemplatesRootPath(goValues.Values.Version)
 	if goTemplatesRootPath == "" {
 		return nil, errors.New("go templates root path is empty")
 	}
@@ -359,7 +359,7 @@ func getGoGinServerCopier(goValues *GoValues) (*goginserver.Copier, error) {
 }
 
 func getIntegrationsCopier(goValues *GoValues) (map[string]interface{}, error) {
-	goTemplatesRootPath := GetGoTemplatesRootPath()
+	goTemplatesRootPath := GetGoTemplatesRootPath(goValues.Values.Version)
 	if goTemplatesRootPath == "" {
 		return nil, errors.New("go templates root path is empty")
 	}

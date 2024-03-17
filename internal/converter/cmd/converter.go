@@ -20,6 +20,7 @@ func GetProject(input *models.Project) (*core.Project, error) {
 	return &core.Project{
 		CompageJSON:         compageJSON,
 		Name:                input.Name,
+		Version:             input.Version,
 		GitPlatformName:     input.GitDetails.Platform.Name,
 		GitPlatformURL:      input.GitDetails.Platform.URL,
 		GitPlatformUserName: input.GitDetails.Platform.UserName,

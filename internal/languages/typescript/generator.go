@@ -56,7 +56,7 @@ func Generate(ctx context.Context) error {
 }
 
 func getIntegrationsCopier(typescriptValues Values) (map[string]interface{}, error) {
-	typeScriptTemplatesRootPath := GetTypeScriptTemplatesRootPath()
+	typeScriptTemplatesRootPath := GetTypeScriptTemplatesRootPath(typescriptValues.Values.Version)
 	if typeScriptTemplatesRootPath == "" {
 		return nil, errors.New("typescript templates root path is empty")
 	}
