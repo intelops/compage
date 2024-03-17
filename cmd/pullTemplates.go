@@ -4,6 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	ociregistry "github.com/intelops/compage/cmd/artifacts"
 	"github.com/spf13/cobra"
 )
 
@@ -18,28 +19,29 @@ var pullTemplatesCmd = &cobra.Command{
 	Short: "Pulls the compage supported templates in the ~/.compage/templates directory",
 	Long:  `Compage supports multiple templates for different languages. You can pull just the required template by lana or all the templates.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		version := "latest"
 		// common template is required for all the languages
-		err := CloneOrPullRepository("common")
+		err := ociregistry.PullOCIArtifact("common", version)
 		cobra.CheckErr(err)
 		if all {
-			err := CloneOrPullRepository("go")
+			err := ociregistry.PullOCIArtifact("go", version)
 			cobra.CheckErr(err)
-			err = CloneOrPullRepository("python")
+			err = ociregistry.PullOCIArtifact("python", version)
 			cobra.CheckErr(err)
-			err = CloneOrPullRepository("java")
+			err = ociregistry.PullOCIArtifact("java", version)
 			cobra.CheckErr(err)
-			err = CloneOrPullRepository("javascript")
+			err = ociregistry.PullOCIArtifact("javascript", version)
 			cobra.CheckErr(err)
-			err = CloneOrPullRepository("ruby")
+			err = ociregistry.PullOCIArtifact("ruby", version)
 			cobra.CheckErr(err)
-			err = CloneOrPullRepository("rust")
+			err = ociregistry.PullOCIArtifact("rust", version)
 			cobra.CheckErr(err)
-			err = CloneOrPullRepository("typescript")
+			err = ociregistry.PullOCIArtifact("typescript", version)
 			cobra.CheckErr(err)
-			err = CloneOrPullRepository("dotnet")
+			err = ociregistry.PullOCIArtifact("dotnet", version)
 			cobra.CheckErr(err)
 		} else {
-			err := CloneOrPullRepository(languageTemplate)
+			err := ociregistry.PullOCIArtifact(languageTemplate, version)
 			cobra.CheckErr(err)
 		}
 	},

@@ -1,4 +1,4 @@
-package git_checker
+package git
 
 import (
 	"errors"
@@ -7,24 +7,39 @@ import (
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/storage/memory"
 	log "github.com/sirupsen/logrus"
+	"os"
 )
 
-func CheckIfSHACommitSimilar(repoPath, repoURL, branchName string) (bool, error) {
+func GetRepositoryURLByLanguage(language, version string) (string, string, error) {
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", "", err
+	}
+	repositoryPath := userHomeDir + "/.compage/templates/compage-template-" + language + "/" + version
+	repositoryURL := "https://github.com/intelops/compage-template-" + language + ".git"
+	if language == "common" {
+		repositoryPath = userHomeDir + "/.compage/templates/common-templates/" + version
+		return "https://github.com/intelops/common-templates.git", repositoryPath, nil
+	}
+	return repositoryURL, repositoryPath, nil
+}
+
+func CheckIfSHACommitSimilar(repositoryURL, repositoryPath, version string) (bool, error) {
 	// Get local commit SHA
-	localSHA, err := GetLocalGitCommitSHA(repoPath)
+	localSHA, err := GetLocalGitCommitSHA(repositoryPath)
 	if err != nil {
 		log.Error("Error fetching local Git commit SHA:", err)
 		return false, err
 	}
 
 	// Get remote commit SHA
-	remoteSHA, err := GetRemoteGitCommitSHA(repoURL, branchName)
+	remoteSHA, err := GetRemoteGitCommitSHA(repositoryURL, version)
 	if err != nil {
 		log.Errorf("Error fetching remote Git commit SHA: %s", err)
 		return false, err
 	}
 
-	isDirty, err := IsRepoDirty(repoPath)
+	isDirty, err := IsRepositoryDirty(repositoryPath)
 	if err != nil {
 		log.Errorf("Error checking if repository is dirty: %s", err)
 		return false, err
@@ -37,10 +52,9 @@ func CheckIfSHACommitSimilar(repoPath, repoURL, branchName string) (bool, error)
 	return localSHA == remoteSHA, nil
 }
 
-func GetLocalGitCommitSHA(repoPath string) (string, error) {
-	log.Debugf("repoPath: %s", repoPath)
+func GetLocalGitCommitSHA(repositoryPath string) (string, error) {
 	// Open the given repository
-	r, err := git.PlainOpen(repoPath)
+	r, err := git.PlainOpen(repositoryPath)
 	if err != nil {
 		log.Errorf("Error opening repository: %s", err)
 		return "", err
@@ -59,11 +73,11 @@ func GetLocalGitCommitSHA(repoPath string) (string, error) {
 	return commitSHA, nil
 }
 
-func GetRemoteGitCommitSHA(repoURL, branchName string) (string, error) {
+func GetRemoteGitCommitSHA(repositoryURL, version string) (string, error) {
 	// List remote references
 	references, err := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
 		Name: "origin",
-		URLs: []string{repoURL},
+		URLs: []string{repositoryURL},
 	}).List(&git.ListOptions{})
 	if err != nil {
 		log.Errorf("Error listing remote references: %s", err)
@@ -72,24 +86,24 @@ func GetRemoteGitCommitSHA(repoURL, branchName string) (string, error) {
 
 	// Look for the branch reference
 	for _, ref := range references {
-		if ref.Name().String() == "refs/heads/"+branchName {
+		if ref.Name().String() == "refs/tags/"+version {
 			return ref.Hash().String(), nil
 		}
 	}
 
-	return "", fmt.Errorf("branch %s not found", branchName)
+	return "", fmt.Errorf("branch %s not found", version)
 }
 
-func IsRepoDirty(repoPath string) (bool, error) {
+func IsRepositoryDirty(repositoryPath string) (bool, error) {
 	// Open the given repository
-	repo, err := git.PlainOpen(repoPath)
+	repository, err := git.PlainOpen(repositoryPath)
 	if err != nil {
 		log.Errorf("Error opening repository: %s", err)
 		return false, err
 	}
 
 	// Get the working directory for the repository
-	worktree, err := repo.Worktree()
+	worktree, err := repository.Worktree()
 	if err != nil {
 		log.Errorf("Error getting working directory: %s", err)
 		return false, err
@@ -104,4 +118,17 @@ func IsRepoDirty(repoPath string) (bool, error) {
 
 	// The repository is dirty if there are any changes in the status
 	return !status.IsClean(), nil
+}
+
+func IsCommitSimilar(repositoryURL, repositoryPath, version string) bool {
+	commitSimilar, err := CheckIfSHACommitSimilar(repositoryURL, repositoryPath, version)
+	if err != nil {
+		log.Errorf("error while checking the commit sha [" + err.Error() + "]")
+		return false
+	}
+	if !commitSimilar {
+		log.Errorf("the templates are not matching with the latest commit, please pull the latest templates")
+		return false
+	}
+	return true
 }

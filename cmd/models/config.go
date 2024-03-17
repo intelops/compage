@@ -24,6 +24,7 @@ type GitDetails struct {
 
 type Project struct {
 	Name            string                 `yaml:"name"`
+	Version         string                 `yaml:"version"`
 	GitDetails      GitDetails             `yaml:"git"`
 	CompageJSON     map[string]interface{} `yaml:"compageJSON"`
 	ProjectMetadata string                 `yaml:"projectMetadata"`

@@ -1,8 +1,7 @@
 package cmd
 
 import (
-	"errors"
-	git_checker "github.com/intelops/compage/cmd/git-checker"
+	ociregistry "github.com/intelops/compage/cmd/artifacts"
 	"github.com/intelops/compage/cmd/models"
 	"github.com/intelops/compage/internal/converter/cmd"
 	"github.com/intelops/compage/internal/handlers"
@@ -64,33 +63,19 @@ func GenerateCode() error {
 
 	// pull all required templates
 	// pull the common templates
-	err = CloneOrPullRepository("common")
+	err = ociregistry.PullOCIArtifact("common", project.Version)
 	if err != nil {
 		log.Errorf("error while pulling the common templates [" + err.Error() + "]")
 		return err
 	}
 	for _, node := range coreProject.CompageJSON.Nodes {
 		// make sure that the latest template is pulled
-		err = CloneOrPullRepository(node.Language)
+		err = ociregistry.PullOCIArtifact(node.Language, project.Version)
 		if err != nil {
 			log.Errorf("error while pulling the template [" + err.Error() + "]")
 			return err
 		}
 		log.Debugf("template pulled successfully for language %s", node.Language)
-
-		// check if the templates sha is matching
-		repoPath := "/Users/mahendrabagul/.compage/templates/compage-template-go"
-		repoURL := "git@github.com:intelops/compage-template-go.git"
-		branchName := "template-v8"
-		commitSimilar, err := git_checker.CheckIfSHACommitSimilar(repoPath, repoURL, branchName)
-		if err != nil {
-			log.Errorf("error while checking the commit sha [" + err.Error() + "]")
-			return err
-		}
-		if !commitSimilar {
-			log.Errorf("the templates are not matching with the latest commit, please pull the latest templates")
-			return errors.New("the templates are not matching with the latest commit, please pull the latest templates")
-		}
 	}
 
 	// triggers project generation, process the request

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	ociregistry "github.com/intelops/compage/cmd/artifacts"
 	"github.com/intelops/compage/config"
 	project "github.com/intelops/compage/gen/api/v1"
 	server "github.com/intelops/compage/grpc"
@@ -49,23 +50,24 @@ This command will start thr gRPC server and allow the gRPC clients to get connec
 			}
 		}()
 
-		err := CloneOrPullRepository("common")
+		version := "latest"
+		err := ociregistry.PullOCIArtifact("common", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("go")
+		err = ociregistry.PullOCIArtifact("go", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("python")
+		err = ociregistry.PullOCIArtifact("python", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("java")
+		err = ociregistry.PullOCIArtifact("java", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("javascript")
+		err = ociregistry.PullOCIArtifact("javascript", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("ruby")
+		err = ociregistry.PullOCIArtifact("ruby", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("rust")
+		err = ociregistry.PullOCIArtifact("rust", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("typescript")
+		err = ociregistry.PullOCIArtifact("typescript", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("dotnet")
+		err = ociregistry.PullOCIArtifact("dotnet", version)
 		cobra.CheckErr(err)
 
 		// check if the git submodules have been pulled (mainly need to check this on developer's machine)
