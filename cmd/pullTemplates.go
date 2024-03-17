@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	version          string
 	languageTemplate string
 	all              bool
 )
@@ -17,9 +18,8 @@ var (
 var pullTemplatesCmd = &cobra.Command{
 	Use:   "pullTemplates",
 	Short: "Pulls the compage supported templates in the ~/.compage/templates directory",
-	Long:  `Compage supports multiple templates for different languages. You can pull just the required template by lana or all the templates.`,
+	Long:  `Compage supports multiple templates for different languages. You can pull just the required template by language or all the templates.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		version := "latest"
 		// common template is required for all the languages
 		err := ociregistry.PullOCIArtifact("common", version)
 		cobra.CheckErr(err)
@@ -61,4 +61,5 @@ func init() {
 	// pullTemplatesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	pullTemplatesCmd.Flags().BoolVar(&all, "all", false, "all templates")
 	pullTemplatesCmd.Flags().StringVar(&languageTemplate, "language", "go", "language template")
+	pullTemplatesCmd.Flags().StringVar(&version, "version", "v1.0.0", "Version (latest, v1.0.0 - matching your version)")
 }
