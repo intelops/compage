@@ -135,6 +135,20 @@ func getCompageTemplateFromManifestLayers(manifestData []byte, templateRootDir s
 		case commonTemplatesMediaType:
 			fallthrough
 		case compageTemplateGoMediaType:
+			fallthrough
+		case compageTemplateDotNetMediaType:
+			fallthrough
+		case compageTemplateJavaMediaType:
+			fallthrough
+		case compageTemplateJavaScriptMediaType:
+			fallthrough
+		case compageTemplateTypeScriptMediaType:
+			fallthrough
+		case compageTemplatePythonMediaType:
+			fallthrough
+		case compageTemplateRubyMediaType:
+			fallthrough
+		case compageTemplateRustMediaType:
 			if title, ok := layer.Annotations["org.opencontainers.image.title"]; ok && title != "" {
 				template := filepath.Join(templateRootDir, title)
 				return &template, nil
