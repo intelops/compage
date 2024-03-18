@@ -3,7 +3,6 @@ module github.com/intelops/compage
 go 1.22
 
 require (
-	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/go-git/go-git/v5 v5.11.0
 	github.com/iancoleman/strcase v0.3.0
