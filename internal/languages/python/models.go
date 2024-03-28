@@ -19,8 +19,8 @@ func (n *LPythonNode) FillDefaults() error {
 	return nil
 }
 
-func GetPythonTemplatesRootPath() string {
-	templatesRootPath, err := utils.GetTemplatesRootPath(TemplateDirectoryName)
+func GetPythonTemplatesRootPath(version string) string {
+	templatesRootPath, err := utils.GetTemplatesRootPath(TemplateDirectoryName, version)
 	if err != nil {
 		log.Errorf("error while getting the project root path [" + err.Error() + "]")
 		return ""

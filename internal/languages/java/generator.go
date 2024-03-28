@@ -73,7 +73,7 @@ func Generate(ctx context.Context) error {
 }
 
 func getIntegrationsCopier(javaValues Values) (map[string]interface{}, error) {
-	javaTemplatesRootPath := GetJavaTemplatesRootPath()
+	javaTemplatesRootPath := GetJavaTemplatesRootPath(javaValues.Values.Version)
 	if javaTemplatesRootPath == "" {
 		return nil, errors.New("java templates root path is empty")
 	}

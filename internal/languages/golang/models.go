@@ -56,8 +56,8 @@ func (n *LGolangNode) FillDefaults() error {
 	return nil
 }
 
-func GetGoTemplatesRootPath() string {
-	templatesRootPath, err := utils.GetTemplatesRootPath(TemplateDirectoryName)
+func GetGoTemplatesRootPath(version string) string {
+	templatesRootPath, err := utils.GetTemplatesRootPath(TemplateDirectoryName, version)
 	if err != nil {
 		log.Errorf("error while getting the project root path [" + err.Error() + "]")
 		return ""

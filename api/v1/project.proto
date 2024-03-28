@@ -9,13 +9,14 @@ service ProjectService {
 }
 
 message GenerateCodeRequest {
-  string projectName = 1;
-  string projectJSON = 2;
-  string gitRepositoryName = 3;
-  string gitPlatformName = 4;
-  string gitPlatformURL = 5;
-  string gitPlatformUserName = 6;
-  string projectMetadata = 7;
+  string projectVersion = 1;
+  string projectName = 2;
+  string projectJSON = 3;
+  string gitRepositoryName = 4;
+  string gitPlatformName = 5;
+  string gitPlatformURL = 6;
+  string gitPlatformUserName = 7;
+  string projectMetadata = 8;
 }
 
 message GenerateCodeResponse{

@@ -27,8 +27,8 @@ To contribute code.
 ## Regenerate the gRPC code from .proto files
 - Install below packages to regenerate the gRPC code.
    ```shell
-   go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
-   go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+   go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+   go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
    ``` 
 - Update below statement in ~/.zshrc or ~/.bashrc depending on the shell you are using.
    ```shell

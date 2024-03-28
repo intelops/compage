@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	ociregistry "github.com/intelops/compage/cmd/artifacts"
 	"github.com/intelops/compage/cmd/models"
 	"github.com/intelops/compage/internal/converter/cmd"
 	"github.com/intelops/compage/internal/handlers"
@@ -62,14 +63,14 @@ func GenerateCode() error {
 
 	// pull all required templates
 	// pull the common templates
-	err = CloneOrPullRepository("common")
+	err = ociregistry.PullOCIArtifact("common", project.Version)
 	if err != nil {
 		log.Errorf("error while pulling the common templates [" + err.Error() + "]")
 		return err
 	}
 	for _, node := range coreProject.CompageJSON.Nodes {
 		// make sure that the latest template is pulled
-		err = CloneOrPullRepository(node.Language)
+		err = ociregistry.PullOCIArtifact(node.Language, project.Version)
 		if err != nil {
 			log.Errorf("error while pulling the template [" + err.Error() + "]")
 			return err

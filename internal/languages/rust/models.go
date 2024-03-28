@@ -19,8 +19,8 @@ func (n *LRustNode) FillDefaults() error {
 	return nil
 }
 
-func GetRustTemplatesRootPath() string {
-	templatesRootPath, err := utils.GetTemplatesRootPath(TemplateDirectoryName)
+func GetRustTemplatesRootPath(version string) string {
+	templatesRootPath, err := utils.GetTemplatesRootPath(TemplateDirectoryName, version)
 	if err != nil {
 		log.Errorf("error while getting the project root path [" + err.Error() + "]")
 		return ""

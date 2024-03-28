@@ -29,6 +29,7 @@ const (
 type Values struct {
 	TemplateVars      map[TemplateVarKey]string
 	ProjectName       string
+	Version           string
 	NodeDirectoryName string
 	LanguageNode      *LanguageNode
 }
@@ -55,6 +56,7 @@ func AddValuesToContext(ctx context.Context, project *core.Project, languageNode
 		},
 		NodeDirectoryName: nodeDirectoryName,
 		ProjectName:       project.Name,
+		Version:           project.Version,
 		LanguageNode:      languageNode,
 	}
 

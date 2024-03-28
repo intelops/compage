@@ -18,6 +18,7 @@ type ModificationDetails struct {
 // It has a single compage.json and can have multiple nodes and edges (projects and connections) internally.
 type Project struct {
 	Name                string                 `json:"name"`
+	Version             string                 `json:"version"`
 	CompageJSON         *CompageJSON           `json:"compageJSON"`
 	GitRepositoryName   string                 `json:"gitRepositoryName"`
 	GitRepositoryURL    string                 `json:"gitRepositoryURL"`

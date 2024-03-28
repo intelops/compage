@@ -17,3 +17,7 @@ compage
 dist/
 /cosign.key
 /cosign.pub
+/myproject/*
+myproject/*
+cmd/artifacts/.DS_Store
+/__debug_bin*
