@@ -51,7 +51,7 @@ func PullOCIArtifact(language, version string) error {
 	}
 
 	log.Infof("verifying artifact %s \n", artifactURL)
-	err = cosign.VerifyImage(ctx)
+	err = cosign.VerifyArtifact(ctx, "")
 	if err != nil {
 		log.Errorf("error:%v", err)
 		return err
