@@ -63,7 +63,7 @@ signs:
       - '--output-signature=${signature}'
       - '${artifact}'
       - "--yes"
-    artifacts: checksum
+    artifacts: all
     output: true
 
 changelog:
