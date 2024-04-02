@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	artifactUtils "github.com/intelops/compage/cmd/artifacts/utils"
 	spec "github.com/opencontainers/image-spec/specs-go/v1"
 	log "github.com/sirupsen/logrus"
 	"oras.land/oras-go/v2"
@@ -32,7 +33,7 @@ func GetOCIArtifactURLAndPathByLanguage(language, version string) (string, strin
 
 // Pull pulls an OCI image from a registry.
 func Pull(requestCtx context.Context, disableTLS bool) (template *string, err error) {
-	ociName := requestCtx.Value("artifactURL").(string)
+	ociName := requestCtx.Value(artifactUtils.ContextKeyArtifactURL).(string)
 	ref, err := registry.ParseReference(ociName)
 	if err != nil {
 		log.Errorf("parse reference: %v", err)
@@ -77,7 +78,7 @@ func Pull(requestCtx context.Context, disableTLS bool) (template *string, err er
 	}
 
 	// Create the template root directory
-	templateRootDir := requestCtx.Value("artifactPath").(string)
+	templateRootDir := requestCtx.Value(artifactUtils.ContextKeyArtifactPath).(string)
 
 	fs, err := file.New(templateRootDir)
 	if err != nil {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/fatih/color"
 	"github.com/google/go-containerregistry/pkg/name"
+	artifactUtils "github.com/intelops/compage/cmd/artifacts/utils"
 	"github.com/sigstore/cosign/v2/cmd/cosign/cli/fulcio"
 	"github.com/sigstore/cosign/v2/cmd/cosign/cli/options"
 	"github.com/sigstore/cosign/v2/cmd/cosign/cli/rekor"
@@ -15,7 +16,7 @@ import (
 )
 
 func VerifyArtifact(ctx context.Context, key string) error {
-	artifactURL := ctx.Value("artifactURL").(string)
+	artifactURL := ctx.Value(artifactUtils.ContextKeyArtifactURL).(string)
 	ref, err := name.ParseReference(artifactURL)
 	if err != nil {
 		log.Errorf("parsing reference: %v", err)

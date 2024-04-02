@@ -6,6 +6,7 @@ import (
 	"github.com/intelops/compage/cmd/artifacts/cosign"
 	"github.com/intelops/compage/cmd/artifacts/git"
 	"github.com/intelops/compage/cmd/artifacts/oci-registry"
+	artifactUtils "github.com/intelops/compage/cmd/artifacts/utils"
 	"github.com/intelops/compage/internal/utils"
 	log "github.com/sirupsen/logrus"
 )
@@ -28,10 +29,10 @@ func PullOCIArtifact(language, version string) error {
 	}
 
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, "artifactURL", artifactURL)
-	ctx = context.WithValue(ctx, "artifactPath", artifactPath)
-	ctx = context.WithValue(ctx, "repositoryURL", repositoryURL)
-	ctx = context.WithValue(ctx, "repositoryPath", repositoryPath)
+	ctx = context.WithValue(ctx, artifactUtils.ContextKeyArtifactURL, artifactURL)
+	ctx = context.WithValue(ctx, artifactUtils.ContextKeyArtifactPath, artifactPath)
+	ctx = context.WithValue(ctx, artifactUtils.ContextKeyRepositoryURL, repositoryURL)
+	ctx = context.WithValue(ctx, artifactUtils.ContextKeyRepositoryPath, repositoryPath)
 
 	exists, err := utils.DirectoryExists(artifactPath)
 	if err != nil {
