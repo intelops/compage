@@ -342,7 +342,7 @@ func parseWithMetaCommentConfig(in []byte, c Config) ([]*ast.Node, error) {
 	if err := wrapStrings(nodes, 0, c); err != nil {
 		return nil, err
 	}
-	if err := sortAndFilterNodes( /*parent=*/ nil, nodes, nodeSortFunction(c), nodeFilterFunction(c)); err != nil {
+	if err := sortAndFilterNodes( /*parent=*/ nil, nodes, nodeSortFunction(c), nodeFilterFunction(c), valuesSortFunction(c)); err != nil {
 		return nil, err
 	}
 	return nodes, nil
@@ -567,24 +567,21 @@ func (p *parser) parse(isRoot bool) (result []*ast.Node, endPos ast.Position, er
 			return nil, ast.Position{}, err
 		}
 
+		// p.parse is often invoked with the index pointing at the newline character
+		// after the previous item. We should still report that this item starts in
+		// the next line.
+		p.consume('\n')
 		startPos := p.position()
-		if p.nextInputIs('\n') {
-			// p.parse is often invoked with the index pointing at the
-			// newline character after the previous item.
-			// We should still report that this item starts in the next line.
-			startPos.Byte++
-			startPos.Line++
-			startPos.Column = 1
-		}
 
 		// Read PreComments.
 		comments, blankLines := p.skipWhiteSpaceAndReadComments(true /* multiLine */)
 
 		// Handle blank lines.
-		if blankLines > 1 {
+		if blankLines > 0 {
 			if p.config.infoLevel() {
 				p.config.infof("blankLines: %v", blankLines)
 			}
+			// Here we collapse the leading blank lines into one blank line.
 			comments = append([]string{""}, comments...)
 		}
 
@@ -824,15 +821,20 @@ func (p *parser) readContinuousBlocksOfComments() []string {
 // skipWhiteSpaceAndReadComments has multiple cases:
 //   - (1) reading a block of comments followed by a blank line
 //   - (2) reading a block of comments followed by non-blank content
-//   - (3) reading the inline comments between the current char and the end of the
-//     current line
+//   - (3) reading the inline comments between the current char and the end of
+//     the current line
 //
-// Lines of comments and number of blank lines will be returned.
+// In both cases (1) and (2), there can also be blank lines before the comment
+// starts.
+//
+// Lines of comments and number of blank lines before the comment will be
+// returned. If there is no comment, the returned slice will be empty.
 func (p *parser) skipWhiteSpaceAndReadComments(multiLine bool) ([]string, int) {
 	i := p.index
 	var foundComment, insideComment bool
 	commentBegin := 0
 	var comments []string
+	// Number of blanks lines *before* the comment (if any) starts.
 	blankLines := 0
 	for ; i < p.length; i++ {
 		if p.in[i] == '#' && !insideComment {
@@ -1048,7 +1050,10 @@ type NodeSortFunction func(parent *ast.Node, nodes []*ast.Node) error
 // NodeFilterFunction filters the given nodes.
 type NodeFilterFunction func(nodes []*ast.Node)
 
-func sortAndFilterNodes(parent *ast.Node, nodes []*ast.Node, sortFunction NodeSortFunction, filterFunction NodeFilterFunction) error {
+// ValuesSortFunction sorts the given values.
+type ValuesSortFunction func(values []*ast.Value)
+
+func sortAndFilterNodes(parent *ast.Node, nodes []*ast.Node, sortFunction NodeSortFunction, filterFunction NodeFilterFunction, valuesSortFunction ValuesSortFunction) error {
 	if len(nodes) == 0 {
 		return nil
 	}
@@ -1056,9 +1061,12 @@ func sortAndFilterNodes(parent *ast.Node, nodes []*ast.Node, sortFunction NodeSo
 		filterFunction(nodes)
 	}
 	for _, nd := range nodes {
-		err := sortAndFilterNodes(nd, nd.Children, sortFunction, filterFunction)
+		err := sortAndFilterNodes(nd, nd.Children, sortFunction, filterFunction, valuesSortFunction)
 		if err != nil {
 			return err
+		}
+		if valuesSortFunction != nil && nd.ValuesAsList {
+			valuesSortFunction(nd.Values)
 		}
 	}
 	if sortFunction != nil {
@@ -1418,6 +1426,13 @@ func parseSubfieldSpec(subfieldSpec string) (field string, subfield string) {
 func nodeFilterFunction(c Config) NodeFilterFunction {
 	if c.RemoveDuplicateValuesForRepeatedFields {
 		return RemoveDuplicates
+	}
+	return nil
+}
+
+func valuesSortFunction(c Config) ValuesSortFunction {
+	if c.SortRepeatedFieldsByContent {
+		return ast.SortValues
 	}
 	return nil
 }

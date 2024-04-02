@@ -3,7 +3,9 @@ package pipeline
 import (
 	"fmt"
 
+	"github.com/buildkite/go-pipeline/internal/env"
 	"github.com/buildkite/go-pipeline/ordered"
+	"github.com/buildkite/go-pipeline/warning"
 	"github.com/buildkite/interpolate"
 )
 
@@ -28,19 +30,25 @@ func (p *Pipeline) MarshalJSON() ([]byte, error) {
 // UnmarshalOrdered unmarshals the pipeline from either []any (a legacy
 // sequence of steps) or *ordered.MapSA (a modern pipeline configuration).
 func (p *Pipeline) UnmarshalOrdered(o any) error {
+	var warns []error
+
 	switch o := o.(type) {
 	case *ordered.MapSA:
 		// A pipeline can be a mapping.
 		// Wrap in a secret type to avoid infinite recursion between this method
 		// and ordered.Unmarshal.
 		type wrappedPipeline Pipeline
-		if err := ordered.Unmarshal(o, (*wrappedPipeline)(p)); err != nil {
+		err := ordered.Unmarshal(o, (*wrappedPipeline)(p))
+		if w := warning.As(err); w != nil {
+			warns = append(warns, w)
+		} else if err != nil {
 			return fmt.Errorf("unmarshaling Pipeline: %w", err)
 		}
 
 	case []any:
 		// A pipeline can be a sequence of steps.
-		if err := ordered.Unmarshal(o, &p.Steps); err != nil {
+		err := ordered.Unmarshal(o, &p.Steps)
+		if err != nil {
 			return fmt.Errorf("unmarshaling steps: %w", err)
 		}
 
@@ -51,68 +59,76 @@ func (p *Pipeline) UnmarshalOrdered(o any) error {
 	// Ensure Steps is never nil. Server side expects a sequence.
 	if p.Steps == nil {
 		p.Steps = Steps{}
+		warns = append(warns, warning.New("pipeline contains no steps"))
 	}
-	return nil
+	return warning.Wrap(warns...)
 }
 
-// needed to plug a reggo map into a interpolate.Env
-type mapGetter map[string]string
-
-func (m mapGetter) Get(key string) (string, bool) {
-	v, ok := m[key]
-	return v, ok
+// InterpolationEnv contains environment variables that may be interpolated into
+// a pipeline. Users may define an equivalence between environment variable name, for example
+// the environment variable names may case-insensitive.
+type InterpolationEnv interface {
+	Get(name string) (string, bool)
+	Set(name string, value string)
 }
 
-// Interpolate interpolates variables defined in both env and p.Env into the
-// pipeline.
+// Interpolate interpolates variables defined in both interpolationEnv and p.Env into the pipeline.
 // More specifically, it does these things:
-//   - Interpolate pipeline.Env and copy the results into env to apply later.
+//   - Interpolate pipeline.Env and copy the results into interpolationEnv, provided they don't
+//     conflict, to apply later.
 //   - Interpolate any string value in the rest of the pipeline.
-func (p *Pipeline) Interpolate(env map[string]string) error {
-	if env == nil {
-		env = map[string]string{}
+func (p *Pipeline) Interpolate(interpolationEnv InterpolationEnv) error {
+	if interpolationEnv == nil {
+		interpolationEnv = env.New()
 	}
 
 	// Preprocess any env that are defined in the top level block and place them
 	// into env for later interpolation into the rest of the pipeline.
-	if err := p.interpolateEnvBlock(env); err != nil {
+	if err := p.interpolateEnvBlock(interpolationEnv); err != nil {
 		return err
 	}
 
-	tf := envInterpolator{env: mapGetter(env)}
+	tf := envInterpolator{env: interpolationEnv}
 
 	// Recursively go through the rest of the pipeline and perform environment
 	// variable interpolation on strings. Interpolation is performed in-place.
 	if err := interpolateSlice(tf, p.Steps); err != nil {
 		return err
 	}
+
 	return interpolateMap(tf, p.RemainingFields)
 }
 
 // interpolateEnvBlock runs interpolate.Interpolate on each pair in p.Env,
-// interpolating with the variables defined in env, and then adding the
-// results back into both p.Env and env. Each environment variable can
-// be interpolated into later environment variables, making the input ordering
-// of p.Env potentially important.
-func (p *Pipeline) interpolateEnvBlock(env map[string]string) error {
+// interpolating with the variables defined in interpolationEnv, and then adding the
+// results back into p.Env. Since each environment variable in p.Env can
+// be interpolated into later environment variables, we also add the results
+// to interpolationEnv, but only if interpolationEnv does not already contain that variable
+// as interpolationEnv has precedence over p.Env. For clarification, this means that
+// if a variable name is interpolated to collide with a variable in the
+// interpolationEnv, the interpolationEnv will take precedence.
+func (p *Pipeline) interpolateEnvBlock(interpolationEnv InterpolationEnv) error {
 	return p.Env.Range(func(k, v string) error {
 		// We interpolate both keys and values.
-		intk, err := interpolate.Interpolate(mapGetter(env), k)
+		intk, err := interpolate.Interpolate(interpolationEnv, k)
 		if err != nil {
 			return err
 		}
 
 		// v is always a string in this case.
-		intv, err := interpolate.Interpolate(mapGetter(env), v)
+		intv, err := interpolate.Interpolate(interpolationEnv, v)
 		if err != nil {
 			return err
 		}
 
 		p.Env.Replace(k, intk, intv)
 
-		// Bonus part for the env block!
-		// Add the results back into env.
-		env[intk] = intv
+		// put it into the interpolationEnv for interpolation on a later iteration, but only if it is not
+		// already there, as interpolationEnv has precedence over p.Env
+		if _, exists := interpolationEnv.Get(intk); !exists {
+			interpolationEnv.Set(intk, intv)
+		}
+
 		return nil
 	})
 }

@@ -10,6 +10,17 @@ import (
 )
 
 // Parse parses a pipeline. It does not apply interpolation.
+// Warnings are passed through the err return:
+//
+//	p, err := Parse(src)
+//	if w := warning.As(err); w != nil {
+//		// Here are some warnings that should be shown
+//		log.Printf("*Warning* - pipeline is not fully parsed:\n%v", w)
+//	} else if err != nil {
+//	    // Parse could not understand src at all
+//	    return err
+//	}
+//	// Use p
 func Parse(src io.Reader) (*Pipeline, error) {
 	// First get yaml.v3 to give us a raw document (*yaml.Node).
 	n := new(yaml.Node)
