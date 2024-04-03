@@ -87,7 +87,7 @@ jobs:
           find . -type f
       - uses: actions/setup-go@v5
         with:
-          go-version: 1.21
+          go-version: 1.22
           cache: true
       - uses: sigstore/cosign-installer@v3.1.2         # installs cosign
       - uses: anchore/sbom-action/download-syft@v0.14.3 # installs syft
