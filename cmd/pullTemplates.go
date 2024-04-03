@@ -61,5 +61,5 @@ func init() {
 	// pullTemplatesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	pullTemplatesCmd.Flags().BoolVar(&all, "all", false, "all templates")
 	pullTemplatesCmd.Flags().StringVar(&languageTemplate, "language", "go", "language template")
-	pullTemplatesCmd.Flags().StringVar(&version, "version", "v1.0.0", "Version (latest, v1.0.0 - matching your version)")
+	pullTemplatesCmd.Flags().StringVar(&version, "version", "v1.0.0", "Version (v1.0.0 - matching your version or sha like string)")
 }

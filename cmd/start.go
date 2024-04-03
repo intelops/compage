@@ -51,6 +51,7 @@ This command will start thr gRPC server and allow the gRPC clients to get connec
 		}()
 
 		// this will be the version same as release (as the version is not configurable from the ui)
+		// for local development, you can set the version in the environment variable
 		version := os.Getenv("COMPAGE_CORE_VERSION")
 		if version == "" {
 			// default version
