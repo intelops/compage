@@ -16,11 +16,11 @@ func GetBaseTemplateRootPath() (string, error) {
 }
 
 // GetTemplatesRootPath returns a root path of the language template passed.
-func GetTemplatesRootPath(languageTemplateDirectoryName string) (string, error) {
+func GetTemplatesRootPath(languageTemplateDirectoryName, version string) (string, error) {
 	baseTemplateRootPath, err := GetBaseTemplateRootPath()
 	if err != nil {
 		log.Errorf("error while getting the base template root path [" + err.Error() + "]")
 		return "", err
 	}
-	return baseTemplateRootPath + "/" + languageTemplateDirectoryName, nil
+	return baseTemplateRootPath + "/" + languageTemplateDirectoryName + "/" + version + "/code", nil
 }

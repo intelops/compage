@@ -4,10 +4,12 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	ociregistry "github.com/intelops/compage/cmd/artifacts"
 	"github.com/spf13/cobra"
 )
 
 var (
+	version          string
 	languageTemplate string
 	all              bool
 )
@@ -16,30 +18,30 @@ var (
 var pullTemplatesCmd = &cobra.Command{
 	Use:   "pullTemplates",
 	Short: "Pulls the compage supported templates in the ~/.compage/templates directory",
-	Long:  `Compage supports multiple templates for different languages. You can pull just the required template by lana or all the templates.`,
+	Long:  `Compage supports multiple templates for different languages. You can pull just the required template by language or all the templates.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// common template is required for all the languages
-		err := CloneOrPullRepository("common")
+		err := ociregistry.PullOCIArtifact("common", version)
 		cobra.CheckErr(err)
 		if all {
-			err := CloneOrPullRepository("go")
+			err := ociregistry.PullOCIArtifact("go", version)
 			cobra.CheckErr(err)
-			err = CloneOrPullRepository("python")
+			err = ociregistry.PullOCIArtifact("python", version)
 			cobra.CheckErr(err)
-			err = CloneOrPullRepository("java")
+			err = ociregistry.PullOCIArtifact("java", version)
 			cobra.CheckErr(err)
-			err = CloneOrPullRepository("javascript")
+			err = ociregistry.PullOCIArtifact("javascript", version)
 			cobra.CheckErr(err)
-			err = CloneOrPullRepository("ruby")
+			err = ociregistry.PullOCIArtifact("ruby", version)
 			cobra.CheckErr(err)
-			err = CloneOrPullRepository("rust")
+			err = ociregistry.PullOCIArtifact("rust", version)
 			cobra.CheckErr(err)
-			err = CloneOrPullRepository("typescript")
+			err = ociregistry.PullOCIArtifact("typescript", version)
 			cobra.CheckErr(err)
-			err = CloneOrPullRepository("dotnet")
+			err = ociregistry.PullOCIArtifact("dotnet", version)
 			cobra.CheckErr(err)
 		} else {
-			err := CloneOrPullRepository(languageTemplate)
+			err := ociregistry.PullOCIArtifact(languageTemplate, version)
 			cobra.CheckErr(err)
 		}
 	},
@@ -59,4 +61,5 @@ func init() {
 	// pullTemplatesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	pullTemplatesCmd.Flags().BoolVar(&all, "all", false, "all templates")
 	pullTemplatesCmd.Flags().StringVar(&languageTemplate, "language", "go", "language template")
+	pullTemplatesCmd.Flags().StringVar(&version, "version", "v1.0.0", "Version (v1.0.0 - matching your version or sha like string)")
 }

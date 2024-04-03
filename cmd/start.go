@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	ociregistry "github.com/intelops/compage/cmd/artifacts"
 	"github.com/intelops/compage/config"
 	project "github.com/intelops/compage/gen/api/v1"
 	server "github.com/intelops/compage/grpc"
@@ -49,31 +50,38 @@ This command will start thr gRPC server and allow the gRPC clients to get connec
 			}
 		}()
 
-		err := CloneOrPullRepository("common")
+		// this will be the version same as release (as the version is not configurable from the ui)
+		// for local development, you can set the version in the environment variable
+		version := os.Getenv("COMPAGE_CORE_VERSION")
+		if version == "" {
+			// default version
+			version = "v1.0.0"
+		}
+		err := ociregistry.PullOCIArtifact("common", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("go")
+		err = ociregistry.PullOCIArtifact("go", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("python")
+		err = ociregistry.PullOCIArtifact("python", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("java")
+		err = ociregistry.PullOCIArtifact("java", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("javascript")
+		err = ociregistry.PullOCIArtifact("javascript", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("ruby")
+		err = ociregistry.PullOCIArtifact("ruby", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("rust")
+		err = ociregistry.PullOCIArtifact("rust", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("typescript")
+		err = ociregistry.PullOCIArtifact("typescript", version)
 		cobra.CheckErr(err)
-		err = CloneOrPullRepository("dotnet")
+		err = ociregistry.PullOCIArtifact("dotnet", version)
 		cobra.CheckErr(err)
 
-		// check if the git submodules have been pulled (mainly need to check this on developer's machine)
-		if checkIfGitSubmodulesExist() {
+		// check if the language templates have been pulled (mainly need to check this on developer's machine)
+		if checkIfLanguageTemplatesExist() {
 			err = startGrpcServer()
 			cobra.CheckErr(err)
 		} else {
-			log.Error("starting gRPC server failed as git submodules don't exist")
+			log.Error("starting gRPC server failed as language templates don't exist")
 		}
 	},
 }
@@ -92,7 +100,7 @@ func init() {
 	// startCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func checkIfGitSubmodulesExist() bool {
+func checkIfLanguageTemplatesExist() bool {
 	// currently available templates
 	templates := []string{"common-templates", "compage-template-go", "compage-template-java", "compage-template-python", "compage-template-javascript", "compage-template-ruby", "compage-template-rust", "compage-template-typescript"}
 

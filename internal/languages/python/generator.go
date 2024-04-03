@@ -66,7 +66,7 @@ func Generate(ctx context.Context) error {
 }
 
 func getIntegrationsCopier(pythonValues Values) (map[string]interface{}, error) {
-	pythonTemplatesRootPath := GetPythonTemplatesRootPath()
+	pythonTemplatesRootPath := GetPythonTemplatesRootPath(pythonValues.Values.Version)
 	if pythonTemplatesRootPath == "" {
 		return nil, errors.New("python templates root path is empty")
 	}

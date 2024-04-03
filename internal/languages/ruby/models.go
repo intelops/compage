@@ -19,8 +19,8 @@ func (n *LRubyNode) FillDefaults() error {
 	return nil
 }
 
-func GetRubyTemplatesRootPath() string {
-	templatesRootPath, err := utils.GetTemplatesRootPath(TemplateDirectoryName)
+func GetRubyTemplatesRootPath(version string) string {
+	templatesRootPath, err := utils.GetTemplatesRootPath(TemplateDirectoryName, version)
 	if err != nil {
 		log.Errorf("error while getting the project root path [" + err.Error() + "]")
 		return ""

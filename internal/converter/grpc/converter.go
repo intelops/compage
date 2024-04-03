@@ -17,8 +17,10 @@ func GetProject(input *project.GenerateCodeRequest) (*core.Project, error) {
 	}
 
 	return &core.Project{
-		CompageJSON:         compageJSON,
-		Name:                input.ProjectName,
+		CompageJSON: compageJSON,
+		Name:        input.ProjectName,
+		// latest is the tag for every ui based request
+		Version:             input.ProjectVersion,
 		GitRepositoryName:   input.GitRepositoryName,
 		GitPlatformUserName: input.GitPlatformUserName,
 		GitPlatformURL:      input.GitPlatformURL,

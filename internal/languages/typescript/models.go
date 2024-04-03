@@ -19,8 +19,8 @@ func (n *LTypeScriptNode) FillDefaults() error {
 	return nil
 }
 
-func GetTypeScriptTemplatesRootPath() string {
-	templatesRootPath, err := utils.GetTemplatesRootPath(TemplateDirectoryName)
+func GetTypeScriptTemplatesRootPath(version string) string {
+	templatesRootPath, err := utils.GetTemplatesRootPath(TemplateDirectoryName, version)
 	if err != nil {
 		log.Errorf("error while getting the project root path [" + err.Error() + "]")
 		return ""

@@ -17,24 +17,24 @@ jobs:
       actions: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           token: ${{ secrets.GH_TOKEN }}
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.20'
+          go-version: '1.22'
           cache-dependency-path: '**/go.sum'
       - name: Build
         run: |
           go build -v ./...
       - name: golangci-lint
         run: |
-          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.2
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
           golangci-lint run
       - name: Install Protoc
-        uses: arduino/setup-protoc@v2
+        uses: arduino/setup-protoc@v3
         with:
           version: "23.x"
       - name: Test
@@ -51,7 +51,7 @@ jobs:
           go run main.go pullTemplates --all
           go test -v ./... -race -coverprofile=coverage.out -coverpkg=./... -covermode=atomic
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./coverage.out
           flags: core
@@ -83,14 +83,14 @@ jobs:
       security-events: write
     steps:
       - name: Checkout GitHub Action
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         # setup Docker build action
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Docker metadata
         id: metadata
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ github.repository }}
           tags: |
@@ -100,13 +100,13 @@ jobs:
           flavor: |
             latest=true
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GH_TOKEN }}
       - name: Build image and push to GitHub Container Registry
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           # relative path to the place where source code with Dockerfile is located
           context: .

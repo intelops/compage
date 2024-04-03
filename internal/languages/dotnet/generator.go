@@ -65,7 +65,7 @@ func generateRESTConfig(_ context.Context, dotNetValues *DotNetValues) error {
 }
 
 func getDotNetCleanArchitectureCopier(dotNetValues *DotNetValues) (*dotnetcleanarchitecture.Copier, error) {
-	dotNetTemplatesRootPath := GetDotNetTemplatesRootPath()
+	dotNetTemplatesRootPath := GetDotNetTemplatesRootPath(dotNetValues.Values.Version)
 	if dotNetTemplatesRootPath == "" {
 		return nil, errors.New("dotnet templates root path is empty")
 	}
@@ -138,7 +138,7 @@ func generateIntegrationConfig(dotNetValues *DotNetValues) error {
 }
 
 func getIntegrationsCopier(dotNetValues *DotNetValues) (map[string]interface{}, error) {
-	dotNetTemplatesRootPath := GetDotNetTemplatesRootPath()
+	dotNetTemplatesRootPath := GetDotNetTemplatesRootPath(dotNetValues.Values.Version)
 	if dotNetTemplatesRootPath == "" {
 		return nil, errors.New("dotnet templates root path is empty")
 	}
