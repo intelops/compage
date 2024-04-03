@@ -7,7 +7,7 @@ import (
 )
 
 // TemplateDirectoryName directory of template files
-const TemplateDirectoryName = "compage-template-python/code"
+const TemplateDirectoryName = "compage-template-python"
 
 // LPythonNode language specific struct.
 type LPythonNode struct {

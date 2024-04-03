@@ -7,7 +7,7 @@ import (
 )
 
 // TemplateDirectoryName directory of template files
-const TemplateDirectoryName = "compage-template-typescript/code"
+const TemplateDirectoryName = "compage-template-typescript"
 
 // LTypeScriptNode language specific struct.
 type LTypeScriptNode struct {

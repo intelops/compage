@@ -7,7 +7,7 @@ import (
 )
 
 // TemplateDirectoryName directory of template files
-const TemplateDirectoryName = "compage-template-ruby/code"
+const TemplateDirectoryName = "compage-template-ruby"
 
 // LRubyNode language specific struct.
 type LRubyNode struct {

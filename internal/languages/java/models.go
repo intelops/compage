@@ -7,7 +7,7 @@ import (
 )
 
 // TemplateDirectoryName directory of template files
-const TemplateDirectoryName = "compage-template-java/code"
+const TemplateDirectoryName = "compage-template-java"
 
 var LJavaPlayFramework = "java-play-framework"
 var LJavaMicronautServer = "java-micronaut-server"

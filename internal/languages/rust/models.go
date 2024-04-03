@@ -7,7 +7,7 @@ import (
 )
 
 // TemplateDirectoryName directory of template files
-const TemplateDirectoryName = "compage-template-rust/code"
+const TemplateDirectoryName = "compage-template-rust"
 
 // LRustNode language specific struct.
 type LRustNode struct {
