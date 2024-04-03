@@ -7,7 +7,7 @@ import (
 )
 
 // TemplateDirectoryName directory of template files
-const TemplateDirectoryName = "compage-template-javascript/code"
+const TemplateDirectoryName = "compage-template-javascript"
 
 // LJavaScriptNode language specific struct.
 type LJavaScriptNode struct {

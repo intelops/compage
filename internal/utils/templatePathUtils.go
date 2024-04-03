@@ -22,5 +22,5 @@ func GetTemplatesRootPath(languageTemplateDirectoryName, version string) (string
 		log.Errorf("error while getting the base template root path [" + err.Error() + "]")
 		return "", err
 	}
-	return baseTemplateRootPath + "/" + languageTemplateDirectoryName + "/" + version, nil
+	return baseTemplateRootPath + "/" + languageTemplateDirectoryName + "/" + version + "/code", nil
 }
