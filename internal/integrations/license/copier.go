@@ -20,8 +20,6 @@ type Copier struct {
 }
 
 func NewCopier(project *core.Project) (*Copier, error) {
-	// retrieve project named directory
-	//gitPlatformUserName, gitRepositoryName, projectDirectoryName, templatesRootPath string
 	// populate map to replace templates
 	data := map[string]interface{}{
 		"GitRepositoryName":   project.GitRepositoryName,
