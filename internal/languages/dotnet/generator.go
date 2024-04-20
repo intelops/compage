@@ -11,6 +11,7 @@ import (
 	"github.com/intelops/compage/internal/languages/dotnet/integrations/docker"
 	"github.com/intelops/compage/internal/languages/dotnet/integrations/githubactions"
 	"github.com/intelops/compage/internal/languages/dotnet/integrations/kubernetes"
+	"github.com/intelops/compage/internal/languages/dotnet/integrations/license"
 	"github.com/intelops/compage/internal/languages/templates"
 	"github.com/intelops/compage/internal/utils"
 	log "github.com/sirupsen/logrus"
@@ -113,6 +114,14 @@ func generateIntegrationConfig(dotNetValues *DotNetValues) error {
 		log.Errorf("error while getting the integrations copier [" + err.Error() + "]")
 		return err
 	}
+
+	// license files need to be generated for the whole project so, it should be here.
+	licenseCopier := m["license"].(*license.Copier)
+	if err = licenseCopier.CreateLicenseFiles(); err != nil {
+		log.Errorf("err : %s", err)
+		return err
+	}
+
 	// dockerfile needs to be generated for the whole project, so it should be here.
 	dockerCopier := m["docker"].(*docker.Copier)
 	if err = dockerCopier.CreateDockerFile(); err != nil {
@@ -159,6 +168,9 @@ func getIntegrationsCopier(dotNetValues *DotNetValues) (map[string]interface{}, 
 		restServerPort = ""
 	}
 
+	// create dotnet specific licenseCopier
+	licenseCopier := license.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, dotNetTemplatesRootPath, dotNetValues.LDotNetLangNode.License)
+
 	// create dotnet specific dockerCopier
 	dockerCopier := docker.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, dotNetTemplatesRootPath, isRestServer, restServerPort)
 
@@ -172,5 +184,6 @@ func getIntegrationsCopier(dotNetValues *DotNetValues) (map[string]interface{}, 
 		"docker":        dockerCopier,
 		"k8s":           k8sCopier,
 		"githubActions": githubActionsCopier,
+		"license":       licenseCopier,
 	}, nil
 }

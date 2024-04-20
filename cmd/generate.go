@@ -62,21 +62,26 @@ func GenerateCode() error {
 		return err
 	}
 
-	// assign absolute path to the license file Path if it's not
-	absPath, err := filepath.Abs(coreProject.License.Path)
-	if err != nil {
-		log.Errorf("error while getting absolute path [" + err.Error() + "]")
-		return err
-	}
-	coreProject.License.Path = absPath
-	// assign absolute path to the license file path if it's not (if supplied for the nodes)
-	for _, node := range coreProject.CompageJSON.Nodes {
-		absPath, err = filepath.Abs(node.License.Path)
+	if len(coreProject.License.Path) > 0 {
+		// assign absolute path to the license file Path if it's not
+		absPath, err := filepath.Abs(coreProject.License.Path)
 		if err != nil {
 			log.Errorf("error while getting absolute path [" + err.Error() + "]")
 			return err
 		}
-		node.License.Path = absPath
+		coreProject.License.Path = absPath
+	}
+
+	// assign absolute path to the license file path if it's not (if supplied for the nodes)
+	for _, node := range coreProject.CompageJSON.Nodes {
+		if len(node.License.Path) > 0 {
+			absPath, err := filepath.Abs(node.License.Path)
+			if err != nil {
+				log.Errorf("error while getting absolute path [" + err.Error() + "]")
+				return err
+			}
+			node.License.Path = absPath
+		}
 	}
 
 	// pull all required templates

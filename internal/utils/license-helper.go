@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
@@ -34,6 +33,6 @@ func DownloadFile(destination, src string) error {
 	defer func(file *os.File) {
 		_ = file.Close()
 	}(file)
-	fmt.Printf("Downloaded a file %s with size %d", src, size)
+	log.Debugf("Downloaded a file %s with size %d", src, size)
 	return nil
 }
