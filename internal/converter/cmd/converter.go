@@ -21,6 +21,7 @@ func GetProject(input *models.Project) (*core.Project, error) {
 		CompageJSON:         compageJSON,
 		Name:                input.Name,
 		Version:             input.Version,
+		License:             &input.License,
 		GitPlatformName:     input.GitDetails.Platform.Name,
 		GitPlatformURL:      input.GitDetails.Platform.URL,
 		GitPlatformUserName: input.GitDetails.Platform.UserName,

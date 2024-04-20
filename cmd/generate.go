@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
+	"path/filepath"
 )
 
 // generateCmd represents the generate command
@@ -59,6 +60,23 @@ func GenerateCode() error {
 	if err != nil {
 		log.Errorf("error while converting request to project [" + err.Error() + "]")
 		return err
+	}
+
+	// assign absolute path to the license file Path if it's not
+	absPath, err := filepath.Abs(coreProject.License.Path)
+	if err != nil {
+		log.Errorf("error while getting absolute path [" + err.Error() + "]")
+		return err
+	}
+	coreProject.License.Path = absPath
+	// assign absolute path to the license file path if it's not (if supplied for the nodes)
+	for _, node := range coreProject.CompageJSON.Nodes {
+		absPath, err = filepath.Abs(node.License.Path)
+		if err != nil {
+			log.Errorf("error while getting absolute path [" + err.Error() + "]")
+			return err
+		}
+		node.License.Path = absPath
 	}
 
 	// pull all required templates

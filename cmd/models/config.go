@@ -22,9 +22,16 @@ type GitDetails struct {
 	Platform   Platform   `yaml:"platform,omitempty"`
 }
 
+type License struct {
+	Name string `yaml:"name,omitempty"`
+	URL  string `yaml:"url,omitempty"`
+	Path string `yaml:"path,omitempty"`
+}
+
 type Project struct {
 	Name            string                 `yaml:"name"`
 	Version         string                 `yaml:"version"`
+	License         License                `yaml:"license"`
 	GitDetails      GitDetails             `yaml:"git"`
 	CompageJSON     map[string]interface{} `yaml:"compageJSON"`
 	ProjectMetadata string                 `yaml:"projectMetadata"`
