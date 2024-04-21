@@ -9,14 +9,14 @@ service ProjectService {
 }
 
 message GenerateCodeRequest {
-  string projectVersion = 1;
+  string compageCoreVersion = 1;
   string projectName = 2;
   string projectJSON = 3;
-  string gitRepositoryName = 4;
-  string gitPlatformName = 5;
-  string gitPlatformURL = 6;
-  string gitPlatformUserName = 7;
-  string projectMetadata = 8;
+  string projectMetadata = 4;
+  string gitRepositoryName = 5;
+  string gitPlatformName = 6;
+  string gitPlatformURL = 7;
+  string gitPlatformUserName = 8;
 }
 
 message GenerateCodeResponse{

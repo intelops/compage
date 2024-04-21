@@ -66,7 +66,7 @@ func generateRESTConfig(_ context.Context, dotNetValues *DotNetValues) error {
 }
 
 func getDotNetCleanArchitectureCopier(dotNetValues *DotNetValues) (*dotnetcleanarchitecture.Copier, error) {
-	dotNetTemplatesRootPath := GetDotNetTemplatesRootPath(dotNetValues.Values.Version)
+	dotNetTemplatesRootPath := GetDotNetTemplatesRootPath(dotNetValues.Values.CompageCoreVersion)
 	if dotNetTemplatesRootPath == "" {
 		return nil, errors.New("dotnet templates root path is empty")
 	}
@@ -147,7 +147,7 @@ func generateIntegrationConfig(dotNetValues *DotNetValues) error {
 }
 
 func getIntegrationsCopier(dotNetValues *DotNetValues) (map[string]interface{}, error) {
-	dotNetTemplatesRootPath := GetDotNetTemplatesRootPath(dotNetValues.Values.Version)
+	dotNetTemplatesRootPath := GetDotNetTemplatesRootPath(dotNetValues.Values.CompageCoreVersion)
 	if dotNetTemplatesRootPath == "" {
 		return nil, errors.New("dotnet templates root path is empty")
 	}
@@ -169,7 +169,7 @@ func getIntegrationsCopier(dotNetValues *DotNetValues) (map[string]interface{}, 
 	}
 
 	// create dotnet specific licenseCopier
-	licenseCopier := license.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, dotNetTemplatesRootPath, dotNetValues.LDotNetLangNode.License)
+	licenseCopier := license.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, dotNetTemplatesRootPath, dotNetValues.LDotNetLangNode.Metadata)
 
 	// create dotnet specific dockerCopier
 	dockerCopier := docker.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, dotNetTemplatesRootPath, isRestServer, restServerPort)

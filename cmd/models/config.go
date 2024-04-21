@@ -23,18 +23,17 @@ type GitDetails struct {
 }
 
 type License struct {
-	Name string `yaml:"name,omitempty"`
-	URL  string `yaml:"url,omitempty"`
-	Path string `yaml:"path,omitempty"`
+	Name string `yaml:"name,omitempty" json:"name,omitempty"`
+	URL  string `yaml:"url,omitempty" json:"url,omitempty"`
+	Path string `yaml:"path,omitempty" json:"path,omitempty"`
 }
 
 type Project struct {
-	Name            string                 `yaml:"name"`
-	Version         string                 `yaml:"version"`
-	License         License                `yaml:"license"`
-	GitDetails      GitDetails             `yaml:"git"`
-	CompageJSON     map[string]interface{} `yaml:"compageJSON"`
-	ProjectMetadata string                 `yaml:"projectMetadata"`
+	Name               string                 `yaml:"name"`
+	CompageCoreVersion string                 `yaml:"compageCoreVersion"`
+	GitDetails         GitDetails             `yaml:"git"`
+	CompageJSON        map[string]interface{} `yaml:"compageJSON"`
+	Metadata           map[string]interface{} `yaml:"metadata"`
 }
 
 func ReadConfigYAMLFile(configFile string) (*Project, error) {
