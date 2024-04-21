@@ -27,11 +27,11 @@ const (
 )
 
 type Values struct {
-	TemplateVars      map[TemplateVarKey]string
-	ProjectName       string
-	Version           string
-	NodeDirectoryName string
-	LanguageNode      *LanguageNode
+	TemplateVars       map[TemplateVarKey]string
+	ProjectName        string
+	CompageCoreVersion string
+	NodeDirectoryName  string
+	LanguageNode       *LanguageNode
 }
 
 func (v Values) Get(key TemplateVarKey) string {
@@ -54,10 +54,10 @@ func AddValuesToContext(ctx context.Context, project *core.Project, languageNode
 			GitPlatformURL:      project.GitPlatformURL,
 			GitPlatformUserName: project.GitPlatformUserName,
 		},
-		NodeDirectoryName: nodeDirectoryName,
-		ProjectName:       project.Name,
-		Version:           project.Version,
-		LanguageNode:      languageNode,
+		NodeDirectoryName:  nodeDirectoryName,
+		ProjectName:        project.Name,
+		CompageCoreVersion: project.CompageCoreVersion,
+		LanguageNode:       languageNode,
 	}
 
 	return context.WithValue(ctx, ContextKeyLanguageContextVars, v)

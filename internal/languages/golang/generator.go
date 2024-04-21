@@ -214,7 +214,7 @@ func generateRESTConfig(ctx context.Context, goValues *GoValues) error {
 }
 
 func getCommonFilesCopier(goValues GoValues) (*commonfiles.Copier, error) {
-	goTemplatesRootPath := GetGoTemplatesRootPath(goValues.Values.Version)
+	goTemplatesRootPath := GetGoTemplatesRootPath(goValues.Values.CompageCoreVersion)
 	if goTemplatesRootPath == "" {
 		return nil, errors.New("go templates root path is empty")
 	}
@@ -284,7 +284,7 @@ func getCommonFilesCopier(goValues GoValues) (*commonfiles.Copier, error) {
 }
 
 func getGoGrpcServerCopier(goValues *GoValues) (*gogrpcserver.Copier, error) {
-	goTemplatesRootPath := GetGoTemplatesRootPath(goValues.Values.Version)
+	goTemplatesRootPath := GetGoTemplatesRootPath(goValues.Values.CompageCoreVersion)
 	if goTemplatesRootPath == "" {
 		return nil, errors.New("go templates root path is empty")
 	}
@@ -326,7 +326,7 @@ func getGoGrpcServerCopier(goValues *GoValues) (*gogrpcserver.Copier, error) {
 }
 
 func getGoGinServerCopier(goValues *GoValues) (*goginserver.Copier, error) {
-	goTemplatesRootPath := GetGoTemplatesRootPath(goValues.Values.Version)
+	goTemplatesRootPath := GetGoTemplatesRootPath(goValues.Values.CompageCoreVersion)
 	if goTemplatesRootPath == "" {
 		return nil, errors.New("go templates root path is empty")
 	}
@@ -368,7 +368,7 @@ func getGoGinServerCopier(goValues *GoValues) (*goginserver.Copier, error) {
 }
 
 func getIntegrationsCopier(goValues *GoValues) (map[string]interface{}, error) {
-	goTemplatesRootPath := GetGoTemplatesRootPath(goValues.Values.Version)
+	goTemplatesRootPath := GetGoTemplatesRootPath(goValues.Values.CompageCoreVersion)
 	if goTemplatesRootPath == "" {
 		return nil, errors.New("go templates root path is empty")
 	}
@@ -399,7 +399,7 @@ func getIntegrationsCopier(goValues *GoValues) (map[string]interface{}, error) {
 	projectName := goValues.Values.ProjectName
 
 	// create dotnet specific licenseCopier
-	licenseCopier := license.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, goValues.LGoLangNode.License)
+	licenseCopier := license.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, goValues.LGoLangNode.Metadata)
 
 	// create golang specific dockerCopier
 	dockerCopier := docker.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, isRestServer, restServerPort, isGrpcServer, grpcServerPort)

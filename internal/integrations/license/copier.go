@@ -1,6 +1,7 @@
 package license
 
 import (
+	"encoding/json"
 	"github.com/intelops/compage/cmd/models"
 	"github.com/intelops/compage/internal/core"
 	"github.com/intelops/compage/internal/languages/executor"
@@ -26,18 +27,41 @@ func NewCopier(project *core.Project) (*Copier, error) {
 		"GitPlatformUserName": project.GitPlatformUserName,
 	}
 
-	templatesRootPath, err := utils.GetTemplatesRootPath("common-templates/", project.Version)
+	templatesRootPath, err := utils.GetTemplatesRootPath("common-templates/", project.CompageCoreVersion)
 	if err != nil {
 		log.Errorf("error while getting the project root path [" + err.Error() + "]")
 		return nil, err
 	}
+	// extract license from metadata
+	license := &models.License{}
+	if project.Metadata != nil {
+		l, ok := project.Metadata["license"]
+		if ok {
+			licenseData, err1 := json.Marshal(l)
+			if err1 != nil {
+				log.Errorf("error while marshalling license data [" + err1.Error() + "]")
+				return nil, err1
+			}
+			// for license data
+			err1 = json.Unmarshal(licenseData, license)
+			if err1 != nil {
+				log.Errorf("error while unmarshalling license data [" + err1.Error() + "]")
+				return nil, err1
+			}
+			// this is not required to be set back as we are not modifying the license data
+			//project.Metadata["license"] = license
+		} else {
+			log.Warn("license data not found in project metadata")
+		}
+	}
+
 	return &Copier{
 		// TODO change this path to constant. Add language specific analysers in a generic way later.
 		TemplatesRootPath:    templatesRootPath,
 		ProjectDirectoryName: utils.GetProjectDirectoryName(project.Name),
 		GitRepositoryName:    project.GitRepositoryName,
 		Data:                 data,
-		License:              project.License,
+		License:              license,
 	}, nil
 }
 

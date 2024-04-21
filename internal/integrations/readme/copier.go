@@ -24,7 +24,7 @@ func NewCopier(project *core.Project) (*Copier, error) {
 		"GitPlatformUserName": project.GitPlatformUserName,
 	}
 
-	templatesRootPath, err := utils.GetTemplatesRootPath("common-templates/", project.Version)
+	templatesRootPath, err := utils.GetTemplatesRootPath("common-templates/", project.CompageCoreVersion)
 	if err != nil {
 		log.Errorf("error while getting the project root path [" + err.Error() + "]")
 		return nil, err

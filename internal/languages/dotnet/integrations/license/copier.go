@@ -1,6 +1,7 @@
 package license
 
 import (
+	"encoding/json"
 	corenode "github.com/intelops/compage/internal/core/node"
 	"github.com/intelops/compage/internal/utils"
 	log "github.com/sirupsen/logrus"
@@ -15,13 +16,34 @@ type Copier struct {
 	Data              map[string]interface{}
 }
 
-func NewCopier(gitRepositoryName, gitPlatformUserName, nodeName, nodeDirectoryName, templatesRootPath string, license *corenode.License) *Copier {
+func NewCopier(gitRepositoryName, gitPlatformUserName, nodeName, nodeDirectoryName, templatesRootPath string, metadata map[string]interface{}) *Copier {
 	// populate map to replace templates
 	data := map[string]interface{}{
 		"GitRepositoryName":   gitRepositoryName,
 		"GitPlatformUserName": gitPlatformUserName,
 	}
-
+	// extract license from metadata
+	license := &corenode.License{}
+	if metadata != nil {
+		l, ok := metadata["license"]
+		if ok {
+			licenseData, err1 := json.Marshal(l)
+			if err1 != nil {
+				log.Errorf("error while marshalling node license data [" + err1.Error() + "]")
+				return nil
+			}
+			// for license data
+			err1 = json.Unmarshal(licenseData, license)
+			if err1 != nil {
+				log.Errorf("error while unmarshalling node license data [" + err1.Error() + "]")
+				return nil
+			}
+			// this is not required to be set back as we are not modifying the license data
+			//project.Metadata["license"] = license
+		} else {
+			log.Warn("license data not found in node metadata")
+		}
+	}
 	return &Copier{
 		TemplatesRootPath: templatesRootPath,
 		NodeDirectoryName: nodeDirectoryName,

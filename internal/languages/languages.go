@@ -39,7 +39,6 @@ func NewLanguageNode(compageJSON *core.CompageJSON, node *corenode.Node) (*Langu
 		Metadata:    node.Metadata,
 		Annotations: node.Annotations,
 		Language:    node.Language,
-		License:     node.License,
 	}
 
 	addRestConfig(node, languageNode)

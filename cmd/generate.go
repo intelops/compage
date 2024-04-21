@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	ociregistry "github.com/intelops/compage/cmd/artifacts"
 	"github.com/intelops/compage/cmd/models"
 	"github.com/intelops/compage/internal/converter/cmd"
@@ -62,38 +63,79 @@ func GenerateCode() error {
 		return err
 	}
 
-	if len(coreProject.License.Path) > 0 {
-		// assign absolute path to the license file Path if it's not
-		absPath, err := filepath.Abs(coreProject.License.Path)
-		if err != nil {
-			log.Errorf("error while getting absolute path [" + err.Error() + "]")
-			return err
+	if project.Metadata != nil {
+		license := &models.License{}
+		l, ok := project.Metadata["license"]
+		if ok {
+			// convert the license data to byte array
+			licenseData, err1 := json.Marshal(l)
+			if err1 != nil {
+				log.Errorf("error while marshalling license data [" + err1.Error() + "]")
+				return err1
+			}
+			// convert the license data to license struct
+			err1 = json.Unmarshal(licenseData, license)
+			if err1 != nil {
+				log.Errorf("error while unmarshalling license data [" + err1.Error() + "]")
+				return err1
+			}
+			// assign absolute path to the license file Path if it's not set
+			if len(license.Path) > 0 {
+				// assign absolute path to the license file Path if it's not
+				absPath, err2 := filepath.Abs(license.Path)
+				if err2 != nil {
+					log.Errorf("error while getting absolute path [" + err2.Error() + "]")
+					return err2
+				}
+				license.Path = absPath
+			}
+			project.Metadata["license"] = license
+		} else {
+			log.Warn("license data not found in project metadata")
 		}
-		coreProject.License.Path = absPath
 	}
 
 	// assign absolute path to the license file path if it's not (if supplied for the nodes)
 	for _, node := range coreProject.CompageJSON.Nodes {
-		if len(node.License.Path) > 0 {
-			absPath, err := filepath.Abs(node.License.Path)
-			if err != nil {
-				log.Errorf("error while getting absolute path [" + err.Error() + "]")
-				return err
+		license := &models.License{}
+		l, ok := node.Metadata["license"]
+		if ok {
+			// convert the license data to byte array
+			licenseData, err1 := json.Marshal(l)
+			if err1 != nil {
+				log.Errorf("error while marshalling license data [" + err1.Error() + "]")
+				return err1
 			}
-			node.License.Path = absPath
+			// convert the license data to license struct
+			err1 = json.Unmarshal(licenseData, license)
+			if err1 != nil {
+				log.Errorf("error while unmarshalling license data [" + err1.Error() + "]")
+				return err1
+			}
+			// assign absolute path to the license file Path if it's not set
+			if len(license.Path) > 0 {
+				// assign absolute path to the license file Path if it's not
+				absPath, err2 := filepath.Abs(license.Path)
+				if err2 != nil {
+					log.Errorf("error while getting absolute path [" + err2.Error() + "]")
+					return err2
+				}
+				license.Path = absPath
+			}
+			node.Metadata["license"] = license
 		}
 	}
 
 	// pull all required templates
 	// pull the common templates
-	err = ociregistry.PullOCIArtifact("common", project.Version)
+	err = ociregistry.PullOCIArtifact("common", project.CompageCoreVersion)
 	if err != nil {
 		log.Errorf("error while pulling the common templates [" + err.Error() + "]")
 		return err
 	}
 	for _, node := range coreProject.CompageJSON.Nodes {
 		// make sure that the latest template is pulled
-		err = ociregistry.PullOCIArtifact(node.Language, project.Version)
+		err = ociregistry.PullOCIArtifact(node.Language, project.CompageCoreVersion)
 		if err != nil {
 			log.Errorf("error while pulling the template [" + err.Error() + "]")
 			return err

@@ -58,7 +58,7 @@ func Generate(ctx context.Context) error {
 }
 
 func getIntegrationsCopier(rustValues Values) (map[string]interface{}, error) {
-	rustTemplatesRootPath := GetRustTemplatesRootPath(rustValues.Values.Version)
+	rustTemplatesRootPath := GetRustTemplatesRootPath(rustValues.Values.CompageCoreVersion)
 	if rustTemplatesRootPath == "" {
 		return nil, errors.New("rust templates root path is empty")
 	}

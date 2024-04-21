@@ -66,7 +66,7 @@ func Generate(ctx context.Context) error {
 }
 
 func getIntegrationsCopier(rubyValues Values) (map[string]interface{}, error) {
-	rubyTemplatesRootPath := GetRubyTemplatesRootPath(rubyValues.Values.Version)
+	rubyTemplatesRootPath := GetRubyTemplatesRootPath(rubyValues.Values.CompageCoreVersion)
 	if rubyTemplatesRootPath == "" {
 		return nil, errors.New("ruby templates root path is empty")
 	}

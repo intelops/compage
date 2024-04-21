@@ -1,11 +1,11 @@
 package cmd
 
 import (
+	"github.com/intelops/compage/internal/converter"
 	log "github.com/sirupsen/logrus"
 	"time"
 
 	"github.com/intelops/compage/cmd/models"
-	"github.com/intelops/compage/internal/converter"
 	"github.com/intelops/compage/internal/core"
 )
 
@@ -20,14 +20,13 @@ func GetProject(input *models.Project) (*core.Project, error) {
 	return &core.Project{
 		CompageJSON:         compageJSON,
 		Name:                input.Name,
-		Version:             input.Version,
-		License:             &input.License,
+		CompageCoreVersion:  input.CompageCoreVersion,
 		GitPlatformName:     input.GitDetails.Platform.Name,
 		GitPlatformURL:      input.GitDetails.Platform.URL,
 		GitPlatformUserName: input.GitDetails.Platform.UserName,
 		GitRepositoryName:   input.GitDetails.Repository.Name,
 		GitRepositoryURL:    input.GitDetails.Repository.URL,
-		Metadata:            converter.GetMetadata(input.ProjectMetadata),
+		Metadata:            input.Metadata,
 		ModificationDetails: core.ModificationDetails{
 			CreatedBy: input.GitDetails.Platform.UserName,
 			UpdatedBy: input.GitDetails.Platform.UserName,

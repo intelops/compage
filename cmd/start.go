@@ -52,28 +52,33 @@ This command will start thr gRPC server and allow the gRPC clients to get connec
 
 		// this will be the version same as release (as the version is not configurable from the ui)
 		// for local development, you can set the version in the environment variable
-		version := os.Getenv("COMPAGE_CORE_VERSION")
-		if version == "" {
+		compageCoreVersion := os.Getenv("COMPAGE_CORE_VERSION")
+		if compageCoreVersion == "" {
 			// default version
-			version = "v1.0.0"
+			compageCoreVersion = "v1.0.0"
+			err := os.Setenv("COMPAGE_CORE_VERSION", compageCoreVersion)
+			if err != nil {
+				log.Errorf("error while setting environment variable COMPAGE_CORE_VERSION [%v]", err)
+				return
+			}
 		}
-		err := ociregistry.PullOCIArtifact("common", version)
+		err := ociregistry.PullOCIArtifact("common", compageCoreVersion)
 		cobra.CheckErr(err)
-		err = ociregistry.PullOCIArtifact("go", version)
+		err = ociregistry.PullOCIArtifact("go", compageCoreVersion)
 		cobra.CheckErr(err)
-		err = ociregistry.PullOCIArtifact("python", version)
+		err = ociregistry.PullOCIArtifact("python", compageCoreVersion)
 		cobra.CheckErr(err)
-		err = ociregistry.PullOCIArtifact("java", version)
+		err = ociregistry.PullOCIArtifact("java", compageCoreVersion)
 		cobra.CheckErr(err)
-		err = ociregistry.PullOCIArtifact("javascript", version)
+		err = ociregistry.PullOCIArtifact("javascript", compageCoreVersion)
 		cobra.CheckErr(err)
-		err = ociregistry.PullOCIArtifact("ruby", version)
+		err = ociregistry.PullOCIArtifact("ruby", compageCoreVersion)
 		cobra.CheckErr(err)
-		err = ociregistry.PullOCIArtifact("rust", version)
+		err = ociregistry.PullOCIArtifact("rust", compageCoreVersion)
 		cobra.CheckErr(err)
-		err = ociregistry.PullOCIArtifact("typescript", version)
+		err = ociregistry.PullOCIArtifact("typescript", compageCoreVersion)
 		cobra.CheckErr(err)
-		err = ociregistry.PullOCIArtifact("dotnet", version)
+		err = ociregistry.PullOCIArtifact("dotnet", compageCoreVersion)
 		cobra.CheckErr(err)
 
 		// check if the language templates have been pulled (mainly need to check this on developer's machine)

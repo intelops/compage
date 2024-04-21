@@ -81,7 +81,7 @@ func Generate(ctx context.Context) error {
 }
 
 func getIntegrationsCopier(javascriptValues Values) (map[string]interface{}, error) {
-	javaScriptTemplatesRootPath := GetJavaScriptTemplatesRootPath(javascriptValues.Values.Version)
+	javaScriptTemplatesRootPath := GetJavaScriptTemplatesRootPath(javascriptValues.Values.CompageCoreVersion)
 	if javaScriptTemplatesRootPath == "" {
 		return nil, errors.New("javascript templates root path is empty")
 	}
