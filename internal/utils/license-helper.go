@@ -30,6 +30,10 @@ func DownloadFile(destination, src string) error {
 		_ = Body.Close()
 	}(resp.Body)
 	size, err := io.Copy(file, resp.Body)
+	if err != nil {
+		log.Errorf("error while copying file [" + err.Error() + "]")
+		return err
+	}
 	defer func(file *os.File) {
 		_ = file.Close()
 	}(file)
