@@ -25,10 +25,10 @@ type LanguageNode struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Annotations map[string]string      `json:"annotations,omitempty"`
 	Language    string                 `json:"language"`
-
-	RestConfig *corenode.RestConfig `json:"addRestConfig"`
-	GrpcConfig *corenode.GrpcConfig `json:"grpcConfig"`
-	WsConfig   *corenode.WsConfig   `json:"wsConfig"`
+	License     *corenode.License      `json:"license"`
+	RestConfig  *corenode.RestConfig   `json:"addRestConfig"`
+	GrpcConfig  *corenode.GrpcConfig   `json:"grpcConfig"`
+	WsConfig    *corenode.WsConfig     `json:"wsConfig"`
 }
 
 // NewLanguageNode converts node to LanguageNode struct
@@ -39,6 +39,7 @@ func NewLanguageNode(compageJSON *core.CompageJSON, node *corenode.Node) (*Langu
 		Metadata:    node.Metadata,
 		Annotations: node.Annotations,
 		Language:    node.Language,
+		License:     node.License,
 	}
 
 	addRestConfig(node, languageNode)

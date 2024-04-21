@@ -7,6 +7,8 @@ type Node struct {
 	Language string `json:"language"`
 	// Name of a component (required, this will be service and deployment name).
 	Name string `json:"name"`
+	// License of the component.
+	License *License `json:"license"`
 	// RestConfig holds all config related to REST. If nil, it means that the node is not REST server or has REST clients.
 	RestConfig *RestConfig `json:"restConfig,omitempty"`
 	// GrpcConfig holds all config related to gRPC. If nil, it means that the node is not gRPC server or has gRPC clients.
@@ -17,6 +19,12 @@ type Node struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Annotations hold annotations for the node.
 	Annotations map[string]string `json:"annotations,omitempty"`
+}
+
+type License struct {
+	Name string `yaml:"name,omitempty"`
+	URL  string `yaml:"url,omitempty"`
+	Path string `yaml:"path,omitempty"`
 }
 
 type RestServer struct {

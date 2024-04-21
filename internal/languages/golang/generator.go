@@ -14,6 +14,7 @@ import (
 	"github.com/intelops/compage/internal/languages/golang/integrations/docker"
 	"github.com/intelops/compage/internal/languages/golang/integrations/githubactions"
 	"github.com/intelops/compage/internal/languages/golang/integrations/kubernetes"
+	"github.com/intelops/compage/internal/languages/golang/integrations/license"
 	"github.com/intelops/compage/internal/languages/templates"
 	"github.com/intelops/compage/internal/utils"
 	log "github.com/sirupsen/logrus"
@@ -68,6 +69,14 @@ func generateIntegrationConfig(goValues *GoValues) error {
 		log.Errorf("error while getting the integrations copier [" + err.Error() + "]")
 		return err
 	}
+
+	// license files need to be generated for the whole project so, it should be here.
+	licenseCopier := m["license"].(*license.Copier)
+	if err = licenseCopier.CreateLicenseFiles(); err != nil {
+		log.Errorf("err : %s", err)
+		return err
+	}
+
 	// dockerfile needs to be generated for the whole project, so it should be here.
 	dockerCopier := m["docker"].(*docker.Copier)
 	if err = dockerCopier.CreateDockerFile(); err != nil {
@@ -389,6 +398,9 @@ func getIntegrationsCopier(goValues *GoValues) (map[string]interface{}, error) {
 	projectDirectoryName := utils.GetProjectDirectoryName(goValues.Values.ProjectName)
 	projectName := goValues.Values.ProjectName
 
+	// create dotnet specific licenseCopier
+	licenseCopier := license.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, goValues.LGoLangNode.License)
+
 	// create golang specific dockerCopier
 	dockerCopier := docker.NewCopier(gitPlatformUserName, gitRepositoryName, nodeName, nodeDirectoryName, goTemplatesRootPath, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
@@ -405,6 +417,7 @@ func getIntegrationsCopier(goValues *GoValues) (map[string]interface{}, error) {
 	devContainerCopier := devcontainer.NewCopier(gitPlatformUserName, gitRepositoryName, projectName, nodeName, nodeDirectoryName, goTemplatesRootPath, isRestServer, restServerPort, isGrpcServer, grpcServerPort)
 
 	return map[string]interface{}{
+		"license":       licenseCopier,
 		"docker":        dockerCopier,
 		"k8s":           k8sCopier,
 		"githubActions": githubActionsCopier,
