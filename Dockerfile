@@ -70,4 +70,4 @@ RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 EXPOSE 8080
 EXPOSE 50051
 # Container start command for production
-ENTRYPOINT ["/compage"]
+ENTRYPOINT ["/compage", "start"]
