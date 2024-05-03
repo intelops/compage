@@ -60,6 +60,13 @@ func Generate(ctx context.Context) error {
 		return err
 	}
 
+	// RunSwag runs the swag command to generate the swagger documentation
+	err = RunSwag(goValues.Values.NodeDirectoryName)
+	if err != nil {
+		log.Errorf("err : %s", err)
+		return err
+	}
+	
 	return nil
 }
 

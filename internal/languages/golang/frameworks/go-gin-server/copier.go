@@ -42,6 +42,9 @@ const SQLServiceFile = "sqls-service.go.tmpl"
 const MySQLDaoFile = "mysql-dao.go.tmpl"
 const SQLModelFile = "sqls-model.go.tmpl"
 
+// common file for common utility functions in controllers 
+const ControllersCommonFile = "common.go.tmpl"
+
 const DaoFile = "dao.go.tmpl"
 const SQLiteDaoFile = "sqlite-dao.go.tmpl"
 const MySQLDBConfigFile = "mysql.go.tmpl"
@@ -472,6 +475,15 @@ func (c *Copier) copyNoSQLDBResourceFiles(resourceName string, filePaths []*stri
 	}
 	filePaths = append(filePaths, &targetResourceControllerFileName)
 
+	// copy controller common file to a generated project
+	targetResourceControllerCommonFileName := c.NodeDirectoryName + ControllersPath + "/" + ControllersCommonFile
+	_, err = utils.CopyFile(targetResourceControllerCommonFileName, c.TemplatesRootPath+ControllersPath+"/"+ControllersCommonFile)
+	if err != nil {
+		log.Debugf("error copying controller utils file: %v", err)
+		return nil, err
+	}
+	filePaths = append(filePaths, &targetResourceControllerCommonFileName)
+
 	// copy model files to a generated project
 	targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + strings.Replace(NoSQLModelFile, "nosqls-", "", 1)
 	_, err = utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+NoSQLModelFile)
@@ -515,6 +527,15 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string
 	}
 	filePaths = append(filePaths, &targetResourceControllerFileName)
 
+	// copy controller common file to a generated project
+	targetResourceControllerCommonFileName := c.NodeDirectoryName + ControllersPath + "/" + ControllersCommonFile
+	_, err = utils.CopyFile(targetResourceControllerCommonFileName, c.TemplatesRootPath+ControllersPath+"/"+ControllersCommonFile)
+	if err != nil {
+		log.Debugf("error copying controller utils file: %v", err)
+		return nil, err
+	}
+	filePaths = append(filePaths, &targetResourceControllerCommonFileName)
+	
 	// copy service files to a generated project
 	targetResourceServiceFileName := c.NodeDirectoryName + ServicesPath + "/" + resourceName + "-" + strings.Replace(SQLServiceFile, "sqls-", "", 1)
 	_, err = utils.CopyFile(targetResourceServiceFileName, c.TemplatesRootPath+ServicesPath+"/"+SQLServiceFile)
