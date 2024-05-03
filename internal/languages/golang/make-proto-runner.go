@@ -40,3 +40,9 @@ func RunMakeProto(directoryName string) error {
 	}
 	return fmt.Errorf("%s command doesn't exist", protocCommand)
 }
+
+// as util
+func commandExists(cmd string) bool {
+	_, err := exec.LookPath(cmd)
+	return err == nil
+}
