@@ -1,0 +1,27 @@
+version: 3
+
+tasks:
+  dev-setup:
+    desc: "Setup development environment"
+    cmds:
+      - devbox init -q
+      - devbox add go@1.22.2
+      - devbox run -- go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+      - devbox run -- go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+      - devbox run -- go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
+  build:
+    desc: "build go app"
+    cmds:
+      -  devbox run -- go build -v ./...
+  lint:
+    desc: "lint"
+    cmds:
+      -  devbox run -- golangci-lint run
+  test:
+    desc: "test"
+    cmds:
+      - mkdir -p $HOME/.openapi-generator
+      - chmod -R 777 $HOME/.openapi-generator
+      - wget https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar -O $HOME/.openapi-generator/openapi-generator-cli.jar
+      - go run main.go pullTemplates --all
+      - go test -v ./... -race -coverprofile=coverage.out -coverpkg=./... -covermode=atomic
