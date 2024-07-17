@@ -24,7 +24,7 @@
 
 <hr>
 
-# Compage by IntelOps
+# Compage 
 
 Low-Code Framework to develop Rest APIs, gRPC, dRPC, GraphQL APIs, WebSockets, Micro-services, FaaS, Temporal workloads,
 IoT and edge services, K8s controllers, K8s CRDs, K8s custom APIs, K8s Operators, K8s hooks, etc. with visual coding and
