@@ -51,8 +51,10 @@ const SQLiteDBConfigFile = "sqlite.go.tmpl"
 const SQLGORMModelFile = "sqls-gorm-model.go.tmpl"
 const MySQLGORMDaoFile = "mysql-gorm-dao.go.tmpl"
 const SQLiteGORMDaoFile = "sqlite-gorm-dao.go.tmpl"
+const PostgresGORMDaoFile = "postgresql-gorm-dao.go.tmpl"
 const MySQLGORMDBConfigFile = "mysql-gorm.go.tmpl"
 const SQLiteGORMDBConfigFile = "sqlite-gorm.go.tmpl"
+const PostgresGORMDBConfigFile = "postgresql-gorm.go.tmpl"
 const MapDBConfigFile = "map.go.tmpl"
 
 const ClientFile = "client.go.tmpl"
@@ -68,6 +70,7 @@ const Map = "Map"
 
 const SQLiteGORM = "SQLite-GORM"
 const MySQLGORM = "MySQL-GORM"
+const PostgreSQLGORM = "PostgreSQL-GORM"
 
 // Copier Language specific *Copier
 type Copier struct {
@@ -615,6 +618,24 @@ func (c *Copier) copySQLDBResourceFiles(resourceName string, filePaths []*string
 			return nil, err
 		}
 		filePaths = append(filePaths, &targetResourceDaoFileName)
+	} else if c.SQLDB == PostgreSQLGORM {
+		// model files
+		targetResourceModelFileName := c.NodeDirectoryName + ModelsPath + "/" + resourceName + "-" + strings.Replace(SQLGORMModelFile, "sqls-gorm-", "", 1)
+		_, err = utils.CopyFile(targetResourceModelFileName, c.TemplatesRootPath+ModelsPath+"/"+SQLGORMModelFile)
+		if err != nil {
+			log.Debugf("error copying postgresql model file: %v", err)
+			return nil, err
+		}
+		filePaths = append(filePaths, &targetResourceModelFileName)
+
+		// dao files
+		targetResourceDaoFileName = c.NodeDirectoryName + DaosPath + "/" + resourceName + "-" + strings.Replace(PostgresGORMDaoFile, "postgresql-gorm-", "", 1)
+		_, err = utils.CopyFile(targetResourceDaoFileName, c.TemplatesRootPath+DaosPath+"/"+PostgresGORMDaoFile)
+		if err != nil {
+			log.Debugf("error copying postgresql dao file: %v", err)
+			return nil, err
+		}
+		filePaths = append(filePaths, &targetResourceDaoFileName)
 	}
 	return filePaths, nil
 }
@@ -703,6 +724,17 @@ func (c *Copier) CreateRestServer() error {
 				// client files
 				targetMapConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + MapDBConfigFile
 				_, err = utils.CopyFile(targetMapConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+MapDBConfigFile)
+				if err != nil {
+					log.Debugf("error copying map config file: %v", err)
+					return err
+				}
+				filePaths = append(filePaths, &targetMapConfigFileName)
+				return executor.Execute(filePaths, c.Data)
+			} else if c.SQLDB == PostgreSQLGORM {
+				filePaths = []*string{}
+				// client files
+				targetMapConfigFileName := c.NodeDirectoryName + SQLDBClientsPath + "/" + PostgresGORMDBConfigFile
+				_, err = utils.CopyFile(targetMapConfigFileName, c.TemplatesRootPath+SQLDBClientsPath+"/"+PostgresGORMDBConfigFile)
 				if err != nil {
 					log.Debugf("error copying map config file: %v", err)
 					return err
